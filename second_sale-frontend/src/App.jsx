@@ -61,6 +61,7 @@ import AdminDevices from './pages/admin/AdminDevices.jsx';
 import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminPincodes from './pages/admin/AdminPincodes.jsx';
+import AdminSiteSettings from './pages/admin/AdminSiteSettings.jsx';
 
 function App() {
   const location = useLocation();
@@ -129,6 +130,7 @@ function App() {
             <Route path="partners" element={<AdminPartners />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="pincodes" element={<AdminPincodes />} />
+            <Route path="site-settings" element={<AdminSiteSettings />} />
           </Route>
 
           <Route path="*" element={<NotFoundPage />} />

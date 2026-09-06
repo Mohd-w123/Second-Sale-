@@ -58,7 +58,7 @@ export default function BrandSelectionPage() {
 
   const getBrandColor = (name) => {
     const b = BRANDS.find(br => br.name.toLowerCase() === name.toLowerCase());
-    return b?.color || '#0565E6';
+    return b?.color || '#2563EB';
   };
 
   const getBrandLogo = (name) => {

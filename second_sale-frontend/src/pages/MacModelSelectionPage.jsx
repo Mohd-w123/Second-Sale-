@@ -59,7 +59,7 @@ export default function MacModelSelectionPage() {
           placeholder={`Search ${brandName} iMac models...`}
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full pl-11 pr-4 py-3 border-[1.5px] border-border rounded-xl text-sm bg-white focus:border-[#0565E6] focus:shadow-[0_0_0_3px_rgba(5,101,230,0.15)] outline-none transition-all"
+          className="w-full pl-11 pr-4 py-3 border-[1.5px] border-border rounded-xl text-sm bg-white focus:border-[#2563EB] focus:shadow-[0_0_0_3px_rgba(5,101,230,0.15)] outline-none transition-all"
         />
       </div>
 
@@ -74,9 +74,9 @@ export default function MacModelSelectionPage() {
             <Link
               key={model.slug}
               to={`/sell-imac/${brand}/${model.slug}`}
-              className="group bg-white rounded-2xl border border-border p-4 sm:p-5 transition-all duration-200 hover:border-[#0565E6] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(5,101,230,0.12)] no-underline flex flex-col"
+              className="group bg-white rounded-2xl border border-border p-4 sm:p-5 transition-all duration-200 hover:border-[#2563EB] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(5,101,230,0.12)] no-underline flex flex-col"
             >
-              <div className="bg-gray-50 rounded-xl h-28 sm:h-36 flex items-center justify-center mb-4 group-hover:bg-[#0565E6]/5 transition-colors relative">
+              <div className="bg-gray-50 rounded-xl h-28 sm:h-36 flex items-center justify-center mb-4 group-hover:bg-[#2563EB]/5 transition-colors relative">
                 {model.imageUrl ? (
                   <img src={model.imageUrl} alt={model.modelName} className="h-24 sm:h-28 object-contain" />
                 ) : (
@@ -101,7 +101,7 @@ export default function MacModelSelectionPage() {
               <p className="text-xs text-text-muted mb-3">Upto {formatCurrency(model.maxPrice)}</p>
 
               <div className="mt-auto">
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0565E6] bg-[#0565E6]/5 px-3 py-1.5 rounded-lg group-hover:bg-[#0565E6] group-hover:text-white transition-colors">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2563EB] bg-[#2563EB]/5 px-3 py-1.5 rounded-lg group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
                   Get Quote →
                 </span>
               </div>

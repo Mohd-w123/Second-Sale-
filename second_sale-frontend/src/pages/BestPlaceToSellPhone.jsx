@@ -45,7 +45,7 @@ export default function BestPlaceToSellPhone() {
               <span className="text-sm text-gray-500 w-36">{p.type}</span>
               <span className="text-sm text-gray-600 flex-1">{p.bestFor}</span>
               {p.link && (
-                <Link to={p.link} className="text-[#0565E6] font-bold text-sm whitespace-nowrap hover:underline">
+                <Link to={p.link} className="text-[#2563EB] font-bold text-sm whitespace-nowrap hover:underline">
                   Sell now →
                 </Link>
               )}
@@ -53,7 +53,7 @@ export default function BestPlaceToSellPhone() {
           ))}
         </div>
 
-        <div className="bg-[#EEF4FF] rounded-2xl p-6 mb-8">
+        <div className="bg-[#E6F4FF] rounded-2xl p-6 mb-8">
           <h2 className="text-xl font-black text-gray-900 mb-3">Sell on SecondSale in 3 steps</h2>
           <ol className="text-sm text-gray-600 space-y-2 list-decimal list-inside">
             <li>Select your phone brand and model for an instant price quote</li>
@@ -62,7 +62,7 @@ export default function BestPlaceToSellPhone() {
           </ol>
           <Link
             to="/sell-old-mobile-phones/brand"
-            className="inline-flex mt-4 bg-[#0565E6] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#044ab8] transition-colors no-underline"
+            className="inline-flex mt-4 bg-[#2563EB] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#1D4ED8] transition-colors no-underline"
           >
             Get instant quote
           </Link>

@@ -46,7 +46,7 @@ export default function CategoryHubPage() {
 
         <Link
           to={hub.path}
-          className="inline-flex bg-[#0565E6] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#044ab8] transition-colors no-underline mb-10"
+          className="inline-flex bg-[#2563EB] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#1D4ED8] transition-colors no-underline mb-10"
         >
           Get instant quote →
         </Link>

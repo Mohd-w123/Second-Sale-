@@ -39,19 +39,19 @@ export default function AboutUs() {
         schema={schema}
       />
       {/* ── HERO SECTION ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#EEF4FF] via-white to-white pt-10 pb-12 px-4">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-10 pb-12 px-4">
         {/* Decorative background blobs */}
-        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#0565E6]/5 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#0565E6]/5 blur-3xl" />
+        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#2563EB]/5 blur-3xl" />
 
         <div className="max-w-[1000px] mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-[#EEF4FF] border border-[#0565E6]/20 rounded-full px-4 py-1.5 text-xs font-bold text-[#0565E6] mb-6 shadow-sm shadow-[#0565E6]/5">
+          <div className="inline-flex items-center gap-2 bg-[#E6F4FF] border border-[#2563EB]/20 rounded-full px-4 py-1.5 text-xs font-bold text-[#2563EB] mb-6 shadow-sm shadow-[#2563EB]/5">
             <Sparkles size={13} className="animate-pulse" />
             Trusted Tech Buyback Partner
           </div>
           
           <h1 className="text-[2.5rem] sm:text-[3.5rem] font-black text-gray-900 leading-tight tracking-tight mb-6">
-            About <span className="text-[#0565E6]">Swastika Innovation</span>
+            About <span className="text-[#2563EB]">Swastika Innovation</span>
           </h1>
 
           <p className="text-base sm:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto font-medium">
@@ -64,7 +64,7 @@ export default function AboutUs() {
       <section className="py-10 sm:py-16 bg-white border-t border-gray-50">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="text-center mb-10">
-            <span className="inline-block bg-[#EEF4FF] text-[#0565E6] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#0565E6]/10">
+            <span className="inline-block bg-[#E6F4FF] text-[#2563EB] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#2563EB]/10">
               Our Core Business
             </span>
             <h2 className="text-2xl sm:text-[2.25rem] font-extrabold text-gray-900 mb-4 tracking-tight">
@@ -79,7 +79,7 @@ export default function AboutUs() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {[
               {
-                icon: <Smartphone size={28} className="text-[#0565E6]" />,
+                icon: <Smartphone size={28} className="text-[#2563EB]" />,
                 title: "Mobile Phones & Laptops",
                 desc: "Premium pre-owned smartphones and high-performance notebooks restored to flawless functionality.",
                 color: "from-blue-50 to-indigo-50",
@@ -109,12 +109,12 @@ export default function AboutUs() {
             ].map((item, index) => (
               <div 
                 key={index}
-                className="group relative flex flex-col bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 hover:border-[#0565E6]/30 hover:shadow-xl hover:shadow-gray-100 transition-all duration-300 hover:-translate-y-1"
+                className="group relative flex flex-col bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 hover:border-[#2563EB]/30 hover:shadow-xl hover:shadow-gray-100 transition-all duration-300 hover:-translate-y-1"
               >
                 <div className={`w-12 h-12 ${item.iconBg} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                   {item.icon}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-[#0565E6] transition-colors">
+                <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-[#2563EB] transition-colors">
                   {item.title}
                 </h3>
                 <p className="text-sm text-gray-500 leading-relaxed">
@@ -125,8 +125,8 @@ export default function AboutUs() {
           </div>
 
           {/* Mission Note Banner */}
-          <div className="bg-[#F8FAFF] rounded-3xl p-8 sm:p-10 border border-[#0565E6]/10 flex flex-col sm:flex-row items-center gap-6 max-w-4xl mx-auto shadow-sm">
-            <div className="w-14 h-14 bg-[#0565E6] text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#0565E6]/20">
+          <div className="bg-[#F7FAFF] rounded-3xl p-8 sm:p-10 border border-[#2563EB]/10 flex flex-col sm:flex-row items-center gap-6 max-w-4xl mx-auto shadow-sm">
+            <div className="w-14 h-14 bg-[#2563EB] text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#2563EB]/20">
               <ShieldCheck size={26} />
             </div>
             <div>
@@ -140,14 +140,14 @@ export default function AboutUs() {
       </section>
 
       {/* ── VISION & MISSION ── */}
-      <section className="py-10 sm:py-16 bg-gradient-to-b from-white to-[#F8FAFF] border-t border-gray-50">
+      <section className="py-10 sm:py-16 bg-gradient-to-b from-white to-[#F7FAFF] border-t border-gray-50">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             
             {/* Vision Card */}
-            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-lg relative overflow-hidden group hover:border-[#0565E6]/30 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#EEF4FF] rounded-bl-full -z-10 group-hover:bg-[#0565E6]/5 transition-colors" />
-              <div className="w-12 h-12 bg-[#EEF4FF] rounded-xl flex items-center justify-center text-[#0565E6] mb-6">
+            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-lg relative overflow-hidden group hover:border-[#2563EB]/30 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#E6F4FF] rounded-bl-full -z-10 group-hover:bg-[#2563EB]/5 transition-colors" />
+              <div className="w-12 h-12 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB] mb-6">
                 <Eye size={24} />
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-4">Our Vision</h3>
@@ -157,9 +157,9 @@ export default function AboutUs() {
             </div>
 
             {/* Mission Card */}
-            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-lg relative overflow-hidden group hover:border-[#0565E6]/30 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#EEF4FF] rounded-bl-full -z-10 group-hover:bg-[#0565E6]/5 transition-colors" />
-              <div className="w-12 h-12 bg-[#EEF4FF] rounded-xl flex items-center justify-center text-[#0565E6] mb-6">
+            <div className="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-lg relative overflow-hidden group hover:border-[#2563EB]/30 transition-all duration-300">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#E6F4FF] rounded-bl-full -z-10 group-hover:bg-[#2563EB]/5 transition-colors" />
+              <div className="w-12 h-12 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB] mb-6">
                 <Target size={24} />
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-4">Our Mission</h3>
@@ -173,10 +173,10 @@ export default function AboutUs() {
       </section>
 
       {/* ── MEET OUR LEADERSHIP ── */}
-      <section className="py-10 sm:py-16 bg-[#F8FAFF] border-t border-b border-gray-100">
+      <section className="py-10 sm:py-16 bg-[#F7FAFF] border-t border-b border-gray-100">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="text-center mb-10">
-            <span className="inline-block bg-[#EEF4FF] text-[#0565E6] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#0565E6]/10">
+            <span className="inline-block bg-[#E6F4FF] text-[#2563EB] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#2563EB]/10">
               Leadership
             </span>
             <h2 className="text-2xl sm:text-[2.25rem] font-extrabold text-gray-900 mb-4 tracking-tight">
@@ -233,21 +233,21 @@ export default function AboutUs() {
             <div className="bg-white rounded-[28px] p-8 sm:p-10 border border-gray-100 shadow-md flex flex-col justify-between hover:shadow-xl transition-all duration-300">
               <div>
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md shadow-[#0565E6]/20">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md shadow-[#2563EB]/20">
                     PV
                   </div>
                   <div>
                     <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-none">Pankaj Vinda</h3>
-                    <p className="text-xs sm:text-sm font-bold text-[#0565E6] mt-1.5 uppercase tracking-wider">Founder</p>
+                    <p className="text-xs sm:text-sm font-bold text-[#2563EB] mt-1.5 uppercase tracking-wider">Founder</p>
                   </div>
                 </div>
 
                 <div className="bg-blue-50/50 rounded-2xl p-5 border border-blue-100/50 mb-6">
-                  <span className="text-xs font-bold text-[#0565E6] uppercase tracking-widest block mb-1">Expertise Accent</span>
+                  <span className="text-xs font-bold text-[#2563EB] uppercase tracking-widest block mb-1">Expertise Accent</span>
                   <div className="text-base sm:text-lg font-extrabold text-gray-900">
                     25+ Years in Consumer Electronics
                   </div>
-                  <div className="text-xs sm:text-sm text-[#0565E6] mt-1">
+                  <div className="text-xs sm:text-sm text-[#2563EB] mt-1">
                     Including 5+ years of hands-on e-commerce leadership.
                   </div>
                 </div>
@@ -265,7 +265,7 @@ export default function AboutUs() {
                     "His vision is to deliver quality products, fair pricing, and a customer-first experience that people can trust."
                   ].map((bullet, i) => (
                     <div key={i} className="flex items-start gap-3 text-xs sm:text-sm text-gray-600">
-                      <div className="w-5 h-5 bg-blue-50 text-[#0565E6] rounded-full flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                      <div className="w-5 h-5 bg-blue-50 text-[#2563EB] rounded-full flex items-center justify-center shrink-0 mt-0.5 font-bold">
                         <CheckCircle2 size={13} strokeWidth={2.5} />
                       </div>
                       <span className="leading-relaxed">{bullet}</span>
@@ -288,7 +288,7 @@ export default function AboutUs() {
       {/* ── OUR COMMITMENT SECTION ── */}
       <section className="py-10 sm:py-16 bg-white relative overflow-hidden">
         <div className="max-w-[900px] mx-auto px-4 text-center relative z-10">
-          <span className="inline-block bg-[#EEF4FF] text-[#0565E6] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-6 border border-[#0565E6]/10">
+          <span className="inline-block bg-[#E6F4FF] text-[#2563EB] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-6 border border-[#2563EB]/10">
             Our Guarantee
           </span>
           <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-6 tracking-tight">
@@ -299,20 +299,20 @@ export default function AboutUs() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="inline-flex items-center gap-2 bg-[#EEF4FF] text-[#0565E6] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#0565E6]/10 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#2563EB] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#2563EB]/10 shadow-sm">
               <ShieldCheck size={16} /> Transparent Pricing
             </div>
-            <div className="inline-flex items-center gap-2 bg-[#EEF4FF] text-[#0565E6] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#0565E6]/10 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#2563EB] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#2563EB]/10 shadow-sm">
               <CheckCircle2 size={16} /> Rigorous Quality Inspection
             </div>
-            <div className="inline-flex items-center gap-2 bg-[#EEF4FF] text-[#0565E6] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#0565E6]/10 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#2563EB] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#2563EB]/10 shadow-sm">
               <Globe size={16} /> Ethical Circular Economy
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-12 bg-[#F8FAFF] border-t border-gray-100">
+      <section className="py-12 bg-[#F7FAFF] border-t border-gray-100">
         <div className="max-w-[800px] mx-auto px-4 text-center">
           <h2 className="text-lg font-black text-gray-900 mb-3">About SecondSale in 30 seconds</h2>
           <p className="text-sm text-gray-600 leading-relaxed">{ENTITY_SUMMARY}</p>

@@ -52,7 +52,7 @@ export default function LaptopBrandSelectionPage() {
 
   const getBrandColor = (name) => {
     const b = LAPTOP_BRANDS.find(br => br.name.toLowerCase() === name.toLowerCase());
-    return b?.color || '#0565E6';
+    return b?.color || '#2563EB';
   };
 
   const getBrandLogo = (name) => {

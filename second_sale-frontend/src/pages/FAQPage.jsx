@@ -35,7 +35,7 @@ export default function FAQPage() {
         </div>
         <p className="mt-10 text-sm text-gray-500">
           Still have questions?{' '}
-          <Link to="/help-center" className="text-[#0565E6] font-bold hover:underline">
+          <Link to="/help-center" className="text-[#2563EB] font-bold hover:underline">
             Contact our support team
           </Link>
           .

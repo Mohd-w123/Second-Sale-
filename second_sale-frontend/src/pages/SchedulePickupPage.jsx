@@ -115,13 +115,13 @@ export default function SchedulePickupPage() {
           </button>
           <div className="flex items-center gap-12 text-sm font-bold">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#0565E6]/20 text-[#0565E6] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[#2563EB]/20 text-[#2563EB] flex items-center justify-center">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
               <span className="text-gray-400">Payment</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-[#0565E6] text-white flex items-center justify-center">2</span>
+              <span className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center">2</span>
               <span className="text-[#111827]">Pickup</span>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function SchedulePickupPage() {
                 </div>
                 <button 
                   onClick={() => setShowAddressModal(true)}
-                  className="flex items-center gap-2 bg-[#E8F1FF] text-[#0565E6] px-5 py-2.5 rounded-xl font-black text-sm hover:bg-[#0565E6] hover:text-white transition-all"
+                  className="flex items-center gap-2 bg-[#E6F4FF] text-[#2563EB] px-5 py-2.5 rounded-xl font-black text-sm hover:bg-[#2563EB] hover:text-white transition-all"
                 >
                   <span className="text-lg">+</span> Add New Address
                 </button>
@@ -152,7 +152,7 @@ export default function SchedulePickupPage() {
                       key={addr._id}
                       className={`p-6 rounded-[32px] border-2 cursor-pointer transition-all flex items-start gap-4
                         ${selectedAddressId === addr._id 
-                          ? 'border-[#0565E6] bg-[#E8F1FF]' 
+                          ? 'border-[#2563EB] bg-[#E6F4FF]' 
                           : 'border-gray-50 bg-gray-50/50 hover:border-gray-200'}`}
                     >
                       <input 
@@ -163,7 +163,7 @@ export default function SchedulePickupPage() {
                         className="sr-only"
                       />
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0
-                        ${selectedAddressId === addr._id ? 'bg-[#0565E6] text-white' : 'bg-white text-gray-400'}`}>
+                        ${selectedAddressId === addr._id ? 'bg-[#2563EB] text-white' : 'bg-white text-gray-400'}`}>
                         {addr.label === 'Home' ? (
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                         ) : (
@@ -175,7 +175,7 @@ export default function SchedulePickupPage() {
                         <p className="text-xs text-gray-500 font-medium line-clamp-2 leading-relaxed">{addr.address}, {addr.city}, {addr.pincode}</p>
                       </div>
                       {selectedAddressId === addr._id && (
-                        <div className="ml-auto w-5 h-5 bg-[#0565E6] rounded-full flex items-center justify-center shrink-0">
+                        <div className="ml-auto w-5 h-5 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0">
                           <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="3" strokeLinecap="round"/></svg>
                         </div>
                       )}
@@ -209,9 +209,9 @@ export default function SchedulePickupPage() {
                         key={d.toISOString()} 
                         onClick={() => setSelectedDate(d)}
                         className={`min-w-[100px] p-5 rounded-[28px] border-2 transition-all flex flex-col items-center gap-1
-                          ${isSelected ? 'border-[#0565E6] bg-[#E8F1FF]' : 'border-gray-50 bg-gray-50/50 hover:border-gray-100'}`}
+                          ${isSelected ? 'border-[#2563EB] bg-[#E6F4FF]' : 'border-gray-50 bg-gray-50/50 hover:border-gray-100'}`}
                       >
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-[#0565E6]' : 'text-gray-400'}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${isSelected ? 'text-[#2563EB]' : 'text-gray-400'}`}>
                           {dayName}
                         </span>
                         <span className="text-2xl font-black text-[#111827]">{d.getDate()}</span>
@@ -228,7 +228,7 @@ export default function SchedulePickupPage() {
                       key={slot.value} 
                       onClick={() => setSelectedSlot(slot.value)}
                       className={`p-5 rounded-2xl border-2 font-bold transition-all relative
-                        ${selectedSlot === slot.value ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' : 'border-gray-50 bg-gray-50/50 text-gray-500 hover:border-gray-100'}`}
+                        ${selectedSlot === slot.value ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' : 'border-gray-50 bg-gray-50/50 text-gray-500 hover:border-gray-100'}`}
                     >
                       {slot.popular && (
                         <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-amber-400 text-[9px] font-black text-white px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm border border-white">Popular</span>
@@ -249,31 +249,31 @@ export default function SchedulePickupPage() {
 
               <div className="space-y-4">
                 {/* UPI */}
-                <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'upi' ? 'border-[#0565E6] bg-[#E8F1FF]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
+                <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'upi' ? 'border-[#2563EB] bg-[#E6F4FF]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
                   <div className="flex items-center gap-6" onClick={() => setPaymentType('upi')}>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'upi' ? 'bg-[#0565E6] text-white border-[#0565E6]' : 'bg-white text-gray-500 border-gray-100'}`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'upi' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-white text-gray-500 border-gray-100'}`}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                     </div>
                     <div className="flex-1">
                       <p className="font-black text-[#111827] text-lg">UPI</p>
                       <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Add UPI ID</p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'upi' ? 'border-[#0565E6] bg-[#0565E6]' : 'border-gray-300'}`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'upi' ? 'border-[#2563EB] bg-[#2563EB]' : 'border-gray-300'}`}>
                       {paymentType === 'upi' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                     </div>
                   </div>
                   
                   {paymentType === 'upi' && (
-                    <div className="mt-6 pt-6 border-t border-[#0565E6]/20">
+                    <div className="mt-6 pt-6 border-t border-[#2563EB]/20">
                       <div className="space-y-3 mb-4">
                         {user?.paymentMethods?.filter(pm => pm.type === 'upi').map(pm => (
-                          <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#0565E6]/5 transition-colors">
+                          <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#2563EB]/5 transition-colors">
                             <input 
                               type="radio" 
                               name="upiId" 
                               checked={selectedPaymentId === pm._id}
                               onChange={() => setSelectedPaymentId(pm._id)}
-                              className="w-4 h-4 text-[#0565E6] focus:ring-[#0565E6] cursor-pointer"
+                              className="w-4 h-4 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer"
                             />
                             <span className="font-bold text-[#111827] text-sm">{pm.upiId}</span>
                           </label>
@@ -281,7 +281,7 @@ export default function SchedulePickupPage() {
                       </div>
                       <button 
                         onClick={() => setShowPaymentModal('upi')}
-                        className="text-sm font-black text-[#0565E6] hover:text-[#044ab8] flex items-center gap-2"
+                        className="text-sm font-black text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-2"
                       >
                         <span className="text-lg">+</span> Add New UPI ID
                       </button>
@@ -290,31 +290,31 @@ export default function SchedulePickupPage() {
                 </div>
 
                 {/* Bank */}
-                <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'bank' ? 'border-[#0565E6] bg-[#E8F1FF]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
+                <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'bank' ? 'border-[#2563EB] bg-[#E6F4FF]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
                   <div className="flex items-center gap-6" onClick={() => setPaymentType('bank')}>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'bank' ? 'bg-[#0565E6] text-white border-[#0565E6]' : 'bg-white text-gray-500 border-gray-100'}`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'bank' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-white text-gray-500 border-gray-100'}`}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
                     </div>
                     <div className="flex-1">
                       <p className="font-black text-[#111827] text-lg">Bank</p>
                       <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Add Bank Details</p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'bank' ? 'border-[#0565E6] bg-[#0565E6]' : 'border-gray-300'}`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'bank' ? 'border-[#2563EB] bg-[#2563EB]' : 'border-gray-300'}`}>
                       {paymentType === 'bank' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                     </div>
                   </div>
 
                   {paymentType === 'bank' && (
-                    <div className="mt-6 pt-6 border-t border-[#0565E6]/20">
+                    <div className="mt-6 pt-6 border-t border-[#2563EB]/20">
                       <div className="space-y-3 mb-4">
                         {user?.paymentMethods?.filter(pm => pm.type === 'bank').map(pm => (
-                          <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#0565E6]/5 transition-colors">
+                          <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#2563EB]/5 transition-colors">
                             <input 
                               type="radio" 
                               name="bankId" 
                               checked={selectedPaymentId === pm._id}
                               onChange={() => setSelectedPaymentId(pm._id)}
-                              className="w-4 h-4 text-[#0565E6] focus:ring-[#0565E6] cursor-pointer"
+                              className="w-4 h-4 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer"
                             />
                             <div className="flex flex-col">
                               <span className="font-bold text-[#111827] text-sm">{pm.bankName} - {pm.accountNumber.slice(-4)}</span>
@@ -325,7 +325,7 @@ export default function SchedulePickupPage() {
                       </div>
                       <button 
                         onClick={() => setShowPaymentModal('bank')}
-                        className="text-sm font-black text-[#0565E6] hover:text-[#044ab8] flex items-center gap-2"
+                        className="text-sm font-black text-[#2563EB] hover:text-[#1D4ED8] flex items-center gap-2"
                       >
                         <span className="text-lg">+</span> Add New Bank Account
                       </button>
@@ -335,18 +335,18 @@ export default function SchedulePickupPage() {
 
                 {/* Cash */}
                 <div 
-                  className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'cash' ? 'border-[#0565E6] bg-[#E8F1FF]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}
+                  className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'cash' ? 'border-[#2563EB] bg-[#E6F4FF]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}
                   onClick={() => setPaymentType('cash')}
                 >
                   <div className="flex items-center gap-6">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'cash' ? 'bg-[#0565E6] text-white border-[#0565E6]' : 'bg-white text-gray-500 border-gray-100'}`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'cash' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-white text-gray-500 border-gray-100'}`}>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
                     </div>
                     <div className="flex-1">
                       <p className="font-black text-[#111827] text-lg">Cash</p>
                       <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Cash Payment</p>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'cash' ? 'border-[#0565E6] bg-[#0565E6]' : 'border-gray-300'}`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'cash' ? 'border-[#2563EB] bg-[#2563EB]' : 'border-gray-300'}`}>
                       {paymentType === 'cash' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                     </div>
                   </div>
@@ -376,11 +376,11 @@ export default function SchedulePickupPage() {
               <div className="space-y-5">
                 <PriceRow label="Final Offer" value={quote.priceBreakdown?.finalPrice} />
                 <div className="pt-5 border-t border-gray-100 flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-[#0565E6]">
+                  <div className="flex items-center gap-2 text-[#2563EB]">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
                     <span className="text-[11px] font-black uppercase tracking-wider">Free doorstep pickup</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[#0565E6]">
+                  <div className="flex items-center gap-2 text-[#2563EB]">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
                     <span className="text-[11px] font-black uppercase tracking-wider">Instant payment at pickup</span>
                   </div>
@@ -390,7 +390,7 @@ export default function SchedulePickupPage() {
               <button 
                 disabled={submitting || !selectedAddressId || !selectedDate || !selectedSlot}
                 onClick={handleCreateOrder}
-                className="w-full mt-8 bg-[#0565E6] text-white font-black py-5 rounded-2xl hover:bg-[#044BA8] transition-all shadow-xl shadow-blue-100 disabled:opacity-50 disabled:shadow-none"
+                className="w-full mt-8 bg-[#2563EB] text-white font-black py-5 rounded-2xl hover:bg-[#1D4ED8] transition-all shadow-xl shadow-blue-100 disabled:opacity-50 disabled:shadow-none"
               >
                 {submitting ? 'Scheduling...' : `Confirm Order — ${formatCurrency(quote.priceBreakdown?.finalPrice)}`}
               </button>
@@ -515,7 +515,7 @@ function CreateAddressModal({ onClose }) {
         </button>
 
         <div className="flex items-center gap-4 mb-10">
-          <div className="w-12 h-12 bg-[#E8F1FF] rounded-2xl flex items-center justify-center text-[#0565E6]">
+          <div className="w-12 h-12 bg-[#E6F4FF] rounded-2xl flex items-center justify-center text-[#2563EB]">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </div>
           <h2 className="text-2xl font-black text-[#111827]">Create New Address</h2>
@@ -535,7 +535,7 @@ function CreateAddressModal({ onClose }) {
                     type="button" 
                     onClick={() => setForm({ ...form, label: type })}
                     className={`flex-1 py-4 rounded-2xl border-2 font-black text-sm transition-all
-                      ${form.label === type ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' : 'border-gray-100 text-gray-400 hover:border-gray-200'}`}
+                      ${form.label === type ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' : 'border-gray-100 text-gray-400 hover:border-gray-200'}`}
                   >
                     {type}
                   </button>
@@ -554,7 +554,7 @@ function CreateAddressModal({ onClose }) {
                   value={searchText}
                   onChange={(e) => handleSearch(e.target.value)}
                   placeholder="Search here to autofill address" 
-                  className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all pr-32"
+                  className="w-full bg-gray-50 border-2 border-gray-50 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all pr-32"
                 />
                 <button 
                   type="button" 
@@ -578,7 +578,7 @@ function CreateAddressModal({ onClose }) {
                 placeholder="Enter building details" 
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
-                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
                 required
               />
             </div>
@@ -596,7 +596,7 @@ function CreateAddressModal({ onClose }) {
                   onChange={(e) => handlePincodeChange(e.target.value)}
                   maxLength={6}
                   className={`w-full bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none transition-all ${
-                    pincodeError ? 'border-red-400 focus:border-red-400' : 'border-gray-100 focus:border-[#0565E6]'
+                    pincodeError ? 'border-red-400 focus:border-red-400' : 'border-gray-100 focus:border-[#2563EB]'
                   }`}
                   required
                 />
@@ -630,7 +630,7 @@ function CreateAddressModal({ onClose }) {
                 placeholder="Enter landmark details" 
                 value={form.landmark}
                 onChange={(e) => setForm({ ...form, landmark: e.target.value })}
-                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
               />
             </div>
 
@@ -662,7 +662,7 @@ function CreateAddressModal({ onClose }) {
           <button 
             type="submit" 
             disabled={loading || !!pincodeError || pincodeChecking}
-            className="w-full mt-6 bg-[#0565E6] text-white font-black py-5 rounded-[24px] hover:bg-[#044ab8] transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+            className="w-full mt-6 bg-[#2563EB] text-white font-black py-5 rounded-[24px] hover:bg-[#1D4ED8] transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
             {loading ? 'Saving...' : pincodeChecking ? 'Checking pincode...' : 'Save Address'}
           </button>
@@ -704,7 +704,7 @@ function CreatePaymentModal({ type, onClose }) {
         </button>
 
         <div className="flex items-center gap-4 mb-10">
-          <div className="w-12 h-12 bg-[#E8F1FF] rounded-2xl flex items-center justify-center text-[#0565E6]">
+          <div className="w-12 h-12 bg-[#E6F4FF] rounded-2xl flex items-center justify-center text-[#2563EB]">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </div>
           <h2 className="text-2xl font-black text-[#111827]">
@@ -721,7 +721,7 @@ function CreatePaymentModal({ type, onClose }) {
                 placeholder="e.g. 9876543210@ybl" 
                 value={form.upiId}
                 onChange={(e) => setForm({ ...form, upiId: e.target.value })}
-                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
                 required
               />
             </div>
@@ -734,7 +734,7 @@ function CreatePaymentModal({ type, onClose }) {
                   placeholder="Name as per bank" 
                   value={form.accountName}
                   onChange={(e) => setForm({ ...form, accountName: e.target.value })}
-                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
                   required
                 />
               </div>
@@ -745,7 +745,7 @@ function CreatePaymentModal({ type, onClose }) {
                   placeholder="Enter Account Number" 
                   value={form.accountNumber}
                   onChange={(e) => setForm({ ...form, accountNumber: e.target.value })}
-                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
                   required
                 />
               </div>
@@ -756,7 +756,7 @@ function CreatePaymentModal({ type, onClose }) {
                   placeholder="e.g. HDFC0001234" 
                   value={form.ifscCode}
                   onChange={(e) => setForm({ ...form, ifscCode: e.target.value })}
-                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
                   required
                 />
               </div>
@@ -767,7 +767,7 @@ function CreatePaymentModal({ type, onClose }) {
                   placeholder="e.g. HDFC Bank" 
                   value={form.bankName}
                   onChange={(e) => setForm({ ...form, bankName: e.target.value })}
-                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                  className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
                   required
                 />
               </div>
@@ -777,7 +777,7 @@ function CreatePaymentModal({ type, onClose }) {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full mt-6 bg-[#0565E6] text-white font-black py-5 rounded-[24px] hover:bg-[#044ab8] transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
+            className="w-full mt-6 bg-[#2563EB] text-white font-black py-5 rounded-[24px] hover:bg-[#1D4ED8] transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
           >
             {loading ? 'Saving...' : 'Save Details'}
           </button>

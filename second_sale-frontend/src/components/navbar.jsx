@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { deviceService } from "../services/device.service";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo-secondsale.png";
+
+const SELL_DEVICE_ITEMS = [
+  { label: "Phone", to: "/sell-old-mobile-phones/brand", icon: "📱" },
+  { label: "Tablet", to: "/sell-tablet/brand", icon: "📲" },
+  { label: "Laptop", to: "/sell-old-laptops/brand", icon: "💻" },
+  { label: "iMac", to: "/sell-imac/brand", icon: "🖥️" },
+];
 
 const NAV_ITEMS = [
-  { label: "Mobile", hasDropdown: false, to: "/sell-old-mobile-phones/brand" },
-  { label: "Tablet", hasDropdown: false, to: "/sell-tablet/brand" },
-  { label: "Laptop", hasDropdown: false, to: "/sell-old-laptops/brand" },
-  { label: "IMac", hasDropdown: false, to: "/sell-imac/brand" },
-  { label: "Corporate", hasDropdown: false, to: "/corporate" },
-  { label: "About Us", hasDropdown: false, to: "/about-us" },
-  { label: "Become a Partner", hasDropdown: false, to: "/partner" },
+  { label: "Sell Device", hasDropdown: true },
+  { label: "How It Works", to: "/#how-it-works" },
+  { label: "Corporate", to: "/corporate" },
+  { label: "About Us", to: "/about-us" },
+  { label: "Become a Partner", to: "/partner" },
 ];
 
 const CATEGORY_ROUTE_MAP = {
@@ -28,9 +33,17 @@ const CATEGORY_LABELS = {
   mac: "iMac",
 };
 
-const ChevronDown = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+/* ── SVG Icons ─────────────────────────────────────────────── */
+
+const ChevronDown = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+const ChevronRight = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="9 18 15 12 9 6" />
   </svg>
 );
 
@@ -49,7 +62,7 @@ const UserIcon = () => (
 );
 
 const MenuIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
     <line x1="3" y1="6" x2="21" y2="6" />
     <line x1="3" y1="12" x2="21" y2="12" />
     <line x1="3" y1="18" x2="21" y2="18" />
@@ -57,30 +70,63 @@ const MenuIcon = () => (
 );
 
 const CloseIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
     <line x1="18" y1="6" x2="6" y2="18" />
     <line x1="6" y1="6" x2="18" y2="18" />
   </svg>
 );
 
+const ShieldCheck = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <polyline points="9 12 11 14 15 10" />
+  </svg>
+);
+
+/* ── Navbar Component ──────────────────────────────────────── */
+
 export default function Navbar() {
-  const [openDropdown, setOpenDropdown] = useState(null);
+  const [siteLogo, setSiteLogo] = useState(logo);
+
+  useEffect(() => {
+    const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    fetch(API + "/site-settings")
+      .then(r => r.json())
+      .then(data => { if (data?.logoUrl) setSiteLogo(data.logoUrl); })
+      .catch(() => {});
+  }, []);
+  const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(null);
-  const [activeItem, setActiveItem] = useState("Corporate");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
   const debounceTimer = useRef(null);
+  const dropdownRef = useRef(null);
 
   const auth = useAuth();
   const isLoggedIn = auth?.isAuthenticated;
   const userName = auth?.user?.name;
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll shadow
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setSellDropdownOpen(false);
+  }, [location.pathname]);
 
   const handleMobileExpand = (label) => {
     setMobileExpanded((prev) => (prev === label ? null : label));
@@ -138,6 +184,9 @@ export default function Navbar() {
       if (clickedOutsideDesktop && clickedOutsideMobile) {
         setShowResults(false);
       }
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setSellDropdownOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -152,7 +201,7 @@ export default function Navbar() {
   const renderSearchResults = () => {
     if (!showResults) return null;
     return (
-      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-[2000] max-h-96 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-150">
+      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-[2000] max-h-96 overflow-y-auto dropdown-animate">
         {isSearching ? (
           <div className="px-4 py-3 text-center text-gray-500 text-sm">Searching...</div>
         ) : searchResults.length === 0 ? (
@@ -164,7 +213,7 @@ export default function Navbar() {
             <button
               key={result.slug}
               onClick={() => handleResultClick(result)}
-              className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0 transition-colors flex items-center gap-3"
+              className="w-full px-4 py-3 text-left hover:bg-[#E6F4FF] border-b border-gray-100 last:border-b-0 transition-colors flex items-center gap-3"
             >
               {result.imageUrl ? (
                 <img src={result.imageUrl} alt={result.modelName} className="w-10 h-10 object-cover rounded" />
@@ -174,13 +223,13 @@ export default function Navbar() {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">{result.modelName}</p>
+                <p className="font-medium text-[#0F2D5B] truncate">{result.modelName}</p>
                 <p className="text-xs text-gray-500">
                   {result.brand} · {CATEGORY_LABELS[result.category] || result.category}
                 </p>
               </div>
               {result.maxPrice > 0 && (
-                <p className="text-sm font-semibold text-primary whitespace-nowrap">
+                <p className="text-sm font-semibold text-[#2563EB] whitespace-nowrap">
                   ₹{result.maxPrice.toLocaleString("en-IN")}
                 </p>
               )}
@@ -192,63 +241,126 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-[1000] bg-white border-b border-gray-100 mx-4 sm:mx-8 mt-2 rounded-xl shadow-sm">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 sm:px-8 h-16 gap-4">
+    <nav className={`sticky top-0 z-[1000] bg-white transition-shadow duration-300 ${scrolled ? "shadow-md" : "shadow-sm"}`}>
+      <div className="max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-8 h-[68px] gap-4">
 
         {/* Logo */}
         <Link to="/" className="flex items-center no-underline shrink-0">
           <img
-            src={logo}
+            src={siteLogo || logo}
             alt="SecondSale"
-            className="h-10 w-auto object-contain"
+            className="h-10 sm:h-11 w-auto object-contain"
           />
         </Link>
 
+        {/* Desktop Nav Items */}
+        <div className="hidden lg:flex items-center gap-1">
+          {NAV_ITEMS.map((item) => (
+            <div
+              key={item.label}
+              className="relative"
+              ref={item.hasDropdown ? dropdownRef : undefined}
+              onMouseEnter={() => item.hasDropdown && setSellDropdownOpen(true)}
+              onMouseLeave={() => item.hasDropdown && setSellDropdownOpen(false)}
+            >
+              {item.hasDropdown ? (
+                <button
+                  className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap
+                    ${sellDropdownOpen ? "text-[#2563EB] bg-[#E6F4FF]" : "text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50"}`}
+                  onClick={() => setSellDropdownOpen(!sellDropdownOpen)}
+                >
+                  {item.label}
+                  <span className={`transition-transform duration-200 ${sellDropdownOpen ? "rotate-180" : ""}`}>
+                    <ChevronDown />
+                  </span>
+                </button>
+              ) : (
+                <button
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50 transition-colors whitespace-nowrap"
+                  onClick={() => {
+                    if (item.to?.startsWith("/#")) {
+                      const el = document.getElementById(item.to.replace("/#", ""));
+                      if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
+                    }
+                    if (item.to) navigate(item.to);
+                  }}
+                >
+                  {item.label}
+                </button>
+              )}
+
+              {/* Sell Device Dropdown */}
+              {item.hasDropdown && sellDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 bg-white border border-gray-100 rounded-xl shadow-xl min-w-[220px] py-2 z-[2000] dropdown-animate">
+                  {SELL_DEVICE_ITEMS.map((sub) => (
+                    <Link
+                      key={sub.label}
+                      to={sub.to}
+                      className="flex items-center justify-between px-5 py-3 text-sm text-[#0F2D5B] hover:bg-[#E6F4FF] hover:text-[#2563EB] transition-colors font-medium no-underline group"
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className="text-base">{sub.icon}</span>
+                        {sub.label}
+                      </span>
+                      <span className="text-gray-300 group-hover:text-[#2563EB] transition-colors">
+                        <ChevronRight />
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
         {/* Search (Desktop) */}
-        <div className="hidden md:block flex-1 max-w-md relative" ref={searchRef}>
+        <div className="hidden md:block flex-1 max-w-sm relative" ref={searchRef}>
           <input
             type="text"
-            placeholder="Search devices by name or brand..."
-            className="w-full pl-4 pr-10 py-2.5 border-1.5 border-gray-300 rounded-xl text-sm font-sans text-gray-800 outline-none bg-gray-200 focus:border-primary focus:bg-white transition-all"
+            placeholder="Search device (e.g. iPhone 15)"
+            className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-sans text-[#0F2D5B] outline-none bg-[#F7FAFF] focus:border-[#2563EB] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 transition-all"
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => {
               if (searchResults.length > 0 || searchQuery.length >= 2) setShowResults(true);
             }}
           />
-          <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors">
+          <button className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#2563EB] rounded-lg flex items-center justify-center text-white hover:bg-[#1D4ED8] transition-colors">
             <SearchIcon />
           </button>
           {renderSearchResults()}
         </div>
 
-        {/* Actions */}
+        {/* Right Actions */}
         <div className="flex items-center gap-3 shrink-0">
+          {/* Secure & Trusted badge */}
+          <div className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-[#2563EB]">
+            <ShieldCheck />
+            Secure & Trusted
+          </div>
+
           {isLoggedIn ? (
-            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 font-medium text-sm no-underline transition-colors">
-              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E6F4FF] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
+              <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-xs font-bold">
                 {userName?.[0]?.toUpperCase() || "U"}
               </div>
-              Dashboard
             </Link>
           ) : (
-            <Link to="/login" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 font-medium text-sm no-underline transition-colors">
+            <Link to="/login" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E6F4FF] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
               <UserIcon />
-              Login
             </Link>
           )}
 
           <Link
             to="/sell-old-mobile-phones/brand"
-            className="bg-primary hover:bg-primary-dark text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-lg transition-all no-underline shadow-sm hover:-translate-y-px active:translate-y-0 uppercase tracking-wide"
+            className="hidden sm:inline-flex btn-gradient font-bold text-sm px-5 py-2.5 rounded-xl no-underline hover:-translate-y-px active:translate-y-0"
           >
             Sell Now
           </Link>
 
           {/* Hamburger */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-[#E6F4FF] text-[#0F2D5B] transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -256,52 +368,14 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Bottom Nav (Desktop) */}
-      <div className="hidden md:flex items-center justify-around px-8 h-12 gap-1 overflow-x-auto no-scrollbar">
-        {NAV_ITEMS.map((item) => (
-          <div
-            key={item.label}
-            className="relative"
-            onMouseEnter={() => item.hasDropdown && setOpenDropdown(item.label)}
-            onMouseLeave={() => setOpenDropdown(null)}
-          >
-            <button
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
-                ${activeItem === item.label ? "text-text-primary font-bold bg-gray-50" : "text-gray-500 hover:text-primary hover:bg-primary-light"}`}
-              onClick={() => {
-                setActiveItem(item.label);
-                if (item.to) navigate(item.to);
-              }}
-            >
-              {item.label}
-              {item.hasDropdown && (
-                <span className={`transition-transform duration-200 ${openDropdown === item.label ? "rotate-180" : ""}`}>
-                  <ChevronDown />
-                </span>
-              )}
-            </button>
-
-            {item.hasDropdown && openDropdown === item.label && (
-              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-100 rounded-xl shadow-xl min-w-[180px] py-2 z-[2000] animate-in fade-in slide-in-from-top-2 duration-150">
-                {item.items.map((sub) => (
-                  <button key={sub} className="block w-full text-left px-5 py-2.5 text-sm text-gray-600 hover:bg-primary-light hover:text-primary transition-colors font-sans">
-                    {sub}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-18 bg-white z-[999] overflow-y-auto animate-in fade-in slide-in-from-top-4 duration-200 p-4">
+        <div className="lg:hidden fixed inset-0 top-[68px] bg-white z-[999] overflow-y-auto dropdown-animate p-4">
           <div className="mb-6 relative" ref={mobileSearchRef}>
             <input
               type="text"
               placeholder="Search devices by name or brand..."
-              className="w-full px-4 py-3 border-1.5 border-gray-300 rounded-xl text-sm font-sans bg-gray-200 outline-none focus:border-primary focus:bg-white"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-sans bg-[#F7FAFF] outline-none focus:border-[#2563EB] focus:bg-white"
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={() => {
@@ -315,12 +389,16 @@ export default function Navbar() {
             {NAV_ITEMS.map((item) => (
               <div key={item.label}>
                 <button
-                  className={`flex items-center justify-between w-full px-5 py-4 text-left font-medium border-b border-gray-50 transition-colors
-                    ${activeItem === item.label ? "text-primary font-bold" : "text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex items-center justify-between w-full px-5 py-4 text-left font-semibold rounded-xl transition-colors
+                    ${mobileExpanded === item.label ? "text-[#2563EB] bg-[#E6F4FF]" : "text-[#0F2D5B] hover:bg-[#F7FAFF]"}`}
                   onClick={() => {
                     if (!item.hasDropdown) {
-                      setActiveItem(item.label);
                       setMobileMenuOpen(false);
+                      if (item.to?.startsWith("/#")) {
+                        const el = document.getElementById(item.to.replace("/#", ""));
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                        return;
+                      }
                       if (item.to) navigate(item.to);
                     } else {
                       handleMobileExpand(item.label);
@@ -336,11 +414,17 @@ export default function Navbar() {
                 </button>
 
                 {item.hasDropdown && mobileExpanded === item.label && (
-                  <div className="bg-gray-50 px-8 py-2 border-b border-gray-100">
-                    {item.items.map((sub) => (
-                      <button key={sub} className="block w-full text-left py-3 text-sm text-gray-500 hover:text-primary transition-colors">
-                        {sub}
-                      </button>
+                  <div className="bg-[#F7FAFF] rounded-xl mx-2 mb-2 overflow-hidden">
+                    {SELL_DEVICE_ITEMS.map((sub) => (
+                      <Link
+                        key={sub.label}
+                        to={sub.to}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-6 py-3.5 text-sm text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF] transition-colors no-underline font-medium"
+                      >
+                        <span className="text-base">{sub.icon}</span>
+                        {sub.label}
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -350,15 +434,15 @@ export default function Navbar() {
 
           <div className="mt-8 flex flex-col gap-3">
             {isLoggedIn ? (
-              <Link to="/dashboard" className="flex items-center justify-center gap-2 p-4 border-1.5 border-gray-200 rounded-xl font-medium text-gray-700 no-underline hover:border-primary hover:text-primary transition-colors">
+              <Link to="/dashboard" className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl font-semibold text-[#0F2D5B] no-underline hover:border-[#2563EB] hover:text-[#2563EB] transition-colors">
                 <UserIcon /> Dashboard
               </Link>
             ) : (
-              <Link to="/login" className="flex items-center justify-center gap-2 p-4 border-1.5 border-gray-200 rounded-xl font-medium text-gray-700 no-underline hover:border-primary hover:text-primary transition-colors">
+              <Link to="/login" className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl font-semibold text-[#0F2D5B] no-underline hover:border-[#2563EB] hover:text-[#2563EB] transition-colors">
                 <UserIcon /> Login
               </Link>
             )}
-            <Link to="/sell-old-mobile-phones/brand" className="bg-primary text-white p-4 rounded-xl font-bold text-center no-underline shadow-lg uppercase tracking-wider">
+            <Link to="/sell-old-mobile-phones/brand" className="btn-gradient p-4 rounded-xl font-bold text-center no-underline">
               Sell Now
             </Link>
           </div>

@@ -54,7 +54,7 @@ export default function CityLandingPage() {
             <Link
               key={brand.name}
               to={brand.path}
-              className="bg-[#F8FAFF] border border-gray-200 rounded-xl px-5 py-3 text-sm font-bold text-gray-700 hover:border-[#0565E6] hover:text-[#0565E6] transition-colors no-underline"
+              className="bg-[#F7FAFF] border border-gray-200 rounded-xl px-5 py-3 text-sm font-bold text-gray-700 hover:border-[#2563EB] hover:text-[#2563EB] transition-colors no-underline"
             >
               Sell {brand.name}
             </Link>
@@ -68,7 +68,7 @@ export default function CityLandingPage() {
             { step: '3', title: 'Instant payment', desc: 'UPI, bank transfer, or cash' },
           ].map((s) => (
             <div key={s.step} className="bg-white border border-gray-100 rounded-xl p-5">
-              <div className="w-8 h-8 bg-[#0565E6] text-white rounded-full flex items-center justify-center font-black text-sm mb-3">
+              <div className="w-8 h-8 bg-[#2563EB] text-white rounded-full flex items-center justify-center font-black text-sm mb-3">
                 {s.step}
               </div>
               <h3 className="font-bold text-gray-900 mb-1">{s.title}</h3>
@@ -79,7 +79,7 @@ export default function CityLandingPage() {
 
         <Link
           to="/sell-old-mobile-phones/brand"
-          className="inline-flex bg-[#0565E6] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#044ab8] transition-colors no-underline"
+          className="inline-flex bg-[#2563EB] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#1D4ED8] transition-colors no-underline"
         >
           Start selling in {city.name}
         </Link>
