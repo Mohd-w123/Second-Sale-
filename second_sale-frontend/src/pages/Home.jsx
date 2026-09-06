@@ -1,12 +1,13 @@
+import BannerSlider from "../components/BannerSlider";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Smartphone, Tablet, Laptop, Monitor,
   Shield, Tag, Zap, Truck, ArrowRight,
-  ChevronDown, Star, BadgeCheck, Users
+  ChevronDown, Star, BadgeCheck, Users,
+  Search, Clock, CreditCard, MapPin, Headphones
 } from "lucide-react";
-// Note: Smartphone, Tablet, Laptop, Monitor still used in mini pills & trust features
-import phoneMockupImage from "../assets/image.png";
+import heroBannerImage from "../assets/hero-banner.jpg";
 import mobileDeviceImg from "../assets/devices/mobile.png";
 import tabletDeviceImg from "../assets/devices/tablet.png";
 import laptopDeviceImg from "../assets/devices/laptop.png";
@@ -17,52 +18,98 @@ import { HOME_FAQS, HOW_TO_STEPS } from "../data/faqs";
 import { CITIES as CITY_DATA } from "../data/cities";
 import { buildSchemaGraph, faqPageSchema, howToSchema, organizationSchema, websiteSchema } from "../utils/schema";
 
-// ─── Icons (Play/App Store) ───────────────────────────────────────────────────
-
-const PlayStoreIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.61 3,21.09 3,20.5M16.81,15.12L6.05,21.34L13.98,13.41L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L14.89,11.5L17.89,8.5L20.16,10.81M6.05,2.66L16.81,8.88L13.98,11.59L6.05,2.66Z" />
-  </svg>
-);
-
-const AppStoreIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M18.71,19.5C17.88,20.74 17,21.95 15.66,21.97C14.32,22 13.89,21.18 12.37,21.18C10.84,21.18 10.37,21.95 9.1,22C7.79,22.05 6.8,20.68 5.96,19.47C4.25,17 2.94,12.45 4.7,9.39C5.57,7.87 7.13,6.91 8.82,6.88C10.1,6.86 11.32,7.75 12.11,7.75C12.89,7.75 14.37,6.68 15.92,6.84C16.57,6.87 18.39,7.1 19.56,8.82C19.47,8.88 17.39,10.1 17.41,12.63C17.44,15.65 20.06,16.66 20.09,16.67C20.06,16.74 19.67,18.11 18.71,19.5M13,3.5C13.73,2.67 14.94,2.04 15.94,2C16.07,3.17 15.6,4.35 14.9,5.19C14.21,6.04 13.07,6.7 11.95,6.61C11.8,5.46 12.36,4.26 13,3.5Z" />
-  </svg>
-);
-
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const DEVICE_CATEGORIES = [
   {
-    label: "Mobile",
+    label: "Mobile Phones",
+    desc: "Sell old smartphones",
     to: "/sell-old-mobile-phones/brand",
     img: mobileDeviceImg,
+    color: "#E6F4FF",
   },
   {
-    label: "Tablet",
+    label: "Tablets",
+    desc: "Sell old tablets",
     to: "/sell-tablet/brand",
     img: tabletDeviceImg,
+    color: "#E0F0FF",
   },
   {
-    label: "Laptop",
+    label: "Laptops",
+    desc: "Sell old laptops",
     to: "/sell-old-laptops/brand",
     img: laptopDeviceImg,
+    color: "#FFF3E0",
   },
   {
-    label: "Mac",
+    label: "iMac",
+    desc: "Sell old iMac / Mac",
     to: "/sell-imac/brand",
     img: macDeviceImg,
+    color: "#F3E8FF",
   },
 ];
 
-const HOW_STEPS = HOW_TO_STEPS.map((step, i) => ({ ...step, num: String(i + 1).padStart(2, '0') }));
+const POPULAR_SEARCHES = ["iPhone 15", "Samsung S24", "OnePlus 12", "MacBook Air", "iPad Pro"];
+
+const HERO_STATS = [
+  { icon: <Users size={22} strokeWidth={1.8} />, value: "50,000+", label: "Happy Customers" },
+  { icon: <CreditCard size={22} strokeWidth={1.8} />, value: "₹25Cr+", label: "Paid to Customers" },
+  { icon: <Smartphone size={22} strokeWidth={1.8} />, value: "1L+", label: "Devices Sold" },
+  { icon: <Star size={22} strokeWidth={1.8} />, value: "4.9/5", label: "Customer Rating" },
+  { icon: <MapPin size={22} strokeWidth={1.8} />, value: "100+", label: "Cities Covered" },
+];
+
+const HOW_IT_WORKS_STEPS = [
+  { num: "1", title: "Get Quote", desc: "Search your device and get instant price.", icon: <Search size={24} strokeWidth={1.8} /> },
+  { num: "2", title: "Confirm Details", desc: "Answer few questions about your device.", icon: <BadgeCheck size={24} strokeWidth={1.8} /> },
+  { num: "3", title: "Free Pickup", desc: "We pick it up from your doorstep for free.", icon: <Truck size={24} strokeWidth={1.8} /> },
+  { num: "4", title: "Get Paid Instantly", desc: "Receive instant payment in your bank account.", icon: <Zap size={24} strokeWidth={1.8} /> },
+];
+
+const SERVICE_FEATURES = [
+  {
+    title: "Sell Your Device",
+    highlight: "Your",
+    desc: "Get the best value for your old devices in 60 seconds.",
+    points: ["Best Price Guaranteed", "Free Doorstep Pickup", "Instant Payment", "100% Safe & Secure"],
+    cta: "Get Device Value",
+    ctaTo: "/sell-old-mobile-phones/brand",
+    img: mobileDeviceImg,
+    color: "#E6F4FF",
+    iconColor: "#2563EB",
+  },
+  {
+    title: "Sell Tablets",
+    highlight: "Tablets",
+    desc: "Get instant quotes for your old tablets with free pickup.",
+    points: ["All Brands Accepted", "Fair Valuation", "Easy Returns", "Best Market Prices"],
+    cta: "Sell Tablet",
+    ctaTo: "/sell-tablet/brand",
+    img: tabletDeviceImg,
+    color: "#E0F0FF",
+    iconColor: "#3B82F6",
+  },
+  {
+    title: "Sell Laptops",
+    highlight: "Laptops",
+    desc: "Professional laptop evaluation with transparent pricing.",
+    points: ["CPU/GPU Based Pricing", "All Brands Welcome", "Expert Inspection", "Quick Payment"],
+    cta: "Sell Laptop",
+    ctaTo: "/sell-old-laptops/brand",
+    img: laptopDeviceImg,
+    color: "#FFF3E0",
+    iconColor: "#F59E0B",
+  },
+];
 
 const TRUST_FEATURES = [
-  { icon: <Shield size={22} strokeWidth={1.8} />, title: "Verified Pickup Professionals", desc: "Every pickup is handled by background-checked, trained professionals you can trust." },
-  { icon: <Tag size={22} strokeWidth={1.8} />, title: "Transparent Device Pricing", desc: "Our smart algorithm gives you a fair, data-driven price with no hidden deductions." },
-  { icon: <Zap size={22} strokeWidth={1.8} />, title: "Instant Payment After Verification", desc: "Get paid immediately via UPI, bank transfer, or cash right after device inspection." },
-  { icon: <Truck size={22} strokeWidth={1.8} />, title: "Free Doorstep Pickup Across Cities", desc: "We come to you — no need to visit a store. Free pickup from 2,000+ cities in India." },
+  { icon: <Shield size={22} strokeWidth={1.8} />, title: "100% Safe & Secure", desc: "Data wiped & secure handling" },
+  { icon: <Tag size={22} strokeWidth={1.8} />, title: "Best Price Guaranteed", desc: "Get highest value for your device" },
+  { icon: <Users size={22} strokeWidth={1.8} />, title: "Trusted by 50,000+", desc: "Rated 4.9/5 across platforms" },
+  { icon: <Headphones size={22} strokeWidth={1.8} />, title: "24x7 Customer Support", desc: "We're always here to help" },
+  { icon: <Truck size={22} strokeWidth={1.8} />, title: "Free Pickup", desc: "At your doorstep anywhere in India" },
 ];
 
 const REVIEWS = [
@@ -86,36 +133,6 @@ const GUARANTEES = [
   "Free Doorstep Pickup Anywhere",
   "Factory-Grade Secure Data Wipe",
   "Genuine Official Invoice Provided",
-];
-
-// ─── Hero Stats ───────────────────────────────────────────────────────────────
-
-const HERO_STATS = [
-  {
-    icon: (
-      <Star size={28} strokeWidth={1.8} className="text-[#0565E6]" fill="#0565E6" />
-    ),
-    value: "4.8",
-    label: "Verified Rating",
-  },
-  {
-    icon: (
-      // Rupee / coin icon
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0565E6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M8 9h8M8 12h5a2.5 2.5 0 0 0 0-5H8v10l5-5" />
-      </svg>
-    ),
-    value: "100Cr+",
-    label: "Cash Paid",
-  },
-  {
-    icon: (
-      <Users size={28} strokeWidth={1.8} className="text-[#0565E6]" />
-    ),
-    value: "50k+",
-    label: "Happy Customers",
-  },
 ];
 
 // ─── Review Column ────────────────────────────────────────────────────────────
@@ -165,13 +182,13 @@ function ReviewColumn({ reviews, reverse = false }) {
       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none" />
       <div ref={trackRef} className="will-change-transform">
         {doubled.map((r, i) => (
-          <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 mb-3 shadow-sm hover:border-[#0565E6]/30 hover:shadow-md transition-all duration-300 cursor-default">
+          <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 mb-3 shadow-sm hover:border-[#2563EB]/30 hover:shadow-md transition-all duration-300 cursor-default">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full bg-[#0565E6] text-white flex items-center justify-center text-sm font-bold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-sm font-bold shrink-0">
                 {r.name[0]}
               </div>
               <div>
-                <div className="text-sm font-bold text-gray-900">{r.name}</div>
+                <div className="text-sm font-bold text-[#0F2D5B]">{r.name}</div>
                 <div className="flex gap-0.5 mt-0.5">
                   {[1,2,3,4,5].map(s => (
                     <Star key={s} size={12} fill={s <= r.stars ? "#f59e0b" : "none"} stroke="#f59e0b" strokeWidth={1.5} />
@@ -189,16 +206,26 @@ function ReviewColumn({ reviews, reverse = false }) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SectionTitle({ tag, title, subtitle }) {
+function SectionTag({ children }) {
+  return (
+    <span className="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#1D4ED8] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#2563EB]/20">
+      {children}
+    </span>
+  );
+}
+
+function SectionTitle({ tag, title, titleHighlight, subtitle }) {
   return (
     <div className="text-center mb-12 px-4">
-      {tag && (
-        <span className="inline-block bg-[#EEF4FF] text-[#0565E6] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#0565E6]/20">
-          {tag}
-        </span>
-      )}
-      <h2 className="text-2xl sm:text-[2.25rem] font-extrabold text-gray-900 mb-4 leading-tight tracking-tight">
-        {title}
+      {tag && <SectionTag>{tag}</SectionTag>}
+      <h2 className="text-2xl sm:text-[2.25rem] font-extrabold text-[#0F2D5B] mb-4 leading-tight tracking-tight">
+        {titleHighlight ? (
+          <>
+            {title.split(titleHighlight)[0]}
+            <span className="text-[#2563EB]">{titleHighlight}</span>
+            {title.split(titleHighlight)[1] || ""}
+          </>
+        ) : title}
       </h2>
       {subtitle && (
         <p className="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto leading-relaxed">
@@ -212,13 +239,13 @@ function SectionTitle({ tag, title, subtitle }) {
 function FAQItem({ q, a }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-gray-100 bg-gray-50 rounded-2xl mb-3 overflow-hidden transition-all duration-200">
+    <div className="border border-gray-100 bg-[#F7FAFF] rounded-2xl mb-3 overflow-hidden transition-all duration-200">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex justify-between items-center px-6 py-5 text-left bg-transparent border-none cursor-pointer gap-4 group"
       >
-        <span className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-[#0565E6] transition-colors">{q}</span>
-        <span className="text-[#0565E6] shrink-0">
+        <span className="text-base sm:text-lg font-bold text-[#0F2D5B] group-hover:text-[#2563EB] transition-colors">{q}</span>
+        <span className="text-[#2563EB] shrink-0">
           <ChevronDown size={18} strokeWidth={2.5} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </span>
       </button>
@@ -243,187 +270,349 @@ export default function HomePage() {
 
   return (
     <div className="w-full">
+
+      {/* ══ BANNER SLIDER — top of page ══ */}
+      <BannerSlider />
+
       <SEOHead
         title="SecondSale — Sell Old Phones, Laptops & Tablets for Instant Cash in India"
         description="SecondSale is India's trusted device buyback platform. Sell old mobile phones, tablets, laptops and iMac online with free doorstep pickup and instant payment across 2,000+ cities."
         path="/"
         schema={schema}
       />
-      {/* ══════════════════════════════════════════════════════
+
+      {/* ════════════════════════════════════════════════════════════
           ── HERO SECTION ──
-      ══════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#EEF4FF] via-white to-white pt-0 pb-12 sm:pb-16 px-4">
+      ════════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF]/40 via-white to-white pt-6 pb-12 sm:pb-16 px-4">
 
         {/* Background decoration blobs */}
-        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#0565E6]/5 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#0565E6]/5 blur-3xl" />
+        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#2563EB]/5 blur-3xl" />
 
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-14 items-center">
 
           {/* ── Left Column ── */}
-          <div className="relative z-10 pt-8 sm:pt-10">
+          <div className="relative z-10 pt-4 sm:pt-8">
 
             {/* Top badge */}
-            <div className="inline-flex items-center gap-2 bg-white border border-[#0565E6]/20 rounded-full pl-2 pr-4 py-1.5 text-[11px] sm:text-xs font-bold text-[#0565E6] mb-5 shadow-sm shadow-[#0565E6]/10">
-              <div className="w-5 h-5 rounded-full bg-[#0565E6] flex items-center justify-center">
-                <BadgeCheck size={11} className="text-white" />
+            <div className="inline-flex items-center gap-2 bg-[#E6F4FF] border border-[#2563EB]/20 rounded-full pl-2.5 pr-4 py-1.5 text-[11px] sm:text-xs font-bold text-[#1D4ED8] mb-6">
+              <div className="w-5 h-5 rounded-full bg-[#2563EB] flex items-center justify-center">
+                <Shield size={11} className="text-white" />
               </div>
-              India's #1 Device Buyback Platform
+              INDIA'S TRUSTED DEVICE MARKETPLACE
             </div>
 
             {/* Main heading */}
-            <h1 className="text-[1.75rem] sm:text-[2.4rem] lg:text-[2.85rem] font-black text-gray-900 leading-[1.08] tracking-tight mb-4">
-              India's Trusted Buyback<br />
-              Platform to{" "}
-              <span className="text-[#0565E6]">Sell Old Devices</span>
+            <h1 className="text-[2rem] sm:text-[2.8rem] lg:text-[3.2rem] font-black text-[#0F2D5B] leading-[1.08] tracking-tight mb-2">
+              Sell Old.
+            </h1>
+            <h1 className="text-[2rem] sm:text-[2.8rem] lg:text-[3.2rem] font-black leading-[1.08] tracking-tight mb-5">
+              <span className="text-[#2563EB] relative inline-block">
+                Upgrade Smart.
+                <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#2563EB] rounded-full" style={{bottom: "-4px"}} />
+              </span>
             </h1>
 
             {/* Subtext */}
-            <p className="text-sm sm:text-base lg:text-[1rem] text-gray-500 leading-relaxed mb-7 max-w-[500px]">
-              SecondSale is India's premier online device buyback platform helping you sell old electronics with fair pricing, free doorstep pickup and instant payment.
+            <p className="text-sm sm:text-base lg:text-[1.05rem] text-gray-500 leading-relaxed mb-7 max-w-[520px]">
+              Get the best value for your old devices, with free doorstep pickup and <strong className="text-[#0F2D5B]">instant payment</strong> — all in one place.
             </p>
 
-            {/* ── Category Cards Grid ── */}
-            <div className="border border-gray-200 rounded-3xl p-3 mb-8 bg-white/60">
-              <div className="grid grid-cols-2 gap-3">
-                {DEVICE_CATEGORIES.map((cat) => (
-                  <Link
-                    to={cat.to}
-                    key={cat.label}
-                    className="group flex flex-col bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden hover:border-[#0565E6]/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 no-underline"
-                  >
-                    {/* Image area */}
-                    <div className="flex items-center justify-center bg-gray-50 h-[130px] px-5 pt-5 pb-2">
-                      <img
-                        src={cat.img}
-                        alt={cat.label}
-                        className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-300"
-                      />
+            {/* Search Bar */}
+            <div className="relative max-w-[520px] mb-4">
+              <div className="flex items-center bg-white border-2 border-gray-200 rounded-2xl overflow-hidden focus-within:border-[#2563EB] transition-colors shadow-sm">
+                <div className="pl-4 text-gray-400">
+                  <Search size={20} />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search device (e.g. iPhone 15)"
+                  className="flex-1 px-3 py-4 text-sm sm:text-base outline-none bg-transparent text-[#0F2D5B] font-medium placeholder:text-gray-400"
+                  onClick={() => document.querySelector('.navbar-search')?.focus()}
+                  readOnly
+                  onFocus={(e) => {
+                    e.target.blur();
+                    const navSearch = document.querySelector('nav input[type="text"]');
+                    if (navSearch) navSearch.focus();
+                  }}
+                />
+                <button className="btn-gradient text-white px-5 py-4 transition-colors">
+                  <Search size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Popular Searches */}
+            <div className="flex flex-wrap items-center gap-2 mb-8 max-w-[520px]">
+              <span className="text-xs text-gray-400 font-medium">Popular searches:</span>
+              {POPULAR_SEARCHES.map((tag) => (
+                <Link
+                  key={tag}
+                  to="/sell-old-mobile-phones/brand"
+                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-semibold text-[#0F2D5B] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors no-underline"
+                >
+                  {tag}
+                </Link>
+              ))}
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-3 mb-6">
+              <Link
+                to="/sell-old-mobile-phones/brand"
+                className="inline-flex items-center gap-2 btn-gradient text-white font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all no-underline shadow-lg shadow-[#2563EB]/25 hover:-translate-y-0.5"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                Get Device Value
+                <ArrowRight size={18} />
+              </Link>
+              <a
+                href="#how-it-works"
+                className="inline-flex items-center gap-2 bg-white border-2 border-gray-200 hover:border-[#2563EB] text-[#0F2D5B] hover:text-[#2563EB] font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all no-underline"
+              >
+                <Clock size={18} />
+                How It Works
+                <ArrowRight size={18} />
+              </a>
+            </div>
+
+            {/* Trust pills */}
+            <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-gray-500 font-medium">
+              {["Free Pickup", "Instant Payment", "Secure & Hassle-free"].map((pill) => (
+                <span key={pill} className="flex items-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full bg-[#2563EB] flex items-center justify-center text-white text-[9px]">✓</span>
+                  {pill}
+                </span>
+              ))}
+            </div>
+
+          </div>
+
+          {/* ── Right Column: Hero Banner Image (Desktop Only) ── */}
+          <div className="hidden lg:flex items-center justify-center relative">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-100/20 max-w-[560px]">
+              <img
+                src={heroBannerImage}
+                alt="SecondSale Devices - Sell Smart Buy Better"
+                fetchpriority="high"
+                width={600}
+                height={500}
+                className="w-full h-auto object-cover rounded-3xl transform hover:scale-[1.02] transition-transform duration-500"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats Bar ── */}
+      <section className="bg-white py-5 border-y border-gray-100">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar py-2">
+            {HERO_STATS.map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-3 min-w-fit">
+                <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                  {stat.icon}
+                </div>
+                <div>
+                  <div className="text-base sm:text-lg font-black text-[#0F2D5B] leading-none">{stat.value}</div>
+                  <div className="text-xs text-gray-400 font-medium mt-0.5">{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ── Category Cards ── */}
+      <section className="py-10 bg-white">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {DEVICE_CATEGORIES.map((cat) => (
+              <Link
+                to={cat.to}
+                key={cat.label}
+                className="group flex items-center gap-4 rounded-2xl p-5 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
+                style={{ backgroundColor: cat.color + "40" }}
+              >
+                <div className="w-16 h-16 flex items-center justify-center shrink-0">
+                  <img src={cat.img} alt={cat.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-bold text-[#0F2D5B] mb-0.5">{cat.label}</h3>
+                  <p className="text-xs text-gray-500">{cat.desc}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-[#2563EB] flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                  <ArrowRight size={16} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Trust Marquee ── */}
+      <section className="py-4 bg-[#F7FAFF] border-y border-gray-100">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex items-center justify-center gap-6 sm:gap-10 flex-wrap text-xs sm:text-sm font-semibold text-gray-500">
+            {["100% Secure Transactions", "Data Wipe Protection", "7 Days Easy Return", "Warranty on All Devices", "Doorstep Pickup"].map((item, i) => (
+              <span key={item} className="flex items-center gap-1.5 whitespace-nowrap">
+                {i > 0 && <span className="text-gray-300 mx-1">|</span>}
+                <span className="text-[#2563EB]">✓</span>
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Our Services, Your Benefits ── */}
+      <section className="py-16 sm:py-24 bg-[#F7FAFF]">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <SectionTitle
+            tag="🔄 ALL-IN-ONE DEVICE SOLUTION"
+            title="Our Services, Your Benefits"
+            titleHighlight="Your Benefits"
+            subtitle="Sell your old device — all in one trusted platform."
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {SERVICE_FEATURES.map((s) => (
+              <div key={s.title} className="bg-white rounded-[28px] p-7 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+                {/* Icon badge */}
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style={{ backgroundColor: s.color }}>
+                  <Tag size={22} strokeWidth={1.8} style={{ color: s.iconColor }} />
+                </div>
+                
+                {/* Title */}
+                <h3 className="text-xl font-black text-[#0F2D5B] mb-2">
+                  {s.title.split(s.highlight)[0]}
+                  <span className="text-[#2563EB]">{s.highlight}</span>
+                  {s.title.split(s.highlight)[1] || ""}
+                </h3>
+                <p className="text-sm text-gray-500 mb-5 leading-relaxed">{s.desc}</p>
+
+                {/* Checklist */}
+                <div className="space-y-2.5 mb-6">
+                  {s.points.map((point) => (
+                    <div key={point} className="flex items-center gap-2.5 text-sm text-[#0F2D5B] font-medium">
+                      <span className="w-5 h-5 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] text-[10px] shrink-0">✓</span>
+                      {point}
                     </div>
-                    {/* Label */}
-                    <div className="px-4 py-3 text-center">
-                      <span className="text-base font-bold text-gray-700 group-hover:text-[#0565E6] transition-colors duration-200">
-                        {cat.label}
-                      </span>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <Link
+                  to={s.ctaTo}
+                  className="flex items-center justify-between w-full btn-gradient text-white font-bold text-sm px-5 py-3.5 rounded-xl transition-all no-underline"
+                >
+                  {s.cta}
+                  <ArrowRight size={18} />
+                </Link>
+
+                {/* Device image (decorative) */}
+                <img
+                  src={s.img}
+                  alt=""
+                  className="absolute -bottom-4 -right-4 w-28 h-28 opacity-10 group-hover:opacity-15 object-contain transition-opacity pointer-events-none"
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Trust bar */}
+          <div className="mt-10 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+              {TRUST_FEATURES.map((f) => (
+                <div key={f.title} className="flex items-center gap-3 min-w-fit">
+                  <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                    {f.icon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#0F2D5B] leading-tight">{f.title}</p>
+                    <p className="text-[11px] text-gray-400">{f.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ── */}
+      <section id="how-it-works" className="py-16 sm:py-24 bg-white">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="bg-[#E6F4FF]/40 rounded-[32px] p-8 sm:p-12 border border-[#2563EB]/10">
+            <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
+              {/* Left */}
+              <div className="lg:w-[280px] shrink-0">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="w-8 h-[3px] bg-[#2563EB] rounded-full" />
+                  <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">EASY PROCESS</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#0F2D5B] mb-3 leading-tight">
+                  Sell Your Device in{" "}
+                  <span className="text-[#2563EB]">4 Simple Steps</span>
+                </h2>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Fast, secure and hassle-free experience from quote to payment.
+                </p>
+              </div>
+
+              {/* Steps */}
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 relative">
+                {HOW_IT_WORKS_STEPS.map((step, i) => (
+                  <div key={step.num} className="text-center relative">
+                    {/* Connector line */}
+                    {i < HOW_IT_WORKS_STEPS.length - 1 && (
+                      <div className="hidden lg:block absolute top-7 left-[60%] w-[80%] border-t-2 border-dashed border-[#2563EB]/30 z-0" />
+                    )}
+                    {/* Circle icon */}
+                    <div className="w-14 h-14 bg-[#2563EB] text-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#2563EB]/20 relative z-10">
+                      {step.icon}
                     </div>
-                  </Link>
+                    <h4 className="text-sm font-black text-[#0F2D5B] mb-1">
+                      <span className="text-[#2563EB] mr-1">{step.num}</span>
+                      {step.title}
+                    </h4>
+                    <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* ── Icon Stats Row ── */}
-            <div className="flex items-center gap-8 sm:gap-10 flex-wrap">
-              {HERO_STATS.map((stat, i) => (
-                <div key={stat.label} className="flex items-center gap-3">
-                  {/* Divider */}
-                  {i > 0 && (
-                    <div className="w-px h-10 bg-gray-200 mr-2 hidden sm:block" />
-                  )}
-                  <div className="shrink-0">{stat.icon}</div>
-                  <div>
-                    <div className="text-xl sm:text-2xl font-black text-gray-900 leading-none">{stat.value}</div>
-                    <div className="text-xs sm:text-sm font-semibold text-gray-400 mt-0.5">{stat.label}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* ── Mini stat pills row ── */}
-            <div className="flex flex-wrap gap-2 mt-6">
+            {/* Bottom trust indicators */}
+            <div className="mt-8 pt-6 border-t border-[#2563EB]/10 flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
               {[
-                { icon: <Smartphone size={12} />, label: "50,000+ Devices Sold" },
-                { icon: <Zap size={12} />, label: "Instant UPI Payment" },
-                { icon: <Truck size={12} />, label: "Free Doorstep Pickup" },
-                { icon: <Shield size={12} />, label: "100% Safe Data Wipe" },
-              ].map((p) => (
-                <div
-                  key={p.label}
-                  className="inline-flex items-center gap-1.5 bg-white border border-gray-100 rounded-full px-3 py-1.5 text-[11px] font-semibold text-gray-600 shadow-sm"
-                >
-                  <span className="text-[#0565E6]">{p.icon}</span>
-                  {p.label}
+                { icon: <Shield size={18} />, text: "100% Safe & Secure", sub: "Data wiped & secure handling" },
+                { icon: <Tag size={18} />, text: "Best Price Guaranteed", sub: "Get highest value for your device" },
+                { icon: <Users size={18} />, text: "Trusted by 50,000+ Customers", sub: "Rated 4.9/5 across platforms" },
+                { icon: <Headphones size={18} />, text: "24x7 Customer Support", sub: "We're always here to help" },
+              ].map((t) => (
+                <div key={t.text} className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#2563EB] shrink-0 shadow-sm">
+                    {t.icon}
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#0F2D5B]">{t.text}</p>
+                    <p className="text-[10px] text-gray-400">{t.sub}</p>
+                  </div>
                 </div>
               ))}
             </div>
-
-          </div>
-
-          {/* ── Right Column: Phone Image (Desktop Only) ── */}
-          <img
-            src={phoneMockupImage}
-            alt="SecondSale App"
-            fetchPriority="high"
-            width={600}
-            height={600}
-            className="hidden lg:block w-full h-auto max-w-none scale-110"
-          />
-
-        </div>
-      </section>
-      {/* ══════════════════════════════ END HERO ══════════════════════════════ */}
-
-      {/* ── How It Works ── */}
-      <section className="py-16 sm:py-24 bg-white">
-        <div className="max-w-[1200px] mx-auto px-4">
-          <SectionTitle
-            tag="Simple Process"
-            title="How SecondSale Buyback Process Works"
-            subtitle="No hassle, no bargaining — selling your old device online is simple. Instant pricing, secure pickups, and fast payments."
-          />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            {HOW_STEPS.map((step, i) => (
-              <div
-                key={step.num}
-                className="bg-white rounded-[28px] p-8 text-center border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative"
-              >
-                {i < HOW_STEPS.length - 1 && (
-                  <div className="hidden md:block absolute top-10 -right-3 z-10">
-                    <ArrowRight size={20} strokeWidth={2} className="text-[#0565E6]/30" />
-                  </div>
-                )}
-                <div className="w-14 h-14 bg-[#0565E6] text-white rounded-full flex items-center justify-center text-xl font-black mx-auto mb-6 shadow-lg shadow-[#0565E6]/30">
-                  {step.num}
-                </div>
-                <h3 className="text-base font-bold text-gray-900 mb-3 leading-snug">{step.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Why Trust Us ── */}
-      <section className="py-16 sm:py-24 bg-[#F8FAFF]">
-        <div className="max-w-[1200px] mx-auto px-4">
-          <SectionTitle
-            tag="Why Choose Us"
-            title="Why People Trust SecondSale"
-            subtitle="Built to make selling electronics simple, transparent, and secure — every single time."
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {TRUST_FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="flex gap-5 bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#0565E6]/20 transition-all duration-200"
-              >
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#EEF4FF] rounded-xl flex items-center justify-center text-[#0565E6] shrink-0">
-                  {f.icon}
-                </div>
-                <div>
-                  <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-2">{f.title}</h4>
-                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">{f.desc}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
       {/* ── Customer Reviews ── */}
-      <section className="py-16 sm:py-24 bg-white overflow-hidden">
+      <section className="py-16 sm:py-24 bg-[#F7FAFF] overflow-hidden">
         <div className="max-w-[1200px] mx-auto px-4">
           <SectionTitle
-            tag="Customer Reviews"
+            tag="⭐ Customer Reviews"
             title="Real Feedback From Our Customers"
             subtitle="Thousands of users across India trust SecondSale to convert their old phones into instant cash with free pickup."
           />
@@ -440,11 +629,11 @@ export default function HomePage() {
       </section>
 
       {/* ── Cities & Guarantees ── */}
-      <section className="py-16 sm:py-24 bg-[#F8FAFF]">
+      <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-4">
+              <h2 className="text-2xl sm:text-3xl font-black text-[#0F2D5B] mb-4">
                 Serving 2,000+ Cities Across India 🇮🇳
               </h2>
               <p className="text-sm text-gray-500 mb-8 leading-relaxed">Free doorstep pickup services across major cities in India. We're growing fast!</p>
@@ -453,7 +642,7 @@ export default function HomePage() {
                   <Link
                     key={city.slug}
                     to={`/sell-old-phone-in/${city.slug}`}
-                    className="bg-white border border-gray-200 rounded-lg px-4 py-2 text-xs font-bold text-gray-600 hover:border-[#0565E6] hover:text-[#0565E6] hover:shadow-sm transition-all no-underline"
+                    className="bg-[#F7FAFF] border border-gray-200 rounded-lg px-4 py-2 text-xs font-bold text-gray-600 hover:border-[#2563EB] hover:text-[#2563EB] hover:bg-[#E6F4FF] hover:shadow-sm transition-all no-underline"
                   >
                     {city.name}
                   </Link>
@@ -461,11 +650,11 @@ export default function HomePage() {
               </div>
             </div>
             <div className="bg-white rounded-[28px] p-8 sm:p-10 border border-gray-100 shadow-xl">
-              <h3 className="text-xl font-black text-gray-900 mb-7">SecondSale Guarantees</h3>
+              <h3 className="text-xl font-black text-[#0F2D5B] mb-7">SecondSale Guarantees</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {GUARANTEES.map((g) => (
-                  <div key={g} className="flex items-center gap-3 text-xs sm:text-sm font-semibold text-gray-700 bg-[#F8FAFF] rounded-xl p-4 border border-[#0565E6]/10">
-                    <div className="w-5 h-5 bg-[#0565E6] text-white rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">✓</div>
+                  <div key={g} className="flex items-center gap-3 text-xs sm:text-sm font-semibold text-[#0F2D5B] bg-[#E6F4FF]/50 rounded-xl p-4 border border-[#2563EB]/10">
+                    <div className="w-5 h-5 bg-[#2563EB] text-white rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">✓</div>
                     {g}
                   </div>
                 ))}
@@ -476,10 +665,10 @@ export default function HomePage() {
       </section>
 
       {/* ── FAQ Section ── */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-16 sm:py-24 bg-[#F7FAFF]">
         <div className="max-w-[760px] mx-auto px-4">
           <SectionTitle
-            tag="FAQs"
+            tag="❓ FAQs"
             title="Frequently Asked Questions"
             subtitle="Find clear answers to all your questions about device pricing, pickups, and secure payments."
           />
@@ -489,7 +678,7 @@ export default function HomePage() {
             ))}
           </div>
           <p className="text-center mt-6">
-            <Link to="/faq" className="text-[#0565E6] font-bold text-sm hover:underline">
+            <Link to="/faq" className="text-[#2563EB] font-bold text-sm hover:underline">
               View all FAQs →
             </Link>
           </p>
@@ -497,9 +686,9 @@ export default function HomePage() {
       </section>
 
       {/* ── Entity summary (AEO) ── */}
-      <section className="py-12 bg-[#F8FAFF] border-t border-gray-100">
+      <section className="py-12 bg-white border-t border-gray-100">
         <div className="max-w-[760px] mx-auto px-4">
-          <h2 className="text-lg font-black text-gray-900 mb-3">About SecondSale in 30 seconds</h2>
+          <h2 className="text-lg font-black text-[#0F2D5B] mb-3">About SecondSale in 30 seconds</h2>
           <p className="text-sm text-gray-600 leading-relaxed">{ENTITY_SUMMARY}</p>
         </div>
       </section>

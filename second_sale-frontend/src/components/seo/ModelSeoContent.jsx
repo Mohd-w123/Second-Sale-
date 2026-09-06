@@ -13,18 +13,18 @@ export default function ModelSeoContent({ device, brandName }) {
       <p className="text-sm text-gray-600 leading-relaxed mb-8">{paragraph}</p>
       <div className="space-y-4">
         {faqs.map((faq) => (
-          <article key={faq.q} className="bg-[#F8FAFF] rounded-xl p-5 border border-gray-100">
+          <article key={faq.q} className="bg-[#F7FAFF] rounded-xl p-5 border border-gray-100">
             <h3 className="font-bold text-gray-900 text-sm mb-2">{faq.q}</h3>
             <p className="text-xs text-gray-600 leading-relaxed">{faq.a}</p>
           </article>
         ))}
       </div>
       <p className="mt-6 text-xs text-gray-400">
-        <Link to="/faq" className="text-[#0565E6] hover:underline">
+        <Link to="/faq" className="text-[#2563EB] hover:underline">
           View all FAQs
         </Link>
         {' · '}
-        <Link to="/compare/secondsale-vs-cashify" className="text-[#0565E6] hover:underline">
+        <Link to="/compare/secondsale-vs-cashify" className="text-[#2563EB] hover:underline">
           Compare with Cashify
         </Link>
       </p>

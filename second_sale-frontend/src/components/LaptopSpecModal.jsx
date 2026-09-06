@@ -87,7 +87,7 @@ export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, i
             disabled={!isComplete}
             className={`w-full py-4 rounded-xl font-black transition-all flex items-center justify-center gap-2 text-base
               ${isComplete 
-                ? 'bg-[#0565E6] text-white hover:bg-[#044BA8] shadow-[0_0_15px_rgba(5,101,230,0.3)] scale-[1.01]' 
+                ? 'bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-[0_0_15px_rgba(5,101,230,0.3)] scale-[1.01]' 
                 : 'bg-[#93C5B5]/50 text-white cursor-not-allowed'}`}
           >
             Next →
@@ -125,7 +125,7 @@ function SpecSelect({ label, value, disabled, setOpen }) {
           {label} 
           <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400 font-bold cursor-help">?</span>
         </label>
-        {value && <span className="text-[9px] font-black text-[#0565E6] uppercase tracking-wider">Selected</span>}
+        {value && <span className="text-[9px] font-black text-[#2563EB] uppercase tracking-wider">Selected</span>}
       </div>
 
       <button 
@@ -175,7 +175,7 @@ function OverlayList({ type, isMac, onSelect, onClose }) {
             <button 
               key={opt}
               onClick={() => onSelect(opt)}
-              className="w-full text-left px-8 py-5 text-base font-bold text-gray-700 hover:bg-gray-50 hover:text-[#0565E6] transition-all border-b border-gray-50 last:border-none"
+              className="w-full text-left px-8 py-5 text-base font-bold text-gray-700 hover:bg-gray-50 hover:text-[#2563EB] transition-all border-b border-gray-50 last:border-none"
             >
               {opt}
             </button>

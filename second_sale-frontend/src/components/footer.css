@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800');
 
 .footer-root {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   background: #111827;
   color: #e5e7eb;
 }
@@ -62,11 +62,11 @@
   text-decoration: none;
   color: inherit;
 }
-.app-btn:hover { background: #374151; border-color: #0565E6; }
+.app-btn:hover { background: #374151; border-color: #2563EB; }
 .app-btn-text {}
 .app-btn-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
 .app-btn-name { font-size: 14px; font-weight: 600; color: #fff; }
-.app-btn-icon { color: #0565E6; display: flex; }
+.app-btn-icon { color: #2563EB; display: flex; }
 
 /* Links Column */
 .footer-col {}
@@ -75,7 +75,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #0565E6;
+  color: #2563EB;
   margin-bottom: 18px;
 }
 .footer-col-links {
@@ -92,7 +92,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   padding: 0;
   transition: color 0.15s;
   text-align: left;
@@ -149,7 +149,7 @@
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.social-btn:hover { background: #0565E6; color: #fff; border-color: #0565E6; }
+.social-btn:hover { background: #2563EB; color: #fff; border-color: #2563EB; }
 
 .footer-badges {
   display: flex;

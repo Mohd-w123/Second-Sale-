@@ -35,9 +35,9 @@ export default function CompareSecondSaleVsCashify() {
         <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm mb-10">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-[#F8FAFF]">
+              <tr className="bg-[#F7FAFF]">
                 <th className="text-left p-4 font-black text-gray-900">Feature</th>
-                <th className="text-left p-4 font-black text-[#0565E6]">SecondSale</th>
+                <th className="text-left p-4 font-black text-[#2563EB]">SecondSale</th>
                 <th className="text-left p-4 font-black text-gray-700">Cashify</th>
               </tr>
             </thead>
@@ -53,14 +53,14 @@ export default function CompareSecondSaleVsCashify() {
           </table>
         </div>
 
-        <div className="bg-[#EEF4FF] rounded-2xl p-6 mb-8">
+        <div className="bg-[#E6F4FF] rounded-2xl p-6 mb-8">
           <h2 className="text-xl font-black text-gray-900 mb-3">Why choose SecondSale?</h2>
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
             SecondSale focuses on transparent, no-haggle pricing with free pickup across 2,000+ Indian cities. Get an instant quote, schedule pickup from home, and receive payment immediately after verification.
           </p>
           <Link
             to="/sell-old-mobile-phones/brand"
-            className="inline-flex items-center gap-2 bg-[#0565E6] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#044ab8] transition-colors no-underline"
+            className="inline-flex items-center gap-2 bg-[#2563EB] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#1D4ED8] transition-colors no-underline"
           >
             Sell your device on SecondSale
           </Link>

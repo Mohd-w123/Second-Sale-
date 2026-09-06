@@ -1,0 +1,134 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
+
+// ── Static fallback banners (used if API has no banners yet) ────
+import banner1 from "../assets/banners/banner1.png";
+import banner2 from "../assets/banners/banner2.png";
+import banner3 from "../assets/banners/banner3.png";
+
+const FALLBACK_BANNERS = [
+  { _id: "f1", imageUrl: banner1, altText: "Promotional Offer", linkTo: "/sell-old-mobile-phones/brand" },
+  { _id: "f2", imageUrl: banner2, altText: "iPhone Discounts",  linkTo: "/sell-old-mobile-phones/brand" },
+  { _id: "f3", imageUrl: banner3, altText: "Buy More Save More", linkTo: "/sell-old-mobile-phones/brand" },
+];
+
+const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const AUTO_PLAY_MS = 4000;
+
+export default function BannerSlider() {
+  const [banners, setBanners] = useState(FALLBACK_BANNERS);
+  const [active, setActive] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(0);
+  const timerRef = useRef(null);
+
+  // Fetch live banners from API
+  useEffect(() => {
+    fetch(`${API}/site-settings`)
+      .then(r => r.json())
+      .then(data => {
+        const live = data?.banners?.filter(b => b.isActive);
+        if (live?.length) setBanners(live);
+      })
+      .catch(() => {}); // silently fall back to static
+  }, []);
+
+  const total = banners.length;
+
+  const goTo = useCallback((idx) => setActive((idx + total) % total), [total]);
+  const next = useCallback(() => goTo(active + 1), [active, goTo]);
+  const prev = useCallback(() => goTo(active - 1), [active, goTo]);
+
+  const resetTimer = useCallback(() => {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(next, AUTO_PLAY_MS);
+  }, [next]);
+
+  useEffect(() => {
+    timerRef.current = setInterval(next, AUTO_PLAY_MS);
+    return () => clearInterval(timerRef.current);
+  }, [next]);
+
+  // Touch/drag support
+  const onDragStart = (x) => { setDragging(false); setDragStart(x); };
+  const onDragEnd   = (x) => {
+    const diff = dragStart - x;
+    if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); resetTimer(); }
+  };
+
+  if (!total) return null;
+
+  return (
+    <section className="w-full bg-white">
+      <div className="max-w-[1280px] mx-auto px-4 pt-4 pb-2">
+        <div
+          className="relative overflow-hidden rounded-2xl select-none cursor-grab active:cursor-grabbing"
+          onMouseDown={(e) => onDragStart(e.clientX)}
+          onMouseUp={(e) => onDragEnd(e.clientX)}
+          onMouseLeave={() => setDragging(false)}
+          onTouchStart={(e) => onDragStart(e.touches[0].clientX)}
+          onTouchEnd={(e) => onDragEnd(e.changedTouches[0].clientX)}
+        >
+          {/* Track */}
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${active * 100}%)` }}
+          >
+            {banners.map((banner) => (
+              <Link
+                key={banner._id}
+                to={banner.linkTo || "/sell-old-mobile-phones/brand"}
+                className="flex-shrink-0 w-full block no-underline"
+                draggable={false}
+                onClick={(e) => dragging && e.preventDefault()}
+              >
+                <img
+                  src={banner.imageUrl}
+                  alt={banner.altText}
+                  className="w-full object-cover rounded-2xl"
+                  style={{ height: "clamp(180px, 28vw, 380px)" }}
+                  draggable={false}
+                />
+              </Link>
+            ))}
+          </div>
+
+          {/* Prev / Next arrows */}
+          {total > 1 && (
+            <>
+              <button
+                onClick={() => { prev(); resetTimer(); }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-colors z-10"
+                aria-label="Previous"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button
+                onClick={() => { next(); resetTimer(); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-colors z-10"
+                aria-label="Next"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </>
+          )}
+
+          {/* Dot indicators */}
+          {total > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+              {banners.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { goTo(i); resetTimer(); }}
+                  className={`transition-all duration-300 rounded-full border-0 cursor-pointer
+                    ${i === active ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/50 hover:bg-white/80"}`}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

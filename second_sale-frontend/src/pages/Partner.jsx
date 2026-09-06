@@ -69,7 +69,7 @@ const HIGHLIGHT_METRICS = [
 
 const VALUE_PROPS = [
   {
-    icon: <TrendingUp size={24} className="text-[#0565E6]" />,
+    icon: <TrendingUp size={24} className="text-[#2563EB]" />,
     title: "Steady Stream of Motivated Sellers",
     desc: "With SecondSale massive active user base and established online presence, you will receive a consistent structural flow of local device sellers.",
     bullets: [
@@ -78,7 +78,7 @@ const VALUE_PROPS = [
     ],
   },
   {
-    icon: <ShieldCheck size={24} className="text-[#0565E6]" />,
+    icon: <ShieldCheck size={24} className="text-[#2563EB]" />,
     title: "Complete System Autonomy",
     desc: "Forget wasting hours formatting custom customer invoices or manually building outreach files. Our system handles data overhead natively.",
     bullets: [
@@ -147,7 +147,7 @@ function SectionHeading({ tag, title, subtitle, center = true }) {
       className={`mb-12 max-w-3xl ${center ? "text-center mx-auto" : "text-left"}`}
     >
       {tag && (
-        <span className="inline-block bg-[#EEF4FF] text-[#0565E6] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#0565E6]/10">
+        <span className="inline-block bg-[#E6F4FF] text-[#2563EB] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#2563EB]/10">
           {tag}
         </span>
       )}
@@ -208,14 +208,14 @@ export default function PartnerPage() {
         schema={buildSchemaGraph([organizationSchema(), websiteSchema()])}
       />
       {/* ─── 1. HERO & ONBOARDING APPLICATION ─── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#EEF4FF] via-white to-white pt-12 pb-20 px-4">
-        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#0565E6]/5 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-12 pb-20 px-4">
+        <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
 
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-start">
           {/* Left Column Content */}
           <div className="lg:sticky lg:top-8 mt-4">
-            <div className="inline-flex items-center gap-2 bg-white border border-[#0565E6]/20 rounded-full pl-2 pr-4 py-1.5 text-xs font-bold text-[#0565E6] mb-6 shadow-sm">
-              <span className="bg-[#0565E6] text-white text-[10px] uppercase px-2 py-0.5 rounded-md font-black">
+            <div className="inline-flex items-center gap-2 bg-white border border-[#2563EB]/20 rounded-full pl-2 pr-4 py-1.5 text-xs font-bold text-[#2563EB] mb-6 shadow-sm">
+              <span className="bg-[#2563EB] text-white text-[10px] uppercase px-2 py-0.5 rounded-md font-black">
                 🤝
               </span>
               Partner With SecondSale - Device Buyback Solutions
@@ -223,7 +223,7 @@ export default function PartnerPage() {
 
             <h1 className="text-[2.25rem] sm:text-[3rem] font-black text-gray-900 leading-[1.1] tracking-tight mb-6">
               Join India's Fastest-Growing <br />
-              <span className="text-[#0565E6]">Buyback Platform</span>
+              <span className="text-[#2563EB]">Buyback Platform</span>
             </h1>
 
             <p className="text-base text-gray-500 leading-relaxed mb-8 max-w-[540px]">
@@ -240,8 +240,8 @@ export default function PartnerPage() {
                   key={i}
                   className="flex items-center gap-3 bg-white border border-gray-100 p-3.5 rounded-xl shadow-sm"
                 >
-                  <div className="w-6 h-6 bg-[#EEF4FF] rounded-full flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={15} className="text-[#0565E6]" />
+                  <div className="w-6 h-6 bg-[#E6F4FF] rounded-full flex items-center justify-center shrink-0">
+                    <CheckCircle2 size={15} className="text-[#2563EB]" />
                   </div>
                   <span className="text-sm font-bold text-gray-700">
                     {bullet}
@@ -282,7 +282,7 @@ export default function PartnerPage() {
                   type="text"
                   required
                   value={formData.businessName}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#0565E6]"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
                   placeholder="e.g. Om Electronics"
                   onChange={(e) =>
                     setFormData({ ...formData, businessName: e.target.value })
@@ -299,7 +299,7 @@ export default function PartnerPage() {
                     type="text"
                     required
                     value={formData.contactPerson}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#0565E6]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
                     placeholder="Full name"
                     onChange={(e) =>
                       setFormData({
@@ -316,7 +316,7 @@ export default function PartnerPage() {
                   <select
                     required
                     value={formData.shopType}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#0565E6]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#2563EB]"
                     onChange={(e) =>
                       setFormData({ ...formData, shopType: e.target.value })
                     }
@@ -339,7 +339,7 @@ export default function PartnerPage() {
                   type="email"
                   required
                   value={formData.email}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#0565E6]"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
                   placeholder="contact@yourfirm.com"
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -361,7 +361,7 @@ export default function PartnerPage() {
                       required
                       pattern="[0-9]{10}"
                       value={formData.mobile}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-16 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#0565E6]"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-16 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
                       placeholder="WhatsApp Active"
                       onChange={(e) =>
                         setFormData({ ...formData, mobile: e.target.value })
@@ -377,7 +377,7 @@ export default function PartnerPage() {
                     type="text"
                     required
                     value={formData.city}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#0565E6]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
                     placeholder="e.g. Mumbai"
                     onChange={(e) =>
                       setFormData({ ...formData, city: e.target.value })
@@ -389,7 +389,7 @@ export default function PartnerPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className={`w-full rounded-xl py-3 font-black text-sm shadow-lg transition duration-200 mt-2 ${submitting ? "bg-gray-400 cursor-not-allowed" : "bg-[#0565E6] hover:bg-blue-700 shadow-[#0565E6]/20"} text-white`}
+                className={`w-full rounded-xl py-3 font-black text-sm shadow-lg transition duration-200 mt-2 ${submitting ? "bg-gray-400 cursor-not-allowed" : "bg-[#2563EB] hover:bg-blue-700 shadow-[#2563EB]/20"} text-white`}
               >
                 {submitting ? "Submitting..." : "Register Storefront Profile"}
               </button>
@@ -431,7 +431,7 @@ export default function PartnerPage() {
           <div className="grid grid-cols-4 gap-6 sm:gap-12">
             {METRICS.map((m, idx) => (
               <div key={idx} className="text-center">
-                <div className="text-xl sm:text-2xl font-black text-[#0565E6]">
+                <div className="text-xl sm:text-2xl font-black text-[#2563EB]">
                   {m.value}
                 </div>
                 <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
@@ -461,7 +461,7 @@ export default function PartnerPage() {
               </div>
               <div className="text-right">
                 <div className="text-xs text-gray-400">Avg Monthly Leads</div>
-                <div className="text-sm font-black text-[#0565E6]">
+                <div className="text-sm font-black text-[#2563EB]">
                   50+ Per Node
                 </div>
               </div>
@@ -503,7 +503,7 @@ export default function PartnerPage() {
                 </div>
               </div>
               <div>
-                <div className="text-lg font-black text-[#0565E6]">50K+</div>
+                <div className="text-lg font-black text-[#2563EB]">50K+</div>
                 <div className="text-[10px] text-gray-400 uppercase tracking-wide">
                   Monthly Success Drops
                 </div>
@@ -523,7 +523,7 @@ export default function PartnerPage() {
             <div className="space-y-8 mt-6">
               {VALUE_PROPS.map((prop, idx) => (
                 <div key={idx} className="flex gap-4">
-                  <div className="w-12 h-12 bg-[#EEF4FF] rounded-xl flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 bg-[#E6F4FF] rounded-xl flex items-center justify-center shrink-0">
                     {prop.icon}
                   </div>
                   <div>
@@ -539,7 +539,7 @@ export default function PartnerPage() {
                           key={bIdx}
                           className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-700 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100"
                         >
-                          <CheckCircle2 size={12} className="text-[#0565E6]" />
+                          <CheckCircle2 size={12} className="text-[#2563EB]" />
                           {b}
                         </span>
                       ))}
@@ -568,7 +568,7 @@ export default function PartnerPage() {
                 className="bg-white border border-gray-200/60 rounded-2xl p-6 relative flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-8 h-8 rounded-lg bg-[#EEF4FF] text-[#0565E6] flex items-center justify-center font-bold text-xs mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-[#E6F4FF] text-[#2563EB] flex items-center justify-center font-bold text-xs mb-4">
                     0{step.num}
                   </div>
                   <h4 className="text-sm font-bold text-gray-900 mb-2">
@@ -600,7 +600,7 @@ export default function PartnerPage() {
             {COHORTS.map((c, idx) => (
               <div
                 key={idx}
-                className="border border-gray-100 rounded-xl p-5 text-center bg-white shadow-sm hover:shadow-md transition hover:border-[#0565E6]/30"
+                className="border border-gray-100 rounded-xl p-5 text-center bg-white shadow-sm hover:shadow-md transition hover:border-[#2563EB]/30"
               >
                 <div
                   className={`w-11 h-11 ${c.bg} rounded-xl flex items-center justify-center mx-auto mb-3.5 shadow-sm`}
@@ -621,7 +621,7 @@ export default function PartnerPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(5,101,230,0.15),transparent_50%)]" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4">
-          <span className="text-[#0565E6] text-xs font-bold uppercase tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
+          <span className="text-[#2563EB] text-xs font-bold uppercase tracking-widest bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
             Performance Frameworks
           </span>
           <h2 className="text-2xl sm:text-3xl font-black text-white mt-4 mb-10">

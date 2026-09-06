@@ -164,10 +164,10 @@ export default function DashboardPage() {
             {/* User Profile Card */}
             <div
               onClick={() => setActiveTab('Profile')}
-              className={`rounded-2xl border p-6 shadow-sm flex items-center gap-4 cursor-pointer transition-all ${activeTab === 'Profile' ? 'bg-[#E8F1FF] border-[#0565E6]' : 'bg-white border-gray-100 hover:border-[#0565E6]/50'}`}
+              className={`rounded-2xl border p-6 shadow-sm flex items-center gap-4 cursor-pointer transition-all ${activeTab === 'Profile' ? 'bg-[#E6F4FF] border-[#2563EB]' : 'bg-white border-gray-100 hover:border-[#2563EB]/50'}`}
             >
-              <div className="w-16 h-16 rounded-full bg-[#E8F1FF] flex items-center justify-center border-4 border-white shadow-sm overflow-hidden shrink-0">
-                <div className="w-10 h-10 rounded-full bg-[#0565E6] flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-[#E6F4FF] flex items-center justify-center border-4 border-white shadow-sm overflow-hidden shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#2563EB] flex items-center justify-center">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                   </svg>
@@ -187,11 +187,11 @@ export default function DashboardPage() {
                   onClick={() => setActiveTab(item.name)}
                   className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group
                     ${activeTab === item.name
-                      ? 'bg-[#E8F1FF] text-[#0565E6]'
+                      ? 'bg-[#E6F4FF] text-[#2563EB]'
                       : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
                 >
                   <div className={`p-2 rounded-lg transition-colors
-                    ${activeTab === item.name ? 'bg-white shadow-sm text-[#0565E6]' : 'bg-gray-50 text-gray-400 group-hover:text-gray-600'}`}>
+                    ${activeTab === item.name ? 'bg-white shadow-sm text-[#2563EB]' : 'bg-gray-50 text-gray-400 group-hover:text-gray-600'}`}>
                     {item.icon}
                   </div>
                   <span className="font-bold text-[15px]">{item.name}</span>
@@ -303,7 +303,7 @@ function ProfileTab({ user, onUpdateProfile }) {
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 border border-[#0565E6] text-[#0565E6] px-5 py-2.5 rounded-full font-bold text-sm hover:bg-[#E8F1FF] transition-all"
+            className="flex items-center gap-2 border border-[#2563EB] text-[#2563EB] px-5 py-2.5 rounded-full font-bold text-sm hover:bg-[#E6F4FF] transition-all"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 5 1 1-11 11-4 1 1-4Z" /><path d="m15 8 1 1" /></svg>
             Edit Profile
@@ -320,7 +320,7 @@ function ProfileTab({ user, onUpdateProfile }) {
               value={formData.firstName}
               onChange={e => setFormData({ ...formData, firstName: e.target.value })}
               disabled={!isEditing}
-              className="w-full bg-[#F9FAFB] border border-transparent rounded-xl px-5 py-4 text-[#111827] font-bold focus:bg-white focus:border-[#0565E6] focus:outline-none transition-all disabled:opacity-80"
+              className="w-full bg-[#F9FAFB] border border-transparent rounded-xl px-5 py-4 text-[#111827] font-bold focus:bg-white focus:border-[#2563EB] focus:outline-none transition-all disabled:opacity-80"
               required
             />
           </div>
@@ -331,7 +331,7 @@ function ProfileTab({ user, onUpdateProfile }) {
               value={formData.lastName}
               onChange={e => setFormData({ ...formData, lastName: e.target.value })}
               disabled={!isEditing}
-              className="w-full bg-[#F9FAFB] border border-transparent rounded-xl px-5 py-4 text-[#111827] font-bold focus:bg-white focus:border-[#0565E6] focus:outline-none transition-all disabled:opacity-80"
+              className="w-full bg-[#F9FAFB] border border-transparent rounded-xl px-5 py-4 text-[#111827] font-bold focus:bg-white focus:border-[#2563EB] focus:outline-none transition-all disabled:opacity-80"
             />
           </div>
           <div>
@@ -341,7 +341,7 @@ function ProfileTab({ user, onUpdateProfile }) {
               value={formData.phone}
               onChange={e => setFormData({ ...formData, phone: e.target.value })}
               disabled={!isEditing}
-              className="w-full bg-[#F9FAFB] border border-transparent rounded-xl px-5 py-4 text-[#111827] font-bold focus:bg-white focus:border-[#0565E6] focus:outline-none transition-all disabled:opacity-80"
+              className="w-full bg-[#F9FAFB] border border-transparent rounded-xl px-5 py-4 text-[#111827] font-bold focus:bg-white focus:border-[#2563EB] focus:outline-none transition-all disabled:opacity-80"
               required
             />
           </div>
@@ -360,7 +360,7 @@ function ProfileTab({ user, onUpdateProfile }) {
           <div className="flex gap-4">
             <button
               type="submit"
-              className="bg-[#0565E6] text-white font-bold py-3 px-8 rounded-xl hover:bg-[#044BA8] transition-colors"
+              className="bg-[#2563EB] text-white font-bold py-3 px-8 rounded-xl hover:bg-[#1D4ED8] transition-colors"
             >
               Save Changes
             </button>
@@ -385,15 +385,15 @@ function ProfileTab({ user, onUpdateProfile }) {
       </form>
 
       <div className="border border-gray-100 rounded-2xl p-6 flex items-start gap-5">
-        <div className="w-10 h-10 rounded-full bg-[#E8F1FF] text-[#0565E6] flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-full bg-[#E6F4FF] text-[#2563EB] flex items-center justify-center shrink-0">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>
         </div>
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <h4 className="text-[15px] font-black text-[#111827]">WhatsApp Updates</h4>
             <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-              <input type="checkbox" defaultChecked className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[#0565E6]" style={{ right: 0, borderColor: '#0565E6' }} />
-              <label className="toggle-label block overflow-hidden h-6 rounded-full bg-[#0565E6] cursor-pointer"></label>
+              <input type="checkbox" defaultChecked className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-[#2563EB]" style={{ right: 0, borderColor: '#2563EB' }} />
+              <label className="toggle-label block overflow-hidden h-6 rounded-full bg-[#2563EB] cursor-pointer"></label>
             </div>
           </div>
           <p className="text-sm text-gray-500 font-medium mt-1 leading-relaxed">
@@ -432,7 +432,7 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
-              className={`px-5 py-2 rounded-lg text-xs font-black transition-all ${categoryFilter === cat ? 'bg-white text-[#0565E6] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`px-5 py-2 rounded-lg text-xs font-black transition-all ${categoryFilter === cat ? 'bg-white text-[#2563EB] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
             >
               {cat}
             </button>
@@ -454,14 +454,14 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
               <div key={order.orderId} className="bg-white border border-gray-100 rounded-[40px] p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
                 {/* Category Tag */}
                 <div className="absolute top-0 right-10">
-                  <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${order.device?.category === 'laptop' ? 'bg-blue-50 text-blue-500' : 'bg-[#E8F1FF] text-[#0565E6]'}`}>
+                  <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${order.device?.category === 'laptop' ? 'bg-blue-50 text-blue-500' : 'bg-[#E6F4FF] text-[#2563EB]'}`}>
                     {order.device?.category || 'Mobile'}
                   </div>
                 </div>
                 {/* Top Status Bar */}
                 <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-50">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-[#E8F1FF] rounded-full flex items-center justify-center text-[#0565E6]">
+                    <div className="w-12 h-12 bg-[#E6F4FF] rounded-full flex items-center justify-center text-[#2563EB]">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
                     <div>
@@ -471,7 +471,7 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
                   </div>
                   <button
                     onClick={() => navigate(`/orders/${order.orderId}`)}
-                    className="px-8 py-3 rounded-xl border-2 border-[#0565E6] text-[#0565E6] font-black text-sm hover:bg-[#0565E6] hover:text-white transition-all"
+                    className="px-8 py-3 rounded-xl border-2 border-[#2563EB] text-[#2563EB] font-black text-sm hover:bg-[#2563EB] hover:text-white transition-all"
                   >
                     View Details
                   </button>
@@ -539,7 +539,7 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
               <IconChevronLeft />
             </button>
             <div className="flex items-center gap-2">
-              <span className="w-10 h-10 rounded-xl bg-[#E8F1FF] text-[#0565E6] flex items-center justify-center font-black">1</span>
+              <span className="w-10 h-10 rounded-xl bg-[#E6F4FF] text-[#2563EB] flex items-center justify-center font-black">1</span>
             </div>
             <button className="flex items-center justify-center w-12 h-12 rounded-2xl border border-gray-100 bg-white text-gray-400 hover:text-[#111827] hover:border-gray-200 transition-all">
               <IconChevronRight />
@@ -582,7 +582,7 @@ function AddressTab({ addresses, onAdd, onDelete }) {
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 px-6 py-3 rounded-xl border border-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-all shadow-sm"
         >
-          <span className="text-[#0565E6] text-xl">{showForm ? '×' : '+'}</span> {showForm ? 'Cancel' : 'Add New Address'}
+          <span className="text-[#2563EB] text-xl">{showForm ? '×' : '+'}</span> {showForm ? 'Cancel' : 'Add New Address'}
         </button>
       </div>
 
@@ -590,28 +590,28 @@ function AddressTab({ addresses, onAdd, onDelete }) {
         <form onSubmit={handleSubmit} className="bg-gray-50 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             placeholder="Label (e.g. Home, Office)"
-            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
             value={formData.label}
             onChange={(e) => setFormData({ ...formData, label: e.target.value })}
             required
           />
           <input
             placeholder="Full Name"
-            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
           <input
             placeholder="Phone Number"
-            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             required
           />
           <input
             placeholder="Pincode"
-            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
             value={formData.pincode}
             onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
             required
@@ -619,7 +619,7 @@ function AddressTab({ addresses, onAdd, onDelete }) {
           <div className="md:col-span-2">
             <textarea
               placeholder="Full Address"
-              className="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+              className="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               required
@@ -627,25 +627,25 @@ function AddressTab({ addresses, onAdd, onDelete }) {
           </div>
           <input
             placeholder="Landmark"
-            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
             value={formData.landmark}
             onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
           />
           <input
             placeholder="City"
-            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
             value={formData.city}
             onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             required
           />
           <input
             placeholder="State"
-            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+            className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
             value={formData.state}
             onChange={(e) => setFormData({ ...formData, state: e.target.value })}
             required
           />
-          <button type="submit" className="md:col-span-2 bg-[#0565E6] text-white font-bold py-3 rounded-xl hover:bg-[#044BA8] transition-colors mt-2">
+          <button type="submit" className="md:col-span-2 bg-[#2563EB] text-white font-bold py-3 rounded-xl hover:bg-[#1D4ED8] transition-colors mt-2">
             Save Address
           </button>
         </form>
@@ -658,9 +658,9 @@ function AddressTab({ addresses, onAdd, onDelete }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {addresses.map((addr) => (
-            <div key={addr._id} className="border border-gray-100 rounded-2xl p-5 relative group hover:border-[#0565E6]/30 transition-all">
+            <div key={addr._id} className="border border-gray-100 rounded-2xl p-5 relative group hover:border-[#2563EB]/30 transition-all">
               <div className="flex items-center justify-between mb-3">
-                <span className="px-3 py-1 bg-[#E8F1FF] text-[#0565E6] text-xs font-bold rounded-full uppercase">{addr.label}</span>
+                <span className="px-3 py-1 bg-[#E6F4FF] text-[#2563EB] text-xs font-bold rounded-full uppercase">{addr.label}</span>
                 <button
                   onClick={() => onDelete(addr._id)}
                   className="text-gray-400 hover:text-red-500 transition-colors"
@@ -672,7 +672,7 @@ function AddressTab({ addresses, onAdd, onDelete }) {
               <p className="text-sm text-gray-500 mt-1">{addr.address}</p>
               <p className="text-sm text-gray-500">{addr.city}, {addr.state} - {addr.pincode}</p>
               <p className="text-sm text-gray-500 mt-2 font-medium">📞 {addr.phone}</p>
-              {addr.isDefault && <p className="text-[10px] text-[#0565E6] font-bold mt-3 uppercase tracking-wider">Default Address</p>}
+              {addr.isDefault && <p className="text-[10px] text-[#2563EB] font-bold mt-3 uppercase tracking-wider">Default Address</p>}
             </div>
           ))}
         </div>
@@ -712,17 +712,17 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
       <div className="space-y-4">
         {/* Forms for adding */}
         {showForm && (
-          <div className="bg-gray-50 rounded-3xl p-6 border border-[#0565E6]/20">
+          <div className="bg-gray-50 rounded-3xl p-6 border border-[#2563EB]/20">
             <div className="flex gap-4 mb-6">
               <button
                 onClick={() => setType('bank')}
-                className={`flex-1 py-2 rounded-xl font-bold text-sm transition-all ${type === 'bank' ? 'bg-[#0565E6] text-white shadow-md' : 'bg-white text-gray-500 border border-gray-100'}`}
+                className={`flex-1 py-2 rounded-xl font-bold text-sm transition-all ${type === 'bank' ? 'bg-[#2563EB] text-white shadow-md' : 'bg-white text-gray-500 border border-gray-100'}`}
               >
                 Bank Account
               </button>
               <button
                 onClick={() => setType('upi')}
-                className={`flex-1 py-2 rounded-xl font-bold text-sm transition-all ${type === 'upi' ? 'bg-[#0565E6] text-white shadow-md' : 'bg-white text-gray-500 border border-gray-100'}`}
+                className={`flex-1 py-2 rounded-xl font-bold text-sm transition-all ${type === 'upi' ? 'bg-[#2563EB] text-white shadow-md' : 'bg-white text-gray-500 border border-gray-100'}`}
               >
                 UPI ID
               </button>
@@ -733,28 +733,28 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
                 <>
                   <input
                     placeholder="Account Holder Name"
-                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
                     value={formData.accountName}
                     onChange={(e) => setFormData({ ...formData, accountName: e.target.value })}
                     required
                   />
                   <input
                     placeholder="Bank Name"
-                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
                     value={formData.bankName}
                     onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                     required
                   />
                   <input
                     placeholder="Account Number"
-                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
                     value={formData.accountNumber}
                     onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
                     required
                   />
                   <input
                     placeholder="IFSC Code"
-                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+                    className="p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
                     value={formData.ifscCode}
                     onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value })}
                     required
@@ -764,7 +764,7 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
                 <div className="md:col-span-2">
                   <input
                     placeholder="UPI ID (e.g. name@bank)"
-                    className="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0565E6]/50"
+                    className="w-full p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/50"
                     value={formData.upiId}
                     onChange={(e) => setFormData({ ...formData, upiId: e.target.value })}
                     required
@@ -772,7 +772,7 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
                 </div>
               )}
               <div className="md:col-span-2 flex gap-3 mt-2">
-                <button type="submit" className="flex-1 bg-[#0565E6] text-white font-bold py-3 rounded-xl hover:bg-[#044BA8] transition-colors">
+                <button type="submit" className="flex-1 bg-[#2563EB] text-white font-bold py-3 rounded-xl hover:bg-[#1D4ED8] transition-colors">
                   Save Payment Method
                 </button>
                 <button
@@ -788,10 +788,10 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
         )}
 
         {/* Bank Account List */}
-        <div className="border border-gray-100 rounded-3xl p-6 relative overflow-hidden group hover:border-[#0565E6]/20 transition-colors">
+        <div className="border border-gray-100 rounded-3xl p-6 relative overflow-hidden group hover:border-[#2563EB]/20 transition-colors">
           <div className="flex items-start justify-between">
             <div className="flex gap-4">
-              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-[#E8F1FF] group-hover:text-[#0565E6] transition-colors">
+              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-[#E6F4FF] group-hover:text-[#2563EB] transition-colors">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>
               </div>
               <div className="flex-1">
@@ -819,15 +819,15 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
                 <p className="text-xs text-gray-400 mt-2">Bank transfers are sent directly to your account.</p>
               </div>
             </div>
-            {!showForm && <button onClick={() => { setShowForm(true); setType('bank'); }} className="text-[#0565E6] font-bold text-sm hover:underline">Add New Bank Account</button>}
+            {!showForm && <button onClick={() => { setShowForm(true); setType('bank'); }} className="text-[#2563EB] font-bold text-sm hover:underline">Add New Bank Account</button>}
           </div>
         </div>
 
         {/* UPI List */}
-        <div className="border border-gray-100 rounded-3xl p-6 relative overflow-hidden group hover:border-[#0565E6]/20 transition-colors">
+        <div className="border border-gray-100 rounded-3xl p-6 relative overflow-hidden group hover:border-[#2563EB]/20 transition-colors">
           <div className="flex items-start justify-between">
             <div className="flex gap-4">
-              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-[#E8F1FF] group-hover:text-[#0565E6] transition-colors">
+              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-[#E6F4FF] group-hover:text-[#2563EB] transition-colors">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4Z" /></svg>
               </div>
               <div className="flex-1">
@@ -854,7 +854,7 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
                 <p className="text-xs text-gray-400 mt-2">Instant transfer to your UPI linked account.</p>
               </div>
             </div>
-            {!showForm && <button onClick={() => { setShowForm(true); setType('upi'); }} className="text-[#0565E6] font-bold text-sm hover:underline">Add New UPI ID</button>}
+            {!showForm && <button onClick={() => { setShowForm(true); setType('upi'); }} className="text-[#2563EB] font-bold text-sm hover:underline">Add New UPI ID</button>}
           </div>
         </div>
 
@@ -873,10 +873,10 @@ function PaymentTab({ paymentMethods, onAdd, onDelete }) {
 function EarningsTab() {
   return (
     <div className="h-full flex flex-col">
-      <div className="bg-[#0565E6] rounded-3xl p-10 text-white text-center relative overflow-hidden mb-10">
+      <div className="bg-[#2563EB] rounded-3xl p-10 text-white text-center relative overflow-hidden mb-10">
         <div className="relative z-10">
           <h2 className="text-4xl font-black mb-4">Earnings Dashboard</h2>
-          <span className="inline-block bg-white text-[#0565E6] px-6 py-2 rounded-full font-bold text-sm">Coming Soon</span>
+          <span className="inline-block bg-white text-[#2563EB] px-6 py-2 rounded-full font-bold text-sm">Coming Soon</span>
         </div>
         <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
@@ -893,12 +893,12 @@ function EarningsTab() {
           { title: 'Earnings History', desc: 'Track your complete earnings history with detailed transaction records.', icon: <IconOrders /> },
         ].map((card) => (
           <div key={card.title} className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all">
-            <div className="w-12 h-12 bg-[#E8F1FF] rounded-2xl flex items-center justify-center text-[#0565E6] mb-6">
+            <div className="w-12 h-12 bg-[#E6F4FF] rounded-2xl flex items-center justify-center text-[#2563EB] mb-6">
               {card.icon}
             </div>
             <h4 className="font-bold text-[#111827] mb-3">{card.title}</h4>
             <p className="text-sm text-gray-500 leading-relaxed mb-6">{card.desc}</p>
-            <button className="text-[#0565E6] font-bold text-sm flex items-center gap-1 group">
+            <button className="text-[#2563EB] font-bold text-sm flex items-center gap-1 group">
               Learn more <span className="transition-transform group-hover:translate-x-1">→</span>
             </button>
           </div>
@@ -912,7 +912,7 @@ function ReferralTab({ referral, copyCode, copied }) {
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-[10px] font-bold text-[#0565E6] uppercase tracking-widest mb-1">Refer & Earn</p>
+        <p className="text-[10px] font-bold text-[#2563EB] uppercase tracking-widest mb-1">Refer & Earn</p>
         <h2 className="text-3xl font-bold text-[#111827] max-w-md leading-tight">
           Share your referral link, earn instant rewards
         </h2>
@@ -921,12 +921,12 @@ function ReferralTab({ referral, copyCode, copied }) {
         </p>
       </div>
 
-      <div className="border border-[#0565E6]/30 bg-white rounded-3xl p-8 relative">
-        <div className="absolute top-4 right-6 text-[#0565E6]/20">
+      <div className="border border-[#2563EB]/30 bg-white rounded-3xl p-8 relative">
+        <div className="absolute top-4 right-6 text-[#2563EB]/20">
           <IconReferral />
         </div>
 
-        <p className="text-[10px] font-bold text-[#0565E6] uppercase tracking-widest mb-4">Your Referral Link</p>
+        <p className="text-[10px] font-bold text-[#2563EB] uppercase tracking-widest mb-4">Your Referral Link</p>
 
         <div className="mb-8">
           <div className="bg-[#F9FAFB] border border-gray-100 rounded-2xl p-5 text-gray-500 font-medium">
@@ -939,7 +939,7 @@ function ReferralTab({ referral, copyCode, copied }) {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <button className="flex-1 bg-[#044BA8] text-white font-bold py-4 rounded-2xl hover:bg-[#0452B8] transition-colors shadow-lg shadow-blue-200">
+          <button className="flex-1 bg-[#1D4ED8] text-white font-bold py-4 rounded-2xl hover:bg-[#0452B8] transition-colors shadow-lg shadow-blue-200">
             Generate Link
           </button>
           <button
@@ -1032,7 +1032,7 @@ function DeviceEvaluationReportModal({ order, onClose }) {
           {/* Device Evaluation Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-black text-[#0565E6] mb-1">Device Evaluation</h3>
+              <h3 className="text-lg font-black text-[#2563EB] mb-1">Device Evaluation</h3>
               <p className="text-sm font-black text-[#111827]">Summary</p>
             </div>
 

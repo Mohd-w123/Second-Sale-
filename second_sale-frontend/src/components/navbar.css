@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .navbar-root {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -39,7 +39,7 @@
   gap: 2px;
 }
 .logo-chevrons {
-  color: #0565E6;
+  color: #2563EB;
   font-size: 22px;
   font-weight: 900;
   letter-spacing: -4px;
@@ -64,14 +64,14 @@
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   color: #333;
   outline: none;
   background: #fafafa;
   transition: border-color 0.2s, background 0.2s;
 }
 .navbar-search input:focus {
-  border-color: #0565E6;
+  border-color: #2563EB;
   background: #fff;
 }
 .navbar-search input::placeholder { color: #aaa; }
@@ -89,7 +89,7 @@
   padding: 0;
   transition: color 0.2s;
 }
-.search-btn:hover { color: #0565E6; }
+.search-btn:hover { color: #2563EB; }
 
 /* Right Actions */
 .navbar-actions {
@@ -105,7 +105,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #333;
@@ -113,13 +113,13 @@
   border-radius: 8px;
   transition: background 0.15s, color 0.15s;
 }
-.btn-login:hover { background: #f4f4f4; color: #0565E6; }
+.btn-login:hover { background: #f4f4f4; color: #2563EB; }
 .btn-download {
-  background: #0565E6;
+  background: #2563EB;
   color: #fff;
   border: none;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -156,7 +156,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: #555;
@@ -165,7 +165,7 @@
   white-space: nowrap;
   transition: color 0.15s, background 0.15s;
 }
-.nav-item-btn:hover { color: #0565E6; background: #EFF2FF; }
+.nav-item-btn:hover { color: #2563EB; background: #EFF2FF; }
 .nav-item-btn.active {
   color: #111;
   font-weight: 700;
@@ -201,14 +201,14 @@
   color: #444;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-weight: 400;
   border: none;
   background: none;
   width: 100%;
   text-align: left;
 }
-.dropdown-item:hover { background: #EFF2FF; color: #0565E6; font-weight: 500; }
+.dropdown-item:hover { background: #EFF2FF; color: #2563EB; font-weight: 500; }
 
 /* Mobile Hamburger */
 .hamburger-btn {
@@ -256,7 +256,7 @@
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   color: #333;
   outline: none;
   background: #fafafa;
@@ -270,7 +270,7 @@
   padding: 14px 24px;
   background: none;
   border: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #333;
@@ -280,7 +280,7 @@
   border-bottom: 1px solid #f7f7f7;
 }
 .mobile-nav-btn:hover { background: #f9f9f9; }
-.mobile-nav-btn.active { color: #0565E6; font-weight: 700; }
+.mobile-nav-btn.active { color: #2563EB; font-weight: 700; }
 .mobile-dropdown {
   background: #f9fdfb;
   border-bottom: 1px solid #f0f0f0;
@@ -291,14 +291,14 @@
   font-size: 14px;
   color: #555;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   transition: color 0.12s;
   border: none;
   background: none;
   width: 100%;
   text-align: left;
 }
-.mobile-dropdown-item:hover { color: #0565E6; }
+.mobile-dropdown-item:hover { color: #2563EB; }
 .mobile-actions {
   display: flex;
   flex-direction: column;
@@ -314,7 +314,7 @@
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   background: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #333;
@@ -322,14 +322,14 @@
   transition: border-color 0.2s, color 0.2s;
   text-decoration: none;
 }
-.mobile-btn-login:hover { border-color: #0565E6; color: #0565E6; }
+.mobile-btn-login:hover { border-color: #2563EB; color: #2563EB; }
 .mobile-btn-download {
-  background: #0565E6;
+  background: #2563EB;
   color: #fff;
   border: none;
   border-radius: 10px;
   padding: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -378,7 +378,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   text-align: left;
   transition: background 0.12s;
 }
@@ -445,7 +445,7 @@
 .search-result-price {
   font-size: 13px;
   font-weight: 700;
-  color: #0565E6;
+  color: #2563EB;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -465,7 +465,7 @@
   width: 18px;
   height: 18px;
   border: 2.5px solid #e0e0e0;
-  border-top-color: #0565E6;
+  border-top-color: #2563EB;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -474,7 +474,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #e0e0e0;
-  border-top-color: #0565E6;
+  border-top-color: #2563EB;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }

@@ -1,13 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo-secondsale.png";
 import { SOCIAL_LINKS as SOCIAL_URLS } from "../config/seo";
-
-const FooterLogo = () => (
-  <div className="flex items-center gap-2">
-    <img src={logo} alt="SecondSale Logo" className="w-8 h-8 object-contain" />
-    <span className="text-2xl font-bold text-white tracking-tight">SecondSale</span>
-  </div>
-);
 
 const FOOTER_LINKS = {
   "Sell Device": ["Sell Mobile", "Sell Tablet", "Sell Laptop", "Sell Mac", "Corporate Sell"],
@@ -63,25 +57,24 @@ const SOCIAL_LINKS = [
   },
 ];
 
-const PlayStoreIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M3.18 23.76c.3.17.65.2.98.09L14.84 12 3.18.15a1.1 1.1 0 0 0-.98.09C1.84.61 1.5 1.04 1.5 1.6v20.8c0 .56.34.99.84 1.27.28.15.56.16.84.09zM16.55 10.33l-2.29-2.29 2.64-4.56 4.08 2.36c.62.36.62 1.26 0 1.62l-4.43 2.87zM14.84 12l-11.66 11.76 13.26-7.67L14.84 12zM14.84 12l1.6-1.6-11.26-9.96L14.84 12z" />
-  </svg>
-);
-
-const AppStoreIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-  </svg>
-);
-
 export default function Footer() {
+  const [siteLogo, setSiteLogo] = useState(logo);
+
+  useEffect(() => {
+    const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+    fetch(API + "/site-settings")
+      .then(r => r.json())
+      .then(data => { if (data?.logoUrl) setSiteLogo(data.logoUrl); })
+      .catch(() => {});
+  }, []);
   return (
-    <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
+    <footer className="bg-[#0F2D5B] text-gray-300 pt-16 pb-8">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">
         {/* Brand */}
         <div className="space-y-6">
-          <FooterLogo />
+          <Link to="/" className="inline-block no-underline">
+            <img src={siteLogo || logo} alt="SecondSale Logo" className="h-10 w-auto object-contain brightness-0 invert" />
+          </Link>
           <p className="text-sm leading-relaxed text-gray-400 max-w-xs">
             India's most trusted platform to sell your old devices. Get the best price instantly with free doorstep pickup.
           </p>
@@ -93,7 +86,7 @@ export default function Footer() {
               ))}
             </div>
             <p className="text-xs font-medium">
-              <strong className="text-white text-sm">4.8</strong> / 5 · 10,000+ Happy Customers
+              <strong className="text-white text-sm">4.9</strong> / 5 · 50,000+ Happy Customers
             </p>
           </div>
 
@@ -106,7 +99,7 @@ export default function Footer() {
             <ul className="space-y-3.5 list-none p-0 m-0">
               {links.map((link) => (
                 <li key={link}>
-                  <Link to={getLinkRoute(link)} className="text-sm hover:text-primary transition-colors no-underline">
+                  <Link to={getLinkRoute(link)} className="text-sm text-gray-400 hover:text-[#2563EB] transition-colors no-underline">
                     {link}
                   </Link>
                 </li>
@@ -117,13 +110,13 @@ export default function Footer() {
       </div>
 
       <div className="max-w-[1200px] mx-auto px-4 sm:px-8">
-        <hr className="border-gray-800 mb-8" />
+        <hr className="border-[#1e4080] mb-8" />
         
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-xs text-gray-500 text-center md:text-left">
             © {new Date().getFullYear()} SecondSale. All rights reserved. &nbsp;
-            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link> &nbsp;·&nbsp;
-            <Link to="/terms-and-conditions" className="hover:text-white transition-colors">Terms of Use</Link>
+            <Link to="/privacy-policy" className="hover:text-[#2563EB] transition-colors text-gray-500 no-underline">Privacy Policy</Link> &nbsp;·&nbsp;
+            <Link to="/terms-and-conditions" className="hover:text-[#2563EB] transition-colors text-gray-500 no-underline">Terms of Use</Link>
           </p>
 
           <div className="flex items-center gap-4 text-[10px] font-bold tracking-widest text-gray-600 uppercase">
@@ -133,7 +126,7 @@ export default function Footer() {
 
           <div className="flex items-center gap-4">
             {SOCIAL_LINKS.map((s) => (
-              <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary transition-all hover:scale-110" aria-label={s.name}>
+              <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#2563EB] transition-all hover:scale-110 no-underline" aria-label={s.name}>
                 {s.icon}
               </a>
             ))}

@@ -157,7 +157,7 @@ export default function TabletConditionQuizPage() {
           {/* Header Progress */}
           <div className="flex items-center justify-end gap-12 mb-10 text-sm font-bold">
             <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-[#0565E6] text-white flex items-center justify-center">1</span>
+              <span className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center">1</span>
               <span className="text-[#111827]">Payment</span>
             </div>
             <div className="flex items-center gap-3 opacity-30">
@@ -180,20 +180,20 @@ export default function TabletConditionQuizPage() {
                     />
                   </div>
                   <div className="flex-1 text-center sm:text-left">
-                    <span className="text-[#0565E6] text-sm font-black uppercase tracking-wider mb-2 block">Offer ready — instant payout</span>
+                    <span className="text-[#2563EB] text-sm font-black uppercase tracking-wider mb-2 block">Offer ready — instant payout</span>
                     <h1 className="text-2xl sm:text-3xl font-black text-[#111827] mb-4">
                       {device.modelName} ({storage || device.variants[0].storage})
                     </h1>
                     <div className="flex items-center justify-center sm:justify-start gap-4 mb-6">
                       <span className="text-5xl font-black text-[#111827]">{formatCurrency(currentPrice)}</span>
-                      <div className="flex items-center gap-1.5 bg-[#E8F1FF] text-[#0565E6] px-3 py-1.5 rounded-xl border border-[#0565E6]/10">
+                      <div className="flex items-center gap-1.5 bg-[#E6F4FF] text-[#2563EB] px-3 py-1.5 rounded-xl border border-[#2563EB]/10">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
                         <span className="text-xs font-black uppercase tracking-wider">Guaranteed</span>
                       </div>
                     </div>
                     <button 
                       onClick={() => setShowResult(false)}
-                      className="text-[#0565E6] font-black text-sm underline underline-offset-8 hover:text-[#044BA8] transition-all"
+                      className="text-[#2563EB] font-black text-sm underline underline-offset-8 hover:text-[#1D4ED8] transition-all"
                     >
                       Recalculate
                     </button>
@@ -204,7 +204,7 @@ export default function TabletConditionQuizPage() {
                   <label className="flex items-start gap-4 cursor-pointer group">
                     <div className="relative mt-1">
                       <input type="checkbox" defaultChecked className="sr-only peer" />
-                      <div className="w-6 h-6 border-2 border-gray-200 rounded-lg peer-checked:bg-[#0565E6] peer-checked:border-[#0565E6] transition-all" />
+                      <div className="w-6 h-6 border-2 border-gray-200 rounded-lg peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] transition-all" />
                       <svg className="absolute top-1 left-1 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
                     <span className="text-sm font-medium text-gray-500 leading-relaxed group-hover:text-[#111827] transition-colors">
@@ -214,18 +214,18 @@ export default function TabletConditionQuizPage() {
                   <label className="flex items-start gap-4 cursor-pointer group">
                     <div className="relative mt-1">
                       <input type="checkbox" defaultChecked className="sr-only peer" />
-                      <div className="w-6 h-6 border-2 border-gray-200 rounded-lg peer-checked:bg-[#0565E6] peer-checked:border-[#0565E6] transition-all" />
+                      <div className="w-6 h-6 border-2 border-gray-200 rounded-lg peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] transition-all" />
                       <svg className="absolute top-1 left-1 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
                     <span className="text-sm font-medium text-gray-500 leading-relaxed group-hover:text-[#111827] transition-colors">
-                      I agree to the <span className="text-[#0565E6] font-bold">terms and conditions</span> of the service and understand that the final value of {formatCurrency(currentPrice)} is subject to physical device inspection by our technician at the time of pickup.
+                      I agree to the <span className="text-[#2563EB] font-bold">terms and conditions</span> of the service and understand that the final value of {formatCurrency(currentPrice)} is subject to physical device inspection by our technician at the time of pickup.
                     </span>
                   </label>
                 </div>
 
                 <button 
                   onClick={handleSchedulePickup}
-                  className="w-full mt-10 bg-[#0565E6] text-white font-black py-6 rounded-3xl hover:bg-[#044BA8] transition-all shadow-xl shadow-blue-100 text-lg flex items-center justify-center gap-2 group"
+                  className="w-full mt-10 bg-[#2563EB] text-white font-black py-6 rounded-3xl hover:bg-[#1D4ED8] transition-all shadow-xl shadow-blue-100 text-lg flex items-center justify-center gap-2 group"
                 >
                   Get My {formatCurrency(currentPrice)} Now
                   <svg className="transition-transform group-hover:translate-x-1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -233,13 +233,13 @@ export default function TabletConditionQuizPage() {
 
                 <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-4 text-[13px] font-bold text-gray-400">
                   <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#0565E6]" /> Free doorstep pickup
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Free doorstep pickup
                   </span>
                   <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#0565E6]" /> Instant payment at pickup
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Instant payment at pickup
                   </span>
                   <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#0565E6]" /> Price locked for 24h
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Price locked for 24h
                   </span>
                 </div>
               </div>
@@ -248,14 +248,14 @@ export default function TabletConditionQuizPage() {
               <div className="bg-white rounded-[40px] border border-gray-100 p-10 shadow-sm">
                 <h3 className="text-2xl font-black text-[#111827] mb-10">Device Evaluation</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                  <EvaluationRow label="Device Age" value={deviceAge} color="#0565E6" />
-                  <EvaluationRow label="Under Warranty" value={underWarranty ? 'Yes' : 'No'} color={underWarranty ? '#0565E6' : '#EF4444'} />
-                  <EvaluationRow label="Calls Functional" value={ableToMakeCalls ? 'Yes' : 'No (Dead)'} color={ableToMakeCalls ? '#0565E6' : '#EF4444'} />
-                  <EvaluationRow label="Touch Screen working" value={isTouchScreenWorking ? 'Yes' : 'No'} color={isTouchScreenWorking ? '#0565E6' : '#EF4444'} />
-                  <EvaluationRow label="Screen Original" value={isScreenOriginal ? 'Yes' : 'No (Copy Screen)'} color={isScreenOriginal ? '#0565E6' : '#EF4444'} />
-                  <EvaluationRow label="Physical Issues" value={physicalIssues.length > 0 ? physicalIssues.join(', ') : 'No Issues'} color={physicalIssues.length > 0 ? '#EF4444' : '#0565E6'} />
-                  <EvaluationRow label="Technical Issues" value={technicalIssues.length > 0 ? technicalIssues.join(', ') : 'No Issues'} color={technicalIssues.length > 0 ? '#EF4444' : '#0565E6'} />
-                  <EvaluationRow label="Accessories" value={selectedAccessories.join(', ') || 'None'} color="#0565E6" />
+                  <EvaluationRow label="Device Age" value={deviceAge} color="#2563EB" />
+                  <EvaluationRow label="Under Warranty" value={underWarranty ? 'Yes' : 'No'} color={underWarranty ? '#2563EB' : '#EF4444'} />
+                  <EvaluationRow label="Calls Functional" value={ableToMakeCalls ? 'Yes' : 'No (Dead)'} color={ableToMakeCalls ? '#2563EB' : '#EF4444'} />
+                  <EvaluationRow label="Touch Screen working" value={isTouchScreenWorking ? 'Yes' : 'No'} color={isTouchScreenWorking ? '#2563EB' : '#EF4444'} />
+                  <EvaluationRow label="Screen Original" value={isScreenOriginal ? 'Yes' : 'No (Copy Screen)'} color={isScreenOriginal ? '#2563EB' : '#EF4444'} />
+                  <EvaluationRow label="Physical Issues" value={physicalIssues.length > 0 ? physicalIssues.join(', ') : 'No Issues'} color={physicalIssues.length > 0 ? '#EF4444' : '#2563EB'} />
+                  <EvaluationRow label="Technical Issues" value={technicalIssues.length > 0 ? technicalIssues.join(', ') : 'No Issues'} color={technicalIssues.length > 0 ? '#EF4444' : '#2563EB'} />
+                  <EvaluationRow label="Accessories" value={selectedAccessories.join(', ') || 'None'} color="#2563EB" />
                 </div>
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function TabletConditionQuizPage() {
               {/* Payment Summary */}
               <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm">
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-10 h-10 bg-[#E8F1FF] rounded-xl flex items-center justify-center text-[#0565E6]">
+                  <div className="w-10 h-10 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB]">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                   </div>
                   <h3 className="text-xl font-black text-[#111827]">Payment Summary</h3>
@@ -285,7 +285,7 @@ export default function TabletConditionQuizPage() {
               {/* Apply Coupon */}
               <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-10 h-10 bg-[#E8F1FF] rounded-xl flex items-center justify-center text-[#0565E6]">
+                  <div className="w-10 h-10 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB]">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 5V7M15 11V13M15 17V19M5 5C3.34315 5 2 6.34315 2 8V10C3.10457 10 4 10.8954 4 12C4 13.1046 3.10457 14 2 14V16C2 17.6569 3.34315 19 5 19H19C20.6569 19 22 17.6569 22 16V14C20.8954 14 20 13.1046 20 12C20 10.8954 20.8954 10 22 10V8C22 6.34315 20.6569 5 19 5H5Z"/></svg>
                   </div>
                   <div>
@@ -302,7 +302,7 @@ export default function TabletConditionQuizPage() {
                   <input 
                     type="text" 
                     placeholder="Type coupon code here" 
-                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-bold focus:outline-none focus:border-[#0565E6] transition-all"
+                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
                   />
                   <button className="bg-gray-100 text-gray-400 px-6 py-3.5 rounded-xl font-black text-sm cursor-not-allowed">
                     Apply
@@ -313,7 +313,7 @@ export default function TabletConditionQuizPage() {
               {/* Cancellation Policy */}
               <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-10 h-10 bg-[#E8F1FF] rounded-xl flex items-center justify-center text-[#0565E6]">
+                  <div className="w-10 h-10 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB]">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"/></svg>
                   </div>
                   <h3 className="text-lg font-black text-[#111827]">Cancellation Policy</h3>
@@ -344,7 +344,7 @@ export default function TabletConditionQuizPage() {
                 <img src={device.imageUrl || 'https://img.freepik.com/free-photo/mobile-phone-with-blank-screen_23-2148151433.jpg'} alt={device.modelName} className="h-full object-contain" />
               </div>
               <div>
-                <p className="text-[#0565E6] text-xs font-bold uppercase tracking-wider mb-1">Evaluating</p>
+                <p className="text-[#2563EB] text-xs font-bold uppercase tracking-wider mb-1">Evaluating</p>
                 <h1 className="text-2xl font-black text-[#111827]">
                   {device.modelName} <span className="text-gray-400 font-medium">({storage || device.variants[0].storage})</span>
                 </h1>
@@ -356,7 +356,7 @@ export default function TabletConditionQuizPage() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
                 {STEPS.map((s, idx) => (
                   <div key={s.id} className="flex items-center gap-2">
-                    <span className={`text-xs font-bold ${idx === currentStepIndex ? 'text-[#0565E6]' : 'text-gray-400'}`}>
+                    <span className={`text-xs font-bold ${idx === currentStepIndex ? 'text-[#2563EB]' : 'text-gray-400'}`}>
                       {s.label}
                     </span>
                     {idx < STEPS.length - 1 && <span className="text-gray-300 text-xs font-bold">&gt;</span>}
@@ -365,7 +365,7 @@ export default function TabletConditionQuizPage() {
               </div>
               <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-[#0565E6] transition-all duration-500" 
+                  className="h-full bg-[#2563EB] transition-all duration-500" 
                   style={{ width: `${((currentStepIndex + 1) / STEPS.length) * 100}%` }}
                 />
               </div>
@@ -387,7 +387,7 @@ export default function TabletConditionQuizPage() {
                             onClick={() => setDeviceAge(age)}
                             className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                               ${deviceAge === age 
-                                ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                                ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                                 : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                           >
                             {age}
@@ -408,7 +408,7 @@ export default function TabletConditionQuizPage() {
                           disabled={deviceAge === 'Above 11 Months'}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${underWarranty === true 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}
                             ${deviceAge === 'Above 11 Months' ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
@@ -419,7 +419,7 @@ export default function TabletConditionQuizPage() {
                           disabled={deviceAge === 'Above 11 Months'}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${underWarranty === false 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}
                             ${deviceAge === 'Above 11 Months' ? 'cursor-not-allowed' : ''}`}
                         >
@@ -441,7 +441,7 @@ export default function TabletConditionQuizPage() {
                           onClick={() => setAbleToMakeCalls(true)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${ableToMakeCalls === true 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           Yes
@@ -450,7 +450,7 @@ export default function TabletConditionQuizPage() {
                           onClick={() => setAbleToMakeCalls(false)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${ableToMakeCalls === false 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           No (Dead)
@@ -466,7 +466,7 @@ export default function TabletConditionQuizPage() {
                           onClick={() => setIsTouchScreenWorking(true)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isTouchScreenWorking === true 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           Yes
@@ -475,7 +475,7 @@ export default function TabletConditionQuizPage() {
                           onClick={() => setIsTouchScreenWorking(false)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isTouchScreenWorking === false 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           No
@@ -491,7 +491,7 @@ export default function TabletConditionQuizPage() {
                           onClick={() => setIsScreenOriginal(true)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isScreenOriginal === true 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           Yes
@@ -500,7 +500,7 @@ export default function TabletConditionQuizPage() {
                           onClick={() => setIsScreenOriginal(false)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isScreenOriginal === false 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           No (Copy Screen)
@@ -535,12 +535,12 @@ export default function TabletConditionQuizPage() {
                             }}
                             className={`p-6 rounded-2xl border-2 text-left transition-all flex flex-col justify-between h-40
                               ${selected 
-                                ? 'border-[#0565E6] bg-[#E8F1FF]' 
+                                ? 'border-[#2563EB] bg-[#E6F4FF]' 
                                 : 'border-gray-100 bg-white hover:border-gray-200'}`}
                           >
                             <span className="text-[40px]">{issue.icon}</span>
                             <div>
-                              <p className={`font-black text-[15px] ${selected ? 'text-[#0565E6]' : 'text-[#111827]'}`}>{issue.label}</p>
+                              <p className={`font-black text-[15px] ${selected ? 'text-[#2563EB]' : 'text-[#111827]'}`}>{issue.label}</p>
                               <p className="text-[15px] text-gray-400 mt-1">{issue.desc}</p>
                             </div>
                           </button>
@@ -586,7 +586,7 @@ export default function TabletConditionQuizPage() {
                             }}
                             className={`p-4 rounded-xl border-2 text-center transition-all flex flex-col items-center justify-center gap-2
                               ${selected 
-                                ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                                ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                                 : 'border-gray-50 bg-white text-gray-500 hover:border-gray-100'}`}
                           >
                             <span className="text-[40px]">{issue.icon}</span>
@@ -623,18 +623,18 @@ export default function TabletConditionQuizPage() {
                             }}
                             className={`p-6 rounded-[24px] border-2 text-left transition-all flex flex-col justify-between h-40 group
                               ${selected 
-                                ? 'border-[#0565E6] bg-[#E8F1FF]' 
+                                ? 'border-[#2563EB] bg-[#E6F4FF]' 
                                 : 'border-gray-100 bg-white hover:border-gray-200'}`}
                           >
                             <div className="flex justify-between items-start w-full">
                               <span className="text-[40px]">{acc.icon}</span>
                               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
-                                ${selected ? 'border-[#0565E6] bg-[#0565E6]' : 'border-gray-200'}`}>
+                                ${selected ? 'border-[#2563EB] bg-[#2563EB]' : 'border-gray-200'}`}>
                                 {selected && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/></svg>}
                               </div>
                             </div>
                             <div>
-                              <p className={`font-black text-[15px] ${selected ? 'text-[#0565E6]' : 'text-[#111827]'}`}>{acc.label}</p>
+                              <p className={`font-black text-[15px] ${selected ? 'text-[#2563EB]' : 'text-[#111827]'}`}>{acc.label}</p>
                               <p className="text-[15px] text-gray-400 mt-1">{acc.desc}</p>
                             </div>
                           </button>
@@ -662,7 +662,7 @@ export default function TabletConditionQuizPage() {
                       (currentStepIndex === 0 && (underWarranty === null || eSIMSupport === null)) ||
                       (currentStepIndex === 1 && (ableToMakeCalls === null || isTouchScreenWorking === null || isScreenOriginal === null))
                     }
-                    className="bg-[#0565E6] text-white font-bold px-8 py-4 rounded-xl hover:bg-[#044BA8] transition-all disabled:opacity-50"
+                    className="bg-[#2563EB] text-white font-bold px-8 py-4 rounded-xl hover:bg-[#1D4ED8] transition-all disabled:opacity-50"
                   >
                     Next Step →
                   </button>
@@ -686,14 +686,14 @@ export default function TabletConditionQuizPage() {
             <h2 className="text-2xl font-black text-[#111827] mb-8">Device Evaluation</h2>
             
             {/* Price Box */}
-            <div className="bg-[#E8F1FF] rounded-3xl p-6 mb-8 flex items-center justify-between border border-[#0565E6]/10">
+            <div className="bg-[#E6F4FF] rounded-3xl p-6 mb-8 flex items-center justify-between border border-[#2563EB]/10">
               <div>
-                <p className="text-[#0565E6] text-xs font-bold uppercase tracking-widest mb-1">Estimated Value</p>
+                <p className="text-[#2563EB] text-xs font-bold uppercase tracking-widest mb-1">Estimated Value</p>
                 <p className={`text-3xl font-black text-[#111827] transition-all ${priceAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
                   {formatCurrency(currentPrice)}
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[#0565E6] shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[#2563EB] shadow-sm">
                 <IconTrend />
               </div>
             </div>
@@ -720,7 +720,7 @@ function SummaryItem({ label, value, active }) {
     <div className="space-y-1">
       <h4 className="text-sm font-bold text-[#111827]">{label}</h4>
       <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${active ? 'bg-[#0565E6]' : 'bg-gray-200'}`} />
+        <div className={`w-2 h-2 rounded-full ${active ? 'bg-[#2563EB]' : 'bg-gray-200'}`} />
         <p className={`text-[13px] font-medium ${active ? 'text-gray-600' : 'text-gray-400'}`}>{value}</p>
       </div>
     </div>
@@ -733,7 +733,7 @@ function PriceRow({ label, value, originalValue, isFree, isBonus }) {
       <span className="text-sm font-medium text-gray-400 uppercase tracking-widest">{label}</span>
       <div className="flex items-center gap-2">
         {originalValue && <span className="text-sm text-gray-300 line-through">₹{originalValue}</span>}
-        <span className={`font-black ${isFree || isBonus ? 'text-[#0565E6]' : 'text-[#111827]'}`}>
+        <span className={`font-black ${isFree || isBonus ? 'text-[#2563EB]' : 'text-[#111827]'}`}>
           {isFree ? 'Free' : (isBonus ? `+${formatCurrency(value)}` : formatCurrency(value))}
         </span>
       </div>

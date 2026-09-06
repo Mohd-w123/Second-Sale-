@@ -83,7 +83,7 @@ export default function LaptopModelDetailsPage() {
           <div className="w-full md:w-7/12 space-y-8">
             <div>
               <h2 className="text-2xl sm:text-3xl font-black text-[#111827] mb-4 tracking-tight leading-tight">{device.modelName}</h2>
-              <div className="flex items-center gap-2 text-[#0565E6] font-black text-xs">
+              <div className="flex items-center gap-2 text-[#2563EB] font-black text-xs">
                 <div className="bg-[#DCFCE7] p-1.5 rounded-lg shrink-0">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </div>
@@ -91,14 +91,14 @@ export default function LaptopModelDetailsPage() {
               </div>
             </div>
 
-            <div className="bg-[#E8F1FF] rounded-[32px] p-8 border border-[#0565E6]/10 shadow-inner">
-              <p className="text-[#0565E6] text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">Get Upto Offer</p>
+            <div className="bg-[#E6F4FF] rounded-[32px] p-8 border border-[#2563EB]/10 shadow-inner">
+              <p className="text-[#2563EB] text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">Get Upto Offer</p>
               <div className="flex items-center justify-between">
                 <p className="text-3xl sm:text-4xl font-black text-[#166534] tracking-tighter">
                   {formatCurrency(maxPrice)}
                 </p>
                 <div className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0565E6" strokeWidth="4"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="4"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                 </div>
               </div>
             </div>
@@ -109,7 +109,7 @@ export default function LaptopModelDetailsPage() {
               onClick={handleStartSelling}
               disabled={!isPincodeVerified}
               className={`group w-full font-black py-5 rounded-[24px] transition-all text-base flex items-center justify-center gap-3 active:scale-95
-                ${isPincodeVerified ? 'bg-[#0565E6] text-white hover:bg-[#044BA8] shadow-xl shadow-blue-100' : 'bg-gray-300 text-white cursor-not-allowed opacity-60'}`}
+                ${isPincodeVerified ? 'bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-xl shadow-blue-100' : 'bg-gray-300 text-white cursor-not-allowed opacity-60'}`}
             >
               Start Selling
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -129,7 +129,7 @@ export default function LaptopModelDetailsPage() {
           </div>
           <div className="hidden lg:block w-px h-10 bg-gray-100 mx-2" />
           <p className="text-base font-black text-[#111827] leading-snug flex-1 max-w-sm">
-            Convert your old {device.modelName} into <span className="text-[#0565E6]">instant cash</span> — only with SecondSale.
+            Convert your old {device.modelName} into <span className="text-[#2563EB]">instant cash</span> — only with SecondSale.
           </p>
         </div>
       </div>

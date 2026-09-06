@@ -9,7 +9,7 @@ export const ORDER_STATUS = {
     color: "#14b8a6",
     bg: "#f0fdfa",
   },
-  completed: { label: "Completed", color: "#0565E6", bg: "#E8F1FF" },
+  completed: { label: "Completed", color: "#2563EB", bg: "#E6F4FF" },
   cancelled: { label: "Cancelled", color: "#ef4444", bg: "#fef2f2" },
 };
 

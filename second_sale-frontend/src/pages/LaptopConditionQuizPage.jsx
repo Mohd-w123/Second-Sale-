@@ -180,7 +180,7 @@ export default function LaptopConditionQuizPage() {
           {/* Header Progress */}
           <div className="flex justify-center gap-12 border-b border-gray-100 pb-8">
             <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-[#0565E6] text-white flex items-center justify-center font-black">1</span>
+              <span className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-black">1</span>
               <span className="text-[#111827] font-black">Offer Details</span>
             </div>
             <div className="flex items-center gap-3 opacity-30">
@@ -200,18 +200,18 @@ export default function LaptopConditionQuizPage() {
                     <img src={device.imageUrl} alt={device.modelName} className="max-h-full object-contain" />
                   </div>
                   <div className="flex-1 text-center sm:text-left">
-                    <span className="text-[#0565E6] text-xs font-black uppercase tracking-wider mb-2 block">Offer ready — instant payout</span>
+                    <span className="text-[#2563EB] text-xs font-black uppercase tracking-wider mb-2 block">Offer ready — instant payout</span>
                     <h1 className="text-xl sm:text-2xl font-black text-[#111827] mb-4">
                       {device.modelName} {specs.ram && specs.storage && <span className="text-gray-600 font-bold text-sm">({specs.ram}/{specs.storage})</span>}
                     </h1>
                     <div className="flex items-center justify-center sm:justify-start gap-5 mb-6">
                       <span className="text-4xl font-black text-[#111827] tracking-tighter">{formatCurrency(currentPrice)}</span>
-                      <div className="flex items-center gap-2 bg-[#0565E6]/5 text-[#0565E6] px-3 py-1.5 rounded-xl border border-[#0565E6]/10">
+                      <div className="flex items-center gap-2 bg-[#2563EB]/5 text-[#2563EB] px-3 py-1.5 rounded-xl border border-[#2563EB]/10">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
                         <span className="text-xs font-black uppercase tracking-widest">Guaranteed</span>
                       </div>
                     </div>
-                    <button onClick={() => setShowResult(false)} className="text-[#0565E6] font-black text-sm underline underline-offset-8 hover:text-[#0452B9] transition-all">Recalculate</button>
+                    <button onClick={() => setShowResult(false)} className="text-[#2563EB] font-black text-sm underline underline-offset-8 hover:text-[#1D4ED8] transition-all">Recalculate</button>
                   </div>
                 </div>
 
@@ -222,16 +222,16 @@ export default function LaptopConditionQuizPage() {
 
                 <button 
                   onClick={handleSchedulePickup}
-                  className="w-full mt-12 bg-[#0565E6] text-white font-black py-7 rounded-[32px] hover:bg-[#0452B9] transition-all shadow-2xl shadow-[#0565E6]/20 text-xl flex items-center justify-center gap-3 group"
+                  className="w-full mt-12 bg-[#2563EB] text-white font-black py-7 rounded-[32px] hover:bg-[#1D4ED8] transition-all shadow-2xl shadow-[#2563EB]/20 text-xl flex items-center justify-center gap-3 group"
                 >
                   Get My {formatCurrency(currentPrice)} Now
                   <svg className="transition-transform group-hover:translate-x-2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
 
                 <div className="mt-10 flex flex-wrap justify-center gap-x-12 gap-y-4 text-[13px] font-black text-gray-600">
-                  <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#0565E6]" /> Free doorstep pickup</span>
-                  <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#0565E6]" /> Instant payment at pickup</span>
-                  <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#0565E6]" /> Price locked for 24h</span>
+                  <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Free doorstep pickup</span>
+                  <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Instant payment at pickup</span>
+                  <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Price locked for 24h</span>
                 </div>
               </div>
 
@@ -239,19 +239,19 @@ export default function LaptopConditionQuizPage() {
               <div className="bg-white rounded-[40px] border border-gray-100 p-12 shadow-sm">
                 <h3 className="text-2xl font-black text-[#111827] mb-12">Laptop Evaluation Detail</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-10">
-                   <EvaluationDetailRow label="Device" value={device.modelName} color="#0565E6" />
-                   <EvaluationDetailRow label="Processor" value={specs.processor || 'Standard'} color="#0565E6" />
-                   <EvaluationDetailRow label="Generation" value={specs.generation || 'Standard'} color="#0565E6" />
-                   <EvaluationDetailRow label="RAM" value={specs.ram || 'Standard'} color="#0565E6" />
-                   <EvaluationDetailRow label="Storage" value={specs.storage || 'Standard'} color="#0565E6" />
-                   <EvaluationDetailRow label="Power Status" value={powerStatus === 'on' ? 'Turns On' : 'Does Not Turn On (Off)'} color={powerStatus === 'on' ? '#0565E6' : '#EF4444'} />
-                   <EvaluationDetailRow label="Screen Size" value={screenSize ? SCREEN_SIZE_OPTIONS.find(o => o.key === screenSize)?.label : '-'} color="#0565E6" />
-                   <EvaluationDetailRow label="Dedicated GPU" value={hasGpu === 'yes' ? `Available (${isGpuWorking === 'yes' ? 'Working' : 'Not Working'})` : 'Not Available'} color={hasGpu === 'yes' && isGpuWorking === 'yes' ? '#0565E6' : '#EF4444'} />
-                   <EvaluationDetailRow label="Device Age" value={age ? AGE_OPTIONS.find(o => o.key === age).label : '-'} color="#0565E6" />
-                   <EvaluationDetailRow label="Functional Issues" value={issuesList.length > 0 ? issuesList.length + ' issue(s)' : 'No Issues'} color={issuesList.length > 0 ? '#EF4444' : '#0565E6'} />
-                   <EvaluationDetailRow label="Screen Condition" value={screenIssuesList.length > 0 ? screenIssuesList.length + ' issue(s)' : 'No Issues'} color={screenIssuesList.length > 0 ? '#EF4444' : '#0565E6'} />
-                   <EvaluationDetailRow label="Body Condition" value={bodyIssuesList.length > 0 ? bodyIssuesList.length + ' issue(s)' : 'No Issues'} color={bodyIssuesList.length > 0 ? '#EF4444' : '#0565E6'} />
-                   <EvaluationDetailRow label="Accessories" value={accessories.length > 0 ? accessories.map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ') : 'None'} color="#0565E6" />
+                   <EvaluationDetailRow label="Device" value={device.modelName} color="#2563EB" />
+                   <EvaluationDetailRow label="Processor" value={specs.processor || 'Standard'} color="#2563EB" />
+                   <EvaluationDetailRow label="Generation" value={specs.generation || 'Standard'} color="#2563EB" />
+                   <EvaluationDetailRow label="RAM" value={specs.ram || 'Standard'} color="#2563EB" />
+                   <EvaluationDetailRow label="Storage" value={specs.storage || 'Standard'} color="#2563EB" />
+                   <EvaluationDetailRow label="Power Status" value={powerStatus === 'on' ? 'Turns On' : 'Does Not Turn On (Off)'} color={powerStatus === 'on' ? '#2563EB' : '#EF4444'} />
+                   <EvaluationDetailRow label="Screen Size" value={screenSize ? SCREEN_SIZE_OPTIONS.find(o => o.key === screenSize)?.label : '-'} color="#2563EB" />
+                   <EvaluationDetailRow label="Dedicated GPU" value={hasGpu === 'yes' ? `Available (${isGpuWorking === 'yes' ? 'Working' : 'Not Working'})` : 'Not Available'} color={hasGpu === 'yes' && isGpuWorking === 'yes' ? '#2563EB' : '#EF4444'} />
+                   <EvaluationDetailRow label="Device Age" value={age ? AGE_OPTIONS.find(o => o.key === age).label : '-'} color="#2563EB" />
+                   <EvaluationDetailRow label="Functional Issues" value={issuesList.length > 0 ? issuesList.length + ' issue(s)' : 'No Issues'} color={issuesList.length > 0 ? '#EF4444' : '#2563EB'} />
+                   <EvaluationDetailRow label="Screen Condition" value={screenIssuesList.length > 0 ? screenIssuesList.length + ' issue(s)' : 'No Issues'} color={screenIssuesList.length > 0 ? '#EF4444' : '#2563EB'} />
+                   <EvaluationDetailRow label="Body Condition" value={bodyIssuesList.length > 0 ? bodyIssuesList.length + ' issue(s)' : 'No Issues'} color={bodyIssuesList.length > 0 ? '#EF4444' : '#2563EB'} />
+                   <EvaluationDetailRow label="Accessories" value={accessories.length > 0 ? accessories.map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ') : 'None'} color="#2563EB" />
                 </div>
               </div>
             </div>
@@ -269,7 +269,7 @@ export default function LaptopConditionQuizPage() {
                     <SummaryPriceRow label="Processing" value={0} original={150} isFree />
                     <div className="pt-8 border-t border-gray-50 flex justify-between items-center">
                       <span className="text-lg font-black text-[#111827]">Final Payout</span>
-                      <span className="text-3xl font-black text-[#0565E6]">{formatCurrency(currentPrice)}</span>
+                      <span className="text-3xl font-black text-[#2563EB]">{formatCurrency(currentPrice)}</span>
                     </div>
                  </div>
               </div>
@@ -299,7 +299,7 @@ export default function LaptopConditionQuizPage() {
              <img src={device.imageUrl} alt={device.modelName} className="max-h-full object-contain" />
           </div>
           <div>
-            <p className="text-[#0565E6] text-[10px] font-black uppercase tracking-widest mb-1">Evaluating</p>
+            <p className="text-[#2563EB] text-[10px] font-black uppercase tracking-widest mb-1">Evaluating</p>
             <h1 className="text-xl font-black text-[#111827]">{device.modelName}</h1>
           </div>
         </div>
@@ -313,7 +313,7 @@ export default function LaptopConditionQuizPage() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3">
                 {STEPS.map((s, idx) => (
                   <div key={s.id} className="flex items-center gap-2">
-                    <span className={`text-xs font-black uppercase tracking-tight ${idx === currentStepIndex ? 'text-[#0565E6]' : 'text-gray-500'}`}>
+                    <span className={`text-xs font-black uppercase tracking-tight ${idx === currentStepIndex ? 'text-[#2563EB]' : 'text-gray-500'}`}>
                       {s.label}
                     </span>
                     {idx < STEPS.length - 1 && <span className="text-gray-400 text-xs font-bold">&gt;</span>}
@@ -322,7 +322,7 @@ export default function LaptopConditionQuizPage() {
               </div>
               <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-[#0565E6] transition-all duration-500" 
+                  className="h-full bg-[#2563EB] transition-all duration-500" 
                   style={{ width: `${((currentStepIndex + 1) / STEPS.length) * 100}%` }}
                 />
               </div>
@@ -355,7 +355,7 @@ export default function LaptopConditionQuizPage() {
                   </div>
                   <button 
                     onClick={() => setIsSpecsModalOpen(true)}
-                    className="w-full py-4 border-2 border-gray-200 hover:border-[#0565E6] hover:bg-[#E8F1FF] hover:text-[#0565E6] rounded-2xl text-sm font-black text-gray-700 transition-all"
+                    className="w-full py-4 border-2 border-gray-200 hover:border-[#2563EB] hover:bg-[#E6F4FF] hover:text-[#2563EB] rounded-2xl text-sm font-black text-gray-700 transition-all"
                   >
                     Modify Specifications
                   </button>
@@ -372,7 +372,7 @@ export default function LaptopConditionQuizPage() {
                       onClick={() => setPowerStatus('on')}
                       className={`py-6 rounded-2xl border-2 font-black text-base transition-all
                         ${powerStatus === 'on' 
-                          ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                          ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                           : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'}`}
                     >
                       Yes, Turns On
@@ -381,7 +381,7 @@ export default function LaptopConditionQuizPage() {
                       onClick={() => setPowerStatus('off')}
                       className={`py-6 rounded-2xl border-2 font-black text-base transition-all
                         ${powerStatus === 'off' 
-                          ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                          ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                           : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'}`}
                     >
                       No, Does Not Turn On (Off)
@@ -406,7 +406,7 @@ export default function LaptopConditionQuizPage() {
                           onClick={() => setScreenSize(opt.key)}
                           className={`py-6 rounded-2xl border-2 font-black text-base transition-all
                             ${screenSize === opt.key 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'}`}
                         >
                           {opt.label}
@@ -429,7 +429,7 @@ export default function LaptopConditionQuizPage() {
                         }}
                         className={`py-6 rounded-2xl border-2 font-black text-base transition-all
                           ${hasGpu === 'yes' 
-                            ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                            ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                             : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'}`}
                       >
                         Yes, Dedicated GPU Available
@@ -441,7 +441,7 @@ export default function LaptopConditionQuizPage() {
                         }}
                         className={`py-6 rounded-2xl border-2 font-black text-base transition-all
                           ${hasGpu === 'no' 
-                            ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                            ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                             : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'}`}
                       >
                         No Dedicated GPU
@@ -461,7 +461,7 @@ export default function LaptopConditionQuizPage() {
                           onClick={() => setIsGpuWorking('yes')}
                           className={`py-6 rounded-2xl border-2 font-black text-base transition-all
                             ${isGpuWorking === 'yes' 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'}`}
                         >
                           Yes, Working Properly
@@ -470,7 +470,7 @@ export default function LaptopConditionQuizPage() {
                           onClick={() => setIsGpuWorking('no')}
                           className={`py-6 rounded-2xl border-2 font-black text-base transition-all
                             ${isGpuWorking === 'no' 
-                              ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'}`}
                         >
                           No, Graphics Card Issue / Not Working
@@ -498,7 +498,7 @@ export default function LaptopConditionQuizPage() {
                             setIssuesList(prev => prev.includes(i.id) ? prev.filter(x => x !== i.id) : [...prev, i.id]);
                           }} 
                           className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-between gap-2 transition-all relative h-36
-                            ${isSelected ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' : 'border-gray-100 bg-white text-gray-800 hover:border-gray-200'}`}
+                            ${isSelected ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' : 'border-gray-100 bg-white text-gray-800 hover:border-gray-200'}`}
                         >
                           <div className="text-[40px]">{i.icon}</div>
                           <span className="text-[15px] font-black text-center leading-tight">{i.label}</span>
@@ -526,7 +526,7 @@ export default function LaptopConditionQuizPage() {
                             setScreenIssuesList(prev => prev.includes(i.id) ? prev.filter(x => x !== i.id) : [...prev, i.id]);
                           }} 
                           className={`p-6 rounded-2xl border-2 flex flex-col items-center justify-between gap-3 transition-all h-36
-                            ${isSelected ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' : 'border-gray-100 bg-white text-gray-800 hover:border-gray-200'}`}
+                            ${isSelected ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' : 'border-gray-100 bg-white text-gray-800 hover:border-gray-200'}`}
                         >
                           <div className="text-[40px]">{i.icon}</div>
                           <span className="text-[15px] font-black text-center leading-tight">{i.label}</span>
@@ -554,7 +554,7 @@ export default function LaptopConditionQuizPage() {
                             setBodyIssuesList(prev => prev.includes(i.id) ? prev.filter(x => x !== i.id) : [...prev, i.id]);
                           }} 
                           className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-between gap-2 transition-all h-36
-                            ${isSelected ? 'border-[#0565E6] bg-[#E8F1FF] text-[#0565E6]' : 'border-gray-100 bg-white text-gray-800 hover:border-gray-200'}`}
+                            ${isSelected ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' : 'border-gray-100 bg-white text-gray-800 hover:border-gray-200'}`}
                         >
                           <div className="text-[40px]">{i.icon}</div>
                           <span className="text-[15px] font-black text-center leading-tight">{i.label}</span>
@@ -582,17 +582,17 @@ export default function LaptopConditionQuizPage() {
                             setAccessories(prev => prev.includes(i.id) ? prev.filter(x => x !== i.id) : [...prev, i.id]);
                           }} 
                           className={`p-6 rounded-[24px] border-2 text-left transition-all flex flex-col justify-between h-40 group
-                            ${isSelected ? 'border-[#0565E6] bg-[#E8F1FF]' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                            ${isSelected ? 'border-[#2563EB] bg-[#E6F4FF]' : 'border-gray-100 bg-white hover:border-gray-200'}`}
                         >
                           <div className="flex justify-between items-start w-full">
                             <span className="text-[40px]">{i.icon}</span>
                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
-                              ${isSelected ? 'border-[#0565E6] bg-[#0565E6]' : 'border-gray-300'}`}>
+                              ${isSelected ? 'border-[#2563EB] bg-[#2563EB]' : 'border-gray-300'}`}>
                               {isSelected && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/></svg>}
                             </div>
                           </div>
                           <div>
-                            <p className={`font-black text-[15px] ${isSelected ? 'text-[#0565E6]' : 'text-[#111827]'}`}>{i.label}</p>
+                            <p className={`font-black text-[15px] ${isSelected ? 'text-[#2563EB]' : 'text-[#111827]'}`}>{i.label}</p>
                             <p className="text-[15px] text-gray-600 font-bold mt-1">{i.desc}</p>
                           </div>
                         </button>
@@ -615,13 +615,13 @@ export default function LaptopConditionQuizPage() {
                         key={opt.key} 
                         onClick={() => setAge(opt.key)} 
                         className={`flex items-center gap-4 px-6 py-5 rounded-2xl border-[1.5px] font-semibold text-left transition-all w-full
-                          ${age === opt.key ? 'border-[#0565E6] bg-[#0565E6]/5 text-[#0565E6]' : 'border-gray-100 text-gray-800 bg-white hover:border-gray-200'}`}
+                          ${age === opt.key ? 'border-[#2563EB] bg-[#2563EB]/5 text-[#2563EB]' : 'border-gray-100 text-gray-800 bg-white hover:border-gray-200'}`}
                       >
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all
-                          ${age === opt.key ? 'border-[#0565E6]' : 'border-gray-300'}`}
+                          ${age === opt.key ? 'border-[#2563EB]' : 'border-gray-300'}`}
                         >
                           {age === opt.key && (
-                            <div className="w-3 h-3 rounded-full bg-[#0565E6]" />
+                            <div className="w-3 h-3 rounded-full bg-[#2563EB]" />
                           )}
                         </div>
                         <span className="text-base font-bold">{opt.label}</span>
@@ -652,7 +652,7 @@ export default function LaptopConditionQuizPage() {
                         (hasGpu === 'yes' && isGpuWorking === null)
                       ))
                     }
-                    className="bg-[#0565E6] text-white font-bold px-8 py-4 rounded-xl hover:bg-[#044BA8] transition-all disabled:opacity-50"
+                    className="bg-[#2563EB] text-white font-bold px-8 py-4 rounded-xl hover:bg-[#1D4ED8] transition-all disabled:opacity-50"
                   >
                     Next Step →
                   </button>
@@ -673,10 +673,10 @@ export default function LaptopConditionQuizPage() {
           {/* Right Sidebar Summary */}
           <div className="w-full lg:w-[400px]">
             <div className="sticky top-8 space-y-8">
-              <div className="bg-[#0565E6]/5 rounded-[32px] p-8 border border-[#0565E6]/20 shadow-sm flex items-center justify-between">
+              <div className="bg-[#2563EB]/5 rounded-[32px] p-8 border border-[#2563EB]/20 shadow-sm flex items-center justify-between">
                 <div>
-                  <p className="text-[#0565E6] text-xs font-black uppercase tracking-widest mb-1">Estimated Value</p>
-                  <p className={`text-4xl font-black text-[#0452B9] tracking-tighter transition-all ${priceAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
+                  <p className="text-[#2563EB] text-xs font-black uppercase tracking-widest mb-1">Estimated Value</p>
+                  <p className={`text-4xl font-black text-[#1D4ED8] tracking-tighter transition-all ${priceAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
                     {breakdown ? formatCurrency(currentPrice) : '₹ XX,XXX'}
                   </p>
                 </div>
@@ -714,7 +714,7 @@ function CheckboxRow({ label, checked }) {
     <label className="flex items-start gap-5 cursor-pointer group">
       <div className="relative mt-1">
         <input type="checkbox" defaultChecked={checked} className="sr-only peer" />
-        <div className="w-7 h-7 border-2 border-gray-200 rounded-xl peer-checked:bg-[#0565E6] peer-checked:border-[#0565E6] transition-all shadow-sm" />
+        <div className="w-7 h-7 border-2 border-gray-200 rounded-xl peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] transition-all shadow-sm" />
         <svg className="absolute top-1.5 left-1.5 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <span className="text-sm font-bold text-gray-700 leading-relaxed group-hover:text-[#111827] transition-colors">{label}</span>
@@ -740,7 +740,7 @@ function SummaryPriceRow({ label, value, original, isFree }) {
       <span className="text-sm font-black text-gray-600 uppercase tracking-widest">{label}</span>
       <div className="flex items-center gap-3">
         {original && <span className="text-sm text-gray-400 font-bold line-through">₹{original}</span>}
-        <span className={`font-black ${isFree ? 'text-[#0565E6]' : 'text-[#111827]'}`}>{isFree ? 'Free' : formatCurrency(value)}</span>
+        <span className={`font-black ${isFree ? 'text-[#2563EB]' : 'text-[#111827]'}`}>{isFree ? 'Free' : formatCurrency(value)}</span>
       </div>
     </div>
   );
@@ -751,7 +751,7 @@ function SummaryItem({ label, value, active }) {
     <div className="space-y-1">
       <h4 className="text-sm font-bold text-[#111827]">{label}</h4>
       <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${active ? 'bg-[#0565E6]' : 'bg-gray-300'}`} />
+        <div className={`w-2 h-2 rounded-full ${active ? 'bg-[#2563EB]' : 'bg-gray-300'}`} />
         <p className={`text-[13px] font-bold ${active ? 'text-gray-800' : 'text-gray-500'}`}>{value}</p>
       </div>
     </div>

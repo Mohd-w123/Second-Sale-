@@ -36,8 +36,8 @@ function PhoneStep({ onNext, loading, error }) {
 
   return (
     <>
-      <div className="inline-flex items-center gap-2 bg-[#0565E6]/5 text-[#0565E6] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-6 border border-gray-100">
-        <div className="w-1.5 h-1.5 bg-[#0565E6] rounded-full" />
+      <div className="inline-flex items-center gap-2 bg-[#2563EB]/5 text-[#2563EB] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-6 border border-gray-100">
+        <div className="w-1.5 h-1.5 bg-[#2563EB] rounded-full" />
         Welcome Back
       </div>
 
@@ -66,7 +66,7 @@ function PhoneStep({ onNext, loading, error }) {
               value={phone}
               onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
               autoComplete="tel"
-              className="w-full pl-[4.5rem] pr-4 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm font-sans text-text-primary outline-none bg-gray-50 focus:border-[#0565E6] focus:ring-4 focus:ring-[#0565E6]/10 focus:bg-white transition-all tracking-widest"
+              className="w-full pl-[4.5rem] pr-4 py-3 border-[1.5px] border-gray-200 rounded-xl text-sm font-sans text-text-primary outline-none bg-gray-50 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 focus:bg-white transition-all tracking-widest"
             />
           </div>
         </div>
@@ -74,7 +74,7 @@ function PhoneStep({ onNext, loading, error }) {
         <button
           type="submit"
           disabled={phone.length !== 10 || loading}
-          className="w-full bg-[#0565E6] hover:bg-[#0452B9] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-[#0565E6]/30 hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          className="w-full btn-gradient text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-[#2563EB]/30 hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         >
           {loading ? "Sending OTP..." : "Send OTP"}
           {!loading && <ArrowRightIcon />}
@@ -128,8 +128,8 @@ function OtpStep({ phone, onVerify, onBack, loading, error, onResend }) {
 
   return (
     <>
-      <div className="inline-flex items-center gap-2 bg-[#0565E6]/5 text-[#0565E6] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-6 border border-gray-100">
-        <div className="w-1.5 h-1.5 bg-[#0565E6] rounded-full animate-pulse" />
+      <div className="inline-flex items-center gap-2 bg-[#2563EB]/5 text-[#2563EB] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-6 border border-gray-100">
+        <div className="w-1.5 h-1.5 bg-[#2563EB] rounded-full animate-pulse" />
         OTP Sent
       </div>
 
@@ -141,14 +141,14 @@ function OtpStep({ phone, onVerify, onBack, loading, error, onResend }) {
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1 text-[11px] font-bold text-[#0565E6] hover:underline bg-transparent border-none cursor-pointer p-0"
+          className="flex items-center gap-1 text-[11px] font-bold text-[#2563EB] hover:underline bg-transparent border-none cursor-pointer p-0"
         >
           <EditIcon /> Edit
         </button>
       </div>
 
-      <div className="bg-blue-50 border border-blue-100 text-[#0565E6] px-3.5 py-2 rounded-xl text-xs font-semibold mb-6 flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-[#0565E6]"></span>
+      <div className="bg-blue-50 border border-blue-100 text-[#2563EB] px-3.5 py-2 rounded-xl text-xs font-semibold mb-6 flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
         <span>Test Mode Active: Enter any 6-digit OTP (e.g. <strong>123456</strong>)</span>
       </div>
 
@@ -173,8 +173,8 @@ function OtpStep({ phone, onVerify, onBack, loading, error, onResend }) {
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 className={`w-full aspect-square text-center text-xl font-black border-[2px] rounded-xl outline-none transition-all bg-gray-50 focus:bg-white
-                  ${digit ? "border-[#0565E6] text-[#0565E6] bg-[#0565E6]/5" : "border-gray-200 text-text-primary"}
-                  focus:border-[#0565E6] focus:ring-4 focus:ring-[#0565E6]/10`}
+                  ${digit ? "border-[#2563EB] text-[#2563EB] bg-[#2563EB]/5" : "border-gray-200 text-text-primary"}
+                  focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10`}
               />
             ))}
           </div>
@@ -183,7 +183,7 @@ function OtpStep({ phone, onVerify, onBack, loading, error, onResend }) {
         <button
           type="submit"
           disabled={otp.join("").length !== 6 || loading}
-          className="w-full bg-[#0565E6] hover:bg-[#0452B9] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-[#0565E6]/30 hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+          className="w-full btn-gradient text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-[#2563EB]/30 hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         >
           {loading ? "Verifying..." : "Verify & Login"}
           {!loading && <ArrowRightIcon />}
@@ -228,7 +228,7 @@ function ResendTimer({ onResend }) {
         <button
           type="button"
           onClick={handleResend}
-          className="text-sm font-bold text-[#0565E6] hover:underline bg-transparent border-none cursor-pointer"
+          className="text-sm font-bold text-[#2563EB] hover:underline bg-transparent border-none cursor-pointer"
         >
           Resend OTP
         </button>
@@ -284,14 +284,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[90vh] bg-gradient-to-br from-[#0565E6]/5 via-white to-[#0565E6]/5 flex items-center justify-center p-4 sm:p-8">
+    <div className="min-h-[90vh] bg-gradient-to-br from-[#2563EB]/5 via-white to-[#2563EB]/5 flex items-center justify-center p-4 sm:p-8">
       <SEOHead
         title={location.pathname === '/signup' ? 'Sign Up' : 'Login'}
         description="Login to SecondSale to track your device sale orders and manage pickups."
         path={location.pathname}
         noindex
       />
-      <div className="w-full max-w-[440px] bg-white rounded-[32px] shadow-2xl shadow-[#0565E6]/10 border border-gray-100 p-8 sm:p-12 animate-in fade-in zoom-in-95 duration-300">
+      <div className="w-full max-w-[440px] bg-white rounded-[32px] shadow-2xl shadow-[#2563EB]/10 border border-gray-100 p-8 sm:p-12 animate-in fade-in zoom-in-95 duration-300">
 
         {/* Step indicators */}
         <div className="flex items-center gap-2 mb-8">
@@ -302,15 +302,15 @@ export default function LoginPage() {
             return (
               <div key={label} className="flex items-center gap-2">
                 <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider transition-all
-                  ${isActive ? "text-[#0565E6]" : isDone ? "text-green-500" : "text-gray-300"}`}>
+                  ${isActive ? "text-[#2563EB]" : isDone ? "text-green-500" : "text-gray-300"}`}>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black
-                    ${isActive ? "bg-[#0565E6] text-white" : isDone ? "bg-green-500 text-white" : "bg-gray-100 text-gray-400"}`}>
+                    ${isActive ? "bg-[#2563EB] text-white" : isDone ? "bg-green-500 text-white" : "bg-gray-100 text-gray-400"}`}>
                     {isDone ? "✓" : i + 1}
                   </div>
                   {label}
                 </div>
                 {i < 1 && (
-                  <div className={`w-8 h-px transition-all ${isDone || isActive ? "bg-[#0565E6]/30" : "bg-gray-100"}`} />
+                  <div className={`w-8 h-px transition-all ${isDone || isActive ? "bg-[#2563EB]/30" : "bg-gray-100"}`} />
                 )}
               </div>
             );
@@ -344,13 +344,13 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-text-muted font-medium">
           Don't have an account?{" "}
-          <Link to="/signup" className="text-[#0565E6] font-bold hover:underline">Sign up</Link>
+          <Link to="/signup" className="text-[#2563EB] font-bold hover:underline">Sign up</Link>
         </p> */}
 
         <div className="flex justify-center gap-5 mt-10">
           {["SSL Secure", "No Spam", "Free Pickup"].map((t) => (
             <div key={t} className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-tight">
-              <div className="w-1.5 h-1.5 bg-[#0565E6]/40 rounded-full" />
+              <div className="w-1.5 h-1.5 bg-[#2563EB]/40 rounded-full" />
               {t}
             </div>
           ))}

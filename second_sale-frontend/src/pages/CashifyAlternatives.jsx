@@ -65,12 +65,12 @@ export default function CashifyAlternatives() {
           {ALTERNATIVES.map((alt) => (
             <article
               key={alt.name}
-              className={`rounded-2xl p-6 border ${alt.highlight ? 'border-[#0565E6] bg-[#EEF4FF] shadow-md' : 'border-gray-100 bg-white shadow-sm'}`}
+              className={`rounded-2xl p-6 border ${alt.highlight ? 'border-[#2563EB] bg-[#E6F4FF] shadow-md' : 'border-gray-100 bg-white shadow-sm'}`}
             >
               <div className="flex items-center gap-3 mb-3">
                 <h2 className="text-xl font-black text-gray-900">{alt.name}</h2>
                 {alt.highlight && (
-                  <span className="text-xs font-bold bg-[#0565E6] text-white px-2 py-1 rounded-full">
+                  <span className="text-xs font-bold bg-[#2563EB] text-white px-2 py-1 rounded-full">
                     Recommended
                   </span>
                 )}
@@ -79,12 +79,12 @@ export default function CashifyAlternatives() {
               <ul className="text-sm text-gray-600 space-y-1 mb-4">
                 {alt.pros.map((pro) => (
                   <li key={pro} className="flex items-center gap-2">
-                    <span className="text-[#0565E6] font-bold">✓</span> {pro}
+                    <span className="text-[#2563EB] font-bold">✓</span> {pro}
                   </li>
                 ))}
               </ul>
               {alt.url && (
-                <Link to={alt.url} className="text-[#0565E6] font-bold text-sm hover:underline">
+                <Link to={alt.url} className="text-[#2563EB] font-bold text-sm hover:underline">
                   Get instant quote on SecondSale →
                 </Link>
               )}
