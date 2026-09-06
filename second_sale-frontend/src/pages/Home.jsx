@@ -1,6 +1,7 @@
 import BannerSlider from "../components/BannerSlider";
+import { deviceService } from "../services/device.service";
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Smartphone, Tablet, Laptop, Monitor,
   Shield, Tag, Zap, Truck, ArrowRight,
@@ -258,9 +259,94 @@ function FAQItem({ q, a }) {
   );
 }
 
+
+const CATEGORY_ROUTE_MAP = {
+  mobile: "/sell-old-mobile-phones",
+  tablet: "/sell-tablet",
+  laptop: "/sell-old-laptops",
+  mac: "/sell-imac",
+};
+
+const CATEGORY_LABELS = {
+  mobile: "Mobile",
+  tablet: "Tablet",
+  laptop: "Laptop",
+  mac: "iMac",
+};
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const heroSearchRef = useRef(null);
+  const debounceTimer = useRef(null);
+  const navigate = useNavigate();
+
+  const performSearch = async (query) => {
+    if (!query || query.trim().length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const { data } = await deviceService.searchDevices(query.trim());
+      setSearchResults(data || []);
+      setShowResults(true);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    if (value.trim().length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    setShowResults(true);
+    debounceTimer.current = setTimeout(() => {
+      performSearch(value);
+    }, 280);
+  };
+
+  const handleTagClick = (tag) => {
+    setSearchQuery(tag);
+    setShowResults(true);
+    performSearch(tag);
+  };
+
+  const handleResultClick = (result) => {
+    const basePath = CATEGORY_ROUTE_MAP[result.category] || "/sell-old-mobile-phones";
+    navigate(`${basePath}/${encodeURIComponent(result.brand)}/${result.slug}`);
+    setShowResults(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (heroSearchRef.current && !heroSearchRef.current.contains(e.target)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, []);
   const schema = buildSchemaGraph([
     organizationSchema(),
     websiteSchema(),
@@ -280,6 +366,55 @@ export default function HomePage() {
         path="/"
         schema={schema}
       />
+
+      {/* ── Stats Bar ── */}
+      <section className="bg-white py-5 border-y border-gray-100">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar py-2">
+            {HERO_STATS.map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-3 min-w-fit">
+                <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                  {stat.icon}
+                </div>
+                <div>
+                  <div className="text-base sm:text-lg font-black text-[#0F2D5B] leading-none">{stat.value}</div>
+                  <div className="text-xs text-gray-400 font-medium mt-0.5">{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ── Category Cards ── */}
+      <section className="py-10 bg-white">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {DEVICE_CATEGORIES.map((cat) => (
+              <Link
+                to={cat.to}
+                key={cat.label}
+                className="group flex items-center gap-4 rounded-2xl p-5 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
+                style={{ backgroundColor: cat.color + "40" }}
+              >
+                <div className="w-16 h-16 flex items-center justify-center shrink-0">
+                  <img src={cat.img} alt={cat.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-bold text-[#0F2D5B] mb-0.5">{cat.label}</h3>
+                  <p className="text-xs text-gray-500">{cat.desc}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-[#2563EB] flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                  <ArrowRight size={16} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      
 
       {/* ════════════════════════════════════════════════════════════
           ── HERO SECTION ──
@@ -320,40 +455,156 @@ export default function HomePage() {
             </p>
 
             {/* Search Bar */}
-            <div className="relative max-w-[520px] mb-4">
-              <div className="flex items-center bg-white border-2 border-gray-200 rounded-2xl overflow-hidden focus-within:border-[#2563EB] transition-colors shadow-sm">
-                <div className="pl-4 text-gray-400">
+            <div className="relative max-w-[520px] mb-4" ref={heroSearchRef}>
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim().length >= 2) {
+                    performSearch(searchQuery);
+                    setShowResults(true);
+                  }
+                }}
+                className="flex items-center bg-white border-2 border-slate-200 rounded-2xl overflow-hidden focus-within:border-[#2563EB] focus-within:shadow-md transition-all shadow-sm"
+              >
+                <div className="pl-4 text-slate-400">
                   <Search size={20} />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search device (e.g. iPhone 15)"
-                  className="flex-1 px-3 py-4 text-sm sm:text-base outline-none bg-transparent text-[#0F2D5B] font-medium placeholder:text-gray-400"
-                  onClick={() => document.querySelector('.navbar-search')?.focus()}
-                  readOnly
-                  onFocus={(e) => {
-                    e.target.blur();
-                    const navSearch = document.querySelector('nav input[type="text"]');
-                    if (navSearch) navSearch.focus();
+                  placeholder="Search device (e.g. iPhone 15, MacBook Pro)"
+                  className="flex-1 px-3 py-4 text-sm sm:text-base outline-none bg-transparent text-[#0F2D5B] font-medium placeholder:text-slate-400"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => {
+                    if (searchResults.length > 0 || searchQuery.length >= 2) setShowResults(true);
                   }}
                 />
-                <button className="btn-gradient text-white px-5 py-4 transition-colors">
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => { setSearchQuery(""); setSearchResults([]); setShowResults(false); }}
+                    className="p-2 text-slate-400 hover:text-slate-600 transition-colors mr-1 border-none bg-transparent cursor-pointer"
+                    title="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
+                <button 
+                  type="submit"
+                  className="btn-gradient text-white px-5 sm:px-6 py-4 transition-colors font-bold cursor-pointer shrink-0 border-none"
+                >
                   <Search size={20} />
                 </button>
-              </div>
+              </form>
+
+              {/* Dedicated Hero Search Results Dropdown */}
+              {showResults && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[2000] overflow-hidden flex flex-col dropdown-animate">
+                  {/* Dropdown Header */}
+                  {!isSearching && searchResults.length > 0 && (
+                    <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Matching Devices ({searchResults.length})
+                      </span>
+                      <span className="text-[11px] text-blue-600 font-semibold">
+                        Instant Valuation
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="overflow-y-auto divide-y divide-slate-100 max-h-[360px]">
+                    {isSearching ? (
+                      <div className="px-6 py-8 text-center text-slate-500">
+                        <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                        <p className="text-xs font-semibold">Searching devices for &quot;{searchQuery}&quot;...</p>
+                      </div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="px-6 py-8 text-center text-slate-500">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2.5">
+                          <Search size={18} />
+                        </div>
+                        <p className="text-sm font-bold text-slate-800">No matching devices</p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          We couldn&apos;t find anything for &quot;{searchQuery}&quot;. Try clicking the popular tags below.
+                        </p>
+                      </div>
+                    ) : (
+                      searchResults.map((result) => (
+                        <button
+                          key={result.slug}
+                          type="button"
+                          onClick={() => handleResultClick(result)}
+                          className="w-full px-4 py-3 text-left hover:bg-blue-50/70 transition-all flex items-center gap-3.5 group cursor-pointer border-none bg-transparent"
+                        >
+                          {/* Device Image */}
+                          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-blue-300 group-hover:bg-white transition-colors">
+                            {result.imageUrl ? (
+                              <img 
+                                src={result.imageUrl} 
+                                alt={result.modelName} 
+                                className="w-full h-full object-contain" 
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className="text-slate-300">
+                                <Search size={18} />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Device Info */}
+                          <div className="flex-1 min-w-0 pr-2">
+                            <p className="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                              {result.modelName}
+                            </p>
+                            <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
+                              <span className="font-semibold text-slate-600">{result.brand}</span>
+                              <span>•</span>
+                              <span className="capitalize">{CATEGORY_LABELS[result.category] || result.category}</span>
+                            </div>
+                          </div>
+
+                          {/* Price */}
+                          {result.maxPrice > 0 && (
+                            <div className="text-right shrink-0 pl-1">
+                              <p className="text-[10px] uppercase font-bold text-slate-400 leading-tight">Get Upto</p>
+                              <p className="text-sm font-extrabold text-blue-600 leading-tight">
+                                ₹{result.maxPrice.toLocaleString("en-IN")}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Arrow */}
+                          <div className="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0">
+                            <ArrowRight size={16} />
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Dropdown Footer */}
+                  {!isSearching && searchResults.length > 0 && (
+                    <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 text-[11px] text-slate-400 text-center font-medium shrink-0">
+                      Instant valuation · Free doorstep pickup · Same-day payment
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Popular Searches */}
             <div className="flex flex-wrap items-center gap-2 mb-8 max-w-[520px]">
               <span className="text-xs text-gray-400 font-medium">Popular searches:</span>
               {POPULAR_SEARCHES.map((tag) => (
-                <Link
+                <button
                   key={tag}
-                  to="/sell-old-mobile-phones/brand"
-                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-semibold text-[#0F2D5B] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors no-underline"
+                  type="button"
+                  onClick={() => handleTagClick(tag)}
+                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-semibold text-[#0F2D5B] hover:border-[#2563EB] hover:text-[#2563EB] hover:bg-[#E6F4FF]/40 transition-all cursor-pointer shadow-xs"
                 >
                   {tag}
-                </Link>
+                </button>
               ))}
             </div>
 
@@ -403,53 +654,6 @@ export default function HomePage() {
                 className="w-full h-auto object-cover rounded-3xl transform hover:scale-[1.02] transition-transform duration-500"
               />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Stats Bar ── */}
-      <section className="bg-white py-5 border-y border-gray-100">
-        <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar py-2">
-            {HERO_STATS.map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-3 min-w-fit">
-                <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
-                  {stat.icon}
-                </div>
-                <div>
-                  <div className="text-base sm:text-lg font-black text-[#0F2D5B] leading-none">{stat.value}</div>
-                  <div className="text-xs text-gray-400 font-medium mt-0.5">{stat.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* ── Category Cards ── */}
-      <section className="py-10 bg-white">
-        <div className="max-w-[1200px] mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {DEVICE_CATEGORIES.map((cat) => (
-              <Link
-                to={cat.to}
-                key={cat.label}
-                className="group flex items-center gap-4 rounded-2xl p-5 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
-                style={{ backgroundColor: cat.color + "40" }}
-              >
-                <div className="w-16 h-16 flex items-center justify-center shrink-0">
-                  <img src={cat.img} alt={cat.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-bold text-[#0F2D5B] mb-0.5">{cat.label}</h3>
-                  <p className="text-xs text-gray-500">{cat.desc}</p>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-[#2563EB] flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
-                  <ArrowRight size={16} />
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
       </section>
