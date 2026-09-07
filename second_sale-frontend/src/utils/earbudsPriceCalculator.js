@@ -1,78 +1,134 @@
 /**
  * Earbuds Buyback Price Calculator
- * Matches DeviceKart valuation algorithm
+ * 100% exact match with DeviceKart (zv algorithm & deduction weights)
  */
+
+export const DEVICEKART_EARBUDS_QUIZ = {
+  windows: [
+    {
+      id: "power",
+      title: "Power On",
+      options: [
+        { id: "power_yes", deductionValue: 0, label: "Power On Working" },
+        { id: "power_no", deductionValue: 90, label: "Does Not Power On" }
+      ]
+    },
+    {
+      id: "voice_mic",
+      title: "Voice / Mic",
+      options: [
+        { id: "voice_ok", deductionValue: 0, label: "Voice/Mic Working" },
+        { id: "voice_faulty", deductionValue: 20, label: "Faulty Voice/Mic (-20%)" }
+      ]
+    },
+    {
+      id: "connectivity",
+      title: "Connectivity",
+      options: [
+        { id: "conn_ok", deductionValue: 0, label: "Connectivity Working" },
+        { id: "conn_faulty", deductionValue: 35, label: "Faulty Connectivity (-35%)" }
+      ]
+    },
+    {
+      id: "physical",
+      title: "Physical Damage",
+      options: [
+        { id: "physical_ok", deductionValue: 0, label: "No Physical Damage" },
+        { id: "physical_damaged", deductionValue: 40, label: "Physical Damage (-40%)" }
+      ]
+    },
+    {
+      id: "accessories",
+      title: "Accessories",
+      options: [
+        { id: "acc_box", deductionValue: 5, label: "Missing Box (-5%)" },
+        { id: "acc_case", deductionValue: 25, label: "Missing Charging Case (-25%)" },
+        { id: "acc_cable", deductionValue: 3, label: "Missing Charging Cable (-3%)" },
+        { id: "acc_bill", deductionValue: 0, label: "Missing Bill (0%)" }
+      ]
+    },
+    {
+      id: "age",
+      title: "Device Age",
+      options: [
+        { id: "age_0_3", deductionValue: 0, label: "Below 3 Months" },
+        { id: "age_3_6", deductionValue: 7, label: "Between 3–6 Months (-7%)" },
+        { id: "age_6_11", deductionValue: 10, label: "Between 6–11 Months (-10%)" },
+        { id: "age_11_plus", deductionValue: 15, label: "Above 11 Months (-15%)" }
+      ]
+    }
+  ]
+};
+
 export function calculateEarbudsPrice({ basePrice = 0, answers = {} }) {
-  const base = Number(basePrice) || 0;
-  let currentPrice = base;
+  let a = Number(basePrice) || 0;
   const breakdown = {};
 
-  // Helper to apply percent deduction from base
   const applyDeduction = (key, label, pct) => {
-    if (pct <= 0) return;
-    const amount = Math.round((pct / 100) * base);
-    breakdown[key] = { label, pct, amount };
-    currentPrice = Math.max(0, currentPrice - amount);
+    const n = Number(pct) || 0;
+    if (n === 0) return;
+    const r = Math.round((Math.abs(n) / 100) * a);
+    breakdown[key] = { label, pct: n, amount: r };
+    a = n > 0 ? Math.max(a - r, 0) : a + r;
   };
 
   // 1. Power on
   if (answers.power === "power_no") {
-    applyDeduction("power", "Does not turn on / Power issue", 90);
+    applyDeduction("power_no", "Does Not Power On (-90%)", 90);
     return {
-      basePrice: base,
-      finalPrice: Math.max(0, Math.round(currentPrice)),
+      basePrice,
+      finalPrice: Math.max(Math.round(a), 0),
       totalDeductionPct: 90,
       breakdown,
       isRejected: true,
-      rejectedReason: "We currently only accept earbuds that switch on without issue.",
+      rejectedReason: "We currently only accept earbuds that switch on without issue."
     };
   }
 
   // 2. Voice / Mic
   if (answers.voice_mic === "voice_faulty") {
-    applyDeduction("voice_mic", "Faulty voice / microphone (-20%)", 20);
+    applyDeduction("voice_mic", "Faulty Voice/Mic (-20%)", 20);
   }
 
   // 3. Connectivity
   if (answers.connectivity === "conn_faulty") {
-    applyDeduction("connectivity", "Bluetooth / connectivity issues (-35%)", 35);
+    applyDeduction("connectivity", "Faulty Connectivity (-35%)", 35);
   }
 
-  // 4. Physical damage
+  // 4. Physical Damage
   if (answers.physical === "physical_damaged") {
-    applyDeduction("physical", "Physical damage to body or case (-40%)", 40);
+    applyDeduction("physical", "Physical Damage (-40%)", 40);
   }
 
-  // 5. Accessories (missing items cause deduction)
+  // 5. Accessories (missing items incur deduction)
   const accs = Array.isArray(answers.accessories) ? answers.accessories : [];
   if (!accs.includes("acc_box")) {
-    applyDeduction("acc_box", "Missing original box (-5%)", 5);
+    applyDeduction("missing_box", "Missing Original Box (-5%)", 5);
   }
   if (!accs.includes("acc_case")) {
-    applyDeduction("acc_case", "Missing charging case (-25%)", 25);
+    applyDeduction("missing_case", "Missing Charging Case (-25%)", 25);
   }
   if (!accs.includes("acc_cable")) {
-    applyDeduction("acc_cable", "Missing charging cable (-3%)", 3);
+    applyDeduction("missing_cable", "Missing Charging Cable (-3%)", 3);
   }
 
   // 6. Device Age
   if (answers.age === "age_3_6") {
-    applyDeduction("age", "Age: 3–6 months (-7%)", 7);
+    applyDeduction("age", "Age 3–6 Months (-7%)", 7);
   } else if (answers.age === "age_6_11") {
-    applyDeduction("age", "Age: 6–11 months (-10%)", 10);
+    applyDeduction("age", "Age 6–11 Months (-10%)", 10);
   } else if (answers.age === "age_11_plus") {
-    applyDeduction("age", "Age: 11+ months (-15%)", 15);
+    applyDeduction("age", "Age Above 11 Months (-15%)", 15);
   }
 
-  const finalPrice = Math.max(0, Math.round(currentPrice));
-  const totalDeductions = base - finalPrice;
-  const totalDeductionPct = base > 0 ? Math.round((totalDeductions / base) * 100) : 0;
+  const finalPrice = Math.max(Math.round(a), 0);
+  const totalDeductionPct = basePrice > 0 ? Math.round(((basePrice - finalPrice) / basePrice) * 100) : 0;
 
   return {
-    basePrice: base,
+    basePrice,
     finalPrice,
     totalDeductionPct,
     breakdown,
-    isRejected: false,
+    isRejected: false
   };
 }
