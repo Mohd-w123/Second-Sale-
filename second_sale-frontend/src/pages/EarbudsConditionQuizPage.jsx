@@ -138,7 +138,7 @@ export default function EarbudsConditionQuizPage() {
   const [loading, setLoading] = useState(true);
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState({
-    accessories: ["acc_box", "acc_case", "acc_cable", "acc_bill"]
+    accessories: []
   });
   const [showResult, setShowResult] = useState(false);
 
@@ -262,7 +262,7 @@ export default function EarbudsConditionQuizPage() {
               </p>
               <button
                 type="button"
-                onClick={() => { setShowResult(false); setStepIndex(0); }}
+                onClick={() => { setShowResult(false); setStepIndex(0); setAnswers({ accessories: [] }); }}
                 className="px-6 py-3 bg-slate-900 text-white font-bold rounded-2xl text-sm hover:bg-slate-800 transition-colors"
               >
                 Retake Evaluation
