@@ -11,9 +11,9 @@ const DEFAULT_MEGA_MENU_CATEGORIES = [
   { id: "mac", label: "iMac", to: "/sell-imac/brand" },
   { id: "tv", label: "TV", to: "/sell-tv" },
   { id: "earbuds", label: "Earbuds", to: "/sell-earbuds/brand" },
+  { id: "smartwatch", label: "Smartwatch", to: "/sell-smartwatch/brand" },
+  { id: "console", label: "Gaming Console", to: "/sell-gaming/brand" },
   { id: "refrigerator", label: "Refrigerator", comingSoon: true },
-  { id: "smartwatch", label: "Smartwatch", comingSoon: true },
-  { id: "console", label: "Gaming Console", comingSoon: true },
 ];
 
 const DEFAULT_NAV_ITEMS = [
@@ -31,6 +31,9 @@ const CATEGORY_ROUTE_MAP = {
   mac: "/sell-imac",
   tv: "/sell-tv",
   earbuds: "/sell-earbuds",
+  smartwatch: "/sell-smartwatch",
+  console: "/sell-gaming",
+  gaming: "/sell-gaming",
 };
 
 const CATEGORY_LABELS = {
@@ -40,6 +43,9 @@ const CATEGORY_LABELS = {
   mac: "iMac",
   tv: "TV",
   earbuds: "Earbuds",
+  smartwatch: "Smartwatch",
+  console: "Gaming Console",
+  gaming: "Gaming Console",
 };
 
 /* ── SVG Icons ─────────────────────────────────────────────── */
@@ -124,6 +130,9 @@ export default function Navbar() {
     laptop: ["Acer", "Apple", "Asus", "Dell", "HP", "Lenovo", "Samsung", "MSI"],
     mac: ["Apple"],
     earbuds: ["Apple", "Samsung", "OnePlus", "boAt", "Sony"],
+    smartwatch: ["Apple", "Samsung", "boAt", "Noise", "Fire-Boltt", "OnePlus"],
+    console: ["Sony", "Microsoft", "Nintendo"],
+    gaming: ["Sony", "Microsoft", "Nintendo"],
     tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
   });
 
@@ -131,19 +140,26 @@ export default function Navbar() {
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        const [mob, tab, lap, mac, ear] = await Promise.all([
+        const [mob, tab, lap, mac, ear, sw, gam] = await Promise.all([
           deviceService.getBrands("mobile"),
           deviceService.getBrands("tablet"),
           deviceService.getBrands("laptop"),
           deviceService.getBrands("mac"),
           deviceService.getBrands("earbuds"),
+          deviceService.getBrands("smartwatch"),
+          deviceService.getBrands("console"),
         ]);
+        const swBrands = (sw.data || []).map((b) => b.brand);
+        const gamBrands = (gam.data || []).map((b) => b.brand);
         setBrandsData({
           mobile: (mob.data || []).map((b) => b.brand),
           tablet: (tab.data || []).map((b) => b.brand),
           laptop: (lap.data || []).map((b) => b.brand),
           mac: (mac.data || []).map((b) => b.brand),
           earbuds: (ear.data || []).map((b) => b.brand),
+          smartwatch: swBrands.length > 0 ? swBrands : ["Apple", "Samsung", "boAt", "Noise"],
+          console: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft", "Nintendo"],
+          gaming: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft", "Nintendo"],
           tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
         });
       } catch (err) {

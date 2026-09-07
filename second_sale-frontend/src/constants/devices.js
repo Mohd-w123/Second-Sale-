@@ -111,3 +111,20 @@ export const EARBUDS_BRANDS = [
   { name: "Realme", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Realme_logo.svg/1280px-Realme_logo.svg.png" },
   { name: "JBL", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/JBL_Logo.svg/1280px-JBL_Logo.svg.png" }
 ];
+
+export const SMARTWATCH_BRANDS = [
+  { name: "Apple", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png" },
+  { name: "Samsung", color: "white", models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
+  { name: "boAt", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Boat_Logo.png/640px-Boat_Logo.png" },
+  { name: "Noise", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Noise_logo.png/640px-Noise_logo.png" },
+  { name: "Fire-Boltt", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Fire-Boltt_logo.png/640px-Fire-Boltt_logo.png" },
+  { name: "OnePlus", color: "white", models: 0, logo: "https://cdn.worldvectorlogo.com/logos/oneplus-wordmark-4.svg" },
+  { name: "Amazfit", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Amazfit_logo.svg/1280px-Amazfit_logo.svg.png" },
+  { name: "Garmin", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Garmin_logo.svg/1280px-Garmin_logo.svg.png" }
+];
+
+export const GAMING_BRANDS = [
+  { name: "Sony", color: "white", models: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png" },
+  { name: "Microsoft", color: "white", models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Microsoft_logo_%282012%29.svg/1280px-Microsoft_logo_%282012%29.svg.png" },
+  { name: "Nintendo", color: "white", models: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Nintendo.svg/1280px-Nintendo.svg.png" }
+];

@@ -3,7 +3,7 @@ import { adminService } from '../../services/admin.service';
 import { categoryService } from '../../services/category.service';
 import {
   Search, ChevronLeft, ChevronRight, X, Plus, Trash2,
-  Smartphone, Monitor, Laptop, Headphones, FileText, Percent, Info, ToggleLeft, ToggleRight
+  Smartphone, Monitor, Laptop, Headphones, Watch, Gamepad2, FileText, Percent, Info, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import './admin.css';
 
@@ -230,6 +230,11 @@ export default function AdminDevices() {
         return <Monitor className="w-4 h-4" />;
       case 'earbuds':
         return <Headphones className="w-4 h-4" />;
+      case 'smartwatch':
+        return <Watch className="w-4 h-4" />;
+      case 'console':
+      case 'gaming':
+        return <Gamepad2 className="w-4 h-4" />;
       default:
         return <Smartphone className="w-4 h-4" />;
     }
@@ -651,6 +656,25 @@ export default function AdminDevices() {
                                 />
                               </div>
                             </>
+                          ) : ['smartwatch', 'earbuds', 'console', 'gaming'].includes(formData.category) ? (
+                            <>
+                              <div className="flex-1 min-w-[150px] admin-field mb-0">
+                                <label className="text-[9px] mb-0.5">Edition / Dial Size / Variant</label>
+                                <input
+                                  type="text"
+                                  required
+                                  placeholder={
+                                    formData.category === 'smartwatch'
+                                      ? 'e.g. 45mm GPS, 49mm Cellular'
+                                      : formData.category === 'console' || formData.category === 'gaming'
+                                      ? 'e.g. Disc Edition 825GB, Digital Edition 1TB'
+                                      : 'e.g. Standard, USB-C MagSafe'
+                                  }
+                                  value={v.storage}
+                                  onChange={(e) => handleVariantChange(idx, 'storage', e.target.value)}
+                                />
+                              </div>
+                            </>
                           ) : (
                             <>
                               <div className="w-[110px] admin-field mb-0">
@@ -728,6 +752,15 @@ export default function AdminDevices() {
               {/* TAB 3: MULTIPLIERS */}
               {modalTab === 'multipliers' && (
                 <div className="space-y-6 max-h-[450px] overflow-y-auto pr-2">
+                  {['smartwatch', 'earbuds', 'console', 'gaming'].includes(formData.category) && (
+                    <div className="p-4 bg-blue-950/40 border border-blue-800/60 rounded-xl text-xs text-blue-200 flex items-start gap-2.5">
+                      <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="block text-white font-bold mb-1">Standard Dynamic Valuation Active</strong>
+                        This category uses DeviceKart's standardized percentage valuation model. All condition, screen, body, and functional deductions are computed dynamically starting from each variant's <strong>Base Price</strong> configured in the Variants tab.
+                      </div>
+                    </div>
+                  )}
 
                   {/* Condition Multipliers */}
                   <div>

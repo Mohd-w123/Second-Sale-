@@ -59,6 +59,18 @@ import EarbudsModelSelectionPage from './pages/EarbudsModelSelectionPage.jsx';
 import EarbudsModelDetailsPage from './pages/EarbudsModelDetailsPage.jsx';
 import EarbudsConditionQuizPage from './pages/EarbudsConditionQuizPage.jsx';
 
+// Smartwatch Pages
+import SmartwatchBrandSelectionPage from './pages/SmartwatchBrandSelectionPage.jsx';
+import SmartwatchModelSelectionPage from './pages/SmartwatchModelSelectionPage.jsx';
+import SmartwatchModelDetailsPage from './pages/SmartwatchModelDetailsPage.jsx';
+import SmartwatchConditionQuizPage from './pages/SmartwatchConditionQuizPage.jsx';
+
+// Gaming Console Pages
+import GamingBrandSelectionPage from './pages/GamingBrandSelectionPage.jsx';
+import GamingModelSelectionPage from './pages/GamingModelSelectionPage.jsx';
+import GamingModelDetailsPage from './pages/GamingModelDetailsPage.jsx';
+import GamingConditionQuizPage from './pages/GamingConditionQuizPage.jsx';
+
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import AdminLayout from './pages/admin/AdminLayout.jsx';
@@ -120,6 +132,30 @@ function App() {
           <Route path="/sell/earbuds/:brand" element={<EarbudsModelSelectionPage />} />
           <Route path="/sell/earbuds/:brand/:slug" element={<EarbudsModelDetailsPage />} />
           <Route path="/sell/earbuds/:brand/:slug/quiz" element={<EarbudsConditionQuizPage />} />
+
+          {/* Smartwatch Flow */}
+          <Route path="/sell-smartwatch/brand" element={<SmartwatchBrandSelectionPage />} />
+          <Route path="/sell-smartwatch/:brand" element={<SmartwatchModelSelectionPage />} />
+          <Route path="/sell-smartwatch/:brand/:slug" element={<SmartwatchModelDetailsPage />} />
+          <Route path="/sell-smartwatch/:brand/:slug/quiz" element={<SmartwatchConditionQuizPage />} />
+          <Route path="/sell/smartwatch/brand" element={<SmartwatchBrandSelectionPage />} />
+          <Route path="/sell/smartwatch/:brand" element={<SmartwatchModelSelectionPage />} />
+          <Route path="/sell/smartwatch/:brand/:slug" element={<SmartwatchModelDetailsPage />} />
+          <Route path="/sell/smartwatch/:brand/:slug/quiz" element={<SmartwatchConditionQuizPage />} />
+
+          {/* Gaming Console Flow */}
+          <Route path="/sell-gaming/brand" element={<GamingBrandSelectionPage />} />
+          <Route path="/sell-gaming/:brand" element={<GamingModelSelectionPage />} />
+          <Route path="/sell-gaming/:brand/:slug" element={<GamingModelDetailsPage />} />
+          <Route path="/sell-gaming/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
+          <Route path="/sell/gaming/brand" element={<GamingBrandSelectionPage />} />
+          <Route path="/sell/gaming/:brand" element={<GamingModelSelectionPage />} />
+          <Route path="/sell/gaming/:brand/:slug" element={<GamingModelDetailsPage />} />
+          <Route path="/sell/gaming/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
+          <Route path="/sell/console/brand" element={<GamingBrandSelectionPage />} />
+          <Route path="/sell/console/:brand" element={<GamingModelSelectionPage />} />
+          <Route path="/sell/console/:brand/:slug" element={<GamingModelDetailsPage />} />
+          <Route path="/sell/console/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
           {/* Shared */}
 
           <Route path="/schedule-pickup" element={<ProtectedRoute><SchedulePickupPage /></ProtectedRoute>} />

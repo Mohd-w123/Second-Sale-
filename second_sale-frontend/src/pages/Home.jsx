@@ -6,7 +6,7 @@ import {
   Smartphone, Tablet, Laptop, Monitor,
   Shield, Tag, Zap, Truck, ArrowRight,
   ChevronDown, Star, BadgeCheck, Users,
-  Search, Clock, CreditCard, MapPin, Headphones
+  Search, Clock, CreditCard, MapPin, Headphones, Watch, Gamepad2
 } from "lucide-react";
 import heroBannerImage from "../assets/hero-banner.jpg";
 import mobileDeviceImg from "../assets/devices/mobile.png";
@@ -56,6 +56,20 @@ const DEVICE_CATEGORIES = [
     to: "/sell-earbuds/brand",
     icon: "headphones",
     color: "#ECFDF5",
+  },
+  {
+    label: "Smartwatch",
+    desc: "Sell Apple & smartwatches",
+    to: "/sell-smartwatch/brand",
+    icon: "smartwatch",
+    color: "#FEF3C7",
+  },
+  {
+    label: "Gaming Console",
+    desc: "Sell PS5, Xbox & Switch",
+    to: "/sell-gaming/brand",
+    icon: "console",
+    color: "#EDE9FE",
   },
 ];
 
@@ -397,20 +411,28 @@ export default function HomePage() {
       {/* ── Category Cards ── */}
       <section className="py-10 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
             {DEVICE_CATEGORIES.map((cat) => (
               <Link
                 to={cat.to}
                 key={cat.label}
-                className="group flex items-center gap-3.5 rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
+                className="group flex items-center gap-3 rounded-2xl p-3.5 sm:p-4 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
                 style={{ backgroundColor: cat.color + "40" }}
               >
-                <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0">
                   {cat.img ? (
                     <img src={cat.img} alt={cat.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                  ) : cat.icon === "smartwatch" ? (
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Watch size={24} />
+                    </div>
+                  ) : cat.icon === "console" ? (
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Gamepad2 size={24} />
+                    </div>
                   ) : (
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Headphones size={26} />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Headphones size={24} />
                     </div>
                   )}
                 </div>

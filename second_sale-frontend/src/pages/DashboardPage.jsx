@@ -417,8 +417,10 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
     const cat = (order.device?.category || '').toLowerCase();
     if (categoryFilter === 'TV') return cat === 'tv';
     if (categoryFilter === 'Earbuds') return cat === 'earbuds';
+    if (categoryFilter === 'Smartwatch') return cat === 'smartwatch';
+    if (categoryFilter === 'Gaming') return cat === 'gaming' || cat === 'console';
     if (categoryFilter === 'Laptop') return cat === 'laptop';
-    if (categoryFilter === 'Mobile') return cat === 'mobile' || (!['laptop', 'tv', 'earbuds'].includes(cat));
+    if (categoryFilter === 'Mobile') return cat === 'mobile' || (!['laptop', 'tv', 'earbuds', 'smartwatch', 'gaming', 'console'].includes(cat));
     return true;
   });
 
@@ -432,7 +434,7 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
 
         {/* Category Filter */}
         <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
-          {['All', 'Mobile', 'Laptop', 'TV', 'Earbuds'].map(cat => (
+          {['All', 'Mobile', 'Laptop', 'TV', 'Earbuds', 'Smartwatch', 'Gaming'].map(cat => (
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
@@ -516,6 +518,8 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
                         ? `${order.device?.processor} / ${order.device?.ram} / ${order.device?.storage}`
                         : order.device?.category === 'tv'
                         ? `${order.device?.screenSize || ''} • ${order.device?.tvType || 'Smart TV'} • Condition: ${order.device?.screenCondition || 'Good'}`
+                        : (order.device?.category === 'earbuds' || order.device?.category === 'smartwatch' || order.device?.category === 'gaming' || order.device?.category === 'console')
+                        ? `${order.device?.storage || 'Standard Edition'}`
                         : `${order.device?.storage} / ${order.device?.ram || '8 GB'}`
                       }
                     </p>
