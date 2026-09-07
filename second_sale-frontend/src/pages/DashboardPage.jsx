@@ -414,8 +414,11 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
 
   const filteredOrders = orders.filter(order => {
     if (categoryFilter === 'All') return true;
-    const isLaptop = order.device?.category === 'laptop';
-    return categoryFilter === 'Laptop' ? isLaptop : !isLaptop;
+    const cat = (order.device?.category || '').toLowerCase();
+    if (categoryFilter === 'TV') return cat === 'tv';
+    if (categoryFilter === 'Laptop') return cat === 'laptop';
+    if (categoryFilter === 'Mobile') return cat === 'mobile' || (!['laptop', 'tv'].includes(cat));
+    return true;
   });
 
   return (
@@ -428,7 +431,7 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
 
         {/* Category Filter */}
         <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
-          {['All', 'Mobile', 'Laptop'].map(cat => (
+          {['All', 'Mobile', 'Laptop', 'TV'].map(cat => (
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
@@ -454,8 +457,14 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
               <div key={order.orderId} className="bg-white border border-gray-100 rounded-[40px] p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
                 {/* Category Tag */}
                 <div className="absolute top-0 right-10">
-                  <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${order.device?.category === 'laptop' ? 'bg-blue-50 text-blue-500' : 'bg-[#E6F4FF] text-[#2563EB]'}`}>
-                    {order.device?.category || 'Mobile'}
+                  <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${
+                    order.device?.category === 'tv' 
+                      ? 'bg-purple-100 text-purple-700 font-extrabold'
+                      : order.device?.category === 'laptop' 
+                      ? 'bg-blue-50 text-blue-500' 
+                      : 'bg-[#E6F4FF] text-[#2563EB]'
+                  }`}>
+                    {order.device?.category === 'tv' ? 'Television (TV)' : (order.device?.category || 'Mobile')}
                   </div>
                 </div>
                 {/* Top Status Bar */}
@@ -465,8 +474,17 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
                     <div>
-                      <h4 className="text-lg font-black text-[#111827]">Order Confirmed</h4>
-                      <p className="text-sm font-bold text-gray-400">Your order has been created.</p>
+                      <h4 className="text-lg font-black text-[#111827]">
+                        {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Pickup & Inspection Scheduled' :
+                         order.leadStatus === 'quote_sent' ? 'Valuation Quote Sent' :
+                         order.status === 'completed' ? 'Order Completed' :
+                         order.status === 'cancelled' ? 'Order Cancelled' : 'Order Confirmed'}
+                      </h4>
+                      <p className="text-sm font-bold text-gray-400">
+                        {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Inspection team has been scheduled for your device.' :
+                         order.leadStatus === 'quote_sent' ? 'Check your offered price below or wait for pickup.' :
+                         'Your device order has been placed and is being processed.'}
+                      </p>
                     </div>
                   </div>
                   <button
@@ -495,6 +513,8 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
                     <p className="text-sm font-bold text-gray-400">
                       {order.device?.category === 'laptop'
                         ? `${order.device?.processor} / ${order.device?.ram} / ${order.device?.storage}`
+                        : order.device?.category === 'tv'
+                        ? `${order.device?.screenSize || ''} • ${order.device?.tvType || 'Smart TV'} • Condition: ${order.device?.screenCondition || 'Good'}`
                         : `${order.device?.storage} / ${order.device?.ram || '8 GB'}`
                       }
                     </p>
@@ -507,7 +527,11 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
                     </div>
                     <div className="text-center md:text-right">
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Quote</p>
-                      <p className="text-2xl font-black text-[#111827]">{formatCurrency(order.priceBreakdown?.finalPrice)}</p>
+                      <p className="text-2xl font-black text-[#111827]">
+                        {order.priceBreakdown?.finalPrice > 0 
+                          ? formatCurrency(order.priceBreakdown.finalPrice) 
+                          : <span className="text-amber-600 text-sm font-extrabold bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">Pending Quote</span>}
+                      </p>
                     </div>
                   </div>
                 </div>

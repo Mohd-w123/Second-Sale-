@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5002/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 const adminApi = axios.create({
   baseURL: API_BASE,
@@ -59,6 +59,12 @@ export const adminService = {
   createPincode: (data) => adminApi.post('/admin/pincodes', data),
   updatePincode: (id, data) => adminApi.put(`/admin/pincodes/${id}`, data),
   deletePincode: (id) => adminApi.delete(`/admin/pincodes/${id}`),
+
+  // TV Leads
+  getTvLeads: (params) => adminApi.get("/tv-leads", { params }),
+  getTvLeadById: (id) => adminApi.get(`/tv-leads/${id}`),
+  updateTvLeadStatus: (id, data) => adminApi.patch(`/tv-leads/${id}`, data),
+  deleteTvLead: (id) => adminApi.delete(`/tv-leads/${id}`),
 };
 
 export default adminApi;

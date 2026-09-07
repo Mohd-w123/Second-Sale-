@@ -4,7 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import { deviceService } from "../services/device.service";
 import logo from "../assets/logo-secondsale.png";
 
-const MEGA_MENU_CATEGORIES = [
+const DEFAULT_MEGA_MENU_CATEGORIES = [
   { id: "mobile", label: "Phone", to: "/sell-old-mobile-phones/brand" },
   { id: "tablet", label: "Tablet", to: "/sell-tablet/brand" },
   { id: "laptop", label: "Laptop", to: "/sell-old-laptops/brand" },
@@ -112,6 +112,7 @@ const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL ||
 export default function Navbar() {
   const [siteLogo, setSiteLogo] = useState(logo);
   const [navItems, setNavItems] = useState(DEFAULT_NAV_ITEMS);
+  const [categories, setCategories] = useState(DEFAULT_MEGA_MENU_CATEGORIES);
   const [hoveredCategory, setHoveredCategory] = useState("mobile");
   const [brandsData, setBrandsData] = useState({
     mobile: ["Apple", "Google", "Motorola", "Nothing", "OnePlus", "Oppo", "Poco", "Realme", "Samsung", "Vivo", "Xiaomi"],
@@ -143,6 +144,26 @@ export default function Navbar() {
     fetchAllBrands();
   }, []);
 
+  // Fetch dynamic categories
+  const fetchCategories = useCallback(async () => {
+    try {
+      const res = await fetch(API + "/categories");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const mapped = data.map((c) => ({
+          id: c.slug,
+          label: c.name,
+          to: c.route || (c.isComingSoon ? "" : "/sell-" + c.slug + "/brand"),
+          comingSoon: Boolean(c.isComingSoon),
+        }));
+        setCategories(mapped);
+      }
+    } catch (err) {
+      console.error("Failed to load dynamic categories in navbar:", err);
+    }
+  }, []);
+
   // Fetch site settings (logo & dynamic nav links)
   const fetchSiteSettings = useCallback(async () => {
     try {
@@ -165,9 +186,10 @@ export default function Navbar() {
 
   useEffect(() => {
     fetchSiteSettings();
+    fetchCategories();
 
     // 1. Sync when user switches back to this tab
-    const onFocus = () => fetchSiteSettings();
+    const onFocus = () => { fetchSiteSettings(); fetchCategories(); };
     window.addEventListener("focus", onFocus);
 
     // 2. Immediate real-time sync when updated in the same window (e.g. from admin panel)
@@ -186,11 +208,16 @@ export default function Navbar() {
       }
     };
     window.addEventListener("site-settings-updated", onSettingsUpdated);
+    const onCatUpdated = () => fetchCategories();
+    window.addEventListener("categories-updated", onCatUpdated);
 
     // 3. Cross-tab synchronization
     const onStorage = (e) => {
       if (e.key === "site_settings_updated_at") {
         fetchSiteSettings();
+      }
+      if (e.key === "categories_updated_at") {
+        fetchCategories();
       }
     };
     window.addEventListener("storage", onStorage);
@@ -198,9 +225,10 @@ export default function Navbar() {
     return () => {
       window.removeEventListener("focus", onFocus);
       window.removeEventListener("site-settings-updated", onSettingsUpdated);
+      window.removeEventListener("categories-updated", onCatUpdated);
       window.removeEventListener("storage", onStorage);
     };
-  }, [fetchSiteSettings]);
+  }, [fetchSiteSettings, fetchCategories]);
   const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(null);
@@ -473,7 +501,7 @@ export default function Navbar() {
                 >
                   {/* Left Column: Categories List */}
                   <div className="w-[195px] bg-slate-50/75 border-r border-slate-100 p-2 flex flex-col gap-0.5 shrink-0">
-                    {MEGA_MENU_CATEGORIES.map((cat) => {
+                    {categories.map((cat) => {
                       const isSelected = hoveredCategory === cat.id;
                       return (
                         <button
@@ -501,7 +529,7 @@ export default function Navbar() {
 
                   {/* Right Column: Dynamic Brands or Coming Soon */}
                   {(() => {
-                    const currentCategoryObj = MEGA_MENU_CATEGORIES.find((c) => c.id === hoveredCategory);
+                    const currentCategoryObj = categories.find((c) => c.id === hoveredCategory);
                     const displayedBrands = brandsData[hoveredCategory] || [];
                     return (
                       <div className="flex-1 p-5 flex flex-col justify-between bg-white min-w-0">
@@ -681,7 +709,7 @@ export default function Navbar() {
 
                 {item.hasDropdown && mobileExpanded === item.label && (
                   <div className="bg-[#F7FAFF] rounded-xl mx-2 mb-2 overflow-hidden">
-                    {MEGA_MENU_CATEGORIES.map((sub) => (
+                    {categories.map((sub) => (
                       <Link
                         key={sub.label}
                         to={sub.to || "#"}

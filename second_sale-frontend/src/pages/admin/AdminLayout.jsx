@@ -3,7 +3,8 @@ import { NavLink, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  Smartphone, 
+  Smartphone,
+  Layers, 
   Handshake, 
   ClipboardList, 
   LogOut,
@@ -31,6 +32,7 @@ export default function AdminLayout() {
     if (path.includes('/dashboard')) return 'Dashboard Overview';
     if (path.includes('/users')) return 'User Directory';
     if (path.includes('/devices')) return 'Device Catalog';
+    if (path.includes('/categories')) return 'Category Management';
     if (path.includes('/partners')) return 'Partner Applications';
     if (path.includes('/orders')) return 'System Orders';
     if (path.includes('/pincodes')) return 'Serviceable Pincodes';
@@ -42,6 +44,7 @@ export default function AdminLayout() {
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/users', icon: Users, label: 'Users' },
     { to: '/admin/devices', icon: Smartphone, label: 'Devices' },
+    { to: '/admin/categories', icon: Layers, label: 'Categories' },
     { to: '/admin/partners', icon: Handshake, label: 'Partners' },
     { to: '/admin/orders', icon: ClipboardList, label: 'Orders' },
     { to: '/admin/pincodes', icon: MapPin, label: 'Pincodes' },

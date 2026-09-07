@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SITE_URL = 'https://secondsale.in';
-const API_BASE = process.env.VITE_API_BASE_URL || process.env.API_URL || 'http://localhost:5002/api';
+const API_BASE = process.env.VITE_API_BASE_URL || process.env.API_URL || 'http://localhost:5000/api';
 
 const STATIC_ROUTES = [
   '/',

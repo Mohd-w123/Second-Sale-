@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../../services/admin.service';
+import { categoryService } from '../../services/category.service';
 import {
   Search, ChevronLeft, ChevronRight, X, Plus, Trash2,
   Smartphone, Monitor, Laptop, FileText, Percent, Info, ToggleLeft, ToggleRight
@@ -31,6 +32,7 @@ export default function AdminDevices() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Form State
@@ -71,6 +73,22 @@ export default function AdminDevices() {
   useEffect(() => {
     fetchDevices();
   }, [debouncedSearch, category, page]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await categoryService.getCategories();
+        if (res.data && res.data.length > 0) {
+          setCategoryOptions(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load categories in AdminDevices:', err);
+      }
+    };
+    loadCategories();
+    window.addEventListener('categories-updated', loadCategories);
+    return () => window.removeEventListener('categories-updated', loadCategories);
+  }, []);
 
   // Open modal for Create
   const handleCreateOpen = () => {
@@ -240,10 +258,20 @@ export default function AdminDevices() {
             onChange={(e) => { setCategory(e.target.value); setPage(1); }}
           >
             <option value="">All Categories</option>
-            <option value="mobile">Mobiles</option>
-            <option value="tablet">Tablets</option>
-            <option value="laptop">Laptops</option>
-            <option value="mac">Macs</option>
+            {categoryOptions.length > 0 ? (
+              categoryOptions.map((cat) => (
+                <option key={cat.slug} value={cat.slug}>
+                  {cat.name}
+                </option>
+              ))
+            ) : (
+              <>
+                <option value="mobile">Mobiles</option>
+                <option value="tablet">Tablets</option>
+                <option value="laptop">Laptops</option>
+                <option value="mac">Macs</option>
+              </>
+            )}
           </select>
         </div>
 
@@ -425,10 +453,20 @@ export default function AdminDevices() {
                         value={formData.category}
                         onChange={(e) => handleInputChange('category', e.target.value)}
                       >
-                        <option value="mobile">Mobile</option>
-                        <option value="tablet">Tablet</option>
-                        <option value="laptop">Laptop</option>
-                        <option value="mac">Mac</option>
+                        {categoryOptions.length > 0 ? (
+                          categoryOptions.map((cat) => (
+                            <option key={cat.slug} value={cat.slug}>
+                              {cat.name} {cat.isComingSoon ? '(Coming Soon)' : ''}
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value="mobile">Mobile</option>
+                            <option value="tablet">Tablet</option>
+                            <option value="laptop">Laptop</option>
+                            <option value="mac">Mac</option>
+                          </>
+                        )}
                       </select>
                     </div>
 

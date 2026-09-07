@@ -51,6 +51,7 @@ import TabletBrandSelectionPage from './pages/TabletBrandSelectionPage.jsx';
 import TabletModelSelectionPage from './pages/TabletModelSelectionPage.jsx';
 import TabletVariantSelectionPage from './pages/TabletVariantSelectionPage.jsx';
 import TabletConditionQuizPage from './pages/TabletConditionQuizPage.jsx';
+import SellTvPage from './pages/SellTvPage.jsx';
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin.jsx';
@@ -58,6 +59,7 @@ import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
 import AdminDevices from './pages/admin/AdminDevices.jsx';
+import AdminCategories from './pages/admin/AdminCategories.jsx';
 import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminPincodes from './pages/admin/AdminPincodes.jsx';
@@ -100,6 +102,8 @@ function App() {
           <Route path="/sell-tablet/:brand" element={<TabletModelSelectionPage />} />
           <Route path="/sell-tablet/:brand/:slug" element={<TabletVariantSelectionPage />} />
           <Route path="/sell-tablet/:brand/:slug/quiz" element={<TabletConditionQuizPage />} />
+          {/* TV Trade-in Flow */}
+          <Route path="/sell-tv" element={<SellTvPage />} />
           {/* Shared */}
 
           <Route path="/schedule-pickup" element={<ProtectedRoute><SchedulePickupPage /></ProtectedRoute>} />
@@ -127,6 +131,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="devices" element={<AdminDevices />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="partners" element={<AdminPartners />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="pincodes" element={<AdminPincodes />} />
