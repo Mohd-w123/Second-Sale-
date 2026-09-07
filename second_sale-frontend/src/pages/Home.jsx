@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Smartphone, Tablet, Laptop, Monitor,
   Shield, Tag, Zap, Truck, ArrowRight,
-  ChevronDown, Star, BadgeCheck, Users,
+  ChevronDown, Star, CheckCircle2, Sparkles, BadgeCheck, Users,
   Search, Clock, CreditCard, MapPin, Headphones, Watch, Gamepad2
 } from "lucide-react";
 import heroBannerImage from "../assets/hero-banner.jpg";
@@ -92,37 +92,64 @@ const HOW_IT_WORKS_STEPS = [
 
 const SERVICE_FEATURES = [
   {
-    title: "Sell Your Device",
-    highlight: "Your",
-    desc: "Get the best value for your old devices in 60 seconds.",
-    points: ["Best Price Guaranteed", "Free Doorstep Pickup", "Instant Payment", "100% Safe & Secure"],
-    cta: "Get Device Value",
+    category: "mobile",
+    title: "Sell Smartphones",
+    highlight: "Smartphones",
+    badge: "MOST POPULAR",
+    badgeColor: "bg-blue-50 text-blue-700 border-blue-200/80",
+    desc: "Get the highest cash value for your old iPhone, Samsung, OnePlus or Android phone in 60 seconds.",
+    points: [
+      "Instant online price quote in 60s",
+      "Free doorstep pickup across 100+ cities",
+      "Immediate bank or UPI cash transfer",
+      "100% data wipe & safe handling guarantee"
+    ],
+    cta: "Sell Mobile Phone",
     ctaTo: "/sell-old-mobile-phones/brand",
-    img: mobileDeviceImg,
-    color: "#E6F4FF",
-    iconColor: "#2563EB",
+    gradient: "from-[#2563EB] to-[#1D4ED8]",
+    shadowColor: "shadow-blue-500/20",
+    glowColor: "rgba(37, 99, 235, 0.08)",
+    iconBg: "bg-blue-600 text-white shadow-blue-500/30",
   },
   {
-    title: "Sell Tablets",
+    category: "tablet",
+    title: "Sell Tablets & iPads",
     highlight: "Tablets",
-    desc: "Get instant quotes for your old tablets with free pickup.",
-    points: ["All Brands Accepted", "Fair Valuation", "Easy Returns", "Best Market Prices"],
-    cta: "Sell Tablet",
+    badge: "INSTANT EVALUATION",
+    badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200/80",
+    desc: "Turn your old Apple iPad, Samsung Galaxy Tab, or tablet into guaranteed cash with zero hassle.",
+    points: [
+      "All iPad & Android tablet models accepted",
+      "Transparent algorithmic market pricing",
+      "Zero shipping, packaging or pickup fees",
+      "Best buyback valuation guaranteed"
+    ],
+    cta: "Sell Tablet & iPad",
     ctaTo: "/sell-tablet/brand",
-    img: tabletDeviceImg,
-    color: "#E0F0FF",
-    iconColor: "#3B82F6",
+    gradient: "from-[#4F46E5] to-[#4338CA]",
+    shadowColor: "shadow-indigo-500/20",
+    glowColor: "rgba(79, 70, 229, 0.08)",
+    iconBg: "bg-indigo-600 text-white shadow-indigo-500/30",
   },
   {
-    title: "Sell Laptops",
+    category: "laptop",
+    title: "Sell Laptops & MacBooks",
     highlight: "Laptops",
-    desc: "Professional laptop evaluation with transparent pricing.",
-    points: ["CPU/GPU Based Pricing", "All Brands Welcome", "Expert Inspection", "Quick Payment"],
-    cta: "Sell Laptop",
+    badge: "HIGHEST PAYOUT",
+    badgeColor: "bg-amber-50 text-amber-800 border-amber-200/80",
+    desc: "Professional laptop buyback based on exact CPU, GPU, RAM, storage, and body condition.",
+    points: [
+      "MacBook, Gaming & Ultrabook laptops",
+      "CPU / GPU based transparent valuation",
+      "Expert doorstep technician inspection",
+      "Instant on-spot payment before pickup"
+    ],
+    cta: "Sell Laptop & MacBook",
     ctaTo: "/sell-old-laptops/brand",
-    img: laptopDeviceImg,
-    color: "#FFF3E0",
-    iconColor: "#F59E0B",
+    gradient: "from-[#D97706] to-[#B45309]",
+    shadowColor: "shadow-amber-500/20",
+    glowColor: "rgba(217, 119, 6, 0.08)",
+    iconBg: "bg-amber-600 text-white shadow-amber-500/30",
   },
 ];
 
@@ -721,56 +748,79 @@ export default function HomePage() {
       </section>
 
       {/* ── Our Services, Your Benefits ── */}
-      <section className="py-16 sm:py-24 bg-[#F7FAFF]">
-        <div className="max-w-[1200px] mx-auto px-4">
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F7FAFF] via-white to-[#F7FAFF] relative overflow-hidden">
+        {/* Subtle background ambient lights */}
+        <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-blue-400/5 blur-[120px] rounded-full" />
+
+        <div className="max-w-[1200px] mx-auto px-4 relative z-10">
           <SectionTitle
-            tag="🔄 ALL-IN-ONE DEVICE SOLUTION"
+            tag="✨ ALL-IN-ONE DEVICE SOLUTION"
             title="Our Services, Your Benefits"
             titleHighlight="Your Benefits"
-            subtitle="Sell your old device — all in one trusted platform."
+            subtitle="Get the best market price with free doorstep pickup, instant payment, and 100% data safety."
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mt-12">
             {SERVICE_FEATURES.map((s) => (
-              <div key={s.title} className="bg-white rounded-[28px] p-7 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-                {/* Icon badge */}
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5" style={{ backgroundColor: s.color }}>
-                  <Tag size={22} strokeWidth={1.8} style={{ color: s.iconColor }} />
-                </div>
-                
-                {/* Title */}
-                <h3 className="text-xl font-black text-[#0F2D5B] mb-2">
-                  {s.title.split(s.highlight)[0]}
-                  <span className="text-[#2563EB]">{s.highlight}</span>
-                  {s.title.split(s.highlight)[1] || ""}
-                </h3>
-                <p className="text-sm text-gray-500 mb-5 leading-relaxed">{s.desc}</p>
+              <div
+                key={s.title}
+                className="bg-white rounded-[32px] p-7 sm:p-8 border border-slate-200/70 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group"
+              >
+                {/* Decorative background glow */}
+                <div
+                  className="pointer-events-none absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ backgroundColor: s.glowColor }}
+                />
 
-                {/* Checklist */}
-                <div className="space-y-2.5 mb-6">
-                  {s.points.map((point) => (
-                    <div key={point} className="flex items-center gap-2.5 text-sm text-[#0F2D5B] font-medium">
-                      <span className="w-5 h-5 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] text-[10px] shrink-0">✓</span>
-                      {point}
+                <div>
+                  {/* Top Row: Icon & Pill Badge */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 ${s.iconBg}`}>
+                      {s.category === "mobile" ? (
+                        <Smartphone size={26} strokeWidth={2} />
+                      ) : s.category === "tablet" ? (
+                        <Tablet size={26} strokeWidth={2} />
+                      ) : (
+                        <Laptop size={26} strokeWidth={2} />
+                      )}
                     </div>
-                  ))}
+
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold tracking-wider uppercase border ${s.badgeColor}`}>
+                      {s.badge}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5 tracking-tight group-hover:text-blue-600 transition-colors">
+                    {s.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
+                    {s.desc}
+                  </p>
+
+                  {/* Checklist */}
+                  <div className="space-y-3 mb-8">
+                    {s.points.map((point) => (
+                      <div key={point} className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 font-semibold">
+                        <div className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5 border border-blue-100">
+                          <CheckCircle2 size={13} className="stroke-[2.5]" />
+                        </div>
+                        <span className="leading-snug">{point}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* CTA */}
+                {/* Bottom CTA Button */}
                 <Link
                   to={s.ctaTo}
-                  className="flex items-center justify-between w-full btn-gradient text-white font-bold text-sm px-5 py-3.5 rounded-xl transition-all no-underline"
+                  className={`w-full py-4 px-6 rounded-2xl font-black text-sm text-white flex items-center justify-between shadow-md transition-all duration-300 group-hover:shadow-xl bg-gradient-to-r ${s.gradient} ${s.shadowColor} hover:brightness-105 active:scale-[0.99] no-underline`}
                 >
-                  {s.cta}
-                  <ArrowRight size={18} />
+                  <span>{s.cta}</span>
+                  <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1">
+                    <ArrowRight size={16} />
+                  </div>
                 </Link>
-
-                {/* Device image (decorative) */}
-                <img
-                  src={s.img}
-                  alt=""
-                  className="absolute -bottom-4 -right-4 w-28 h-28 opacity-10 group-hover:opacity-15 object-contain transition-opacity pointer-events-none"
-                />
               </div>
             ))}
           </div>
