@@ -163,8 +163,13 @@ export default function EarbudsModelDetailsPage() {
           {/* Start Selling Button */}
           <button
             type="button"
+            disabled={!isPincodeVerified}
             onClick={handleStartQuiz}
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl text-base shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+            className={`w-full py-4 font-black rounded-2xl text-base transition-all flex items-center justify-center gap-2 group ${
+              isPincodeVerified
+                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-xl cursor-pointer"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+            }`}
           >
             <span>Get Exact Value</span>
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

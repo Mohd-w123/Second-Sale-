@@ -102,8 +102,16 @@ export default function MacModelDetailsPage() {
             <PincodeBox onVerified={setIsPincodeVerified} />
 
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="group w-full font-black py-5 rounded-[24px] transition-all text-base flex items-center justify-center gap-3 active:scale-95 bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-xl shadow-blue-100 cursor-pointer"
+              disabled={!isPincodeVerified}
+              onClick={() => {
+                if (!isPincodeVerified) return;
+                setIsModalOpen(true);
+              }}
+              className={`group w-full font-black py-5 rounded-[24px] transition-all text-base flex items-center justify-center gap-3 ${
+                isPincodeVerified
+                  ? "active:scale-95 bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-xl shadow-blue-100 cursor-pointer"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+              }`}
             >
               Start Selling
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
