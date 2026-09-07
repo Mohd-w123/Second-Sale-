@@ -100,14 +100,14 @@ const STEPS = [
   {
     id: "accessories",
     title: "Accessories",
-    question: "Select Original Accessories You Have",
-    desc: "Make sure you have your accessories for maximum buyback value.",
+    question: "Select Original Accessories You Have?",
+    desc: "Make sure you have your bill with you to know the age of your device",
     choiceType: "multi",
     options: [
-      { id: "acc_box", label: "Original Box", icon: Box },
+      { id: "acc_box", label: "Box", icon: Box },
       { id: "acc_case", label: "Charging Case", icon: BatteryCharging },
       { id: "acc_cable", label: "Charging Cable", icon: Cable },
-      { id: "acc_bill", label: "Original Bill", icon: FileText }
+      { id: "acc_bill", label: "Bill", icon: FileText }
     ]
   },
   {
@@ -178,9 +178,14 @@ export default function EarbudsConditionQuizPage() {
     });
   };
 
+  const hasBoxOrBill = Array.isArray(answers.accessories) && (
+    answers.accessories.includes("acc_box") || answers.accessories.includes("acc_bill")
+  );
+
   const isCurrentStepValid = () => {
     if (!currentStep) return false;
-    if (currentStep.id === "accessories") return true;
+    if (currentStep.id === "accessories") return hasBoxOrBill;
+    if (currentStep.id === "power" && answers.power === "power_no") return false;
     return !!answers[currentStep.id];
   };
 
@@ -396,16 +401,21 @@ export default function EarbudsConditionQuizPage() {
             {currentStep.title}
           </span>
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 mb-2 leading-snug">
-            {currentStep.question}
+            {currentStep.id === "accessories" && device?.modelName
+              ? `Select Original ${device.modelName} Accessories You Have?`
+              : currentStep.question}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500">
-            {currentStep.desc}
+            {currentStep.id === "accessories"
+              ? "Make sure you have your bill with you to know the age of your device"
+              : currentStep.desc}
           </p>
         </div>
 
         {/* Question Options */}
         {currentStep.id === "accessories" ? (
-          /* Multi-select accessories */
+          <>
+          {/* Multi-select accessories */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-2xl mx-auto">
             {currentStep.options.map(opt => {
               const IconComp = opt.icon;
@@ -435,6 +445,13 @@ export default function EarbudsConditionQuizPage() {
               );
             })}
           </div>
+
+          {/* Yellow Warning Alert: Box or Bill required */}
+          <div className="mt-6 max-w-2xl mx-auto p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] text-xs sm:text-sm font-semibold flex items-center gap-2.5 shadow-xs">
+            <AlertTriangle size={18} className="text-[#D97706] shrink-0" />
+            <span>Either genuine bill or box is required for device to be acceptable at pickup!</span>
+          </div>
+          </>
         ) : (
           /* Single Select Cards */
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
@@ -491,20 +508,30 @@ export default function EarbudsConditionQuizPage() {
         )}
 
         {/* Continue Button */}
-        <div className="mt-10 max-w-md mx-auto">
+        <div className="mt-8 max-w-xs mx-auto text-center">
           <button
             type="button"
             onClick={handleNext}
             disabled={!isCurrentStepValid()}
-            className={`w-full py-4 rounded-2xl font-black text-sm sm:text-base transition-all flex items-center justify-center gap-2 shadow-md ${
+            className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${
               isCurrentStepValid()
-                ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shadow-blue-500/20"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shadow-md shadow-blue-500/20"
+                : "bg-[#A5C9FF] text-white/90 cursor-not-allowed"
             }`}
           >
             <span>{stepIndex === STEPS.length - 1 ? "Calculate Instant Quote" : "Continue"}</span>
             <ArrowRight size={18} />
           </button>
+
+          {stepIndex > 0 && (
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="mt-3 text-xs sm:text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none"
+            >
+              Back
+            </button>
+          )}
         </div>
       </div>
     </div>
