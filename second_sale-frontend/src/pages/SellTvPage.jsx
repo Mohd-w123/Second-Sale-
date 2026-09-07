@@ -35,12 +35,12 @@ export default function SellTvPage() {
       if (user.phone && !phone) setPhone(user.phone);
     }
   }, [user]);
-  // Choices
-  const [brand, setBrand] = useState('Samsung');
+  // Choices - no default selection
+  const [brand, setBrand] = useState('');
   const [customBrand, setCustomBrand] = useState('');
-  const [screenSize, setScreenSize] = useState('40–43"');
-  const [tvType, setTvType] = useState('Smart TV');
-  const [condition, setCondition] = useState('Working well');
+  const [screenSize, setScreenSize] = useState('');
+  const [tvType, setTvType] = useState('');
+  const [condition, setCondition] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
 
   // Photos state (File + Preview URL)
@@ -94,6 +94,27 @@ export default function SellTvPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!brand) {
+      setError('Please select your TV brand');
+      return;
+    }
+    if (brand === 'Other' && !customBrand.trim()) {
+      setError('Please enter your TV brand name');
+      return;
+    }
+    if (!screenSize) {
+      setError('Please select your TV screen size');
+      return;
+    }
+    if (!tvType) {
+      setError('Please select your TV display type');
+      return;
+    }
+    if (!condition) {
+      setError('Please select your TV condition');
+      return;
+    }
 
     if (!name.trim()) {
       setError('Please enter your full name');
