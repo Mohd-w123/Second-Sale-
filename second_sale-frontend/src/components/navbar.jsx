@@ -123,23 +123,28 @@ export default function Navbar() {
     tablet: ["Apple", "Samsung"],
     laptop: ["Acer", "Apple", "Asus", "Dell", "HP", "Lenovo", "Samsung", "MSI"],
     mac: ["Apple"],
+    earbuds: ["Apple", "Samsung", "OnePlus", "boAt", "Sony"],
+    tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
   });
 
   // Fetch dynamic brands from API
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        const [mob, tab, lap, mac] = await Promise.all([
+        const [mob, tab, lap, mac, ear] = await Promise.all([
           deviceService.getBrands("mobile"),
           deviceService.getBrands("tablet"),
           deviceService.getBrands("laptop"),
           deviceService.getBrands("mac"),
+          deviceService.getBrands("earbuds"),
         ]);
         setBrandsData({
           mobile: (mob.data || []).map((b) => b.brand),
           tablet: (tab.data || []).map((b) => b.brand),
           laptop: (lap.data || []).map((b) => b.brand),
           mac: (mac.data || []).map((b) => b.brand),
+          earbuds: (ear.data || []).map((b) => b.brand),
+          tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
         });
       } catch (err) {
         console.error("Failed to load navbar dynamic brands:", err);
@@ -565,7 +570,9 @@ export default function Navbar() {
                               {/* Dynamic Brands List */}
                               <div className="grid grid-cols-1 gap-1">
                                 {displayedBrands.slice(0, 7).map((brandName) => {
-                                  const brandUrl = `${CATEGORY_ROUTE_MAP[hoveredCategory] || "/sell-old-mobile-phones"}/${encodeURIComponent(brandName)}`;
+                                  const brandUrl = hoveredCategory === "tv" 
+  ? "/sell-tv" 
+  : `${CATEGORY_ROUTE_MAP[hoveredCategory] || "/sell-old-mobile-phones"}/${encodeURIComponent(brandName.toLowerCase())}`;
                                   return (
                                     <Link
                                       key={brandName}
