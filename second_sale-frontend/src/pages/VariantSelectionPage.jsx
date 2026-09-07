@@ -14,7 +14,7 @@ export default function VariantSelectionPage() {
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const [isPincodeVerified, setIsPincodeVerified] = useState(false);
+  const [isPincodeVerified, setIsPincodeVerified] = useState(() => Boolean(localStorage.getItem('verifiedPincode')));
   const brandName = brand.charAt(0).toUpperCase() + brand.slice(1);
 
   useEffect(() => {

@@ -13,7 +13,7 @@ export default function EarbudsModelDetailsPage() {
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
-  const [isPincodeVerified, setIsPincodeVerified] = useState(false);
+  const [isPincodeVerified, setIsPincodeVerified] = useState(() => Boolean(localStorage.getItem('verifiedPincode')));
 
   const brandName = brand ? brand.charAt(0).toUpperCase() + brand.slice(1) : "";
 
@@ -157,7 +157,7 @@ export default function EarbudsModelDetailsPage() {
 
           {/* Pincode Availability Check */}
           <div className="mb-6">
-            <PincodeBox onVerificationChange={setIsPincodeVerified} />
+            <PincodeBox onVerified={setIsPincodeVerified} />
           </div>
 
           {/* Start Selling Button */}
@@ -165,14 +165,14 @@ export default function EarbudsModelDetailsPage() {
             type="button"
             disabled={!isPincodeVerified}
             onClick={handleStartQuiz}
-            className={`w-full py-4 font-black rounded-2xl text-base transition-all flex items-center justify-center gap-2 group ${
+            className={`w-full py-4 sm:py-5 font-black rounded-2xl text-base sm:text-lg transition-all flex items-center justify-center gap-2 group ${
               isPincodeVerified
-                ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-xl cursor-pointer"
+                ? "bg-[#2563EB] text-white shadow-xl shadow-blue-100 hover:bg-[#1D4ED8] hover:-translate-y-1 cursor-pointer"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
             }`}
           >
-            <span>Get Exact Value</span>
-            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            <span>Start Selling</span>
+            <svg className="transition-transform group-hover:translate-x-1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
 
           {/* Trust Highlights */}

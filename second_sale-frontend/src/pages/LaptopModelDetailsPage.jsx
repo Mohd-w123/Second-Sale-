@@ -14,7 +14,7 @@ export default function LaptopModelDetailsPage() {
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPincodeVerified, setIsPincodeVerified] = useState(false);
+  const [isPincodeVerified, setIsPincodeVerified] = useState(() => Boolean(localStorage.getItem('verifiedPincode')));
 
   useEffect(() => {
     deviceService.getDevice(slug).then(res => {
