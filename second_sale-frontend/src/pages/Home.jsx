@@ -50,6 +50,13 @@ const DEVICE_CATEGORIES = [
     img: macDeviceImg,
     color: "#F3E8FF",
   },
+  {
+    label: "Earbuds",
+    desc: "Sell AirPods & Earbuds",
+    to: "/sell-earbuds/brand",
+    icon: "headphones",
+    color: "#ECFDF5",
+  },
 ];
 
 const POPULAR_SEARCHES = ["iPhone 15", "Samsung S24", "OnePlus 12", "MacBook Air", "iPad Pro"];
@@ -390,16 +397,22 @@ export default function HomePage() {
       {/* ── Category Cards ── */}
       <section className="py-10 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {DEVICE_CATEGORIES.map((cat) => (
               <Link
                 to={cat.to}
                 key={cat.label}
-                className="group flex items-center gap-4 rounded-2xl p-5 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
+                className="group flex items-center gap-3.5 rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
                 style={{ backgroundColor: cat.color + "40" }}
               >
-                <div className="w-16 h-16 flex items-center justify-center shrink-0">
-                  <img src={cat.img} alt={cat.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center shrink-0">
+                  {cat.img ? (
+                    <img src={cat.img} alt={cat.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Headphones size={26} />
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-bold text-[#0F2D5B] mb-0.5">{cat.label}</h3>

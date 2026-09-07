@@ -9,8 +9,8 @@ const DEFAULT_MEGA_MENU_CATEGORIES = [
   { id: "tablet", label: "Tablet", to: "/sell-tablet/brand" },
   { id: "laptop", label: "Laptop", to: "/sell-old-laptops/brand" },
   { id: "mac", label: "iMac", to: "/sell-imac/brand" },
-  { id: "tv", label: "TV", comingSoon: true },
-  { id: "earbuds", label: "Earbuds", comingSoon: true },
+  { id: "tv", label: "TV", to: "/sell-tv" },
+  { id: "earbuds", label: "Earbuds", to: "/sell-earbuds/brand" },
   { id: "refrigerator", label: "Refrigerator", comingSoon: true },
   { id: "smartwatch", label: "Smartwatch", comingSoon: true },
   { id: "console", label: "Gaming Console", comingSoon: true },
@@ -29,6 +29,8 @@ const CATEGORY_ROUTE_MAP = {
   tablet: "/sell-tablet",
   laptop: "/sell-old-laptops",
   mac: "/sell-imac",
+  tv: "/sell-tv",
+  earbuds: "/sell-earbuds",
 };
 
 const CATEGORY_LABELS = {
@@ -36,6 +38,8 @@ const CATEGORY_LABELS = {
   tablet: "Tablet",
   laptop: "Laptop",
   mac: "iMac",
+  tv: "TV",
+  earbuds: "Earbuds",
 };
 
 /* ── SVG Icons ─────────────────────────────────────────────── */

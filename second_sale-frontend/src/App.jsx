@@ -53,6 +53,12 @@ import TabletVariantSelectionPage from './pages/TabletVariantSelectionPage.jsx';
 import TabletConditionQuizPage from './pages/TabletConditionQuizPage.jsx';
 import SellTvPage from './pages/SellTvPage.jsx';
 
+// Earbuds Pages
+import EarbudsBrandSelectionPage from './pages/EarbudsBrandSelectionPage.jsx';
+import EarbudsModelSelectionPage from './pages/EarbudsModelSelectionPage.jsx';
+import EarbudsModelDetailsPage from './pages/EarbudsModelDetailsPage.jsx';
+import EarbudsConditionQuizPage from './pages/EarbudsConditionQuizPage.jsx';
+
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import AdminLayout from './pages/admin/AdminLayout.jsx';
@@ -104,6 +110,16 @@ function App() {
           <Route path="/sell-tablet/:brand/:slug/quiz" element={<TabletConditionQuizPage />} />
           {/* TV Trade-in Flow */}
           <Route path="/sell-tv" element={<SellTvPage />} />
+          {/* Earbuds Flow */}
+          <Route path="/sell-earbuds/brand" element={<EarbudsBrandSelectionPage />} />
+          <Route path="/sell-earbuds/:brand" element={<EarbudsModelSelectionPage />} />
+          <Route path="/sell-earbuds/:brand/:slug" element={<EarbudsModelDetailsPage />} />
+          <Route path="/sell-earbuds/:brand/:slug/quiz" element={<EarbudsConditionQuizPage />} />
+          {/* DeviceKart URL compatibility aliases */}
+          <Route path="/sell/earbuds/brand" element={<EarbudsBrandSelectionPage />} />
+          <Route path="/sell/earbuds/:brand" element={<EarbudsModelSelectionPage />} />
+          <Route path="/sell/earbuds/:brand/:slug" element={<EarbudsModelDetailsPage />} />
+          <Route path="/sell/earbuds/:brand/:slug/quiz" element={<EarbudsConditionQuizPage />} />
           {/* Shared */}
 
           <Route path="/schedule-pickup" element={<ProtectedRoute><SchedulePickupPage /></ProtectedRoute>} />

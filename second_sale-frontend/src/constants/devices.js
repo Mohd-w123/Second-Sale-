@@ -100,3 +100,14 @@ export const TABLET_BRANDS = [
 ];
 
 
+
+export const EARBUDS_BRANDS = [
+  { name: "Apple", color: "white", models: 7, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png" },
+  { name: "Samsung", color: "white", models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
+  { name: "OnePlus", color: "white", models: 3, logo: "https://cdn.worldvectorlogo.com/logos/oneplus-wordmark-4.svg" },
+  { name: "boAt", color: "white", models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Boat_Logo.png/640px-Boat_Logo.png" },
+  { name: "Sony", color: "white", models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png" },
+  { name: "Noise", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Noise_logo.png/640px-Noise_logo.png" },
+  { name: "Realme", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Realme_logo.svg/1280px-Realme_logo.svg.png" },
+  { name: "JBL", color: "white", models: 0, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/JBL_Logo.svg/1280px-JBL_Logo.svg.png" }
+];

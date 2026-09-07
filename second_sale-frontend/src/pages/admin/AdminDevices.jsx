@@ -3,7 +3,7 @@ import { adminService } from '../../services/admin.service';
 import { categoryService } from '../../services/category.service';
 import {
   Search, ChevronLeft, ChevronRight, X, Plus, Trash2,
-  Smartphone, Monitor, Laptop, FileText, Percent, Info, ToggleLeft, ToggleRight
+  Smartphone, Monitor, Laptop, Headphones, FileText, Percent, Info, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import './admin.css';
 
@@ -228,6 +228,8 @@ export default function AdminDevices() {
         return <Laptop className="w-4 h-4" />;
       case 'tablet':
         return <Monitor className="w-4 h-4" />;
+      case 'earbuds':
+        return <Headphones className="w-4 h-4" />;
       default:
         return <Smartphone className="w-4 h-4" />;
     }

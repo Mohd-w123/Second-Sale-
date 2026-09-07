@@ -416,8 +416,9 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
     if (categoryFilter === 'All') return true;
     const cat = (order.device?.category || '').toLowerCase();
     if (categoryFilter === 'TV') return cat === 'tv';
+    if (categoryFilter === 'Earbuds') return cat === 'earbuds';
     if (categoryFilter === 'Laptop') return cat === 'laptop';
-    if (categoryFilter === 'Mobile') return cat === 'mobile' || (!['laptop', 'tv'].includes(cat));
+    if (categoryFilter === 'Mobile') return cat === 'mobile' || (!['laptop', 'tv', 'earbuds'].includes(cat));
     return true;
   });
 
@@ -431,7 +432,7 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
 
         {/* Category Filter */}
         <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
-          {['All', 'Mobile', 'Laptop', 'TV'].map(cat => (
+          {['All', 'Mobile', 'Laptop', 'TV', 'Earbuds'].map(cat => (
             <button
               key={cat}
               onClick={() => setCategoryFilter(cat)}
