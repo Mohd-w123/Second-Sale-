@@ -409,39 +409,51 @@ export default function HomePage() {
 
 
       {/* ── Category Cards ── */}
-      <section className="py-10 bg-white">
+      <section className="py-8 sm:py-10 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
             {DEVICE_CATEGORIES.map((cat) => (
               <Link
                 to={cat.to}
                 key={cat.label}
-                className="group flex items-center gap-3 rounded-2xl p-3.5 sm:p-4 border border-gray-100 hover:border-[#2563EB]/30 hover:shadow-lg transition-all duration-300 no-underline"
-                style={{ backgroundColor: cat.color + "40" }}
+                className="group flex flex-col items-center text-center rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#2563EB]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 no-underline relative overflow-hidden"
+                style={{ backgroundColor: cat.color + "35" }}
               >
-                <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0">
+                {/* Device Icon / Image Container */}
+                <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
                   {cat.img ? (
-                    <img src={cat.img} alt={cat.label} className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                    <img
+                      src={cat.img}
+                      alt={cat.label}
+                      className="max-h-full max-w-full object-contain filter drop-shadow-xs"
+                    />
                   ) : cat.icon === "smartwatch" ? (
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Watch size={24} />
+                    <div className="w-14 h-14 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shadow-xs border border-amber-200/50">
+                      <Watch size={28} />
                     </div>
                   ) : cat.icon === "console" ? (
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Gamepad2 size={24} />
+                    <div className="w-14 h-14 rounded-2xl bg-purple-100/90 text-purple-600 flex items-center justify-center shadow-xs border border-purple-200/50">
+                      <Gamepad2 size={28} />
                     </div>
                   ) : (
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-100/80 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Headphones size={24} />
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-100/90 text-emerald-600 flex items-center justify-center shadow-xs border border-emerald-200/50">
+                      <Headphones size={28} />
                     </div>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-bold text-[#0F2D5B] mb-0.5">{cat.label}</h3>
-                  <p className="text-xs text-gray-500">{cat.desc}</p>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-[#2563EB] flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
-                  <ArrowRight size={16} />
+
+                {/* Text Content */}
+                <h3 className="text-sm sm:text-base font-extrabold text-[#0F2D5B] group-hover:text-[#2563EB] transition-colors leading-snug mb-1">
+                  {cat.label}
+                </h3>
+                <p className="text-[11px] text-gray-400 font-medium leading-tight">
+                  {cat.desc}
+                </p>
+
+                {/* Hover indicator */}
+                <div className="mt-2 text-[11px] font-bold text-[#2563EB] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                  <span>Sell Now</span>
+                  <ArrowRight size={12} />
                 </div>
               </Link>
             ))}
