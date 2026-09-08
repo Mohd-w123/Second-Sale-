@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Package
 } from 'lucide-react';
 import './admin.css';
 
@@ -32,6 +33,7 @@ export default function AdminLayout() {
     if (path.includes('/dashboard')) return 'Dashboard Overview';
     if (path.includes('/users')) return 'User Directory';
     if (path.includes('/devices')) return 'Device Catalog';
+    if (path.includes('/refurbished')) return 'Refurbished Marketplace';
     if (path.includes('/categories')) return 'Category Management';
     if (path.includes('/partners')) return 'Partner Applications';
     if (path.includes('/orders')) return 'System Orders';
@@ -43,7 +45,8 @@ export default function AdminLayout() {
   const navItems = [
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/users', icon: Users, label: 'Users' },
-    { to: '/admin/devices', icon: Smartphone, label: 'Devices' },
+    { to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
+    { to: '/admin/refurbished', icon: Package, label: 'Refurbished' },
     { to: '/admin/categories', icon: Layers, label: 'Categories' },
     { to: '/admin/partners', icon: Handshake, label: 'Partners' },
     { to: '/admin/orders', icon: ClipboardList, label: 'Orders' },

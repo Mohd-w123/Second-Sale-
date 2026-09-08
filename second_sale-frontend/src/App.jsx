@@ -34,6 +34,12 @@ import CategoryHubPage from './pages/CategoryHubPage.jsx';
 import { CATEGORY_HUBS } from './data/categoryHubs.js';
 import WhatsAppButton from './components/WhatsAppButton.jsx';
 
+// Buy Refurbished Pages (Cashify-style with native payment flow)
+import RefurbishedCatalogPage from './pages/buy/RefurbishedCatalogPage.jsx';
+import RefurbishedProductDetailPage from './pages/buy/RefurbishedProductDetailPage.jsx';
+import RefurbishedCheckoutPage from './pages/buy/RefurbishedCheckoutPage.jsx';
+import RefurbishedOrderSuccessPage from './pages/buy/RefurbishedOrderSuccessPage.jsx';
+
 // Laptop Pages
 import LaptopBrandSelectionPage from './pages/LaptopBrandSelectionPage.jsx';
 import LaptopModelSelectionPage from './pages/LaptopModelSelectionPage.jsx';
@@ -82,6 +88,7 @@ import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminPincodes from './pages/admin/AdminPincodes.jsx';
 import AdminSiteSettings from './pages/admin/AdminSiteSettings.jsx';
+import AdminRefurbished from './pages/admin/AdminRefurbished.jsx';
 
 function App() {
   const location = useLocation();
@@ -156,6 +163,12 @@ function App() {
           <Route path="/sell/console/:brand" element={<GamingModelSelectionPage />} />
           <Route path="/sell/console/:brand/:slug" element={<GamingModelDetailsPage />} />
           <Route path="/sell/console/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
+          {/* Buy Refurbished Flow (Cashify-style) */}
+          <Route path="/buy-refurbished" element={<RefurbishedCatalogPage />} />
+          <Route path="/buy-refurbished/product/:slug" element={<RefurbishedProductDetailPage />} />
+          <Route path="/buy-refurbished/checkout" element={<RefurbishedCheckoutPage />} />
+          <Route path="/buy-refurbished/order-success/:orderId" element={<RefurbishedOrderSuccessPage />} />
+
           {/* Shared */}
 
           <Route path="/schedule-pickup" element={<ProtectedRoute><SchedulePickupPage /></ProtectedRoute>} />
@@ -183,6 +196,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="devices" element={<AdminDevices />} />
+            <Route path="refurbished" element={<AdminRefurbished />} />
             <Route path="categories" element={<AdminCategories />} />
             <Route path="partners" element={<AdminPartners />} />
             <Route path="orders" element={<AdminOrders />} />

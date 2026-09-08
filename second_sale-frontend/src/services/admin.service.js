@@ -65,6 +65,14 @@ export const adminService = {
   getTvLeadById: (id) => adminApi.get(`/tv-leads/${id}`),
   updateTvLeadStatus: (id, data) => adminApi.patch(`/tv-leads/${id}`, data),
   deleteTvLead: (id) => adminApi.delete(`/tv-leads/${id}`),
+
+  // Refurbished Management
+  getRefurbishedDevices: (params) => adminApi.get('/refurbished/admin/devices', { params }),
+  createRefurbishedDevice: (data) => adminApi.post('/refurbished/admin', data),
+  updateRefurbishedDevice: (id, data) => adminApi.put(`/refurbished/admin/${id}`, data),
+  deleteRefurbishedDevice: (id, params) => adminApi.delete(`/refurbished/admin/${id}`, { params }),
+  getRefurbishedOrders: (params) => adminApi.get('/refurbished/admin/orders', { params }),
+  updateRefurbishedOrderStatus: (orderId, data) => adminApi.patch(`/refurbished/admin/orders/${orderId}/status`, data),
 };
 
 export default adminApi;

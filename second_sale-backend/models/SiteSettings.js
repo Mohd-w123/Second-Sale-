@@ -19,10 +19,11 @@ const bannerSchema = new mongoose.Schema({
 
 const DEFAULT_NAV_LINKS = [
   { label: "Sell Device", hasDropdown: true, to: "/sell-old-mobile-phones/brand", order: 0, isActive: true },
-  { label: "How It Works", hasDropdown: false, to: "/#how-it-works", order: 1, isActive: true },
-  { label: "Corporate", hasDropdown: false, to: "/corporate", order: 2, isActive: true },
-  { label: "About Us", hasDropdown: false, to: "/about-us", order: 3, isActive: true },
-  { label: "Become a Partner", hasDropdown: false, to: "/partner", order: 4, isActive: true },
+  { label: "Buy Refurbished", hasDropdown: false, to: "/buy-refurbished", order: 1, isActive: true },
+  { label: "How It Works", hasDropdown: false, to: "/#how-it-works", order: 2, isActive: true },
+  { label: "Corporate", hasDropdown: false, to: "/corporate", order: 3, isActive: true },
+  { label: "About Us", hasDropdown: false, to: "/about-us", order: 4, isActive: true },
+  { label: "Become a Partner", hasDropdown: false, to: "/partner", order: 5, isActive: true },
 ];
 
 const siteSettingsSchema = new mongoose.Schema({

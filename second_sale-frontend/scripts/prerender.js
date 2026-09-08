@@ -70,7 +70,7 @@ async function main() {
     } catch (err) {
       console.warn(`  ✗ ${route}: ${err.message}`);
     } finally {
-      await page.close();
+      await page.close().catch(() => {});
     }
   }
 

@@ -16,8 +16,17 @@ const DEFAULT_MEGA_MENU_CATEGORIES = [
   { id: "refrigerator", label: "Refrigerator", comingSoon: true },
 ];
 
+const BUY_REFURBISHED_CATEGORIES = [
+  { id: "mobile", label: "Phone", to: "/buy-refurbished?category=mobile" },
+  { id: "tablet", label: "Tablet", to: "/buy-refurbished?category=tablet" },
+  { id: "laptop", label: "Laptop", to: "/buy-refurbished?category=laptop" },
+  { id: "smartwatch", label: "Smartwatch", to: "/buy-refurbished?category=smartwatch" },
+  { id: "console", label: "Gaming Console", to: "/buy-refurbished?category=console" },
+];
+
 const DEFAULT_NAV_ITEMS = [
   { label: "Sell Device", hasDropdown: true },
+  { label: "Buy Refurbished", hasDropdown: true, to: "/buy-refurbished" },
   { label: "How It Works", to: "/#how-it-works" },
   { label: "Corporate", to: "/corporate" },
   { label: "About Us", to: "/about-us" },
@@ -199,7 +208,13 @@ export default function Navbar() {
       if (Array.isArray(data?.navLinks) && data.navLinks.length > 0) {
         const active = data.navLinks
           .filter((item) => item.isActive !== false)
-          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+          .map((item) => {
+            if (item.label === "Buy Refurbished" || item.to === "/buy-refurbished") {
+              return { ...item, hasDropdown: true };
+            }
+            return item;
+          });
         if (active.length > 0) {
           setNavItems(active);
         }
@@ -225,7 +240,13 @@ export default function Navbar() {
         if (Array.isArray(data.navLinks)) {
           const active = data.navLinks
             .filter((item) => item.isActive !== false)
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((item) => {
+              if (item.label === "Buy Refurbished" || item.to === "/buy-refurbished") {
+                return { ...item, hasDropdown: true };
+              }
+              return item;
+            });
           if (active.length > 0) setNavItems(active);
         }
       } else {
@@ -255,6 +276,7 @@ export default function Navbar() {
     };
   }, [fetchSiteSettings, fetchCategories]);
   const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
+  const [buyDropdownOpen, setBuyDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -267,6 +289,7 @@ export default function Navbar() {
   const mobileSearchRef = useRef(null);
   const debounceTimer = useRef(null);
   const dropdownRef = useRef(null);
+  const buyDropdownRef = useRef(null);
 
   const auth = useAuth();
   const isLoggedIn = auth?.isAuthenticated;
@@ -281,10 +304,11 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile menu on route change
+  // Close mobile menu & dropdowns on route change
   useEffect(() => {
     setMobileMenuOpen(false);
     setSellDropdownOpen(false);
+    setBuyDropdownOpen(false);
   }, [location.pathname]);
 
   const handleMobileExpand = (label) => {
@@ -345,6 +369,9 @@ export default function Navbar() {
       }
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setSellDropdownOpen(false);
+      }
+      if (buyDropdownRef.current && !buyDropdownRef.current.contains(e.target)) {
+        setBuyDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -474,51 +501,97 @@ export default function Navbar() {
 
         {/* Desktop Nav Items */}
         <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 shrink-0">
-          {navItems.map((item) => (
-            <div
-              key={item._id || item.label}
-              className="relative"
-              ref={item.hasDropdown ? dropdownRef : undefined}
-              onMouseEnter={() => item.hasDropdown && setSellDropdownOpen(true)}
-              onMouseLeave={() => item.hasDropdown && setSellDropdownOpen(false)}
-            >
-              {item.hasDropdown ? (
-                <button
-                  className={`flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap
-                    ${sellDropdownOpen ? "text-[#2563EB] bg-[#E6F4FF]" : "text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50"}`}
-                  onClick={() => setSellDropdownOpen(!sellDropdownOpen)}
-                >
-                  {item.label}
-                  <span className={`transition-transform duration-200 ${sellDropdownOpen ? "rotate-180" : ""}`}>
-                    <ChevronDown />
-                  </span>
-                </button>
-              ) : item.isExternal ? (
-                <a
-                  href={item.to}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50 transition-colors whitespace-nowrap no-underline"
-                >
-                  {item.label}
-                </a>
-              ) : (
-                <button
-                  className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50 transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent"
-                  onClick={() => {
-                    if (item.to?.startsWith("/#")) {
-                      const el = document.getElementById(item.to.replace("/#", ""));
-                      if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
-                    }
-                    if (item.to) navigate(item.to);
-                  }}
-                >
-                  {item.label}
-                </button>
-              )}
+          {navItems.map((item) => {
+            const isSell = item.label === "Sell Device" || (item.hasDropdown && item.label !== "Buy Refurbished" && item.to !== "/buy-refurbished");
+            const isBuy = item.label === "Buy Refurbished" || item.to === "/buy-refurbished";
+            const isOpen = isSell ? sellDropdownOpen : isBuy ? buyDropdownOpen : false;
+            const itemRef = isSell ? dropdownRef : isBuy ? buyDropdownRef : undefined;
 
-              {/* Sell Device Dynamic Mega Menu */}
-              {item.hasDropdown && sellDropdownOpen && (
+            return (
+              <div
+                key={item._id || item.label}
+                className="relative"
+                ref={itemRef}
+                onMouseEnter={() => {
+                  if (isSell) setSellDropdownOpen(true);
+                  if (isBuy) setBuyDropdownOpen(true);
+                }}
+                onMouseLeave={() => {
+                  if (isSell) setSellDropdownOpen(false);
+                  if (isBuy) setBuyDropdownOpen(false);
+                }}
+              >
+                {item.hasDropdown ? (
+                  <button
+                    className={`flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent
+                      ${isOpen ? "text-[#2563EB] bg-[#E6F4FF]" : "text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50"}`}
+                    onClick={() => {
+                      if (isSell) setSellDropdownOpen(!sellDropdownOpen);
+                      if (isBuy) setBuyDropdownOpen(!buyDropdownOpen);
+                    }}
+                  >
+                    {item.label}
+                    <span className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                      <ChevronDown />
+                    </span>
+                  </button>
+                ) : item.isExternal ? (
+                  <a
+                    href={item.to}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50 transition-colors whitespace-nowrap no-underline"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <button
+                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50 transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent"
+                    onClick={() => {
+                      if (item.to?.startsWith("/#")) {
+                        const el = document.getElementById(item.to.replace("/#", ""));
+                        if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
+                      }
+                      if (item.to) navigate(item.to);
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                )}
+
+                {/* Buy Refurbished Clean Dropdown Menu (Matches Reference) */}
+                {isBuy && buyDropdownOpen && (
+                  <div
+                    className="absolute top-full left-0 mt-1.5 bg-white border border-slate-100 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.12)] z-[2000] p-2 w-60 dropdown-animate overflow-hidden flex flex-col gap-0.5"
+                    onMouseEnter={() => setBuyDropdownOpen(true)}
+                    onMouseLeave={() => setBuyDropdownOpen(false)}
+                  >
+                    {BUY_REFURBISHED_CATEGORIES.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        to={cat.to}
+                        onClick={() => setBuyDropdownOpen(false)}
+                        className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#2563EB] no-underline"
+                      >
+                        <span className="font-bold text-[15px] tracking-tight">{cat.label}</span>
+                        <ChevronRight size={14} className="text-slate-300 group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all" />
+                      </Link>
+                    ))}
+                    <div className="pt-1.5 mt-1 border-t border-slate-100">
+                      <Link
+                        to="/buy-refurbished"
+                        onClick={() => setBuyDropdownOpen(false)}
+                        className="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-[#2563EB] hover:bg-blue-50/60 transition-colors no-underline"
+                      >
+                        <span>All Refurbished Devices</span>
+                        <ArrowRight size={13} />
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {/* Sell Device Dynamic Mega Menu */}
+                {isSell && sellDropdownOpen && (
                 <div 
                   className="absolute top-full left-0 mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[2000] flex overflow-hidden dropdown-animate w-[490px] min-h-[380px]"
                   onMouseEnter={() => setSellDropdownOpen(true)}
@@ -626,8 +699,9 @@ export default function Navbar() {
                   })()}
                 </div>
               )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
 
         {/* Search (Desktop) */}
@@ -736,7 +810,7 @@ export default function Navbar() {
 
                 {item.hasDropdown && mobileExpanded === item.label && (
                   <div className="bg-[#F7FAFF] rounded-xl mx-2 mb-2 overflow-hidden">
-                    {categories.map((sub) => (
+                    {(item.label === "Buy Refurbished" ? BUY_REFURBISHED_CATEGORIES : categories).map((sub) => (
                       <Link
                         key={sub.label}
                         to={sub.to || "#"}
@@ -760,7 +834,8 @@ export default function Navbar() {
                           <ChevronRight size={14} className="text-slate-400" />
                         )}
                       </Link>
-                    ))}                  </div>
+                    ))}
+                  </div>
                 )}
               </div>
             ))}
