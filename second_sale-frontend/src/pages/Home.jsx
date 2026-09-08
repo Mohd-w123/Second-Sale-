@@ -540,80 +540,7 @@ export default function HomePage() {
         schema={schema}
       />
 
-      {/* ── Stats Bar ── */}
-      <section className="bg-white py-5 border-y border-gray-100">
-        <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar py-2">
-            {HERO_STATS.map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-3 min-w-fit">
-                <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
-                  {stat.icon}
-                </div>
-                <div>
-                  <div className="text-base sm:text-lg font-black text-[#0F2D5B] leading-none">{stat.value}</div>
-                  <div className="text-xs text-gray-400 font-medium mt-0.5">{stat.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-
-      {/* ── Category Cards ── */}
-      <section className="py-8 sm:py-10 bg-white">
-        <div className="max-w-[1200px] mx-auto px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
-            {DEVICE_CATEGORIES.map((cat) => (
-              <Link
-                to={cat.to}
-                key={cat.label}
-                className="group flex flex-col items-center text-center rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#2563EB]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 no-underline relative overflow-hidden"
-                style={{ backgroundColor: cat.color + "35" }}
-              >
-                {/* Device Icon / Image Container */}
-                <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
-                  {cat.img ? (
-                    <img
-                      src={cat.img}
-                      alt={cat.label}
-                      className="max-h-full max-w-full object-contain filter drop-shadow-xs"
-                    />
-                  ) : cat.icon === "smartwatch" ? (
-                    <div className="w-14 h-14 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shadow-xs border border-amber-200/50">
-                      <Watch size={28} />
-                    </div>
-                  ) : cat.icon === "console" ? (
-                    <div className="w-14 h-14 rounded-2xl bg-purple-100/90 text-purple-600 flex items-center justify-center shadow-xs border border-purple-200/50">
-                      <Gamepad2 size={28} />
-                    </div>
-                  ) : (
-                    <div className="w-14 h-14 rounded-2xl bg-emerald-100/90 text-emerald-600 flex items-center justify-center shadow-xs border border-emerald-200/50">
-                      <Headphones size={28} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Text Content */}
-                <h3 className="text-sm sm:text-base font-extrabold text-[#0F2D5B] group-hover:text-[#2563EB] transition-colors leading-snug mb-1">
-                  {cat.label}
-                </h3>
-                <p className="text-[11px] text-gray-400 font-medium leading-tight">
-                  {cat.desc}
-                </p>
-
-                {/* Hover indicator */}
-                <div className="mt-2 text-[11px] font-bold text-[#2563EB] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
-                  <span>Sell Now</span>
-                  <ArrowRight size={12} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      
 
       {/* ════════════════════════════════════════════════════════════
           ── HERO SECTION ──
@@ -856,6 +783,79 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── Category Cards ── */}
+      <section className="py-8 sm:py-10 bg-white">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+            {DEVICE_CATEGORIES.map((cat) => (
+              <Link
+                to={cat.to}
+                key={cat.label}
+                className="group flex flex-col items-center text-center rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#2563EB]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 no-underline relative overflow-hidden"
+                style={{ backgroundColor: cat.color + "35" }}
+              >
+                {/* Device Icon / Image Container */}
+                <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
+                  {cat.img ? (
+                    <img
+                      src={cat.img}
+                      alt={cat.label}
+                      className="max-h-full max-w-full object-contain filter drop-shadow-xs"
+                    />
+                  ) : cat.icon === "smartwatch" ? (
+                    <div className="w-14 h-14 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shadow-xs border border-amber-200/50">
+                      <Watch size={28} />
+                    </div>
+                  ) : cat.icon === "console" ? (
+                    <div className="w-14 h-14 rounded-2xl bg-purple-100/90 text-purple-600 flex items-center justify-center shadow-xs border border-purple-200/50">
+                      <Gamepad2 size={28} />
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-100/90 text-emerald-600 flex items-center justify-center shadow-xs border border-emerald-200/50">
+                      <Headphones size={28} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Text Content */}
+                <h3 className="text-sm sm:text-base font-extrabold text-[#0F2D5B] group-hover:text-[#2563EB] transition-colors leading-snug mb-1">
+                  {cat.label}
+                </h3>
+                <p className="text-[11px] text-gray-400 font-medium leading-tight">
+                  {cat.desc}
+                </p>
+
+                {/* Hover indicator */}
+                <div className="mt-2 text-[11px] font-bold text-[#2563EB] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                  <span>Sell Now</span>
+                  <ArrowRight size={12} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats Bar ── */}
+      <section className="bg-white py-5 border-y border-gray-100">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar py-2">
+            {HERO_STATS.map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-3 min-w-fit">
+                <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                  {stat.icon}
+                </div>
+                <div>
+                  <div className="text-base sm:text-lg font-black text-[#0F2D5B] leading-none">{stat.value}</div>
+                  <div className="text-xs text-gray-400 font-medium mt-0.5">{stat.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
       {/* ── Trust Marquee ── */}
       <section className="py-4 bg-[#F7FAFF] border-y border-gray-100">
