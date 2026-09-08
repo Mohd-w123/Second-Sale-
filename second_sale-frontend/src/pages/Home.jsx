@@ -6,7 +6,7 @@ import {
   Smartphone, Tablet, Laptop, Monitor,
   Shield, Tag, Zap, Truck, ArrowRight,
   ChevronDown, Star, CheckCircle2, Sparkles, BadgeCheck, Users,
-  Search, Clock, CreditCard, MapPin, Headphones, Watch, Gamepad2
+  Search, Clock, CreditCard, MapPin, Headphones, Watch, Gamepad2, ChevronLeft, ChevronRight, ShieldCheck, Flame
 } from "lucide-react";
 import heroBannerImage from "../assets/hero-banner.jpg";
 import mobileDeviceImg from "../assets/devices/mobile.png";
@@ -173,6 +173,118 @@ const REVIEWS = [
   { name: "Priya Nair", text: "The pickup agent was very professional and courteous. Got ₹2,000 more than other platforms quoted.", stars: 5 },
 ];
 
+
+const QUOTED_CATEGORIES = [
+  { id: "all", label: "All Devices" },
+  { id: "iphone", label: "iPhones" },
+  { id: "android", label: "Android & Samsung" },
+  { id: "gaming", label: "Gaming Consoles" },
+  { id: "smartwatch", label: "Smartwatches" },
+];
+
+const MOST_QUOTED_DEVICES = [
+  {
+    id: "iphone-15",
+    name: "iPhone 15",
+    category: "iphone",
+    price: 44094,
+    badge: "Most Popular",
+    badgeType: "blue",
+    imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pink-select-202309?wid=800&hei=800&fmt=jpeg&qlt=90",
+    to: "/sell-old-mobile-phones/apple/apple-iphone-15",
+  },
+  {
+    id: "iphone-16",
+    name: "iPhone 16",
+    category: "iphone",
+    price: 51047,
+    badge: "Best Value",
+    badgeType: "indigo",
+    imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-16-ultramarine-select-202409?wid=800&hei=800&fmt=jpeg&qlt=90",
+    to: "/sell-old-mobile-phones/apple/apple-iphone-16",
+  },
+  {
+    id: "iphone-14",
+    name: "iPhone 14",
+    category: "iphone",
+    price: 29750,
+    badge: "Quick Sale",
+    badgeType: "amber",
+    imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-14-midnight-select-202209?wid=800&hei=800&fmt=jpeg&qlt=90",
+    to: "/sell-old-mobile-phones/apple/apple-iphone-14",
+  },
+  {
+    id: "iphone-13",
+    name: "iPhone 13",
+    category: "iphone",
+    price: 26570,
+    badge: "High Demand",
+    badgeType: "emerald",
+    imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-13-blue-select-2021?wid=800&hei=800&fmt=jpeg&qlt=90",
+    to: "/sell-old-mobile-phones/apple/apple-iphone-13",
+  },
+  {
+    id: "ps5",
+    name: "PlayStation 5 (PS5)",
+    category: "gaming",
+    price: 38250,
+    badge: "Top Console",
+    badgeType: "purple",
+    imageUrl: "https://gmedia.playstation.com/is/image/SIEPDC/ps5-product-thumbnail-01-en-14sep21?$facebook$",
+    to: "/sell-gaming/sony/sony-playstation-5",
+  },
+  {
+    id: "apple-watch-ultra-2",
+    name: "Apple Watch Ultra 2",
+    category: "smartwatch",
+    price: 35000,
+    badge: "Premium Watch",
+    badgeType: "blue",
+    imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/ultra-2-black-band-titanium-202409?wid=800&hei=800&fmt=jpeg&qlt=90",
+    to: "/sell-smartwatch/apple/apple-watch-ultra-2",
+  },
+  {
+    id: "iphone-15-pro-max",
+    name: "iPhone 15 Pro Max",
+    category: "iphone",
+    price: 58500,
+    badge: "Highest Payout",
+    badgeType: "amber",
+    imageUrl: "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-naturaltitanium?wid=800&hei=800&fmt=jpeg&qlt=90",
+    to: "/sell-old-mobile-phones/apple/apple-iphone-15-pro-max",
+  },
+  {
+    id: "galaxy-s24-ultra",
+    name: "Samsung Galaxy S24 Ultra",
+    category: "android",
+    price: 62000,
+    badge: "Flagship Demand",
+    badgeType: "emerald",
+    imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2401/gallery/in-galaxy-s24-s928-sm-s928bztqins-thumb-539573039?$216_216_PNG$",
+    to: "/sell-old-mobile-phones/samsung",
+  },
+  {
+    id: "ps4-slim",
+    name: "PlayStation 4 Slim",
+    category: "gaming",
+    price: 14000,
+    badge: "Quick Sale",
+    badgeType: "purple",
+    imageUrl: "https://gmedia.playstation.com/is/image/SIEPDC/ps4-slim-image-block-01-en-24jul20?$facebook$",
+    to: "/sell-gaming/sony/sony-playstation-4-slim",
+  },
+  {
+    id: "galaxy-watch-6",
+    name: "Galaxy Watch 6 Classic",
+    category: "smartwatch",
+    price: 14000,
+    badge: "Best Value",
+    badgeType: "indigo",
+    imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2307/gallery/in-galaxy-watch6-classic-r960-sm-r960nzkainu-thumb-537409249?$216_216_PNG$",
+    to: "/sell-smartwatch/samsung/samsung-galaxy-watch-6-classic",
+  },
+];
+
 const FAQS = HOME_FAQS;
 
 const GUARANTEES = [
@@ -332,6 +444,19 @@ export default function HomePage() {
   const heroSearchRef = useRef(null);
   const debounceTimer = useRef(null);
   const navigate = useNavigate();
+  const [quotedCategory, setQuotedCategory] = useState("all");
+  const quotedSliderRef = useRef(null);
+
+  const scrollQuoted = (direction) => {
+    if (quotedSliderRef.current) {
+      const scrollAmount = direction === "left" ? -320 : 320;
+      quotedSliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const filteredQuotedDevices = quotedCategory === "all"
+    ? MOST_QUOTED_DEVICES
+    : MOST_QUOTED_DEVICES.filter((d) => d.category === quotedCategory);
 
   const performSearch = async (query) => {
     if (!query || query.trim().length < 2) {
@@ -841,6 +966,181 @@ export default function HomePage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Most Quoted Devices ── */}
+      <section className="py-16 sm:py-24 bg-white border-b border-slate-100 relative overflow-hidden">
+        <div className="max-w-[1200px] mx-auto px-4">
+          
+          {/* Header Row: Title & Slider Controls */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="inline-flex items-center gap-1.5 bg-blue-50 text-[#2563EB] text-xs font-black tracking-wider uppercase px-3.5 py-1.5 rounded-full mb-3 border border-blue-100">
+                <Flame size={14} className="text-amber-500 fill-amber-500" />
+                TOP SELLER CHOICES
+              </div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                Most Quoted <span className="text-[#2563EB]">Devices</span>
+              </h2>
+              <p className="text-slate-500 text-sm sm:text-base mt-1 max-w-xl">
+                These devices are in highest demand right now. Get the best value for your device with instant pickup.
+              </p>
+            </div>
+
+            {/* Right Controls */}
+            <div className="flex items-center gap-3 self-start md:self-end">
+              <Link
+                to="/sell-old-mobile-phones/brand"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#2563EB] hover:text-blue-700 transition-colors mr-2"
+              >
+                <span>View All Devices</span>
+                <ArrowRight size={15} />
+              </Link>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => scrollQuoted("left")}
+                  className="w-10 h-10 rounded-full bg-slate-50 hover:bg-white border border-slate-200 text-slate-700 hover:text-[#2563EB] hover:border-blue-400 hover:shadow-md flex items-center justify-center transition-all cursor-pointer"
+                  aria-label="Previous"
+                >
+                  <ChevronLeft size={20} strokeWidth={2.5} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollQuoted("right")}
+                  className="w-10 h-10 rounded-full bg-slate-50 hover:bg-white border border-slate-200 text-slate-700 hover:text-[#2563EB] hover:border-blue-400 hover:shadow-md flex items-center justify-center transition-all cursor-pointer"
+                  aria-label="Next"
+                >
+                  <ChevronRight size={20} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 mb-8">
+            {QUOTED_CATEGORIES.map((tab) => {
+              const isActive = quotedCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setQuotedCategory(tab.id)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                    isActive
+                      ? "bg-[#2563EB] text-white border-[#2563EB] shadow-md shadow-blue-500/20"
+                      : "bg-slate-50 text-slate-600 border-slate-200/80 hover:border-blue-300 hover:bg-white hover:text-blue-600"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Carousel Slider */}
+          <div
+            ref={quotedSliderRef}
+            className="flex gap-5 sm:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-6 pt-1"
+          >
+            {filteredQuotedDevices.map((d) => {
+              const badgeStyle =
+                d.badgeType === "emerald"
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : d.badgeType === "indigo"
+                  ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                  : d.badgeType === "purple"
+                  ? "bg-purple-50 text-purple-700 border-purple-200"
+                  : d.badgeType === "amber"
+                  ? "bg-amber-50 text-amber-800 border-amber-200"
+                  : "bg-blue-50 text-blue-700 border-blue-200";
+
+              const dotColor =
+                d.badgeType === "emerald"
+                  ? "bg-emerald-500"
+                  : d.badgeType === "indigo"
+                  ? "bg-indigo-500"
+                  : d.badgeType === "purple"
+                  ? "bg-purple-500"
+                  : d.badgeType === "amber"
+                  ? "bg-amber-500"
+                  : "bg-blue-500";
+
+              return (
+                <Link
+                  key={d.id}
+                  to={d.to}
+                  className="min-w-[260px] sm:min-w-[280px] max-w-[280px] shrink-0 snap-start bg-white rounded-[28px] p-5 border border-slate-200/80 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group no-underline relative overflow-hidden"
+                >
+                  {/* Top Badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border ${badgeStyle}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${dotColor}`} />
+                      {d.badge}
+                    </span>
+                  </div>
+
+                  {/* Device Showcase Image */}
+                  <div className="w-full h-44 sm:h-48 rounded-2xl bg-slate-50/60 flex items-center justify-center p-3 mb-4 group-hover:scale-105 transition-transform duration-300 relative overflow-hidden">
+                    <img
+                      src={d.imageUrl}
+                      alt={d.name}
+                      className="max-h-full max-w-full object-contain filter drop-shadow-md"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Title & Valuation */}
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#2563EB] transition-colors leading-snug line-clamp-1 mb-1">
+                      {d.name}
+                    </h3>
+                    <div className="flex items-baseline gap-1.5 mb-3">
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Upto</span>
+                      <span className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                        ₹{d.price.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+
+                    {/* Trust row */}
+                    <div className="grid grid-cols-3 gap-1 py-2 px-1 bg-slate-50 rounded-xl border border-slate-100 text-center mb-4">
+                      <div className="flex flex-col items-center">
+                        <ShieldCheck size={13} className="text-blue-500 mb-0.5" />
+                        <span className="text-[9px] font-bold text-slate-500">Best Price</span>
+                      </div>
+                      <div className="flex flex-col items-center border-x border-slate-200/60">
+                        <Truck size={13} className="text-emerald-500 mb-0.5" />
+                        <span className="text-[9px] font-bold text-slate-500">Free Pickup</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <Zap size={13} className="text-amber-500 mb-0.5" />
+                        <span className="text-[9px] font-bold text-slate-500">Instant Pay</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="w-full py-3 px-4 rounded-xl font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all duration-300 bg-blue-50 text-[#2563EB] border border-blue-100 group-hover:bg-[#2563EB] group-hover:text-white group-hover:border-transparent group-hover:shadow-md group-hover:shadow-blue-500/20">
+                    <span>Get Quote</span>
+                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Mobile View All Link */}
+          <div className="text-center sm:hidden mt-4">
+            <Link
+              to="/sell-old-mobile-phones/brand"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2563EB]"
+            >
+              <span>View All Devices</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
         </div>
       </section>
 
