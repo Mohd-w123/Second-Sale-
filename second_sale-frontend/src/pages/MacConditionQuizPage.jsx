@@ -59,15 +59,20 @@ export default function MacConditionQuizPage() {
   const [breakdown, setBreakdown] = useState(null);
 
   useEffect(() => {
-    if (!specs) {
-      navigate(`/sell-imac/${brand}/${slug}`, { replace: true });
-      return;
-    }
     deviceService.getDevice(slug).then(res => {
-      setDevice(res.data);
+      const dev = res.data;
+      setDevice(dev);
       setLoading(false);
+      if (!specs && dev) {
+        const defVariant = dev.variants?.[0] || {};
+        setSpecs({
+          processor: dev.processor || 'Apple M1',
+          ram: defVariant.ram || dev.ram || '8 GB',
+          storage: defVariant.storage || dev.storage || '256 GB SSD'
+        });
+      }
     }).catch(() => setLoading(false));
-  }, [slug, specs, navigate, brand]);
+  }, [slug]);
 
   useEffect(() => {
     if (!device || !specs) return;

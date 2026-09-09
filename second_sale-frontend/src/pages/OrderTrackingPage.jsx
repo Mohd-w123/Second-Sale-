@@ -97,13 +97,15 @@ export default function OrderTrackingPage() {
               <h1 className="text-2xl font-black text-[#111827] mb-1">Order #: <span className="uppercase">{orderId}</span></h1>
               <p className="text-[#EF4444] font-black text-sm uppercase tracking-wider">PIN : 7803</p>
             </div>
-            <button 
-              onClick={() => setShowReport(true)}
-              className="flex items-center gap-2 bg-[#F9FAFB] border border-gray-100 text-[#2563EB] px-6 py-3 rounded-2xl font-black text-sm hover:bg-white transition-all shadow-sm"
-            >
-               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-               See Device Report
-            </button>
+            {order.device?.category !== 'tv' && (
+              <button 
+                onClick={() => setShowReport(true)}
+                className="flex items-center gap-2 bg-[#F9FAFB] border border-gray-100 text-[#2563EB] px-6 py-3 rounded-2xl font-black text-sm hover:bg-white transition-all shadow-sm"
+              >
+                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                 See Device Report
+              </button>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-y-2 gap-x-8 text-sm font-bold">
@@ -155,6 +157,8 @@ export default function OrderTrackingPage() {
                 <p className="text-sm font-bold text-gray-400">
                   {order.device?.category === 'laptop' 
                     ? `( ${order.device?.processor} / ${order.device?.ram} / ${order.device?.storage} )`
+                    : order.device?.category === 'tv'
+                    ? `( ${order.device?.screenSize || ''} • ${order.device?.tvType || 'Smart TV'} • Condition: ${order.device?.screenCondition || 'Good'} )`
                     : `( ${order.device?.storage} / ${order.device?.ram || '8 GB'} )`
                   }
                 </p>

@@ -5,7 +5,7 @@ export const getBrands = async (req, res, next) => {
     const { category = 'mobile' } = req.query;
 
     const brands = await Device.aggregate([
-      { $match: { category, isActive: true } },
+      { $match: { category: (category === 'console' || category === 'gaming') ? { $in: ['console', 'gaming'] } : category, isActive: true } },
       {
         $group: {
           _id: '$brand',
@@ -39,7 +39,7 @@ export const getModels = async (req, res, next) => {
     }
 
     const models = await Device.find(
-      { brand: new RegExp(`^${brand}$`, 'i'), category, isActive: true },
+      { brand: new RegExp(`^${brand}$`, 'i'), category: (category === 'console' || category === 'gaming') ? { $in: ['console', 'gaming'] } : category, isActive: true },
       { modelName: 1, slug: 1, imageUrl: 1, variants: 1, processorFamily: 1, gpuType: 1, isGamingLaptop: 1, tier: 1 }
     ).sort({ 'variants.0.basePrice': -1 });
 

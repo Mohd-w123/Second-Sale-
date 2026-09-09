@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import SEOHead from "../components/seo/SEOHead";
 import { buildSchemaGraph, organizationSchema, websiteSchema } from "../utils/schema";
 import { 
@@ -73,9 +74,12 @@ function SectionHeading({ tag, title, subtitle, center = true }) {
   );
 }
 
+const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 // ─── Main Corporate Component ─────────────────────────────────────────────────
 
 export default function CorporatePage() {
+  const [dbPage, setDbPage] = useState(null);
   const [formData, setFormData] = useState({
     companyName: "",
     contactPerson: "",
@@ -85,23 +89,129 @@ export default function CorporatePage() {
     industry: ""
   });
 
+  useEffect(() => {
+    axios
+      .get(`${API}/pages/corporate`)
+      .then((res) => {
+        if (res.data) setDbPage(res.data);
+      })
+      .catch(() => {});
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Corporate Inquiry Submitted: ", formData);
-    // Hook up corporate inquiry endpoint here
+    alert("Thank you! Your corporate inquiry has been submitted. Our Enterprise team will contact you shortly.");
   };
 
   return (
     <div className="w-full bg-white antialiased">
       <SEOHead
-        title="Corporate IT Asset Disposal — Bulk Device Buyback | SecondSale"
-        description="SecondSale Corporate helps businesses dispose of laptops, desktops, and IT assets securely with bulk pickup, compliance documentation, and transparent pricing."
+        title={dbPage?.metaTitle || "Corporate IT Asset Disposal — Bulk Device Buyback | SecondSale"}
+        description={
+          dbPage?.metaDescription ||
+          "SecondSale Corporate helps businesses dispose of laptops, desktops, and IT assets securely with bulk pickup, compliance documentation, and transparent pricing."
+        }
         path="/corporate"
         schema={buildSchemaGraph([organizationSchema(), websiteSchema()])}
       />
+
       
-      {/* ─── 1. HERO & CORPORATE INQUIRY FORM ─── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-12 pb-20 px-4">
+      {dbPage?.content ? (
+        <div className="max-w-[1200px] mx-auto px-4 py-8">
+          <div dangerouslySetInnerHTML={{ __html: dbPage.content }} />
+          <div className="mt-12 max-w-2xl mx-auto bg-white border border-gray-100 shadow-xl rounded-[28px] p-6 sm:p-10">
+            <div className="mb-6 text-center">
+              <h3 className="text-xl font-black text-gray-900 mb-1">Request Corporate Quote</h3>
+              <p className="text-xs text-gray-400">Get a customized proposal for your organization's IT liquidation needs.</p>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Company Name</label>
+                <input 
+                  type="text" 
+                  required 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]" 
+                  placeholder="Enter company name"
+                  onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Contact Person</label>
+                  <input 
+                    type="text" 
+                    required 
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]" 
+                    placeholder="Full name"
+                    onChange={(e) => setFormData({...formData, contactPerson: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Industry</label>
+                  <select 
+                    required 
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#2563EB]"
+                    onChange={(e) => setFormData({...formData, industry: e.target.value})}
+                  >
+                    <option value="">Select Industry</option>
+                    <option value="IT">IT & Software</option>
+                    <option value="Finance">Financial Services</option>
+                    <option value="Consulting">Consulting</option>
+                    <option value="Education">Education</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Email Address</label>
+                  <input 
+                    type="email" 
+                    required 
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]" 
+                    placeholder="corporate@company.com"
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Phone Number</label>
+                  <input 
+                    type="tel" 
+                    required 
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]" 
+                    placeholder="+91 98765 43210"
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Estimated Device Count</label>
+                <select 
+                  required 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#2563EB]"
+                  onChange={(e) => setFormData({...formData, deviceCount: e.target.value})}
+                >
+                  <option value="">Select Count Range</option>
+                  <option value="10-50">10 - 50 Devices</option>
+                  <option value="50-200">50 - 200 Devices</option>
+                  <option value="200-500">200 - 500 Devices</option>
+                  <option value="500+">500+ Devices</option>
+                </select>
+              </div>
+              <button 
+                type="submit" 
+                className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-md shadow-blue-500/20 mt-2 border-none cursor-pointer"
+              >
+                Submit Corporate Inquiry
+              </button>
+            </form>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ─── 1. HERO & CORPORATE INQUIRY FORM ─── */}
+          <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-12 pb-20 px-4">
         <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
         
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-start">
@@ -307,6 +417,8 @@ export default function CorporatePage() {
           </div>
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }

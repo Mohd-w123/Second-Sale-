@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5002/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 const adminApi = axios.create({
   baseURL: API_BASE,
@@ -59,6 +59,37 @@ export const adminService = {
   createPincode: (data) => adminApi.post('/admin/pincodes', data),
   updatePincode: (id, data) => adminApi.put(`/admin/pincodes/${id}`, data),
   deletePincode: (id) => adminApi.delete(`/admin/pincodes/${id}`),
+
+  // TV Leads
+  getTvLeads: (params) => adminApi.get("/tv-leads", { params }),
+  getTvLeadById: (id) => adminApi.get(`/tv-leads/${id}`),
+  updateTvLeadStatus: (id, data) => adminApi.patch(`/tv-leads/${id}`, data),
+  deleteTvLead: (id) => adminApi.delete(`/tv-leads/${id}`),
+
+  // Refurbished Management
+  getRefurbishedDevices: (params) => adminApi.get('/refurbished/admin/devices', { params }),
+  createRefurbishedDevice: (data) => adminApi.post('/refurbished/admin', data),
+  updateRefurbishedDevice: (id, data) => adminApi.put(`/refurbished/admin/${id}`, data),
+  deleteRefurbishedDevice: (id, params) => adminApi.delete(`/refurbished/admin/${id}`, { params }),
+  getRefurbishedOrders: (params) => adminApi.get('/refurbished/admin/orders', { params }),
+  updateRefurbishedOrderStatus: (orderId, data) => adminApi.patch(`/refurbished/admin/orders/${orderId}/status`, data),
+
+  // Homepage Dynamic Sections
+  getHomepageConfig: () => adminApi.get('/homepage/admin'),
+  updateHomepageSections: (data) => adminApi.put('/homepage/admin/sections', data),
+  resetHomepageSections: () => adminApi.post('/homepage/admin/reset'),
+  uploadHomepageImage: (formData) => adminApi.post('/homepage/admin/upload-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+
+  // Custom Pages CMS
+  getPages: (params) => adminApi.get('/pages/admin/all', { params }),
+  createPage: (data) => adminApi.post('/pages/admin', data),
+  updatePage: (id, data) => adminApi.put(`/pages/admin/${id}`, data),
+  deletePage: (id) => adminApi.delete(`/pages/admin/${id}`),
+
+  // Site Settings (Favicon, Top Bar, Footer)
+  uploadFavicon: (formData) => adminApi.post('/site-settings/favicon', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  updateTopBar: (data) => adminApi.put('/site-settings/top-bar', data),
+  updateFooter: (data) => adminApi.put('/site-settings/footer', data),
 };
 
 export default adminApi;

@@ -9,7 +9,7 @@ import { getNextDays, formatDate, formatDateISO, TIME_SLOTS } from '../utils/dat
 import Input from '../components/ui/Input';
 import NoIndexSEO from '../components/seo/NoIndexSEO';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5002/api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export default function SchedulePickupPage() {
   const navigate = useNavigate();

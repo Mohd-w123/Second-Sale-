@@ -34,6 +34,12 @@ import CategoryHubPage from './pages/CategoryHubPage.jsx';
 import { CATEGORY_HUBS } from './data/categoryHubs.js';
 import WhatsAppButton from './components/WhatsAppButton.jsx';
 
+// Buy Refurbished Pages (Cashify-style with native payment flow)
+import RefurbishedCatalogPage from './pages/buy/RefurbishedCatalogPage.jsx';
+import RefurbishedProductDetailPage from './pages/buy/RefurbishedProductDetailPage.jsx';
+import RefurbishedCheckoutPage from './pages/buy/RefurbishedCheckoutPage.jsx';
+import RefurbishedOrderSuccessPage from './pages/buy/RefurbishedOrderSuccessPage.jsx';
+
 // Laptop Pages
 import LaptopBrandSelectionPage from './pages/LaptopBrandSelectionPage.jsx';
 import LaptopModelSelectionPage from './pages/LaptopModelSelectionPage.jsx';
@@ -51,6 +57,25 @@ import TabletBrandSelectionPage from './pages/TabletBrandSelectionPage.jsx';
 import TabletModelSelectionPage from './pages/TabletModelSelectionPage.jsx';
 import TabletVariantSelectionPage from './pages/TabletVariantSelectionPage.jsx';
 import TabletConditionQuizPage from './pages/TabletConditionQuizPage.jsx';
+import SellTvPage from './pages/SellTvPage.jsx';
+
+// Earbuds Pages
+import EarbudsBrandSelectionPage from './pages/EarbudsBrandSelectionPage.jsx';
+import EarbudsModelSelectionPage from './pages/EarbudsModelSelectionPage.jsx';
+import EarbudsModelDetailsPage from './pages/EarbudsModelDetailsPage.jsx';
+import EarbudsConditionQuizPage from './pages/EarbudsConditionQuizPage.jsx';
+
+// Smartwatch Pages
+import SmartwatchBrandSelectionPage from './pages/SmartwatchBrandSelectionPage.jsx';
+import SmartwatchModelSelectionPage from './pages/SmartwatchModelSelectionPage.jsx';
+import SmartwatchModelDetailsPage from './pages/SmartwatchModelDetailsPage.jsx';
+import SmartwatchConditionQuizPage from './pages/SmartwatchConditionQuizPage.jsx';
+
+// Gaming Console Pages
+import GamingBrandSelectionPage from './pages/GamingBrandSelectionPage.jsx';
+import GamingModelSelectionPage from './pages/GamingModelSelectionPage.jsx';
+import GamingModelDetailsPage from './pages/GamingModelDetailsPage.jsx';
+import GamingConditionQuizPage from './pages/GamingConditionQuizPage.jsx';
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin.jsx';
@@ -58,10 +83,17 @@ import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
 import AdminDevices from './pages/admin/AdminDevices.jsx';
+import AdminCategories from './pages/admin/AdminCategories.jsx';
 import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminPincodes from './pages/admin/AdminPincodes.jsx';
 import AdminSiteSettings from './pages/admin/AdminSiteSettings.jsx';
+import AdminRefurbished from './pages/admin/AdminRefurbished.jsx';
+import AdminHomepage from './pages/admin/AdminHomepage.jsx';
+import AdminPages from './pages/admin/AdminPages.jsx';
+import CustomPageView from './pages/CustomPageView.jsx';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 function App() {
   const location = useLocation();
@@ -69,6 +101,33 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Sync Favicon dynamically from Site Settings
+  useEffect(() => {
+    const applyFavicon = (url) => {
+      if (!url) return;
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
+      link.href = url;
+    };
+
+    fetch(API_BASE + "/site-settings")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.faviconUrl) applyFavicon(data.faviconUrl);
+      })
+      .catch(() => {});
+
+    const onSettingsUpdate = (e) => {
+      if (e?.detail?.faviconUrl) applyFavicon(e.detail.faviconUrl);
+    };
+    window.addEventListener("site-settings-updated", onSettingsUpdate);
+    return () => window.removeEventListener("site-settings-updated", onSettingsUpdate);
+  }, []);
 
   const isAdminRoute = location.pathname.startsWith('/admin');
 
@@ -100,6 +159,51 @@ function App() {
           <Route path="/sell-tablet/:brand" element={<TabletModelSelectionPage />} />
           <Route path="/sell-tablet/:brand/:slug" element={<TabletVariantSelectionPage />} />
           <Route path="/sell-tablet/:brand/:slug/quiz" element={<TabletConditionQuizPage />} />
+          {/* TV Trade-in Flow */}
+          <Route path="/sell-tv" element={<SellTvPage />} />
+          {/* Earbuds Flow */}
+          <Route path="/sell-earbuds/brand" element={<EarbudsBrandSelectionPage />} />
+          <Route path="/sell-earbuds/:brand" element={<EarbudsModelSelectionPage />} />
+          <Route path="/sell-earbuds/:brand/:slug" element={<EarbudsModelDetailsPage />} />
+          <Route path="/sell-earbuds/:brand/:slug/quiz" element={<EarbudsConditionQuizPage />} />
+          {/* DeviceKart URL compatibility aliases */}
+          <Route path="/sell/earbuds/brand" element={<EarbudsBrandSelectionPage />} />
+          <Route path="/sell/earbuds/:brand" element={<EarbudsModelSelectionPage />} />
+          <Route path="/sell/earbuds/:brand/:slug" element={<EarbudsModelDetailsPage />} />
+          <Route path="/sell/earbuds/:brand/:slug/quiz" element={<EarbudsConditionQuizPage />} />
+
+          {/* Smartwatch Flow */}
+          <Route path="/sell-smartwatch/brand" element={<SmartwatchBrandSelectionPage />} />
+          <Route path="/sell-smartwatch/:brand" element={<SmartwatchModelSelectionPage />} />
+          <Route path="/sell-smartwatch/:brand/:slug" element={<SmartwatchModelDetailsPage />} />
+          <Route path="/sell-smartwatch/:brand/:slug/quiz" element={<SmartwatchConditionQuizPage />} />
+          <Route path="/sell/smartwatch/brand" element={<SmartwatchBrandSelectionPage />} />
+          <Route path="/sell/smartwatch/:brand" element={<SmartwatchModelSelectionPage />} />
+          <Route path="/sell/smartwatch/:brand/:slug" element={<SmartwatchModelDetailsPage />} />
+          <Route path="/sell/smartwatch/:brand/:slug/quiz" element={<SmartwatchConditionQuizPage />} />
+
+          {/* Gaming Console Flow */}
+          <Route path="/sell-gaming/brand" element={<GamingBrandSelectionPage />} />
+          <Route path="/sell-gaming/:brand" element={<GamingModelSelectionPage />} />
+          <Route path="/sell-gaming/:brand/:slug" element={<GamingModelDetailsPage />} />
+          <Route path="/sell-gaming/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
+          <Route path="/sell/gaming/brand" element={<GamingBrandSelectionPage />} />
+          <Route path="/sell/gaming/:brand" element={<GamingModelSelectionPage />} />
+          <Route path="/sell/gaming/:brand/:slug" element={<GamingModelDetailsPage />} />
+          <Route path="/sell/gaming/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
+          <Route path="/sell/console/brand" element={<GamingBrandSelectionPage />} />
+          <Route path="/sell/console/:brand" element={<GamingModelSelectionPage />} />
+          <Route path="/sell/console/:brand/:slug" element={<GamingModelDetailsPage />} />
+          <Route path="/sell/console/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
+          {/* Buy Refurbished Flow (Cashify-style) */}
+          <Route path="/buy-refurbished" element={<RefurbishedCatalogPage />} />
+          <Route path="/buy-refurbished/product/:slug" element={<RefurbishedProductDetailPage />} />
+          <Route path="/buy-refurbished/checkout" element={<RefurbishedCheckoutPage />} />
+          <Route path="/buy-refurbished/order-success/:orderId" element={<RefurbishedOrderSuccessPage />} />
+
+          {/* Dynamic CMS Pages (e.g. /page/warranty-policy) */}
+          <Route path="/page/:slug" element={<CustomPageView />} />
+
           {/* Shared */}
 
           <Route path="/schedule-pickup" element={<ProtectedRoute><SchedulePickupPage /></ProtectedRoute>} />
@@ -113,6 +217,7 @@ function App() {
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/valuation-and-return-policy" element={<CustomPageView slugOverride="valuation-and-return-policy" />} />
           <Route path="/compare/secondsale-vs-cashify" element={<CompareSecondSaleVsCashify />} />
           <Route path="/alternatives/cashify-alternatives" element={<CashifyAlternatives />} />
           <Route path="/best-place-to-sell-old-phone-india" element={<BestPlaceToSellPhone />} />
@@ -125,14 +230,21 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="homepage" element={<AdminHomepage />} />
+            <Route path="pages" element={<AdminPages />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="devices" element={<AdminDevices />} />
+            <Route path="refurbished" element={<AdminRefurbished />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="partners" element={<AdminPartners />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="pincodes" element={<AdminPincodes />} />
             <Route path="site-settings" element={<AdminSiteSettings />} />
           </Route>
 
+          {/* Dynamic CMS Pages (Supports both direct /:slug and legacy /page/:slug) */}
+          <Route path="/page/:slug" element={<CustomPageView />} />
+          <Route path="/:slug" element={<CustomPageView />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

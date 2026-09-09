@@ -17,9 +17,24 @@ import {
 } from "lucide-react";
 import SEOHead from "../components/seo/SEOHead";
 import { ENTITY_SUMMARY } from "../config/seo";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { buildSchemaGraph, organizationSchema, websiteSchema } from "../utils/schema";
 
+const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 export default function AboutUs() {
+  const [dbPage, setDbPage] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get(`${API}/pages/about-us`)
+      .then((res) => {
+        if (res.data) setDbPage(res.data);
+      })
+      .catch(() => {});
+  }, []);
+
   const schema = buildSchemaGraph([
     organizationSchema({
       founder: [
@@ -33,13 +48,22 @@ export default function AboutUs() {
   return (
     <div className="w-full bg-white">
       <SEOHead
-        title="About SecondSale — India's Trusted Device Buyback Platform"
-        description="Learn about SecondSale, operated by Swastika Innovation Private Limited. India's trusted platform to sell old phones, laptops, tablets and iMac online."
+        title={dbPage?.metaTitle || "About SecondSale — India's Trusted Device Buyback Platform"}
+        description={
+          dbPage?.metaDescription ||
+          "Learn about SecondSale, operated by Swastika Innovation Private Limited. India's trusted platform to sell old phones, laptops, tablets and iMac online."
+        }
         path="/about-us"
         schema={schema}
       />
-      {/* ── HERO SECTION ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-10 pb-12 px-4">
+      {dbPage?.content ? (
+        <div className="max-w-[1200px] mx-auto px-4 py-8">
+          <div dangerouslySetInnerHTML={{ __html: dbPage.content }} />
+        </div>
+      ) : (
+        <>
+          {/* ── HERO SECTION ── */}
+          <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-10 pb-12 px-4">
         {/* Decorative background blobs */}
         <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#2563EB]/5 blur-3xl" />
@@ -318,6 +342,8 @@ export default function AboutUs() {
           <p className="text-sm text-gray-600 leading-relaxed">{ENTITY_SUMMARY}</p>
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }
