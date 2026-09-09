@@ -242,3 +242,54 @@ export const reorderNavLinks = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ── UPLOAD favicon ──────────────────────────────────────────────
+export const uploadFavicon = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file provided' });
+    const result = await uploadToCloudinary(req.file.buffer, 'secondsale/favicon');
+    let settings = await SiteSettings.findOneAndUpdate(
+      { singleton: 'main' },
+      { faviconUrl: result.secure_url },
+      { new: true, upsert: true }
+    );
+    res.json({ faviconUrl: settings.faviconUrl, settings });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── UPDATE top bar announcement ────────────────────────────────
+export const updateTopBar = async (req, res) => {
+  try {
+    const { isEnabled, text, linkTo, bgColor, textColor } = req.body;
+    let settings = await SiteSettings.findOne({ singleton: 'main' });
+    if (!settings) settings = new SiteSettings({ singleton: 'main' });
+    settings.topBar = {
+      isEnabled: isEnabled !== undefined ? Boolean(isEnabled) : settings.topBar?.isEnabled,
+      text: text !== undefined ? text : settings.topBar?.text,
+      linkTo: linkTo !== undefined ? linkTo : settings.topBar?.linkTo,
+      bgColor: bgColor !== undefined ? bgColor : settings.topBar?.bgColor,
+      textColor: textColor !== undefined ? textColor : settings.topBar?.textColor,
+    };
+    await settings.save();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── UPDATE footer ───────────────────────────────────────────────
+export const updateFooter = async (req, res) => {
+  try {
+    const { footer } = req.body;
+    let settings = await SiteSettings.findOne({ singleton: 'main' });
+    if (!settings) settings = new SiteSettings({ singleton: 'main' });
+    settings.footer = footer;
+    await settings.save();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

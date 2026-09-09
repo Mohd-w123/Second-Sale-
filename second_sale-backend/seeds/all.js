@@ -42,6 +42,9 @@ const seeds = [
 
   // ── Pincodes ───────────────────────────────────────
   'seedPincodes.js',
+
+  // ── Custom CMS Pages ──────────────────────────────
+  'seedCustomPages.js',
 ];
 
 console.log(`\n🚀 Starting full seed run — ${seeds.length} seed files\n`);

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { adminService } from '../../services/admin.service';
 import { 
   Upload, 
   Trash2, 
@@ -19,10 +20,46 @@ import {
   RefreshCw,
   Compass,
   RotateCcw,
-  X
+  Globe,
+  Megaphone,
+  Phone,
+  Mail,
+  X,
+  Clock,
+  Star,
+  ShieldCheck,
+  Zap,
+  Sparkles
 } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const DEFAULT_SELL_DEVICES = [
+  { label: "Sell Mobile Phones", to: "/sell-old-mobile-phones/brand" },
+  { label: "Sell Laptops", to: "/sell-old-laptops/brand" },
+  { label: "Sell Tablets & iPads", to: "/sell-tablet/brand" },
+  { label: "Sell iMac & Mac", to: "/sell-imac/brand" },
+  { label: "Sell Smartwatches", to: "/sell-smartwatch/brand", isNew: true },
+  { label: "Sell Gaming Consoles", to: "/sell-gaming-console/brand", isNew: true },
+  { label: "Corporate Bulk Buyback", to: "/corporate" },
+];
+
+const DEFAULT_COMPANY_LINKS = [
+  { label: "About SecondSale", to: "/about-us" },
+  { label: "How It Works", to: "/#how-it-works" },
+  { label: "Become a Partner", to: "/partner" },
+  { label: "Corporate Buyback", to: "/corporate" },
+  { label: "Cashify Alternatives", to: "/alternatives/cashify-alternatives" },
+  { label: "Customer Reviews", to: "/#reviews" },
+];
+
+const DEFAULT_SUPPORT_LINKS = [
+  { label: "Help & Support Center", to: "/help-center" },
+  { label: "Frequently Asked Questions", to: "/faq" },
+  { label: "Privacy Policy", to: "/privacy-policy" },
+  { label: "Terms & Conditions", to: "/terms-and-conditions" },
+  { label: "Valuation & Return Policy", to: "/valuation-and-return-policy" },
+];
 
 function authHeaders() {
   const token = localStorage.getItem('adminToken');
@@ -41,6 +78,8 @@ export default function AdminSiteSettings() {
   const [isLogoOpen, setIsLogoOpen] = useState(true);
   const [isBannersOpen, setIsBannersOpen] = useState(true);
   const [isNavOpen, setIsNavOpen] = useState(true);
+  const [isTopBarOpen, setIsTopBarOpen] = useState(true);
+  const [isFooterOpen, setIsFooterOpen] = useState(true);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [isBannerListOpen, setIsBannerListOpen] = useState(true);
 
@@ -56,6 +95,48 @@ export default function AdminSiteSettings() {
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  // Favicon upload state
+  const [faviconFile, setFaviconFile] = useState(null);
+  const [faviconPreview, setFaviconPreview] = useState('');
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
+  const faviconInputRef = useRef();
+
+  // Top Bar Announcement state
+  const [topBarEnabled, setTopBarEnabled] = useState(false);
+  const [topBarText, setTopBarText] = useState('');
+  const [topBarLink, setTopBarLink] = useState('');
+  const [topBarBg, setTopBarBg] = useState('#2563EB');
+  const [topBarTextColor, setTopBarTextColor] = useState('#FFFFFF');
+  const [savingTopBar, setSavingTopBar] = useState(false);
+
+  // Footer Information state
+  const [footerAbout, setFooterAbout] = useState('');
+  const [footerPhone, setFooterPhone] = useState('');
+  const [footerEmail, setFooterEmail] = useState('');
+  const [footerAddress, setFooterAddress] = useState('');
+  const [footerHours, setFooterHours] = useState('Mon – Sun: 9:30 AM – 7:30 PM IST');
+  const [footerRatingScore, setFooterRatingScore] = useState('4.9 / 5.0');
+  const [footerRatingSubtext, setFooterRatingSubtext] = useState('Trusted by over 50,000+ happy sellers nationwide');
+  const [footerTrustFeatures, setFooterTrustFeatures] = useState([
+    { title: "Instant Cashout", desc: "UPI or Bank transfer on the spot during pickup" },
+    { title: "Free Doorstep Pickup", desc: "Zero convenience or shipping fees across 2,000+ cities" },
+    { title: "100% Certified Data Wipe", desc: "Military-grade data sanitization for complete privacy" },
+    { title: "Highest Valuation Guaranteed", desc: "Transparent algorithmic pricing for maximum device value" },
+  ]);
+  const [footerCities, setFooterCities] = useState('Mumbai, Delhi NCR, Bengaluru, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, Lucknow, Chandigarh, Kochi');
+  const [footerCopyright, setFooterCopyright] = useState('');
+  const [footerFacebook, setFooterFacebook] = useState('');
+  const [footerInstagram, setFooterInstagram] = useState('');
+  const [footerTwitter, setFooterTwitter] = useState('');
+  const [footerLinkedin, setFooterLinkedin] = useState('');
+  const [footerSellDevices, setFooterSellDevices] = useState(DEFAULT_SELL_DEVICES);
+  const [footerCompanyLinks, setFooterCompanyLinks] = useState(DEFAULT_COMPANY_LINKS);
+  const [footerSupportLinks, setFooterSupportLinks] = useState(DEFAULT_SUPPORT_LINKS);
+  const [activeFooterTab, setActiveFooterTab] = useState('sellDevices');
+  const [newFooterLabel, setNewFooterLabel] = useState('');
+  const [newFooterTo, setNewFooterTo] = useState('/');
+  const [savingFooter, setSavingFooter] = useState(false);
 
   // Navigation Links state
   const [newNavLabel, setNewNavLabel] = useState('');
@@ -82,6 +163,15 @@ export default function AdminSiteSettings() {
   const broadcastSettingsUpdate = (data) => {
     setSettings(data);
     try {
+      if (data?.faviconUrl) {
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        link.href = data.faviconUrl;
+      }
       window.dispatchEvent(new CustomEvent('site-settings-updated', { detail: data }));
       localStorage.setItem('site_settings_updated_at', Date.now().toString());
     } catch (e) {
@@ -105,12 +195,137 @@ export default function AdminSiteSettings() {
       const data = await res.json();
       setSettings(data);
       setBannerOrder(data.banners?.length || 0);
+
+      if (data?.faviconUrl) {
+        let link = document.querySelector("link[rel~='icon']");
+        if (link) link.href = data.faviconUrl;
+      }
+      if (data.topBar) {
+        setTopBarEnabled(Boolean(data.topBar.isEnabled));
+        setTopBarText(data.topBar.text || '');
+        setTopBarLink(data.topBar.linkTo || '');
+        setTopBarBg(data.topBar.bgColor || '#2563EB');
+        setTopBarTextColor(data.topBar.textColor || '#FFFFFF');
+      }
+      if (data.footer) {
+        setFooterAbout(data.footer.aboutText || '');
+        setFooterPhone(data.footer.phone || '');
+        setFooterEmail(data.footer.email || '');
+        setFooterAddress(data.footer.address || '');
+        setFooterHours(data.footer.hours || data.footer.workingHours || 'Mon – Sun: 9:30 AM – 7:30 PM IST');
+        setFooterRatingScore(data.footer.ratingScore || '4.9 / 5.0');
+        setFooterRatingSubtext(data.footer.ratingSubtext || 'Trusted by over 50,000+ happy sellers nationwide');
+        if (Array.isArray(data.footer.trustFeatures) && data.footer.trustFeatures.length === 4) {
+          setFooterTrustFeatures(data.footer.trustFeatures);
+        }
+        if (data.footer.cities) {
+          setFooterCities(Array.isArray(data.footer.cities) ? data.footer.cities.join(', ') : data.footer.cities);
+        }
+        if (Array.isArray(data.footer.sellDevicesLinks) && data.footer.sellDevicesLinks.length > 0) {
+          setFooterSellDevices(data.footer.sellDevicesLinks);
+        }
+        if (Array.isArray(data.footer.companyLinks) && data.footer.companyLinks.length > 0) {
+          setFooterCompanyLinks(data.footer.companyLinks);
+        }
+        if (Array.isArray(data.footer.supportLinks) && data.footer.supportLinks.length > 0) {
+          setFooterSupportLinks(data.footer.supportLinks);
+        }
+        setFooterCopyright(data.footer.copyrightText || '');
+        setFooterFacebook(data.footer.socialLinks?.facebook || '');
+        setFooterInstagram(data.footer.socialLinks?.instagram || '');
+        setFooterTwitter(data.footer.socialLinks?.twitter || '');
+        setFooterLinkedin(data.footer.socialLinks?.linkedin || '');
+      }
     } catch {
       flash('error', 'Could not load site settings. Please check server connection.');
     } finally {
       setLoading(false);
     }
   }
+
+  // Favicon handlers
+  const onFaviconSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFaviconFile(file);
+    setFaviconPreview(URL.createObjectURL(file));
+  };
+
+  const uploadFavicon = async () => {
+    if (!faviconFile) return;
+    setUploadingFavicon(true);
+    try {
+      const fd = new FormData();
+      fd.append('favicon', faviconFile);
+      const res = await adminService.uploadFavicon(fd);
+      broadcastSettingsUpdate(res.data.settings);
+      setFaviconFile(null);
+      flash('success', 'Favicon uploaded and deployed successfully!');
+    } catch (err) {
+      flash('error', err.response?.data?.message || 'Failed to upload favicon');
+    } finally {
+      setUploadingFavicon(false);
+    }
+  };
+
+  // Top bar handler
+  const saveTopBar = async () => {
+    setSavingTopBar(true);
+    try {
+      const res = await adminService.updateTopBar({
+        isEnabled: topBarEnabled,
+        text: topBarText,
+        linkTo: topBarLink,
+        bgColor: topBarBg,
+        textColor: topBarTextColor,
+      });
+      broadcastSettingsUpdate(res.data);
+      flash('success', 'Top announcement bar updated successfully!');
+    } catch (err) {
+      flash('error', 'Failed to update announcement bar');
+    } finally {
+      setSavingTopBar(false);
+    }
+  };
+
+  // Footer handler
+  const saveFooter = async () => {
+    setSavingFooter(true);
+    try {
+      const currentFooter = settings?.footer || {};
+      const updatedFooter = {
+        ...currentFooter,
+        aboutText: footerAbout,
+        phone: footerPhone,
+        email: footerEmail,
+        address: footerAddress,
+        hours: footerHours,
+        workingHours: footerHours,
+        ratingScore: footerRatingScore,
+        ratingSubtext: footerRatingSubtext,
+        trustFeatures: footerTrustFeatures,
+        cities: footerCities.split(',').map((c) => c.trim()).filter(Boolean),
+        sellDevicesLinks: footerSellDevices,
+        companyLinks: footerCompanyLinks,
+        supportLinks: footerSupportLinks,
+        copyrightText: footerCopyright,
+        socialLinks: {
+          ...(currentFooter.socialLinks || {}),
+          facebook: footerFacebook,
+          instagram: footerInstagram,
+          twitter: footerTwitter,
+          linkedin: footerLinkedin,
+        },
+      };
+      const res = await adminService.updateFooter({ footer: updatedFooter });
+      broadcastSettingsUpdate(res.data);
+      flash('success', 'Footer information updated successfully!');
+    } catch (err) {
+      flash('error', 'Failed to update footer');
+    } finally {
+      setSavingFooter(false);
+    }
+  };
 
   // Toggle all sections
   const allExpanded = isLogoOpen && isBannersOpen && isNavOpen;
@@ -614,6 +829,79 @@ export default function AdminSiteSettings() {
                     </button>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Favicon Identity */}
+            <div className="pt-6 border-t border-slate-100">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+                Website Favicon & Browser Tab Icon
+              </label>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50/70 max-w-xl">
+                <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
+                    <img
+                      src={settings?.faviconUrl || '/src/assets/logo-secondsale.png'}
+                      alt="Current Favicon"
+                      className="w-5 h-5 object-contain"
+                      onError={(e) => { e.currentTarget.src = '/src/assets/logo-secondsale.png'; }}
+                    />
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-500 font-bold pr-2">
+                    Tab Preview: SecondSale
+                  </div>
+                </div>
+
+                <div className="text-xs text-slate-500">
+                  <p className="font-semibold text-slate-700">Square PNG, ICO, or SVG</p>
+                  <p className="text-slate-400 mt-0.5">Recommended: 64x64px or 32x32px</p>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <input
+                  type="file"
+                  ref={faviconInputRef}
+                  accept="image/*,.ico"
+                  className="hidden"
+                  onChange={onFaviconSelect}
+                />
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => faviconInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-2 border border-dashed border-slate-300 hover:border-blue-500 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 bg-slate-50/50 hover:bg-blue-50/40 transition-all cursor-pointer"
+                  >
+                    <Upload size={14} />
+                    <span>Choose Favicon File</span>
+                  </button>
+
+                  {faviconPreview && (
+                    <div className="flex items-center gap-3 bg-blue-50/60 p-2 pr-3 rounded-xl border border-blue-200 animate-in fade-in">
+                      <img
+                        src={faviconPreview}
+                        alt="Favicon preview"
+                        className="w-7 h-7 object-contain rounded border border-blue-200 bg-white p-0.5"
+                      />
+                      <button
+                        type="button"
+                        onClick={uploadFavicon}
+                        disabled={uploadingFavicon}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm disabled:opacity-50"
+                      >
+                        {uploadingFavicon ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
+                        <span>Save Favicon</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setFaviconFile(null); setFaviconPreview(''); }}
+                        className="text-xs text-slate-400 hover:text-slate-600 font-semibold px-1"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1227,6 +1515,572 @@ export default function AdminSiteSettings() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── SECTION 4: TOP ANNOUNCEMENT BAR ───────────────────────── */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div 
+          onClick={() => setIsTopBarOpen(!isTopBarOpen)}
+          className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+              <Megaphone size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  Top Announcement Bar
+                </h3>
+                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                  topBarEnabled ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
+                }`}>
+                  {topBarEnabled ? 'Active' : 'Disabled'}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Display a global promotional or urgent notification strip at the very top of the header
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); setIsTopBarOpen(!isTopBarOpen); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-all shadow-xs"
+            >
+              <span>{isTopBarOpen ? 'Collapse' : 'Expand'}</span>
+              {isTopBarOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+          </div>
+        </div>
+
+        {isTopBarOpen && (
+          <div className="p-5 sm:p-6 bg-white space-y-4 animate-in fade-in duration-200">
+            <label className="flex items-center gap-2.5 cursor-pointer text-xs font-bold text-slate-800">
+              <input
+                type="checkbox"
+                checked={topBarEnabled}
+                onChange={(e) => setTopBarEnabled(e.target.checked)}
+                className="w-4 h-4 rounded text-blue-600"
+              />
+              <span>Enable announcement strip at top of website</span>
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Announcement Message
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. ⚡ Special Offer: Get extra ₹500 on your first sale! Use code FIRST500"
+                  value={topBarText}
+                  onChange={(e) => setTopBarText(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Link Redirect (optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. /sell-old-mobile-phones/brand"
+                  value={topBarLink}
+                  onChange={(e) => setTopBarLink(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4 pt-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-600">Background:</span>
+                <input
+                  type="color"
+                  value={topBarBg}
+                  onChange={(e) => setTopBarBg(e.target.value)}
+                  className="w-7 h-7 p-0 border-0 rounded cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={topBarBg}
+                  onChange={(e) => setTopBarBg(e.target.value)}
+                  className="w-20 px-2 py-1 text-xs font-mono border border-slate-200 rounded-lg"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-600">Text Color:</span>
+                <input
+                  type="color"
+                  value={topBarTextColor}
+                  onChange={(e) => setTopBarTextColor(e.target.value)}
+                  className="w-7 h-7 p-0 border-0 rounded cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={topBarTextColor}
+                  onChange={(e) => setTopBarTextColor(e.target.value)}
+                  className="w-20 px-2 py-1 text-xs font-mono border border-slate-200 rounded-lg"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={saveTopBar}
+                disabled={savingTopBar}
+                className="ml-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
+              >
+                {savingTopBar ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
+                <span>Save Top Bar</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── SECTION 5: FOOTER INFORMATION & SOCIAL LINKS ───────────── */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div 
+          onClick={() => setIsFooterOpen(!isFooterOpen)}
+          className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+              <Globe size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  Footer Information & Social Links
+                </h3>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                  Global Footer
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Customize company bio, contact phone/email, office address, social links, and copyright notice
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); setIsFooterOpen(!isFooterOpen); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-all shadow-xs"
+            >
+              <span>{isFooterOpen ? 'Collapse' : 'Expand'}</span>
+              {isFooterOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+          </div>
+        </div>
+
+        {isFooterOpen && (
+          <div className="p-5 sm:p-6 bg-white space-y-4 animate-in fade-in duration-200">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Company Bio / About Text in Footer
+              </label>
+              <textarea
+                rows={2}
+                value={footerAbout}
+                onChange={(e) => setFooterAbout(e.target.value)}
+                className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+              />
+            </div>
+
+            {/* Contact Details Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Support Phone Number
+                </label>
+                <input
+                  type="text"
+                  placeholder="+91 98765 43210"
+                  value={footerPhone}
+                  onChange={(e) => setFooterPhone(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Support Email Address
+                </label>
+                <input
+                  type="email"
+                  placeholder="support@secondsale.com"
+                  value={footerEmail}
+                  onChange={(e) => setFooterEmail(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Working / Support Hours
+                </label>
+                <input
+                  type="text"
+                  placeholder="Mon – Sun: 9:30 AM – 7:30 PM IST"
+                  value={footerHours}
+                  onChange={(e) => setFooterHours(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Corporate Office Address
+              </label>
+              <input
+                type="text"
+                placeholder="SecondSale Technologies Pvt Ltd, HSR Layout, Sector 2, Bengaluru, Karnataka - 560102"
+                value={footerAddress}
+                onChange={(e) => setFooterAddress(e.target.value)}
+                className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+              />
+            </div>
+
+            {/* Social Proof Rating Card Settings */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+              <div className="flex items-center gap-2">
+                <Star size={15} className="text-amber-500 fill-amber-400" />
+                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
+                  Footer Customer Rating Box
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Rating Score Text</label>
+                  <input
+                    type="text"
+                    placeholder="4.9 / 5.0"
+                    value={footerRatingScore}
+                    onChange={(e) => setFooterRatingScore(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Trust Subtext</label>
+                  <input
+                    type="text"
+                    placeholder="Trusted by over 50,000+ happy sellers nationwide"
+                    value={footerRatingSubtext}
+                    onChange={(e) => setFooterRatingSubtext(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Top 4 Trust Feature Cards */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={16} className="text-blue-600" />
+                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
+                  Top Trust Feature Cards (4 Cards Banner)
+                </span>
+              </div>
+              <p className="text-xs text-slate-500">
+                These 4 highlight cards appear across the top banner of the website footer.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                {footerTrustFeatures.map((card, idx) => (
+                  <div key={idx} className="bg-white p-3 rounded-xl border border-slate-200 space-y-2 shadow-xs">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md inline-block">
+                      Card #{idx + 1}
+                    </span>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-0.5">Card Title</label>
+                      <input
+                        type="text"
+                        value={card.title}
+                        onChange={(e) => {
+                          const updated = [...footerTrustFeatures];
+                          updated[idx] = { ...updated[idx], title: e.target.value };
+                          setFooterTrustFeatures(updated);
+                        }}
+                        className="w-full px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-600 mb-0.5">Description</label>
+                      <input
+                        type="text"
+                        value={card.desc}
+                        onChange={(e) => {
+                          const updated = [...footerTrustFeatures];
+                          updated[idx] = { ...updated[idx], desc: e.target.value };
+                          setFooterTrustFeatures(updated);
+                        }}
+                        className="w-full px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-slate-50/50 focus:bg-white text-slate-600"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── FOOTER NAVIGATION COLUMNS MANAGER ── */}
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Compass size={18} className="text-blue-600" />
+                  <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
+                    Footer Navigation Columns (Sell Devices, Company, Support &amp; Legal)
+                  </h4>
+                </div>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  Directly customize the links shown in the 3 footer columns
+                </span>
+              </div>
+
+              {/* Column Tabs */}
+              <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
+                {[
+                  { id: 'sellDevices', label: 'Sell Devices', count: footerSellDevices.length },
+                  { id: 'company', label: 'Company', count: footerCompanyLinks.length },
+                  { id: 'support', label: 'Support & Legal', count: footerSupportLinks.length },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveFooterTab(tab.id)}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeFooterTab === tab.id
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                      activeFooterTab === tab.id ? 'bg-blue-700 text-blue-100' : 'bg-slate-100 text-slate-500'
+                    }`}>
+                      {tab.count}
+                    </span>
+                  </button>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeFooterTab === 'sellDevices') setFooterSellDevices(DEFAULT_SELL_DEVICES);
+                    if (activeFooterTab === 'company') setFooterCompanyLinks(DEFAULT_COMPANY_LINKS);
+                    if (activeFooterTab === 'support') setFooterSupportLinks(DEFAULT_SUPPORT_LINKS);
+                    flash('success', 'Column links reset to defaults!');
+                  }}
+                  className="ml-auto text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1 font-semibold hover:underline cursor-pointer"
+                >
+                  <RotateCcw size={12} />
+                  <span>Restore Defaults</span>
+                </button>
+              </div>
+
+              {/* Links List for Active Tab */}
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                {(() => {
+                  const currentList =
+                    activeFooterTab === 'sellDevices'
+                      ? footerSellDevices
+                      : activeFooterTab === 'company'
+                      ? footerCompanyLinks
+                      : footerSupportLinks;
+
+                  const updateCurrentList = (newList) => {
+                    if (activeFooterTab === 'sellDevices') setFooterSellDevices(newList);
+                    else if (activeFooterTab === 'company') setFooterCompanyLinks(newList);
+                    else setFooterSupportLinks(newList);
+                  };
+
+                  return currentList.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 p-2.5 bg-white rounded-xl border border-slate-200 shadow-xs"
+                    >
+                      <span className="text-[10px] font-mono font-bold text-slate-400 w-5 text-center shrink-0">
+                        {idx + 1}.
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Link Label"
+                        value={item.label}
+                        onChange={(e) => {
+                          const updated = [...currentList];
+                          updated[idx] = { ...updated[idx], label: e.target.value };
+                          updateCurrentList(updated);
+                        }}
+                        className="flex-1 px-2.5 py-1.5 text-xs font-semibold text-slate-800 border border-slate-200 rounded-lg bg-slate-50/60 focus:bg-white"
+                      />
+                      <input
+                        type="text"
+                        placeholder="URL / Path (e.g. /sell-old-mobile-phones/brand)"
+                        value={item.to}
+                        onChange={(e) => {
+                          const updated = [...currentList];
+                          updated[idx] = { ...updated[idx], to: e.target.value };
+                          updateCurrentList(updated);
+                        }}
+                        className="flex-1 px-2.5 py-1.5 text-xs font-mono text-slate-600 border border-slate-200 rounded-lg bg-slate-50/60 focus:bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = currentList.filter((_, i) => i !== idx);
+                          updateCurrentList(updated);
+                        }}
+                        className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors shrink-0 cursor-pointer"
+                        title="Delete this link"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ));
+                })()}
+              </div>
+
+              {/* Add New Link to Active Tab */}
+              <div className="pt-2 border-t border-slate-200/80">
+                <div className="flex flex-col sm:flex-row items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="New link label (e.g. Sell Smart TV)"
+                    value={newFooterLabel}
+                    onChange={(e) => setNewFooterLabel(e.target.value)}
+                    className="flex-1 w-full px-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-white"
+                  />
+                  <input
+                    type="text"
+                    placeholder="URL path (e.g. /sell-tv)"
+                    value={newFooterTo}
+                    onChange={(e) => setNewFooterTo(e.target.value)}
+                    className="flex-1 w-full px-3 py-1.5 text-xs font-mono border border-slate-200 rounded-xl bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!newFooterLabel.trim()) {
+                        flash('error', 'Please enter a link label');
+                        return;
+                      }
+                      const newItem = { label: newFooterLabel.trim(), to: newFooterTo.trim() || '/' };
+                      if (activeFooterTab === 'sellDevices') {
+                        setFooterSellDevices([...footerSellDevices, newItem]);
+                      } else if (activeFooterTab === 'company') {
+                        setFooterCompanyLinks([...footerCompanyLinks, newItem]);
+                      } else {
+                        setFooterSupportLinks([...footerSupportLinks, newItem]);
+                      }
+                      setNewFooterLabel('');
+                      setNewFooterTo('/');
+                      flash('success', `Added link to ${activeFooterTab === 'sellDevices' ? 'Sell Devices' : activeFooterTab === 'company' ? 'Company' : 'Support & Legal'} column!`);
+                    }}
+                    className="w-full sm:w-auto px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                  >
+                    <Plus size={14} />
+                    <span>Add Link</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Top Cities Covered */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+              <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
+                Top Cities Covered (Comma-Separated Badges)
+              </span>
+              <input
+                type="text"
+                placeholder="Mumbai, Delhi NCR, Bengaluru, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, Lucknow, Chandigarh, Kochi"
+                value={footerCities}
+                onChange={(e) => setFooterCities(e.target.value)}
+                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white"
+              />
+              <p className="text-[11px] text-slate-500">
+                Enter city names separated by commas to update the badges in the &quot;Support &amp; Legal&quot; column.
+              </p>
+            </div>
+
+            {/* Social Links */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+              <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
+                Social Media Links
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Facebook URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://facebook.com/..."
+                    value={footerFacebook}
+                    onChange={(e) => setFooterFacebook(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Instagram URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://instagram.com/..."
+                    value={footerInstagram}
+                    onChange={(e) => setFooterInstagram(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Twitter / X URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://twitter.com/..."
+                    value={footerTwitter}
+                    onChange={(e) => setFooterTwitter(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">LinkedIn URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://linkedin.com/..."
+                    value={footerLinkedin}
+                    onChange={(e) => setFooterLinkedin(e.target.value)}
+                    className="w-full px-3 py-1.5 text-xs border border-slate-200 rounded-lg bg-white font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Copyright Notice
+              </label>
+              <input
+                type="text"
+                placeholder="© 2026 SecondSale Technologies Private Limited. All rights reserved."
+                value={footerCopyright}
+                onChange={(e) => setFooterCopyright(e.target.value)}
+                className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white"
+              />
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={saveFooter}
+                disabled={savingFooter}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
+              >
+                {savingFooter ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
+                <span>Save Footer Information</span>
+              </button>
             </div>
           </div>
         )}

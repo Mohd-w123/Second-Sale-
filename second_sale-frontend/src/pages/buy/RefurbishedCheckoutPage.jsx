@@ -65,6 +65,7 @@ export default function RefurbishedCheckoutPage() {
   const [upiId, setUpiId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [detectingLocation, setDetectingLocation] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -117,6 +118,48 @@ export default function RefurbishedCheckoutPage() {
     } catch {
       // Graceful fallback
     }
+  };
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser.");
+      return;
+    }
+    setDetectingLocation(true);
+    setError("");
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await res.json();
+          const rawPostcode = data.address?.postcode || data.display_name?.match(/\b[1-9][0-9]{5}\b/)?.[0];
+
+          if (rawPostcode && rawPostcode.replace(/\D/g, "").length === 6) {
+            const cleanPostcode = rawPostcode.replace(/\D/g, "").slice(0, 6);
+            setCustomer((prev) => ({
+              ...prev,
+              pincode: cleanPostcode,
+            }));
+            await lookupPincode(cleanPostcode);
+          } else {
+            setError("Could not detect a valid 6-digit pincode from your location. Please enter manually.");
+          }
+        } catch {
+          setError("Error detecting location. Please enter pincode manually.");
+        } finally {
+          setDetectingLocation(false);
+        }
+      },
+      () => {
+        setError("Location permission denied or unavailable. Please enter pincode manually.");
+        setDetectingLocation(false);
+      },
+      { timeout: 10000 }
+    );
   };
 
   const handleSubmitOrder = async (e) => {
@@ -304,9 +347,31 @@ export default function RefurbishedCheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    Delivery Pincode <span className="text-rose-500">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Delivery Pincode <span className="text-rose-500">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleDetectLocation}
+                      disabled={detectingLocation}
+                      className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-none p-0 disabled:opacity-50"
+                    >
+                      {detectingLocation ? (
+                        <span className="flex items-center gap-1">
+                          <span className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin inline-block" />
+                          Detecting...
+                        </span>
+                      ) : (
+                        <>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                          </svg>
+                          <span>Use Current Location</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                   <input
                     type="text"
                     name="pincode"

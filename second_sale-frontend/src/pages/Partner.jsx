@@ -199,16 +199,174 @@ export default function PartnerPage() {
     }
   };
 
+  const [dbPage, setDbPage] = useState(null);
+
+  useEffect(() => {
+    api
+      .get("/pages/partner")
+      .then((res) => {
+        if (res.data) setDbPage(res.data);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="w-full bg-white antialiased">
       <SEOHead
-        title="Become a SecondSale Partner — Join Our Pickup Network"
-        description="Join SecondSale as a partner. Local shops, refurbishers, and e-waste collectors can earn by handling device pickups across India."
+        title={dbPage?.metaTitle || "Become a SecondSale Partner — Join Our Pickup Network"}
+        description={
+          dbPage?.metaDescription ||
+          "Join SecondSale as a partner. Local shops, refurbishers, and e-waste collectors can earn by handling device pickups across India."
+        }
         path="/partner"
         schema={buildSchemaGraph([organizationSchema(), websiteSchema()])}
       />
-      {/* ─── 1. HERO & ONBOARDING APPLICATION ─── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-12 pb-20 px-4">
+      {dbPage?.content ? (
+        <div className="max-w-[1200px] mx-auto px-4 py-8">
+          <div dangerouslySetInnerHTML={{ __html: dbPage.content }} />
+          <div className="mt-12 max-w-2xl mx-auto bg-white border border-gray-100 shadow-xl rounded-[28px] p-6 sm:p-10">
+            <div className="mb-6 text-center">
+              <h3 className="text-xl font-black text-gray-900 mb-1">Partner Onboarding Form</h3>
+              <p className="text-xs text-gray-400">Join 3,000+ active partner centers across India with zero onboarding fee.</p>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">
+                  Business Name / Firm
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.businessName}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                  placeholder="e.g. Om Electronics"
+                  onChange={(e) =>
+                    setFormData({ ...formData, businessName: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">
+                    Contact Person
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.contactPerson}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                    placeholder="Full name"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        contactPerson: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">
+                    Business Type
+                  </label>
+                  <select
+                    required
+                    value={formData.shopType}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#2563EB]"
+                    onChange={(e) =>
+                      setFormData({ ...formData, shopType: e.target.value })
+                    }
+                  >
+                    <option value="">Select Category</option>
+                    <option value="repair">Mobile Repair Shop</option>
+                    <option value="retailer">Laptop Retailer</option>
+                    <option value="mobile_retailer">Mobile Retailer</option>
+                    <option value="refurb">Refurbishing Unit</option>
+                    <option value="collector">E-waste Collector</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                  placeholder="contact@yourfirm.com"
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">
+                    Mobile Number
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-bold border-r border-gray-200 pr-2">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      required
+                      pattern="[0-9]{10}"
+                      value={formData.mobile}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-16 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                      placeholder="WhatsApp Active"
+                      onChange={(e) =>
+                        setFormData({ ...formData, mobile: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">
+                    City / Hub Location
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.city}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                    placeholder="e.g. Mumbai"
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className={`w-full rounded-xl py-3 font-black text-sm shadow-lg transition duration-200 mt-2 ${submitting ? "bg-gray-400 cursor-not-allowed" : "bg-[#2563EB] hover:bg-blue-700 shadow-[#2563EB]/20"} text-white border-none cursor-pointer`}
+              >
+                {submitting ? "Submitting..." : "Register Storefront Profile"}
+              </button>
+
+              {submitStatus === "success" && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold px-4 py-3 rounded-xl text-center mt-3">
+                  ✅ Application submitted successfully! We'll get back to you soon.
+                </div>
+              )}
+              {submitStatus === "error" && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-bold px-4 py-3 rounded-xl text-center mt-3">
+                  ❌ Something went wrong. Please try again.
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ─── 1. HERO & ONBOARDING APPLICATION ─── */}
+          <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-12 pb-20 px-4">
         <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
 
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-start">
@@ -645,6 +803,8 @@ export default function PartnerPage() {
           </div>
         </div>
       </section>
+        </>
+      )}
     </div>
   );
 }

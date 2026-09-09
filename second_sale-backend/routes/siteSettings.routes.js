@@ -12,6 +12,9 @@ import {
   deleteNavLink,
   resetNavLinks,
   reorderNavLinks,
+  uploadFavicon,
+  updateTopBar,
+  updateFooter,
   upload,
 } from '../controllers/siteSettings.controller.js';
 
@@ -23,6 +26,9 @@ router.get('/', getSettings);
 // Admin-protected
 router.use(adminAuth);
 router.post('/logo', upload.single('logo'), uploadLogo);
+router.post('/favicon', upload.single('favicon'), uploadFavicon);
+router.put('/top-bar', updateTopBar);
+router.put('/footer', updateFooter);
 router.post('/banners', upload.single('banner'), addBanner);
 router.patch('/banners/:bannerId', updateBanner);
 router.delete('/banners/:bannerId', deleteBanner);

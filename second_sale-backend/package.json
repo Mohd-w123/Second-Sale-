@@ -7,6 +7,7 @@
     "start": "node server.js",
     "seed": "node seeds/all.js",
     "seed:all": "node seeds/all.js",
+    "seed:pages": "node seeds/seedCustomPages.js",
     "seed:pincodes": "node seeds/seedPincodes.js",
     "seed:laptops": "node seeds/seedLaptops.js",
     "seed:laptop:apple": "node seeds/seedLaptopApple.js",

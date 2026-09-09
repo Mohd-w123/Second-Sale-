@@ -130,6 +130,7 @@ const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL ||
 
 export default function Navbar() {
   const [siteLogo, setSiteLogo] = useState(logo);
+  const [topBar, setTopBar] = useState(null);
   const [navItems, setNavItems] = useState(DEFAULT_NAV_ITEMS);
   const [categories, setCategories] = useState(DEFAULT_MEGA_MENU_CATEGORIES);
   const [hoveredCategory, setHoveredCategory] = useState("mobile");
@@ -198,13 +199,14 @@ export default function Navbar() {
     }
   }, []);
 
-  // Fetch site settings (logo & dynamic nav links)
+  // Fetch site settings (logo, topBar & dynamic nav links)
   const fetchSiteSettings = useCallback(async () => {
     try {
       const res = await fetch(API + "/site-settings");
       if (!res.ok) return;
       const data = await res.json();
       if (data?.logoUrl) setSiteLogo(data.logoUrl);
+      if (data?.topBar) setTopBar(data.topBar);
       if (Array.isArray(data?.navLinks) && data.navLinks.length > 0) {
         const active = data.navLinks
           .filter((item) => item.isActive !== false)
@@ -237,6 +239,7 @@ export default function Navbar() {
       const data = e?.detail;
       if (data) {
         if (data.logoUrl) setSiteLogo(data.logoUrl);
+        if (data.topBar) setTopBar(data.topBar);
         if (Array.isArray(data.navLinks)) {
           const active = data.navLinks
             .filter((item) => item.isActive !== false)
@@ -290,6 +293,44 @@ export default function Navbar() {
   const debounceTimer = useRef(null);
   const dropdownRef = useRef(null);
   const buyDropdownRef = useRef(null);
+  const sellCloseTimerRef = useRef(null);
+  const buyCloseTimerRef = useRef(null);
+  const categoryHoverTimerRef = useRef(null);
+
+  const openSellDropdown = useCallback(() => {
+    if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+    if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+    setBuyDropdownOpen(false);
+    setSellDropdownOpen(true);
+  }, []);
+
+  const closeSellDropdownWithDelay = useCallback((delay = 220) => {
+    if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+    sellCloseTimerRef.current = setTimeout(() => {
+      setSellDropdownOpen(false);
+    }, delay);
+  }, []);
+
+  const openBuyDropdown = useCallback(() => {
+    if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+    if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+    setSellDropdownOpen(false);
+    setBuyDropdownOpen(true);
+  }, []);
+
+  const closeBuyDropdownWithDelay = useCallback((delay = 220) => {
+    if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+    buyCloseTimerRef.current = setTimeout(() => {
+      setBuyDropdownOpen(false);
+    }, delay);
+  }, []);
+
+  const handleCategoryHover = useCallback((catId) => {
+    if (categoryHoverTimerRef.current) clearTimeout(categoryHoverTimerRef.current);
+    categoryHoverTimerRef.current = setTimeout(() => {
+      setHoveredCategory(catId);
+    }, 45);
+  }, []);
 
   const auth = useAuth();
   const isLoggedIn = auth?.isAuthenticated;
@@ -306,6 +347,9 @@ export default function Navbar() {
 
   // Close mobile menu & dropdowns on route change
   useEffect(() => {
+    if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+    if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+    if (categoryHoverTimerRef.current) clearTimeout(categoryHoverTimerRef.current);
     setMobileMenuOpen(false);
     setSellDropdownOpen(false);
     setBuyDropdownOpen(false);
@@ -368,9 +412,11 @@ export default function Navbar() {
         setShowResults(false);
       }
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
         setSellDropdownOpen(false);
       }
       if (buyDropdownRef.current && !buyDropdownRef.current.contains(e.target)) {
+        if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
         setBuyDropdownOpen(false);
       }
     };
@@ -381,6 +427,9 @@ export default function Navbar() {
   useEffect(() => {
     return () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+      if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+      if (categoryHoverTimerRef.current) clearTimeout(categoryHoverTimerRef.current);
     };
   }, []);
 
@@ -488,6 +537,19 @@ export default function Navbar() {
 
   return (
     <nav className={`sticky top-0 z-[1000] bg-white transition-shadow duration-300 ${scrolled ? "shadow-md" : "shadow-sm"}`}>
+      {topBar?.isEnabled && topBar?.text && (
+        <div
+          className="py-1.5 px-4 text-center text-xs font-bold transition-all flex items-center justify-center gap-2"
+          style={{ backgroundColor: topBar.bgColor || '#2563EB', color: topBar.textColor || '#FFFFFF' }}
+        >
+          <span>{topBar.text}</span>
+          {topBar.linkTo && (
+            <Link to={topBar.linkTo} className="underline hover:opacity-90 transition-opacity ml-1" style={{ color: topBar.textColor || '#FFFFFF' }}>
+              Learn More →
+            </Link>
+          )}
+        </div>
+      )}
       <div className="max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-8 h-[68px] gap-4">
 
         {/* Logo */}
@@ -513,21 +575,36 @@ export default function Navbar() {
                 className="relative"
                 ref={itemRef}
                 onMouseEnter={() => {
-                  if (isSell) setSellDropdownOpen(true);
-                  if (isBuy) setBuyDropdownOpen(true);
+                  if (isSell) openSellDropdown();
+                  if (isBuy) openBuyDropdown();
                 }}
                 onMouseLeave={() => {
-                  if (isSell) setSellDropdownOpen(false);
-                  if (isBuy) setBuyDropdownOpen(false);
+                  if (isSell) closeSellDropdownWithDelay(220);
+                  if (isBuy) closeBuyDropdownWithDelay(220);
                 }}
               >
                 {item.hasDropdown ? (
                   <button
                     className={`flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent
                       ${isOpen ? "text-[#2563EB] bg-[#E6F4FF]" : "text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50"}`}
-                    onClick={() => {
-                      if (isSell) setSellDropdownOpen(!sellDropdownOpen);
-                      if (isBuy) setBuyDropdownOpen(!buyDropdownOpen);
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isSell) {
+                        if (sellDropdownOpen) {
+                          if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+                          setSellDropdownOpen(false);
+                        } else {
+                          openSellDropdown();
+                        }
+                      }
+                      if (isBuy) {
+                        if (buyDropdownOpen) {
+                          if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+                          setBuyDropdownOpen(false);
+                        } else {
+                          openBuyDropdown();
+                        }
+                      }
                     }}
                   >
                     {item.label}
@@ -562,15 +639,18 @@ export default function Navbar() {
                 {/* Buy Refurbished Clean Dropdown Menu (Matches Reference) */}
                 {isBuy && buyDropdownOpen && (
                   <div
-                    className="absolute top-full left-0 mt-1.5 bg-white border border-slate-100 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.12)] z-[2000] p-2 w-60 dropdown-animate overflow-hidden flex flex-col gap-0.5"
-                    onMouseEnter={() => setBuyDropdownOpen(true)}
-                    onMouseLeave={() => setBuyDropdownOpen(false)}
+                    className="absolute top-full left-0 mt-1 bg-white border border-slate-100 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.12)] z-[2000] p-2 w-60 dropdown-animate overflow-hidden flex flex-col gap-0.5 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:bg-transparent"
+                    onMouseEnter={openBuyDropdown}
+                    onMouseLeave={() => closeBuyDropdownWithDelay(220)}
                   >
                     {BUY_REFURBISHED_CATEGORIES.map((cat) => (
                       <Link
                         key={cat.id}
                         to={cat.to}
-                        onClick={() => setBuyDropdownOpen(false)}
+                        onClick={() => {
+                          if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+                          setBuyDropdownOpen(false);
+                        }}
                         className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#2563EB] no-underline"
                       >
                         <span className="font-bold text-[15px] tracking-tight">{cat.label}</span>
@@ -580,7 +660,10 @@ export default function Navbar() {
                     <div className="pt-1.5 mt-1 border-t border-slate-100">
                       <Link
                         to="/buy-refurbished"
-                        onClick={() => setBuyDropdownOpen(false)}
+                        onClick={() => {
+                          if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+                          setBuyDropdownOpen(false);
+                        }}
                         className="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-[#2563EB] hover:bg-blue-50/60 transition-colors no-underline"
                       >
                         <span>All Refurbished Devices</span>
@@ -593,9 +676,9 @@ export default function Navbar() {
                 {/* Sell Device Dynamic Mega Menu */}
                 {isSell && sellDropdownOpen && (
                 <div 
-                  className="absolute top-full left-0 mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[2000] flex overflow-hidden dropdown-animate w-[490px] min-h-[380px]"
-                  onMouseEnter={() => setSellDropdownOpen(true)}
-                  onMouseLeave={() => setSellDropdownOpen(false)}
+                  className="absolute top-full left-0 mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[2000] flex overflow-hidden dropdown-animate w-[490px] min-h-[380px] before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:bg-transparent"
+                  onMouseEnter={openSellDropdown}
+                  onMouseLeave={() => closeSellDropdownWithDelay(220)}
                 >
                   {/* Left Column: Categories List */}
                   <div className="w-[195px] bg-slate-50/75 border-r border-slate-100 p-2 flex flex-col gap-0.5 shrink-0">
@@ -605,9 +688,10 @@ export default function Navbar() {
                         <button
                           key={cat.id}
                           type="button"
-                          onMouseEnter={() => setHoveredCategory(cat.id)}
+                          onMouseEnter={() => handleCategoryHover(cat.id)}
                           onClick={() => {
                             if (!cat.comingSoon && cat.to) {
+                              if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
                               setSellDropdownOpen(false);
                               navigate(cat.to);
                             }
@@ -666,7 +750,10 @@ export default function Navbar() {
                                     <Link
                                       key={brandName}
                                       to={brandUrl}
-                                      onClick={() => setSellDropdownOpen(false)}
+                                      onClick={() => {
+                                        if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+                                        setSellDropdownOpen(false);
+                                      }}
                                       className="group flex items-center justify-between py-1.5 px-2 rounded-lg text-sm text-slate-600 hover:text-[#2563EB] hover:bg-blue-50/60 font-medium transition-all no-underline"
                                     >
                                       <span className="group-hover:translate-x-1 transition-transform truncate">
@@ -685,7 +772,10 @@ export default function Navbar() {
                             <div className="pt-3 mt-3 border-t border-slate-100">
                               <Link
                                 to={currentCategoryObj?.to || "/sell-old-mobile-phones/brand"}
-                                onClick={() => setSellDropdownOpen(false)}
+                                onClick={() => {
+                                  if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+                                  setSellDropdownOpen(false);
+                                }}
                                 className="flex items-center gap-1.5 text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] transition-colors no-underline"
                               >
                                 <span>More {currentCategoryObj?.label} Brands</span>

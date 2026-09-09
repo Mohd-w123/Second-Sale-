@@ -2,9 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-const AUTO_PLAY_MS = 4000;
 
-export default function BannerSlider({ onBannersChange }) {
+export default function BannerSlider({ onBannersChange, autoPlaySpeed = 4000 }) {
   const [banners, setBanners] = useState([]);
   const [active, setActive] = useState(0);
   const [dragging, setDragging] = useState(false);
@@ -51,16 +50,16 @@ export default function BannerSlider({ onBannersChange }) {
   const resetTimer = useCallback(() => {
     clearInterval(timerRef.current);
     if (total > 1) {
-      timerRef.current = setInterval(next, AUTO_PLAY_MS);
+      timerRef.current = setInterval(next, autoPlaySpeed);
     }
-  }, [next, total]);
+  }, [next, total, autoPlaySpeed]);
 
   useEffect(() => {
     if (total > 1) {
-      timerRef.current = setInterval(next, AUTO_PLAY_MS);
+      timerRef.current = setInterval(next, autoPlaySpeed);
     }
     return () => clearInterval(timerRef.current);
-  }, [next, total]);
+  }, [next, total, autoPlaySpeed]);
 
   // Touch/drag support
   const onDragStart = (x) => { setDragging(false); setDragStart(x); };

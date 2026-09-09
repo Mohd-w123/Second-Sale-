@@ -148,8 +148,8 @@ export default function DashboardPage() {
     { name: 'Orders', icon: <IconOrders /> },
     { name: 'Address', icon: <IconAddress /> },
     { name: 'Payment', icon: <IconPayment /> },
-    { name: 'Earnings', icon: <IconEarnings /> },
-    { name: 'Referral', icon: <IconReferral /> },
+    // { name: 'Earnings', icon: <IconEarnings /> },
+    // { name: 'Referral', icon: <IconReferral /> },
   ];
 
   return (
@@ -240,14 +240,14 @@ export default function DashboardPage() {
                 onDelete={handleDeletePayment}
               />
             )}
-            {activeTab === 'Earnings' && <EarningsTab />}
-            {activeTab === 'Referral' && (
+            {/* {activeTab === 'Earnings' && <EarningsTab />} */}
+            {/* {activeTab === 'Referral' && (
               <ReferralTab
                 referral={referral}
                 copyCode={copyCode}
                 copied={copied}
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>

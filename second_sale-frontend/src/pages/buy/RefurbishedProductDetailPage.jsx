@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import PincodeBox from "../../components/PincodeBox";
 import {
   ShieldCheck,
   Truck,
@@ -94,26 +95,28 @@ export default function RefurbishedProductDetailPage() {
   const [activeImgIndex, setActiveImgIndex] = useState(0);
 
   // Pincode Check
-  const pincodeInputRef = useRef(null);
+  const pincodeBoxRef = useRef(null);
   const [pincode, setPincode] = useState("");
   const [pincodeStatus, setPincodeStatus] = useState(null);
-  const [pincodeLoading, setPincodeLoading] = useState(false);
+
+  const handlePincodeVerified = (isServiceable, targetCode, info) => {
+    if (isServiceable && targetCode) {
+      setPincode(targetCode);
+      setPincodeStatus({
+        valid: true,
+        city: info?.city || "",
+        state: info?.state || "",
+        message: `Serviceable: Express delivery available in 2-4 business days${info?.city ? " to " + info.city : ""}. Cash / Pay on Delivery eligible!`,
+      });
+    } else {
+      setPincode("");
+      setPincodeStatus(null);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchDevice();
-
-    // Check if customer already has a saved verified pincode
-    try {
-      const saved = localStorage.getItem("verifiedPincode");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed?.code && parsed.code.length === 6) {
-          setPincode(parsed.code);
-          verifyPincode(parsed.code);
-        }
-      }
-    } catch {}
   }, [slug]);
 
   const fetchDevice = async () => {
@@ -146,63 +149,6 @@ export default function RefurbishedProductDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const verifyPincode = async (code) => {
-    const clean = (code || pincode || "").replace(/\D/g, "").slice(0, 6);
-    if (!clean || clean.length !== 6) {
-      setPincodeStatus({ valid: false, message: "Please enter a valid 6-digit delivery pincode." });
-      pincodeInputRef.current?.focus();
-      return;
-    }
-    try {
-      setPincodeLoading(true);
-      const res = await fetch(`${API}/pincodes/check/${clean}`);
-      const data = await res.json().catch(() => ({}));
-
-      if (res.ok && data.isServiceable) {
-        setPincodeStatus({
-          valid: true,
-          city: data.city || "",
-          state: data.state || "",
-          message: `Serviceable: Express delivery available in 2-4 business days${data.city ? " to " + data.city : ""}. Cash / Pay on Delivery eligible!`,
-        });
-        try {
-          localStorage.setItem("verifiedPincode", JSON.stringify({ code: clean, city: data.city, state: data.state }));
-        } catch {}
-      } else {
-        // Pincode is not in serviceable database
-        setPincodeStatus({
-          valid: false,
-          message: `Pincode ${clean} is not serviceable. We do not deliver to this area yet.`,
-        });
-        try {
-          localStorage.removeItem("verifiedPincode");
-        } catch {}
-      }
-    } catch {
-      setPincodeStatus({
-        valid: false,
-        message: `Could not verify pincode ${clean}. Please check your network and try again.`,
-      });
-    } finally {
-      setPincodeLoading(false);
-    }
-  };
-
-  const handlePincodeChange = (e) => {
-    const val = e.target.value.replace(/\D/g, "").slice(0, 6);
-    setPincode(val);
-    if (val.length === 6) {
-      verifyPincode(val);
-    } else {
-      setPincodeStatus(null);
-    }
-  };
-
-  const handlePincodeCheck = (e) => {
-    if (e) e.preventDefault();
-    verifyPincode(pincode);
   };
 
   if (loading) {
@@ -248,12 +194,8 @@ export default function RefurbishedProductDetailPage() {
 
   const handleBuyNow = () => {
     if (!isBuyEnabled) {
-      pincodeInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      pincodeInputRef.current?.focus();
-      setPincodeStatus({
-        valid: false,
-        message: "Check Delivery & Pay on Delivery Eligibility is mandatory before proceeding to Buy Now.",
-      });
+      pincodeBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      pincodeBoxRef.current?.focus?.();
       return;
     }
     const buyItem = {
@@ -532,83 +474,17 @@ export default function RefurbishedProductDetailPage() {
             )}
 
             {/* Pincode Delivery Check */}
-            <div
-              className={`bg-white p-6 sm:p-7 rounded-3xl border transition-all duration-300 shadow-sm space-y-3 ${
-                pincodeStatus && !pincodeStatus.valid
-                  ? "border-rose-400 ring-2 ring-rose-100"
-                  : pincodeStatus?.valid
-                  ? "border-emerald-300 ring-2 ring-emerald-50"
-                  : "border-slate-200"
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                    <span>Check Delivery &amp; Pay on Delivery Eligibility</span>
-                    <span className="text-rose-500 font-extrabold text-base leading-none">*</span>
-                  </h3>
-                </div>
-                <span
-                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
-                    pincodeStatus?.valid
-                      ? "text-emerald-700 bg-emerald-50 border-emerald-200"
-                      : pincodeStatus && !pincodeStatus.valid
-                      ? "text-rose-700 bg-rose-50 border-rose-200"
-                      : "text-amber-700 bg-amber-50 border-amber-200"
-                  }`}
-                >
-                  {pincodeStatus?.valid
-                    ? "Eligible ✓"
-                    : pincodeStatus && !pincodeStatus.valid
-                    ? "Not Serviceable ✗"
-                    : "Mandatory Field"}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500">
-                Please enter your 6-digit delivery pincode to verify shipping availability &amp; Pay on Delivery eligibility before buying.
-              </p>
-              <form onSubmit={handlePincodeCheck} className="flex gap-2 max-w-md">
-                <input
-                  ref={pincodeInputRef}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={6}
-                  value={pincode}
-                  onChange={handlePincodeChange}
-                  placeholder="Enter 6-digit Pincode (e.g. 400001)"
-                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold tracking-wider placeholder:font-normal placeholder:tracking-normal"
-                />
-                <button
-                  type="button"
-                  onClick={handlePincodeCheck}
-                  disabled={pincodeLoading}
-                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition cursor-pointer flex items-center justify-center min-w-[85px] shadow-sm active:scale-95"
-                >
-                  {pincodeLoading ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    "Check"
-                  )}
-                </button>
-              </form>
-              {pincodeStatus && (
-                <div
-                  className={`p-3 rounded-xl text-xs flex items-center gap-2 animate-in fade-in ${
-                    pincodeStatus.valid
-                      ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                      : "bg-rose-50 text-rose-800 border border-rose-200"
-                  }`}
-                >
-                  {pincodeStatus.valid ? (
-                    <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
-                  )}
-                  <span>{pincodeStatus.message}</span>
-                </div>
-              )}
-            </div>
+            <PincodeBox
+              ref={pincodeBoxRef}
+              title="Check Delivery & Pay on Delivery Eligibility"
+              subtitle="Please enter your 6-digit delivery pincode to verify shipping availability & Pay on Delivery eligibility before buying."
+              placeholder="Enter 6-digit Pincode (e.g. 400001)"
+              isMandatory={true}
+              showMandatoryBadge={true}
+              icon={<MapPin className="w-4 h-4 text-blue-600 flex-shrink-0" />}
+              serviceText="Express delivery in 2-4 business days. Cash / Pay on Delivery eligible!"
+              onVerified={handlePincodeVerified}
+            />
 
             {/* CTA Buy Buttons */}
             <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-3">

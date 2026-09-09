@@ -14,7 +14,9 @@ import {
   X,
   ExternalLink,
   ShieldCheck,
-  Package
+  Package,
+  Layout,
+  FileText
 } from 'lucide-react';
 import './admin.css';
 
@@ -31,6 +33,8 @@ export default function AdminLayout() {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes('/dashboard')) return 'Dashboard Overview';
+    if (path.includes('/homepage')) return 'Homepage Section Manager';
+    if (path.includes('/pages')) return 'Custom Pages (CMS)';
     if (path.includes('/users')) return 'User Directory';
     if (path.includes('/devices')) return 'Device Catalog';
     if (path.includes('/refurbished')) return 'Refurbished Marketplace';
@@ -44,6 +48,8 @@ export default function AdminLayout() {
 
   const navItems = [
     { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/admin/homepage', icon: Layout, label: 'Homepage' },
+    { to: '/admin/pages', icon: FileText, label: 'Pages (CMS)' },
     { to: '/admin/users', icon: Users, label: 'Users' },
     { to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
     { to: '/admin/refurbished', icon: Package, label: 'Refurbished' },

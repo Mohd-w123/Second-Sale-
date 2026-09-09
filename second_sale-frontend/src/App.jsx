@@ -89,6 +89,11 @@ import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminPincodes from './pages/admin/AdminPincodes.jsx';
 import AdminSiteSettings from './pages/admin/AdminSiteSettings.jsx';
 import AdminRefurbished from './pages/admin/AdminRefurbished.jsx';
+import AdminHomepage from './pages/admin/AdminHomepage.jsx';
+import AdminPages from './pages/admin/AdminPages.jsx';
+import CustomPageView from './pages/CustomPageView.jsx';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 function App() {
   const location = useLocation();
@@ -96,6 +101,33 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Sync Favicon dynamically from Site Settings
+  useEffect(() => {
+    const applyFavicon = (url) => {
+      if (!url) return;
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
+      link.href = url;
+    };
+
+    fetch(API_BASE + "/site-settings")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.faviconUrl) applyFavicon(data.faviconUrl);
+      })
+      .catch(() => {});
+
+    const onSettingsUpdate = (e) => {
+      if (e?.detail?.faviconUrl) applyFavicon(e.detail.faviconUrl);
+    };
+    window.addEventListener("site-settings-updated", onSettingsUpdate);
+    return () => window.removeEventListener("site-settings-updated", onSettingsUpdate);
+  }, []);
 
   const isAdminRoute = location.pathname.startsWith('/admin');
 
@@ -169,6 +201,9 @@ function App() {
           <Route path="/buy-refurbished/checkout" element={<RefurbishedCheckoutPage />} />
           <Route path="/buy-refurbished/order-success/:orderId" element={<RefurbishedOrderSuccessPage />} />
 
+          {/* Dynamic CMS Pages (e.g. /page/warranty-policy) */}
+          <Route path="/page/:slug" element={<CustomPageView />} />
+
           {/* Shared */}
 
           <Route path="/schedule-pickup" element={<ProtectedRoute><SchedulePickupPage /></ProtectedRoute>} />
@@ -182,6 +217,7 @@ function App() {
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/valuation-and-return-policy" element={<CustomPageView slugOverride="valuation-and-return-policy" />} />
           <Route path="/compare/secondsale-vs-cashify" element={<CompareSecondSaleVsCashify />} />
           <Route path="/alternatives/cashify-alternatives" element={<CashifyAlternatives />} />
           <Route path="/best-place-to-sell-old-phone-india" element={<BestPlaceToSellPhone />} />
@@ -194,6 +230,8 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="homepage" element={<AdminHomepage />} />
+            <Route path="pages" element={<AdminPages />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="devices" element={<AdminDevices />} />
             <Route path="refurbished" element={<AdminRefurbished />} />
@@ -204,6 +242,9 @@ function App() {
             <Route path="site-settings" element={<AdminSiteSettings />} />
           </Route>
 
+          {/* Dynamic CMS Pages (Supports both direct /:slug and legacy /page/:slug) */}
+          <Route path="/page/:slug" element={<CustomPageView />} />
+          <Route path="/:slug" element={<CustomPageView />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

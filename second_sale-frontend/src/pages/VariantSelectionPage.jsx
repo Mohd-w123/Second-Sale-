@@ -103,8 +103,16 @@ export default function VariantSelectionPage() {
             <PincodeBox onVerified={setIsPincodeVerified} />
 
             <button 
-              onClick={() => navigate(`/sell-old-mobile-phones/${brand}/${slug}/quiz?storage=${selectedVariant.storage}`)}
-              className="w-full text-white font-black py-4 sm:py-5 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 text-lg group bg-[#2563EB] shadow-blue-100 hover:bg-[#1D4ED8] hover:-translate-y-1 cursor-pointer"
+              disabled={!isPincodeVerified}
+              onClick={() => {
+                if (!isPincodeVerified) return;
+                navigate(`/sell-old-mobile-phones/${brand}/${slug}/quiz?storage=${selectedVariant.storage}`);
+              }}
+              className={`w-full font-black py-4 sm:py-5 rounded-2xl transition-all flex items-center justify-center gap-2 text-lg group ${
+                isPincodeVerified
+                  ? "bg-[#2563EB] text-white shadow-xl shadow-blue-100 hover:bg-[#1D4ED8] hover:-translate-y-1 cursor-pointer"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+              }`}
             >
               Start Selling 
               <svg className="transition-transform group-hover:translate-x-1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
