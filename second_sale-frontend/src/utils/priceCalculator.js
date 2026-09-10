@@ -2,11 +2,22 @@ import { isSpecialModel } from './specialModels';
 
 // ─── ISSUE DEDUCTION PERCENTAGES ────────────────────────────────────────────
 export const ISSUE_DEDUCTIONS = {
-  // Physical Issues
+  // Physical Issues (Matching DeviceKart)
   glass_crack: 40,
   back_panel: 17,
   camera_glass_broken: 8,
-  // Technical Issues
+  screen_scratches_minor: 5,
+  screen_scratches_major: 12,
+  screen_cracked: 35,
+  screen_chipped: 15,
+  dead_spots_lines: 35,
+  body_scratches_dents: 8,
+  panel_missing_broken: 15,
+  panel_cracked: 12,
+  panel_missing: 18,
+  loose_screen: 10,
+  bent_curved: 20,
+  // Technical Issues (16 Options matching DeviceKart)
   battery_service: 13,
   front_camera: 8,
   back_camera: 15,
@@ -22,6 +33,7 @@ export const ISSUE_DEDUCTIONS = {
   vibrator: 2,
   microphone: 2,
   proximity_sensor: 3,
+  silent_button: 3,
 };
 
 // ─── MOBILE PRICE CALCULATOR (Sequential / Cascading deduction model) ───────

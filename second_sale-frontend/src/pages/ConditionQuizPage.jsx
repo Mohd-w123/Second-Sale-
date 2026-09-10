@@ -6,11 +6,21 @@ import { useAuth } from '../hooks/useAuth';
 import { calculatePrice } from '../utils/priceCalculator';
 import { formatCurrency } from '../utils/formatCurrency';
 import { isSpecialModel } from '../utils/specialModels';
-import Badge from '../components/ui/Badge';
 import Loader from '../components/ui/Loader';
 import NoIndexSEO from '../components/seo/NoIndexSEO';
+import {
+  Lock,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  Phone,
+  ShieldCheck,
+  Zap,
+  ArrowRight,
+  Sparkles,
+} from 'lucide-react';
 
-// --- Icons & Assets (Matching Screenshots) ---
+// --- Icons & Assets ---
 const IconTrend = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
 );
@@ -24,19 +34,94 @@ const ALL_STEPS = [
 ];
 
 const ALL_ACCESSORIES = [
-  { id: 'Bill', label: 'GST Valid Bill', desc: 'Valid GST invoice', icon: '📄' },
+  { id: 'Bill', label: 'GST Valid Bill', desc: 'Valid GST invoice with matching IMEI', icon: '📄' },
   { id: 'Box', label: 'Original Box', desc: 'Original purchase box', icon: '📦' },
-  { id: 'Charger', label: 'Original Charger', desc: 'Original charging adapter', icon: '🔌' }
+  { id: 'Charger', label: 'Original Charger', desc: 'Original charging adapter & cable', icon: '🔌' }
 ];
 
 const AGE_OPTIONS = [
   '0 - 3 Months', '3 - 6 Months', '6 - 11 Months', 'Above 11 Months'
 ];
 
+// Physical Issues Defect Options (Matching DeviceKart)
+const PHYSICAL_DEFECT_OPTIONS = [
+  {
+    id: 'screen_scratch_broken',
+    label: 'Broken/scratch on device screen',
+    desc: 'Screen glass is cracked, scratched or chipped',
+    icon: '📱',
+  },
+  {
+    id: 'dead_spots_lines',
+    label: 'Dead Spot/Visible line and Discoloration on screen',
+    desc: 'Spots, colored lines, or visible discoloration on display',
+    icon: '🖥️',
+  },
+  {
+    id: 'body_scratches_dents',
+    label: 'Scratch/Dent on device body',
+    desc: 'Noticeable scratches, scuffs or dents on outer chassis',
+    icon: '🔨',
+  },
+  {
+    id: 'panel_missing_broken',
+    label: 'Device panel missing/broken',
+    desc: 'Side or back panel missing or heavily cracked',
+    icon: '🧩',
+  },
+  {
+    id: 'camera_glass_broken',
+    label: 'Camera Glass Broken',
+    desc: 'Camera lens glass is cracked or broken',
+    icon: '📷',
+  },
+];
+
+// Conditional Screen Scratch / Crack Depth (Matching DeviceKart)
+const SCREEN_SCRATCH_OPTIONS = [
+  { id: 'screen_scratches_minor', label: '1-2 scratches on screen', desc: 'Minor hairline scratches only' },
+  { id: 'screen_scratches_major', label: 'More than 2 scratches on screen', desc: 'Multiple visible scratches' },
+  { id: 'screen_cracked', label: 'Screen cracked/ glass broken', desc: 'Cracked glass on display area' },
+  { id: 'screen_chipped', label: 'Chipped/cracked outside display area', desc: 'Chipped edge glass or corner' },
+];
+
+// Side / Back Panel Condition (Matching DeviceKart)
+const PANEL_OPTIONS = [
+  { id: 'no_defect', label: 'No defect on side or back panel', desc: 'Normal wear or pristine condition' },
+  { id: 'panel_cracked', label: 'Cracked/ broken side or back panel', desc: 'Cracked back glass or chassis' },
+  { id: 'panel_missing', label: 'Missing side or back panel', desc: 'Panel detached or missing' },
+];
+
+// Bent / Loose Screen (Matching DeviceKart)
+const BEND_OPTIONS = [
+  { id: 'not_bent', label: 'Phone not bent', desc: 'Body and frame are completely straight' },
+  { id: 'loose_screen', label: 'Loose screen (Gap in screen and body)', desc: 'Screen lifting or adhesive gap' },
+  { id: 'bent_curved', label: 'Bent/ curved panel', desc: 'Visible curvature or bent chassis' },
+];
+
+// 16 Technical Hardware Issues (Matching DeviceKart)
+const TECHNICAL_ISSUES = [
+  { id: 'battery_service', label: 'Battery Faulty', icon: '🔋' },
+  { id: 'front_camera', label: 'Front Camera not working', icon: '📸' },
+  { id: 'back_camera', label: 'Back Camera not working', icon: '📷' },
+  { id: 'volume_button', label: 'Volume Button not working', icon: '🔘' },
+  { id: 'wifi_issue', label: 'WiFi not working', icon: '📶' },
+  { id: 'finger_touch', label: 'Finger Touch not working', icon: '☝️' },
+  { id: 'face_unlock', label: 'Face Sensor not working', icon: '👤' },
+  { id: 'speaker_faulty', label: 'Speaker Faulty', icon: '🔊' },
+  { id: 'power_button', label: 'Power Button not working', icon: '🔌' },
+  { id: 'charging_port', label: 'Charging Port not working', icon: '⚡' },
+  { id: 'audio_receiver', label: 'Audio Receiver not working', icon: '📞' },
+  { id: 'bluetooth', label: 'Bluetooth not working', icon: '🦷' },
+  { id: 'vibrator', label: 'Vibrator is not working', icon: '📳' },
+  { id: 'microphone', label: 'Microphone not working', icon: '🎤' },
+  { id: 'proximity_sensor', label: 'Proximity Sensor not working', icon: '📡' },
+  { id: 'silent_button', label: 'Silent Button not working', icon: '🔕' },
+];
+
 const supportsESIM = (modelName) => {
   if (!modelName) return false;
   const name = modelName.toLowerCase();
-  // Only these 12 models support dual eSIM (no physical SIM tray)
   const allowed = [
     'iphone 13 pro', 'iphone 13 pro max',
     'iphone 14 pro', 'iphone 14 pro max',
@@ -54,7 +139,7 @@ export default function ConditionQuizPage() {
   const [searchParams] = useSearchParams();
   const storage = searchParams.get('storage');
   const { updateQuote } = useQuote();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, sendOtp, verifyOtp } = useAuth();
 
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -65,32 +150,50 @@ export default function ConditionQuizPage() {
   const STEPS = special ? ALL_STEPS.filter(s => s.id !== 'warranty') : ALL_STEPS;
   const ACCESSORIES = special ? ALL_ACCESSORIES.filter(a => a.id !== 'Bill') : ALL_ACCESSORIES;
   
-  // Selections (matching new requirements)
+  // Step 1: Age & Warranty
   const [deviceAge, setDeviceAge] = useState('3 - 6 Months');
   const [underWarranty, setUnderWarranty] = useState(null);
   const [eSIMSupport, seteSIMSupport] = useState(null); // 'physical+esim' | 'esim_only_global'
 
+  // Step 2: General & Screen
   const [ableToMakeCalls, setAbleToMakeCalls] = useState(null);
   const [isTouchScreenWorking, setIsTouchScreenWorking] = useState(null);
   const [isScreenOriginal, setIsScreenOriginal] = useState(null);
 
-  const [physicalIssues, setPhysicalIssues] = useState([]);
+  // Step 3: Physical Issues (Matching DeviceKart)
+  const [physicalDefects, setPhysicalDefects] = useState([]);
+  const [screenScratchDetail, setScreenScratchDetail] = useState(null);
+  const [panelCondition, setPanelCondition] = useState('no_defect');
+  const [bendCondition, setBendCondition] = useState('not_bent');
+
+  // Step 4: Technical Issues
   const [technicalIssues, setTechnicalIssues] = useState([]);
+
+  // Step 5: Accessories
   const [selectedAccessories, setSelectedAccessories] = useState(['Bill', 'Box', 'Charger']);
 
-  // When device loads and is special, remove Bill from default selection
-  useEffect(() => {
-    if (device && isSpecialModel(device.brand, device.modelName)) {
-      setSelectedAccessories(prev => prev.filter(a => a !== 'Bill'));
-      // Auto-set warranty/age so they don't block anything
-      setUnderWarranty(true);
-    }
-  }, [device]);
-
+  // Result & Pricing States
   const [showResult, setShowResult] = useState(false);
   const [priceAnimating, setPriceAnimating] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [breakdown, setBreakdown] = useState(null);
+
+  // Price Gating / OTP Modal States
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpPhone, setOtpPhone] = useState(user?.phone || '');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpSessionId, setOtpSessionId] = useState(null);
+  const [otpStep, setOtpStep] = useState('phone'); // 'phone' | 'otp'
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpError, setOtpError] = useState('');
+
+  // Special models handling
+  useEffect(() => {
+    if (device && isSpecialModel(device.brand, device.modelName)) {
+      setSelectedAccessories(prev => prev.filter(a => a !== 'Bill'));
+      setUnderWarranty(true);
+    }
+  }, [device]);
 
   useEffect(() => {
     deviceService.getDevice(slug).then(res => {
@@ -100,25 +203,31 @@ export default function ConditionQuizPage() {
       const selectedVariant = dev.variants.find(v => v.storage === storage) || dev.variants[0];
       setCurrentPrice(selectedVariant.basePrice);
       
-      // If the model does not support eSIM, default the state so it doesn't block validation
       if (!supportsESIM(dev.modelName)) {
         seteSIMSupport('physical+esim');
       }
     }).catch(() => setLoading(false));
   }, [slug, storage]);
 
-  // Auto-set warranty to "No" (with no deduction) for devices older than 11 months
+  // Auto-set warranty to "No" for devices older than 11 months
   useEffect(() => {
     if (deviceAge === 'Above 11 Months') {
       setUnderWarranty(false);
     }
   }, [deviceAge]);
 
+  // Consolidate physical issues for price calculator
+  const effectivePhysicalIssues = [
+    ...physicalDefects.filter(d => d !== 'screen_scratch_broken'),
+    ...(physicalDefects.includes('screen_scratch_broken') && screenScratchDetail ? [screenScratchDetail] : []),
+    ...(panelCondition && panelCondition !== 'no_defect' ? [panelCondition] : []),
+    ...(bendCondition && bendCondition !== 'not_bent' ? [bendCondition] : []),
+  ];
+
   useEffect(() => {
     if (!device) return;
     const variant = device.variants.find(v => v.storage === storage) || device.variants[0];
     
-    // Calculate new price based on user inputs
     const result = calculatePrice({
       brand: device.brand,
       modelName: device.modelName,
@@ -130,7 +239,7 @@ export default function ConditionQuizPage() {
       underWarranty: underWarranty ?? true,
       hasGSTBill: selectedAccessories.includes('Bill'),
       eSIMSupport,
-      physicalIssues,
+      physicalIssues: effectivePhysicalIssues,
       technicalIssues,
       hasCharger: selectedAccessories.includes('Charger'),
       hasBox: selectedAccessories.includes('Box'),
@@ -148,12 +257,15 @@ export default function ConditionQuizPage() {
     isScreenOriginal, 
     underWarranty, 
     eSIMSupport, 
-    physicalIssues, 
+    physicalDefects,
+    screenScratchDetail,
+    panelCondition,
+    bendCondition,
     technicalIssues, 
     selectedAccessories
   ]);
 
-  const handleGetBestPrice = () => {
+  const finalizeAndShowResult = () => {
     updateQuote({
       device: { 
         brand: device.brand, 
@@ -169,13 +281,66 @@ export default function ConditionQuizPage() {
         underWarranty,
         hasGSTBill: selectedAccessories.includes('Bill'),
         eSIMSupport,
-        physicalIssues,
+        physicalIssues: effectivePhysicalIssues,
         technicalIssues,
         accessories: selectedAccessories,
       },
       priceBreakdown: breakdown,
     });
     setShowResult(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Called when user completes the 5th step and clicks GET BEST PRICE
+  const handleGetBestPrice = () => {
+    if (isAuthenticated) {
+      finalizeAndShowResult();
+    } else {
+      setOtpStep('phone');
+      setOtpError('');
+      setShowOtpModal(true);
+    }
+  };
+
+  // OTP Handlers
+  const handleSendOtp = async (e) => {
+    if (e) e.preventDefault();
+    const cleanPhone = otpPhone.replace(/\D/g, '').slice(-10);
+    if (cleanPhone.length !== 10) {
+      setOtpError('Please enter a valid 10-digit Indian mobile number');
+      return;
+    }
+    setOtpLoading(true);
+    setOtpError('');
+    try {
+      const data = await sendOtp(cleanPhone);
+      setOtpSessionId(data?.sessionId || 'test_session');
+      setOtpStep('otp');
+    } catch (err) {
+      setOtpError(err?.response?.data?.message || 'Failed to send OTP. Please try again.');
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    if (e) e.preventDefault();
+    if (!otpCode || otpCode.length < 4) {
+      setOtpError('Please enter the verification code sent to your phone');
+      return;
+    }
+    setOtpLoading(true);
+    setOtpError('');
+    try {
+      const cleanPhone = otpPhone.replace(/\D/g, '').slice(-10);
+      await verifyOtp(cleanPhone, otpCode, otpSessionId);
+      setShowOtpModal(false);
+      finalizeAndShowResult();
+    } catch (err) {
+      setOtpError(err?.response?.data?.message || 'Invalid or expired OTP. Please check and try again.');
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
   const handleSchedulePickup = () => {
@@ -212,7 +377,7 @@ export default function ConditionQuizPage() {
               {/* Offer Card */}
               <div className="bg-white rounded-[40px] border border-gray-100 p-8 sm:p-12 shadow-sm relative overflow-hidden">
                 <div className="flex flex-col sm:flex-row items-center gap-10">
-                  <div className="w-40 h-40 bg-gray-50 rounded-[32px] flex items-center justify-center p-6">
+                  <div className="w-40 h-40 bg-gray-50 rounded-[32px] flex items-center justify-center p-6 shrink-0">
                     <img 
                       src={device.imageUrl || "https://img.freepik.com/free-photo/mobile-phone-with-blank-screen_23-2148151433.jpg"} 
                       alt={device.modelName}
@@ -235,7 +400,7 @@ export default function ConditionQuizPage() {
                       onClick={() => setShowResult(false)}
                       className="text-[#2563EB] font-black text-sm underline underline-offset-8 hover:text-[#1D4ED8] transition-all"
                     >
-                      Recalculate
+                      Recalculate / Retake Quiz
                     </button>
                   </div>
                 </div>
@@ -248,129 +413,71 @@ export default function ConditionQuizPage() {
                       <svg className="absolute top-1 left-1 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
                     <span className="text-sm font-medium text-gray-500 leading-relaxed group-hover:text-[#111827] transition-colors">
-                      Receive updates via Whatsapp (+91 {user?.phone || '9076116803'})
+                      I agree to the terms of service and certify that I am the legal owner of this device with valid identity proof.
                     </span>
                   </label>
-                  <label className="flex items-start gap-4 cursor-pointer group">
-                    <div className="relative mt-1">
-                      <input type="checkbox" defaultChecked className="sr-only peer" />
-                      <div className="w-6 h-6 border-2 border-gray-200 rounded-lg peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] transition-all" />
-                      <svg className="absolute top-1 left-1 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+              </div>
+
+              {/* Price Breakdown Details */}
+              {breakdown && (
+                <div className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm">
+                  <h3 className="font-bold text-[#111827] text-lg mb-6">Valuation Summary Breakdown</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center text-sm py-2 border-b border-gray-50">
+                      <span className="text-gray-500 font-medium">Original Base Value</span>
+                      <span className="font-bold text-gray-900">{formatCurrency(breakdown.basePrice)}</span>
                     </div>
-                    <span className="text-sm font-medium text-gray-500 leading-relaxed group-hover:text-[#111827] transition-colors">
-                      I agree to the <span className="text-[#2563EB] font-bold">terms and conditions</span> of the service and understand that the final value of {formatCurrency(currentPrice)} is subject to physical device inspection by our technician at the time of pickup.
-                    </span>
-                  </label>
+                    <div className="flex justify-between items-center text-sm py-2 border-b border-gray-50">
+                      <span className="text-gray-500 font-medium">Condition & Component Deductions</span>
+                      <span className="font-bold text-rose-600">-{breakdown.totalDeductionPct}%</span>
+                    </div>
+                    <div className="flex justify-between items-center text-base py-3 font-black text-gray-900">
+                      <span>Final Net Payout</span>
+                      <span className="text-2xl text-[#2563EB]">{formatCurrency(breakdown.finalPrice)}</span>
+                    </div>
+                  </div>
                 </div>
-
-                <button 
-                  onClick={handleSchedulePickup}
-                  className="w-full mt-10 bg-[#2563EB] text-white font-black py-6 rounded-3xl hover:bg-[#1D4ED8] transition-all shadow-xl shadow-blue-100 text-lg flex items-center justify-center gap-2 group"
-                >
-                  Get My {formatCurrency(currentPrice)} Now
-                  <svg className="transition-transform group-hover:translate-x-1" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </button>
-
-                <div className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-4 text-[13px] font-bold text-gray-400">
-                  <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Free doorstep pickup
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Instant payment at pickup
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" /> Price locked for 24h
-                  </span>
-                </div>
-              </div>
-
-              {/* Device Evaluation Summary */}
-              <div className="bg-white rounded-[40px] border border-gray-100 p-10 shadow-sm">
-                <h3 className="text-2xl font-black text-[#111827] mb-10">Device Evaluation</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                  {!special && <EvaluationRow label="Device Age" value={deviceAge} color="#2563EB" />}
-                  {!special && <EvaluationRow label="Under Warranty" value={underWarranty ? 'Yes' : 'No'} color={underWarranty ? '#2563EB' : '#EF4444'} />}
-                  {supportsESIM(device?.modelName) && (
-                    <EvaluationRow label="eSIM Support" value={eSIMSupport === 'esim_only_global' ? 'eSIM Only' : 'Physical + eSIM'} color={eSIMSupport === 'esim_only_global' ? '#EF4444' : '#2563EB'} />
-                  )}
-                  <EvaluationRow label="Calls Functional" value={ableToMakeCalls ? 'Yes' : 'No (Dead)'} color={ableToMakeCalls ? '#2563EB' : '#EF4444'} />
-                  <EvaluationRow label="Touch Screen working" value={isTouchScreenWorking ? 'Yes' : 'No'} color={isTouchScreenWorking ? '#2563EB' : '#EF4444'} />
-                  <EvaluationRow label="Screen Original" value={isScreenOriginal ? 'Yes' : 'No (Copy Screen)'} color={isScreenOriginal ? '#2563EB' : '#EF4444'} />
-                  <EvaluationRow label="Physical Issues" value={physicalIssues.length > 0 ? physicalIssues.join(', ') : 'No Issues'} color={physicalIssues.length > 0 ? '#EF4444' : '#2563EB'} />
-                  <EvaluationRow label="Technical Issues" value={technicalIssues.length > 0 ? technicalIssues.join(', ') : 'No Issues'} color={technicalIssues.length > 0 ? '#EF4444' : '#2563EB'} />
-                  <EvaluationRow label="Accessories" value={selectedAccessories.join(', ') || 'None'} color="#2563EB" />
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Sidebars */}
-            <div className="w-full lg:w-96 space-y-6">
-              {/* Payment Summary */}
-              <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-10 h-10 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB]">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                  </div>
-                  <h3 className="text-xl font-black text-[#111827]">Payment Summary</h3>
-                </div>
-                <div className="space-y-6">
-                  <PriceRow label="Base Price" value={breakdown?.basePrice} />
-                  <PriceRow label="Pickup Fee" value={0} originalValue={100} isFree />
-                  <PriceRow label="Processing Fee" value={0} originalValue={100} />
-                  <PriceRow label="Promo Code" value={0} isBonus />
-                  <div className="pt-6 border-t border-gray-100 flex justify-between items-center">
-                    <span className="text-lg font-black text-[#111827]">Final Offer</span>
-                    <span className="text-2xl font-black text-[#111827]">{formatCurrency(currentPrice)}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Apply Coupon */}
-              <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-10 h-10 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB]">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 5V7M15 11V13M15 17V19M5 5C3.34315 5 2 6.34315 2 8V10C3.10457 10 4 10.8954 4 12C4 13.1046 3.10457 14 2 14V16C2 17.6569 3.34315 19 5 19H19C20.6569 19 22 17.6569 22 16V14C20.8954 14 20 13.1046 20 12C20 10.8954 20.8954 10 22 10V8C22 6.34315 20.6569 5 19 5H5Z"/></svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-black text-[#111827]">Apply Coupon</h3>
-                    <p className="text-xs text-gray-400 font-bold mt-0.5">View exciting offers</p>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 rounded-2xl p-6 text-center border border-gray-100 mb-6">
-                  <p className="text-sm font-bold text-gray-500">No coupons available at the moment.</p>
+            {/* Right Sidebar: CTA */}
+            <div className="w-full lg:w-[380px] space-y-6">
+              <div className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm space-y-6 sticky top-10">
+                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-3 text-emerald-800">
+                  <CheckCircle2 size={20} className="shrink-0 text-emerald-600" />
+                  <p className="text-xs font-bold leading-relaxed">
+                    Doorstep technician inspection & instant bank transfer at your address.
+                  </p>
                 </div>
 
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    placeholder="Type coupon code here" 
-                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm font-bold focus:outline-none focus:border-[#2563EB] transition-all"
-                  />
-                  <button className="bg-gray-100 text-gray-400 px-6 py-3.5 rounded-xl font-black text-sm cursor-not-allowed">
-                    Apply
-                  </button>
-                </div>
-              </div>
+                <button
+                  onClick={handleSchedulePickup}
+                  className="w-full py-5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-base rounded-2xl shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3"
+                >
+                  <span>Schedule Free Pickup</span>
+                  <ArrowRight size={18} />
+                </button>
 
-              {/* Cancellation Policy */}
-              <div className="bg-white rounded-[32px] border border-gray-100 p-8 shadow-sm">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-10 h-10 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB]">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z"/></svg>
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                    <ShieldCheck size={16} className="text-[#2563EB]" />
+                    <span>100% Secure & Certified Data Sanitization</span>
                   </div>
-                  <h3 className="text-lg font-black text-[#111827]">Cancellation Policy</h3>
+                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
+                    <Zap size={16} className="text-amber-500" />
+                    <span>Instant UPI / Bank Account Credit on Doorstep</span>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-500 font-medium leading-relaxed">
-                  You can cancel your order anytime before the pickup is completed. Once the device is picked up and verified, the order cannot be cancelled. For any help, reach out to our support team.
-                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
     );
-  }  // --- QUIZ VIEW ---
+  }
+
+  // --- QUIZ VIEW ---
   return (
     <div className="bg-[#F9FAFB] min-h-screen py-10 px-4 sm:px-8">
       <NoIndexSEO title="Device Condition Quiz" path={`/sell-old-mobile-phones/${brand}/${slug}/quiz`} />
@@ -382,7 +489,7 @@ export default function ConditionQuizPage() {
             
             {/* Device Header */}
             <div className="p-8 flex items-center gap-6 border-b border-gray-50">
-              <div className="w-20 h-24 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
+              <div className="w-20 h-24 bg-gray-50 rounded-2xl flex items-center justify-center p-2 shrink-0">
                 <img src={device.imageUrl || 'https://img.freepik.com/free-photo/mobile-phone-with-blank-screen_23-2148151433.jpg'} alt={device.modelName} className="h-full object-contain" />
               </div>
               <div>
@@ -393,7 +500,7 @@ export default function ConditionQuizPage() {
               </div>
             </div>
 
-            {/* Stepper progress */}
+            {/* Stepper progress (Matching DeviceKart) */}
             <div className="px-8 py-4 bg-gray-50/50 border-b border-gray-50">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
                 {STEPS.map((s, idx) => (
@@ -414,9 +521,9 @@ export default function ConditionQuizPage() {
             </div>
 
             {/* Questions Area */}
-            <div className="p-10 min-h-[420px] flex flex-col justify-between">
+            <div className="p-8 sm:p-10 min-h-[420px] flex flex-col justify-between">
               <div>
-                {/* STEP: Age & Warranty (shown only for non-special models) */}
+                {/* ─── STEP 1: Age & Warranty ─── */}
                 {STEPS[currentStepIndex]?.id === 'warranty' && (
                   <div className="space-y-10">
                     {/* Q1: Age */}
@@ -426,6 +533,7 @@ export default function ConditionQuizPage() {
                         {AGE_OPTIONS.map(age => (
                           <button
                             key={age}
+                            type="button"
                             onClick={() => setDeviceAge(age)}
                             className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                               ${deviceAge === age 
@@ -446,6 +554,7 @@ export default function ConditionQuizPage() {
                       )}
                       <div className="grid grid-cols-2 gap-4">
                         <button
+                          type="button"
                           onClick={() => { if (deviceAge !== 'Above 11 Months') setUnderWarranty(true); }}
                           disabled={deviceAge === 'Above 11 Months'}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
@@ -457,6 +566,7 @@ export default function ConditionQuizPage() {
                           Yes
                         </button>
                         <button
+                          type="button"
                           onClick={() => setUnderWarranty(false)}
                           disabled={deviceAge === 'Above 11 Months'}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
@@ -474,8 +584,10 @@ export default function ConditionQuizPage() {
                     {supportsESIM(device?.modelName) && (
                       <div className="space-y-4">
                         <h3 className="text-lg font-bold text-[#111827]">3. How many eSIMs does your device support?</h3>
+                        <p className="text-xs text-gray-400 -mt-2 font-medium">Choose what applies to your device variant</p>
                         <div className="grid grid-cols-2 gap-4">
                           <button
+                            type="button"
                             onClick={() => seteSIMSupport('physical+esim')}
                             className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                               ${eSIMSupport === 'physical+esim' 
@@ -485,13 +597,14 @@ export default function ConditionQuizPage() {
                             Physical SIM + eSIM
                           </button>
                           <button
+                            type="button"
                             onClick={() => seteSIMSupport('esim_only_global')}
                             className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                               ${eSIMSupport === 'esim_only_global' 
                                 ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                                 : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                           >
-                            Dual eSIM Only (Global/US variant)
+                            Single eSIM / Dual eSIM (Global/US variant)
                           </button>
                         </div>
                       </div>
@@ -499,7 +612,7 @@ export default function ConditionQuizPage() {
                   </div>
                 )}
 
-                {/* STEP: General & Screen */}
+                {/* ─── STEP 2: General & Screen ─── */}
                 {STEPS[currentStepIndex]?.id === 'screen' && (
                   <div className="space-y-10">
                     {/* Q1: Calls */}
@@ -507,6 +620,7 @@ export default function ConditionQuizPage() {
                       <h3 className="text-lg font-bold text-[#111827]">1. Are you able to make and receive calls?</h3>
                       <div className="grid grid-cols-2 gap-4">
                         <button
+                          type="button"
                           onClick={() => setAbleToMakeCalls(true)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${ableToMakeCalls === true 
@@ -516,6 +630,7 @@ export default function ConditionQuizPage() {
                           Yes
                         </button>
                         <button
+                          type="button"
                           onClick={() => setAbleToMakeCalls(false)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${ableToMakeCalls === false 
@@ -532,6 +647,7 @@ export default function ConditionQuizPage() {
                       <h3 className="text-lg font-bold text-[#111827]">2. Is your device's touch screen working properly?</h3>
                       <div className="grid grid-cols-2 gap-4">
                         <button
+                          type="button"
                           onClick={() => setIsTouchScreenWorking(true)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isTouchScreenWorking === true 
@@ -541,6 +657,7 @@ export default function ConditionQuizPage() {
                           Yes
                         </button>
                         <button
+                          type="button"
                           onClick={() => setIsTouchScreenWorking(false)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isTouchScreenWorking === false 
@@ -557,6 +674,7 @@ export default function ConditionQuizPage() {
                       <h3 className="text-lg font-bold text-[#111827]">3. Is your phone's screen original?</h3>
                       <div className="grid grid-cols-2 gap-4">
                         <button
+                          type="button"
                           onClick={() => setIsScreenOriginal(true)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isScreenOriginal === true 
@@ -566,6 +684,7 @@ export default function ConditionQuizPage() {
                           Yes
                         </button>
                         <button
+                          type="button"
                           onClick={() => setIsScreenOriginal(false)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
                             ${isScreenOriginal === false 
@@ -576,118 +695,166 @@ export default function ConditionQuizPage() {
                         </button>
                       </div>
                     </div>
+                  </div>
+                )}
 
-                    {/* Q4: eSIM Support (Conditional for special models) */}
-                    {special && supportsESIM(device?.modelName) && (
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-[#111827]">4. How many eSIMs does your device support?</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                          <button
-                            onClick={() => seteSIMSupport('physical+esim')}
-                            className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
-                              ${eSIMSupport === 'physical+esim' 
-                                ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
-                                : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
-                          >
-                            Physical SIM + eSIM
-                          </button>
-                          <button
-                            onClick={() => seteSIMSupport('esim_only_global')}
-                            className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
-                              ${eSIMSupport === 'esim_only_global' 
-                                ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
-                                : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
-                          >
-                            Dual eSIM Only (Global/US variant)
-                          </button>
+                {/* ─── STEP 3: Physical Issues (Matching DeviceKart) ─── */}
+                {STEPS[currentStepIndex]?.id === 'physical' && (
+                  <div className="space-y-8">
+                    {/* Section 1: Multi-select Defects */}
+                    <div>
+                      <h3 className="text-lg font-bold text-[#111827]">Select screen / body defects (if any)</h3>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Select all that apply, or leave unselected if none</p>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-4">
+                        {PHYSICAL_DEFECT_OPTIONS.map(defect => {
+                          const isSelected = physicalDefects.includes(defect.id);
+                          return (
+                            <button
+                              key={defect.id}
+                              type="button"
+                              onClick={() => {
+                                setPhysicalDefects(prev => 
+                                  prev.includes(defect.id) 
+                                    ? prev.filter(x => x !== defect.id) 
+                                    : [...prev, defect.id]
+                                );
+                              }}
+                              className={`p-4 rounded-2xl border-2 text-left transition-all flex flex-col justify-between min-h-[110px] ${
+                                isSelected 
+                                  ? 'border-[#2563EB] bg-[#E6F4FF]' 
+                                  : 'border-gray-100 bg-white hover:border-gray-200'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between">
+                                <span className="text-xl">{defect.icon}</span>
+                                <div className={`w-4 h-4 rounded-md border flex items-center justify-center text-[10px] ${
+                                  isSelected ? 'border-[#2563EB] bg-[#2563EB] text-white' : 'border-gray-300'
+                                }`}>
+                                  {isSelected && '✓'}
+                                </div>
+                              </div>
+                              <div className="mt-2">
+                                <p className={`font-bold text-xs ${isSelected ? 'text-[#2563EB]' : 'text-[#111827]'}`}>
+                                  {defect.label}
+                                </p>
+                                <p className="text-[10px] text-gray-400 mt-0.5">{defect.desc}</p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section 2: Conditional Screen Scratch Detail */}
+                    {physicalDefects.includes('screen_scratch_broken') && (
+                      <div className="p-5 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-3 animate-fadeIn">
+                        <div className="flex items-center gap-2">
+                          <Sparkles size={16} className="text-[#2563EB]" />
+                          <h4 className="text-sm font-bold text-[#111827]">How severe is the screen scratch or crack?</h4>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {SCREEN_SCRATCH_OPTIONS.map(opt => {
+                            const isSelected = screenScratchDetail === opt.id;
+                            return (
+                              <button
+                                key={opt.id}
+                                type="button"
+                                onClick={() => setScreenScratchDetail(opt.id)}
+                                className={`p-3 rounded-xl border text-left transition-all ${
+                                  isSelected
+                                    ? 'border-[#2563EB] bg-white text-[#2563EB] shadow-xs'
+                                    : 'border-blue-100 bg-white/70 text-slate-700 hover:bg-white'
+                                }`}
+                              >
+                                <p className="text-xs font-bold">{opt.label}</p>
+                                <p className="text-[10px] text-slate-500 mt-0.5">{opt.desc}</p>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
+
+                    {/* Section 3: Side / Back Panel Condition (Required) */}
+                    <div className="space-y-3 pt-2">
+                      <h3 className="text-sm font-bold text-[#111827]">Side or Back Panel Condition</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {PANEL_OPTIONS.map(opt => {
+                          const isSelected = panelCondition === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setPanelCondition(opt.id)}
+                              className={`p-3.5 rounded-xl border-2 text-left transition-all ${
+                                isSelected
+                                  ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]'
+                                  : 'border-gray-100 bg-white text-slate-700 hover:border-gray-200'
+                              }`}
+                            >
+                              <p className="text-xs font-bold">{opt.label}</p>
+                              <p className="text-[10px] text-gray-400 mt-0.5">{opt.desc}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section 4: Bent / Loose Screen (Required) */}
+                    <div className="space-y-3 pt-2">
+                      <h3 className="text-sm font-bold text-[#111827]">Is Phone Bent or Loose Screen?</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {BEND_OPTIONS.map(opt => {
+                          const isSelected = bendCondition === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setBendCondition(opt.id)}
+                              className={`p-3.5 rounded-xl border-2 text-left transition-all ${
+                                isSelected
+                                  ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]'
+                                  : 'border-gray-100 bg-white text-slate-700 hover:border-gray-200'
+                              }`}
+                            >
+                              <p className="text-xs font-bold">{opt.label}</p>
+                              <p className="text-[10px] text-gray-400 mt-0.5">{opt.desc}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                {/* STEP: Physical Issues */}
-                {STEPS[currentStepIndex]?.id === 'physical' && (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-bold text-[#111827]">Select physical issues (if any)</h3>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Leave unselected if none apply</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      {[
-                        { id: 'glass_crack', label: 'Glass Crack', desc: 'Screen glass contains cracks', icon: '📱' },
-                        { id: 'back_panel', label: 'Back Panel Damage', desc: 'Scratches, dents or broken back panel', icon: '🎨' },
-                        { id: 'camera_glass_broken', label: 'Camera Glass Broken', desc: 'Camera lens glass is cracked/broken', icon: '📷' }
-                      ].map(issue => {
-                        const selected = physicalIssues.includes(issue.id);
-                        return (
-                          <button
-                            key={issue.id}
-                            onClick={() => {
-                              setPhysicalIssues(prev => 
-                                prev.includes(issue.id) ? prev.filter(i => i !== issue.id) : [...prev, issue.id]
-                              );
-                            }}
-                            className={`p-6 rounded-2xl border-2 text-left transition-all flex flex-col justify-between h-40
-                              ${selected 
-                                ? 'border-[#2563EB] bg-[#E6F4FF]' 
-                                : 'border-gray-100 bg-white hover:border-gray-200'}`}
-                          >
-                            <span className="text-2xl">{issue.icon}</span>
-                            <div>
-                              <p className={`font-black text-sm ${selected ? 'text-[#2563EB]' : 'text-[#111827]'}`}>{issue.label}</p>
-                              <p className="text-xs text-gray-400 mt-1">{issue.desc}</p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* STEP: Technical Issues */}
+                {/* ─── STEP 4: Technical Issues (All 16 Options) ─── */}
                 {STEPS[currentStepIndex]?.id === 'technical' && (
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-lg font-bold text-[#111827]">Select technical/hardware issues (if any)</h3>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Leave unselected if none apply</p>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Leave unselected if none apply to your phone</p>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[360px] overflow-y-auto pr-2 no-scrollbar">
-                      {[
-                        { id: 'battery_service', label: 'Battery Warning', icon: '🔋', pct: '13%' },
-                        { id: 'front_camera', label: 'Front Camera faulty', icon: '📸', pct: '8%' },
-                        { id: 'back_camera', label: 'Back Camera faulty', icon: '📷', pct: '15%' },
-                        { id: 'volume_button', label: 'Volume button issue', icon: '🔘', pct: '4%' },
-                        { id: 'wifi_issue', label: 'Wifi issue', icon: '📶', pct: '39%' },
-                        { id: 'finger_touch', label: 'Finger touch issue', icon: '☝️', pct: '26%' },
-                        { id: 'face_unlock', label: 'Face unlock issue', icon: '👤', pct: '26%' },
-                        { id: 'speaker_faulty', label: 'Speaker faulty', icon: '🔊', pct: '4%' },
-                        { id: 'power_button', label: 'Power button issue', icon: '🔌', pct: '2%' },
-                        { id: 'charging_port', label: 'Charging port issue', icon: '⚡', pct: '10%' },
-                        { id: 'audio_receiver', label: 'Audio receiver issue', icon: '📞', pct: '7%' },
-                        { id: 'bluetooth', label: 'Bluetooth issue', icon: '🦷', pct: '39%' },
-                        { id: 'vibrator', label: 'Vibrator issue', icon: '📳', pct: '2%' },
-                        { id: 'microphone', label: 'Microphone issue', icon: '🎤', pct: '2%' },
-                        { id: 'proximity_sensor', label: 'Proximity sensor', icon: '📡', pct: '3%' }
-                      ].map(issue => {
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5 max-h-[420px] overflow-y-auto pr-2 no-scrollbar">
+                      {TECHNICAL_ISSUES.map(issue => {
                         const selected = technicalIssues.includes(issue.id);
                         return (
                           <button
                             key={issue.id}
+                            type="button"
                             onClick={() => {
                               setTechnicalIssues(prev => 
                                 prev.includes(issue.id) ? prev.filter(i => i !== issue.id) : [...prev, issue.id]
                               );
                             }}
-                            className={`p-4 rounded-xl border-2 text-center transition-all flex flex-col items-center justify-center gap-2
+                            className={`p-4 rounded-xl border-2 text-center transition-all flex flex-col items-center justify-center gap-2 min-h-[96px]
                               ${selected 
                                 ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
-                                : 'border-gray-50 bg-white text-gray-500 hover:border-gray-100'}`}
+                                : 'border-gray-50 bg-white text-gray-600 hover:border-gray-200'}`}
                           >
                             <span className="text-2xl">{issue.icon}</span>
-                            <span className="text-xs font-bold leading-tight">{issue.label}</span>
+                            <span className="text-[11px] font-bold leading-tight">{issue.label}</span>
                           </button>
                         );
                       })}
@@ -695,7 +862,7 @@ export default function ConditionQuizPage() {
                   </div>
                 )}
 
-                {/* STEP: Accessories */}
+                {/* ─── STEP 5: Accessories ─── */}
                 {STEPS[currentStepIndex]?.id === 'accessories' && (
                   <div className="space-y-6">
                     <div>
@@ -709,6 +876,7 @@ export default function ConditionQuizPage() {
                         return (
                           <button
                             key={acc.id}
+                            type="button"
                             onClick={() => {
                               setSelectedAccessories(prev => 
                                 prev.includes(acc.id) ? prev.filter(a => a !== acc.id) : [...prev, acc.id]
@@ -741,6 +909,7 @@ export default function ConditionQuizPage() {
               {/* Stepper buttons row */}
               <div className="flex justify-between items-center mt-10 pt-6 border-t border-gray-100">
                 <button
+                  type="button"
                   onClick={() => setCurrentStepIndex(prev => Math.max(prev - 1, 0))}
                   disabled={currentStepIndex === 0}
                   className="px-8 py-4 rounded-xl border border-gray-200 font-bold text-gray-500 hover:bg-gray-50 transition-all disabled:opacity-50"
@@ -750,14 +919,19 @@ export default function ConditionQuizPage() {
                 
                 {currentStepIndex < STEPS.length - 1 ? (
                   <button
+                    type="button"
                     onClick={() => setCurrentStepIndex(prev => prev + 1)}
                     disabled={
                       (STEPS[currentStepIndex]?.id === 'warranty' && (underWarranty === null || eSIMSupport === null)) ||
                       (STEPS[currentStepIndex]?.id === 'screen' && (
                         ableToMakeCalls === null || 
                         isTouchScreenWorking === null || 
-                        isScreenOriginal === null ||
-                        (special && supportsESIM(device?.modelName) && eSIMSupport === null)
+                        isScreenOriginal === null
+                      )) ||
+                      (STEPS[currentStepIndex]?.id === 'physical' && (
+                        (physicalDefects.includes('screen_scratch_broken') && !screenScratchDetail) ||
+                        !panelCondition ||
+                        !bendCondition
                       ))
                     }
                     className="bg-[#2563EB] text-white font-bold px-8 py-4 rounded-xl hover:bg-[#1D4ED8] transition-all disabled:opacity-50"
@@ -766,6 +940,7 @@ export default function ConditionQuizPage() {
                   </button>
                 ) : (
                   <button
+                    type="button"
                     onClick={handleGetBestPrice}
                     className="bg-[#16A34A] text-white font-black px-10 py-5 rounded-2xl shadow-xl shadow-green-100 hover:bg-[#15803D] transition-all flex items-center gap-2"
                   >
@@ -778,40 +953,208 @@ export default function ConditionQuizPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Sidebar Evaluation */}
+        {/* RIGHT COLUMN: Sidebar Evaluation (PRICE GATED) */}
         <div className="w-full lg:w-[400px]">
           <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-8 sticky top-10">
-            <h2 className="text-2xl font-black text-[#111827] mb-8">Device Evaluation</h2>
+            <h2 className="text-2xl font-black text-[#111827] mb-6">Device Evaluation</h2>
             
-            {/* Price Box */}
-            <div className="bg-[#E6F4FF] rounded-3xl p-6 mb-8 flex items-center justify-between border border-[#2563EB]/10">
-              <div>
-                <p className="text-[#2563EB] text-xs font-bold uppercase tracking-widest mb-1">Estimated Value</p>
-                <p className={`text-3xl font-black text-[#111827] transition-all ${priceAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
-                  {formatCurrency(currentPrice)}
+            {/* Price Box: GATED BEFORE OTP */}
+            {isAuthenticated ? (
+              <div className="bg-[#E6F4FF] rounded-3xl p-6 mb-8 flex items-center justify-between border border-[#2563EB]/10 animate-fadeIn">
+                <div>
+                  <p className="text-[#2563EB] text-xs font-bold uppercase tracking-widest mb-1">Estimated Value</p>
+                  <p className={`text-3xl font-black text-[#111827] transition-all ${priceAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
+                    {formatCurrency(currentPrice)}
+                  </p>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[#2563EB] shadow-sm">
+                  <IconTrend />
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50/60 rounded-3xl p-6 mb-8 border border-blue-100">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[#2563EB] text-[11px] font-bold uppercase tracking-widest">Estimated Value</p>
+                  <span className="inline-flex items-center gap-1 bg-white text-blue-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-blue-200/80 shadow-xs">
+                    <Lock size={10} />
+                    Valuation Locked
+                  </span>
+                </div>
+                <p className="text-3xl font-black text-slate-800 tracking-wider">
+                  ₹ ••••••
+                </p>
+                <p className="text-xs text-slate-500 font-medium mt-2 leading-relaxed">
+                  Enter mobile number at the end of quiz to unlock your highest guaranteed quote.
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[#2563EB] shadow-sm">
-                <IconTrend />
-              </div>
-            </div>
+            )}
 
             {/* Summary List */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {!special && <SummaryItem label="Device Age" value={deviceAge} active />}
-              {!special && <SummaryItem label="Warranty" value={underWarranty === null ? 'Not answered' : (underWarranty ? 'Under Warranty' : 'Out of Warranty')} active={underWarranty !== null} />}
-              {supportsESIM(device?.modelName) && (
-                <SummaryItem label="eSIM Support" value={eSIMSupport === null ? 'Not answered' : (eSIMSupport === 'esim_only_global' ? 'Dual eSIM Only' : 'Physical + eSIM')} active={eSIMSupport !== null} />
+              {!special && (
+                <SummaryItem 
+                  label="Warranty" 
+                  value={underWarranty === null ? 'Not answered' : (underWarranty ? 'Under Warranty' : 'Out of Warranty')} 
+                  active={underWarranty !== null} 
+                />
               )}
-              <SummaryItem label="General & Screen" value={ableToMakeCalls === null ? 'Not answered' : `Calls: ${ableToMakeCalls ? 'Yes' : 'No'}, Touch: ${isTouchScreenWorking ? 'Yes' : 'No'}, Original: ${isScreenOriginal ? 'Yes' : 'No'}`} active={ableToMakeCalls !== null} />
-              <SummaryItem label="Physical Issues" value={physicalIssues.length > 0 ? `${physicalIssues.length} issues selected` : 'No Issues'} active={STEPS.findIndex(s=>s.id==='physical') <= currentStepIndex} />
-              <SummaryItem label="Technical Issues" value={technicalIssues.length > 0 ? `${technicalIssues.length} issues selected` : 'No Issues'} active={STEPS.findIndex(s=>s.id==='technical') <= currentStepIndex} />
-              <SummaryItem label="Accessories" value={selectedAccessories.length > 0 ? selectedAccessories.join(', ') : 'None selected'} active={STEPS.findIndex(s=>s.id==='accessories') <= currentStepIndex} />
+              {supportsESIM(device?.modelName) && (
+                <SummaryItem 
+                  label="eSIM Support" 
+                  value={eSIMSupport === null ? 'Not answered' : (eSIMSupport === 'esim_only_global' ? 'Dual eSIM / Global' : 'Physical + eSIM')} 
+                  active={eSIMSupport !== null} 
+                />
+              )}
+              <SummaryItem 
+                label="General & Screen" 
+                value={ableToMakeCalls === null ? 'Not answered' : `Calls: ${ableToMakeCalls ? 'Yes' : 'No'}, Touch: ${isTouchScreenWorking ? 'Yes' : 'No'}, Original: ${isScreenOriginal ? 'Yes' : 'No'}`} 
+                active={ableToMakeCalls !== null} 
+              />
+              <SummaryItem 
+                label="Physical Condition" 
+                value={
+                  physicalDefects.length > 0 || panelCondition !== 'no_defect' || bendCondition !== 'not_bent'
+                    ? `${physicalDefects.length} defect(s) noted`
+                    : 'Clean Condition'
+                } 
+                active={STEPS.findIndex(s => s.id === 'physical') <= currentStepIndex} 
+              />
+              <SummaryItem 
+                label="Technical Issues" 
+                value={technicalIssues.length > 0 ? `${technicalIssues.length} issues selected` : 'All Working'} 
+                active={STEPS.findIndex(s => s.id === 'technical') <= currentStepIndex} 
+              />
+              <SummaryItem 
+                label="Accessories" 
+                value={selectedAccessories.length > 0 ? selectedAccessories.join(', ') : 'None selected'} 
+                active={STEPS.findIndex(s => s.id === 'accessories') <= currentStepIndex} 
+              />
             </div>
 
           </div>
         </div>
       </div>
+
+      {/* ─── PRICE UNLOCK OTP MODAL (Matching DeviceKart Flow) ─── */}
+      {showOtpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden relative p-8">
+            <button
+              onClick={() => setShowOtpModal(false)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center transition"
+            >
+              <X size={16} />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center mx-auto mb-3">
+                <Lock size={26} />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#2563EB] bg-blue-50 px-3 py-1 rounded-full">
+                Verification Required
+              </span>
+              <h3 className="text-2xl font-black text-slate-900 mt-2">
+                Unlock Your Valuation Quote
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                {otpStep === 'phone' 
+                  ? 'Enter your mobile number to receive instant OTP verification and reveal the highest price for your device.'
+                  : `Enter the verification code sent to +91 ${otpPhone.slice(-10)}`}
+              </p>
+            </div>
+
+            {otpError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2 font-bold">
+                <AlertCircle size={14} className="shrink-0" />
+                <span>{otpError}</span>
+              </div>
+            )}
+
+            {otpStep === 'phone' ? (
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Mobile Number
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-xs text-slate-400">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      maxLength={10}
+                      value={otpPhone}
+                      onChange={(e) => setOtpPhone(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Enter 10-digit phone number"
+                      autoFocus
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={otpLoading || otpPhone.replace(/\D/g, '').length !== 10}
+                  className="w-full py-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-sm rounded-xl transition shadow-lg shadow-blue-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {otpLoading ? 'Sending Verification Code...' : 'Send OTP to Unlock Price →'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Enter Verification Code (OTP)
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Enter 4 or 6-digit OTP"
+                    autoFocus
+                    className="w-full text-center tracking-widest text-2xl py-3 rounded-xl border border-slate-200 font-black text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={otpLoading || otpCode.length < 4}
+                  className="w-full py-4 bg-[#16A34A] hover:bg-[#15803D] text-white font-black text-sm rounded-xl transition shadow-lg shadow-green-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {otpLoading ? 'Verifying...' : 'Verify & Reveal Valuation Price ✓'}
+                </button>
+
+                <div className="flex items-center justify-between text-xs pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setOtpStep('phone')}
+                    className="text-slate-400 hover:text-slate-700 font-semibold"
+                  >
+                    Change Number
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={otpLoading}
+                    className="text-[#2563EB] font-bold hover:underline"
+                  >
+                    Resend Code
+                  </button>
+                </div>
+              </form>
+            )}
+
+            <div className="mt-6 pt-4 border-t border-slate-100 text-center">
+              <p className="text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
+                <ShieldCheck size={12} className="text-emerald-500" />
+                Your number is 100% safe. Zero spam, guaranteed.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -819,36 +1162,10 @@ export default function ConditionQuizPage() {
 function SummaryItem({ label, value, active }) {
   return (
     <div className="space-y-1">
-      <h4 className="text-sm font-bold text-[#111827]">{label}</h4>
+      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">{label}</h4>
       <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${active ? 'bg-[#2563EB]' : 'bg-gray-200'}`} />
-        <p className={`text-[13px] font-medium ${active ? 'text-gray-600' : 'text-gray-400'}`}>{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function PriceRow({ label, value, originalValue, isFree, isBonus }) {
-  return (
-    <div className="flex justify-between items-center">
-      <span className="text-sm font-medium text-gray-400 uppercase tracking-widest">{label}</span>
-      <div className="flex items-center gap-2">
-        {originalValue && <span className="text-sm text-gray-300 line-through">₹{originalValue}</span>}
-        <span className={`font-black ${isFree || isBonus ? 'text-[#2563EB]' : 'text-[#111827]'}`}>
-          {isFree ? 'Free' : (isBonus ? `+${formatCurrency(value)}` : formatCurrency(value))}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function EvaluationRow({ label, value, color }) {
-  return (
-    <div className="space-y-2">
-      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</p>
-      <div className="flex items-center gap-2">
-        <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
-        <span className="font-black text-[#111827]">{value || 'N/A'}</span>
+        <div className={`w-2 h-2 rounded-full shrink-0 ${active ? 'bg-[#2563EB]' : 'bg-gray-200'}`} />
+        <p className={`text-[12px] font-semibold truncate ${active ? 'text-slate-700' : 'text-gray-400'}`}>{value}</p>
       </div>
     </div>
   );
