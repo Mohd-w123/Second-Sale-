@@ -11,6 +11,7 @@ import {
   updateDevice,
   deleteDevice,
   getAllPartners,
+  updatePartnerStatus,
   getAllOrders,
   updateOrderStatus,
   getAllPincodes,
@@ -43,6 +44,7 @@ router.delete('/devices/:id', deleteDevice);
 
 // Partners
 router.get('/partners', getAllPartners);
+router.patch('/partners/:id/status', updatePartnerStatus);
 
 // Orders
 router.get('/orders', getAllOrders);

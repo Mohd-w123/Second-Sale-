@@ -259,6 +259,34 @@ export const getAllPartners = async (req, res, next) => {
   }
 };
 
+export const updatePartnerStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNotes } = req.body;
+
+    if (!['pending', 'approved', 'rejected'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status. Must be pending, approved, or rejected.' });
+    }
+
+    const updateData = { status };
+    if (adminNotes !== undefined) updateData.adminNotes = adminNotes;
+
+    const partner = await PartnerApplication.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
+
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner application not found' });
+    }
+
+    res.json({ message: 'Partner application updated successfully', partner });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 export const getAllOrders = async (req, res, next) => {
