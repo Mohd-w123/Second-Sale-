@@ -685,19 +685,6 @@ export default function TabletConditionQuizPage() {
           <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-8 sticky top-10">
             <h2 className="text-2xl font-black text-[#111827] mb-8">Device Evaluation</h2>
             
-            {/* Price Box */}
-            <div className="bg-[#E6F4FF] rounded-3xl p-6 mb-8 flex items-center justify-between border border-[#2563EB]/10">
-              <div>
-                <p className="text-[#2563EB] text-xs font-bold uppercase tracking-widest mb-1">Estimated Value</p>
-                <p className={`text-3xl font-black text-[#111827] transition-all ${priceAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
-                  {formatCurrency(currentPrice)}
-                </p>
-              </div>
-              <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[#2563EB] shadow-sm">
-                <IconTrend />
-              </div>
-            </div>
-
             {/* Summary List */}
             <div className="space-y-6">
               <SummaryItem label="Device Age" value={deviceAge} active />

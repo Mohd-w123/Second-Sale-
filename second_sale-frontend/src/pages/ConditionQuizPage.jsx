@@ -958,37 +958,6 @@ export default function ConditionQuizPage() {
           <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-8 sticky top-10">
             <h2 className="text-2xl font-black text-[#111827] mb-6">Device Evaluation</h2>
             
-            {/* Price Box: GATED BEFORE OTP */}
-            {isAuthenticated ? (
-              <div className="bg-[#E6F4FF] rounded-3xl p-6 mb-8 flex items-center justify-between border border-[#2563EB]/10 animate-fadeIn">
-                <div>
-                  <p className="text-[#2563EB] text-xs font-bold uppercase tracking-widest mb-1">Estimated Value</p>
-                  <p className={`text-3xl font-black text-[#111827] transition-all ${priceAnimating ? 'scale-95 opacity-50' : 'scale-100 opacity-100'}`}>
-                    {formatCurrency(currentPrice)}
-                  </p>
-                </div>
-                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[#2563EB] shadow-sm">
-                  <IconTrend />
-                </div>
-              </div>
-            ) : (
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50/60 rounded-3xl p-6 mb-8 border border-blue-100">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[#2563EB] text-[11px] font-bold uppercase tracking-widest">Estimated Value</p>
-                  <span className="inline-flex items-center gap-1 bg-white text-blue-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-blue-200/80 shadow-xs">
-                    <Lock size={10} />
-                    Valuation Locked
-                  </span>
-                </div>
-                <p className="text-3xl font-black text-slate-800 tracking-wider">
-                  ₹ ••••••
-                </p>
-                <p className="text-xs text-slate-500 font-medium mt-2 leading-relaxed">
-                  Enter mobile number at the end of quiz to unlock your highest guaranteed quote.
-                </p>
-              </div>
-            )}
-
             {/* Summary List */}
             <div className="space-y-5">
               {!special && <SummaryItem label="Device Age" value={deviceAge} active />}
