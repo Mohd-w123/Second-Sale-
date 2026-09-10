@@ -33,6 +33,11 @@ async function startServer() {
 }
 
 async function main() {
+  if (process.env.VERCEL || process.env.SKIP_PRERENDER || process.env.CI) {
+    console.log('⚡ Skipping Puppeteer prerender in cloud build environment (Vercel).');
+    return;
+  }
+
   if (!fs.existsSync(distDir)) {
     console.error('dist/ not found — run vite build first');
     process.exit(1);
@@ -42,13 +47,22 @@ async function main() {
     ? JSON.parse(fs.readFileSync(routesFile, 'utf-8'))
     : ['/'];
 
-  const server = await startServer();
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  let server;
+  let browser;
+  try {
+    server = await startServer();
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    });
+  } catch (err) {
+    console.warn('⚡ Puppeteer cannot launch in this environment. Skipping prerender:', err.message);
+    if (server) server.close();
+    return;
+  }
 
   console.log(`Prerendering ${routes.length} routes...`);
+
 
   for (const route of routes) {
     const page = await browser.newPage();
