@@ -49,6 +49,7 @@ export const adminService = {
 
   // Partners
   getPartners: (params) => adminApi.get('/admin/partners', { params }),
+  updatePartnerStatus: (id, data) => adminApi.patch(`/admin/partners/${id}/status`, data),
 
   // Orders
   getOrders: (params) => adminApi.get('/admin/orders', { params }),

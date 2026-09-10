@@ -37,6 +37,10 @@ const partnerApplicationSchema = new mongoose.Schema({
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending',
   },
+  adminNotes: {
+    type: String,
+    trim: true,
+  },
 }, {
   timestamps: true,
 });
