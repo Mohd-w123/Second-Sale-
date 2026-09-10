@@ -27,7 +27,6 @@ const PAYMENT_METHODS = [
     title: "Cash on Delivery / Pay on Delivery",
     desc: "Inspect package upon delivery and pay via Cash or UPI to courier agent.",
     icon: Banknote,
-    badge: "Most Popular",
   },
   {
     id: "upi",
