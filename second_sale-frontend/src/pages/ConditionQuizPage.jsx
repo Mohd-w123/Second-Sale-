@@ -18,6 +18,9 @@ import {
   Zap,
   ArrowRight,
   Sparkles,
+  CreditCard,
+  Ticket,
+  Shield,
 } from 'lucide-react';
 
 // --- Icons & Assets ---
@@ -186,6 +189,11 @@ export default function ConditionQuizPage() {
   const [otpStep, setOtpStep] = useState('phone'); // 'phone' | 'otp'
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
+
+  // Post-Evaluation / Result Screen States (Matching DeviceKart)
+  const [whatsappUpdates, setWhatsappUpdates] = useState(true);
+  const [termsAgreed, setTermsAgreed] = useState(true);
+  const [couponCode, setCouponCode] = useState('');
 
   // Special models handling
   useEffect(() => {
@@ -356,119 +364,340 @@ export default function ConditionQuizPage() {
 
   // --- RESULT VIEW ---
   if (showResult) {
+    const displayPhone = (otpPhone || user?.phone || '7707987070').replace(/\D/g, '').slice(-10);
+
     return (
-      <div className="bg-[#F9FAFB] min-h-screen py-10 sm:py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Header Progress */}
-          <div className="flex items-center justify-end gap-12 mb-10 text-sm font-bold">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center">1</span>
-              <span className="text-[#111827]">Payment</span>
+      <div className="bg-[#F8FAFC] min-h-screen py-10 sm:py-14 px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header Step Progress (Matching DeviceKart) */}
+          <div className="flex items-center justify-end gap-10 mb-8 text-sm font-semibold">
+            <div className="flex items-center gap-2.5">
+              <span className="w-7 h-7 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                1
+              </span>
+              <span className="text-gray-900 font-bold">Payment</span>
             </div>
-            <div className="flex items-center gap-3 opacity-30">
-              <span className="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center">2</span>
+            <div className="flex items-center gap-2.5 opacity-40">
+              <span className="w-7 h-7 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">
+                2
+              </span>
               <span className="text-gray-500">Pickup</span>
             </div>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Main Content */}
-            <div className="flex-1 space-y-8">
-              {/* Offer Card */}
-              <div className="bg-white rounded-[40px] border border-gray-100 p-8 sm:p-12 shadow-sm relative overflow-hidden">
-                <div className="flex flex-col sm:flex-row items-center gap-10">
-                  <div className="w-40 h-40 bg-gray-50 rounded-[32px] flex items-center justify-center p-6 shrink-0">
-                    <img 
-                      src={device.imageUrl || "https://img.freepik.com/free-photo/mobile-phone-with-blank-screen_23-2148151433.jpg"} 
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Valuation Card + Device Evaluation breakdown */}
+            <div className="lg:col-span-8 space-y-8">
+              {/* Main Valuation Card */}
+              <div className="bg-white rounded-3xl border border-gray-100 p-8 sm:p-10 shadow-sm">
+                <span className="text-[#2563EB] text-xs font-extrabold uppercase tracking-widest block mb-4">
+                  LIVE MARKET VALUATION
+                </span>
+
+                <div className="flex flex-col sm:flex-row items-center gap-8">
+                  <div className="w-32 h-36 bg-gray-50 rounded-2xl flex items-center justify-center p-3 shrink-0 border border-gray-100">
+                    <img
+                      src={device.imageUrl || "https://img.freepik.com/free-photo/mobile-phone-with-blank-screen_23-2148151433.jpg"}
                       alt={device.modelName}
                       className="max-h-full object-contain"
                     />
                   </div>
                   <div className="flex-1 text-center sm:text-left">
-                    <span className="text-[#2563EB] text-sm font-black uppercase tracking-wider mb-2 block">Offer ready — instant payout</span>
-                    <h1 className="text-2xl sm:text-3xl font-black text-[#111827] mb-4">
-                      {device.modelName} ({storage || device.variants[0].storage})
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">
+                      {device.modelName} ({storage || device.variants?.[0]?.storage})
                     </h1>
-                    <div className="flex items-center justify-center sm:justify-start gap-4 mb-6">
-                      <span className="text-5xl font-black text-[#111827]">{formatCurrency(currentPrice)}</span>
-                      <div className="flex items-center gap-1.5 bg-[#E6F4FF] text-[#2563EB] px-3 py-1.5 rounded-xl border border-[#2563EB]/10">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                        <span className="text-xs font-black uppercase tracking-wider">Guaranteed</span>
-                      </div>
+                    <div className="flex items-center justify-center sm:justify-start gap-3.5 mb-2">
+                      <span className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">
+                        {formatCurrency(currentPrice)}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 bg-blue-50 text-[#2563EB] rounded-full border border-blue-100 uppercase tracking-wide">
+                        ★ SALES TEAM TOUCH
+                      </span>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setShowResult(false)}
-                      className="text-[#2563EB] font-black text-sm underline underline-offset-8 hover:text-[#1D4ED8] transition-all"
+                      className="text-[#2563EB] font-bold text-sm underline underline-offset-4 hover:text-blue-700 transition-colors cursor-pointer"
                     >
-                      Recalculate / Retake Quiz
+                      Recalculate
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-12 space-y-4 pt-10 border-t border-gray-50">
-                  <label className="flex items-start gap-4 cursor-pointer group">
-                    <div className="relative mt-1">
-                      <input type="checkbox" defaultChecked className="sr-only peer" />
-                      <div className="w-6 h-6 border-2 border-gray-200 rounded-lg peer-checked:bg-[#2563EB] peer-checked:border-[#2563EB] transition-all" />
-                      <svg className="absolute top-1 left-1 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <span className="text-sm font-medium text-gray-500 leading-relaxed group-hover:text-[#111827] transition-colors">
-                      I agree to the terms of service and certify that I am the legal owner of this device with valid identity proof.
+                {/* Terms and checkboxes */}
+                <div className="mt-8 pt-8 border-t border-gray-100 space-y-4">
+                  <label className="flex items-start gap-3.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={whatsappUpdates}
+                      onChange={(e) => setWhatsappUpdates(e.target.checked)}
+                      className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      Receive updates via Whatsapp (+91 {displayPhone})
                     </span>
                   </label>
+
+                  <label className="flex items-start gap-3.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={termsAgreed}
+                      onChange={(e) => setTermsAgreed(e.target.checked)}
+                      className="w-5 h-5 mt-0.5 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB] cursor-pointer"
+                    />
+                    <span className="text-sm font-medium text-gray-600 leading-relaxed">
+                      I agree to the{' '}
+                      <span className="text-[#2563EB] font-semibold underline cursor-pointer">terms and conditions</span>{' '}
+                      of the service and understand that the final value of {formatCurrency(currentPrice)} is subject to
+                      physical device inspection by our technician at the time of pickup.
+                    </span>
+                  </label>
+
+                  {/* Primary CTA Button */}
+                  <button
+                    onClick={handleSchedulePickup}
+                    disabled={!termsAgreed}
+                    className="w-full mt-4 py-4 px-6 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-gray-300 text-white font-bold text-base sm:text-lg rounded-xl shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Get My {formatCurrency(currentPrice)} Now</span>
+                    <ArrowRight size={20} />
+                  </button>
+
+                  {/* Highlights under button */}
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-xs text-gray-500 font-medium">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>
+                      <span>Free doorstep pickup</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>
+                      <span>Instant payment at pickup</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>
+                      <span>Provide Our Sales Team Suggestion or Human Touch ;)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Price Breakdown Details */}
-              {breakdown && (
-                <div className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm">
-                  <h3 className="font-bold text-[#111827] text-lg mb-6">Valuation Summary Breakdown</h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center text-sm py-2 border-b border-gray-50">
-                      <span className="text-gray-500 font-medium">Original Base Value</span>
-                      <span className="font-bold text-gray-900">{formatCurrency(breakdown.basePrice)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm py-2 border-b border-gray-50">
-                      <span className="text-gray-500 font-medium">Condition & Component Deductions</span>
-                      <span className="font-bold text-rose-600">-{breakdown.totalDeductionPct}%</span>
-                    </div>
-                    <div className="flex justify-between items-center text-base py-3 font-black text-gray-900">
-                      <span>Final Net Payout</span>
-                      <span className="text-2xl text-[#2563EB]">{formatCurrency(breakdown.finalPrice)}</span>
-                    </div>
+              {/* Device Evaluation Breakdown Card (Matching DeviceKart 100%) */}
+              <div className="bg-white rounded-3xl border border-gray-100 p-8 sm:p-10 shadow-sm">
+                <h3 className="text-xl font-extrabold text-gray-900 mb-8">
+                  Device Evaluation
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      DEVICE AGE
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {deviceAge}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      UNDER WARRANTY
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {underWarranty ? 'Yes' : 'No'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      ESIM SUPPORT
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {eSIMSupport === 'physical+esim' ? 'Physical + eSIM' : eSIMSupport === 'esim_only_global' ? 'eSIM Only (Global)' : 'Single eSIM'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      CALLS FUNCTIONAL
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {ableToMakeCalls ? 'Yes' : 'No Dead'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      TOUCH SCREEN WORKING
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {isTouchScreenWorking ? 'Yes' : 'No'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      SCREEN ORIGINAL
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {isScreenOriginal ? 'Yes' : 'No Copy Screen'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      PHYSICAL ISSUES
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {physicalDefects.length === 0
+                        ? 'No Issues'
+                        : physicalDefects.map(d => PHYSICAL_DEFECT_OPTIONS.find(p => p.id === d)?.label || d).join(', ')}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      PANEL CONDITION
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {PANEL_OPTIONS.find(p => p.id === panelCondition)?.label || 'No defect on side or back panel'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      BENT / LOOSE
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {BEND_OPTIONS.find(b => b.id === bendCondition)?.label || 'Phone not bent'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      TECHNICAL ISSUES
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {technicalIssues.length === 0
+                        ? 'No Issues'
+                        : technicalIssues.map(t => TECHNICAL_ISSUES.find(i => i.id === t)?.label || t).join(', ')}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                      ACCESSORIES
+                    </span>
+                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#2563EB]"></span>
+                      {selectedAccessories.length === 0
+                        ? 'None'
+                        : selectedAccessories.map(a => ALL_ACCESSORIES.find(item => item.id === a)?.label || a).join(', ')}
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* Right Sidebar: CTA */}
-            <div className="w-full lg:w-[380px] space-y-6">
-              <div className="bg-white rounded-[40px] border border-gray-100 p-8 shadow-sm space-y-6 sticky top-10">
-                <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-3 text-emerald-800">
-                  <CheckCircle2 size={20} className="shrink-0 text-emerald-600" />
-                  <p className="text-xs font-bold leading-relaxed">
-                    Doorstep technician inspection & instant bank transfer at your address.
-                  </p>
+            {/* Right Column: Payment Summary, Apply Coupon, Cancellation Policy */}
+            <div className="lg:col-span-4 space-y-6">
+              {/* Payment Summary Card */}
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-7 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                    <CreditCard size={18} />
+                  </div>
+                  <h3 className="font-extrabold text-gray-900 text-base">Payment Summary</h3>
                 </div>
 
-                <button
-                  onClick={handleSchedulePickup}
-                  className="w-full py-5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-base rounded-2xl shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3"
-                >
-                  <span>Schedule Free Pickup</span>
-                  <ArrowRight size={18} />
-                </button>
-
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-                    <ShieldCheck size={16} className="text-[#2563EB]" />
-                    <span>100% Secure & Certified Data Sanitization</span>
+                <div className="space-y-4 text-sm">
+                  <div className="flex justify-between items-center text-gray-500 font-medium">
+                    <span className="uppercase text-xs font-extrabold text-gray-400 tracking-wider">BASE PRICE</span>
+                    <span className="font-bold text-gray-900">{formatCurrency(breakdown?.basePrice || currentPrice)}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-                    <Zap size={16} className="text-amber-500" />
-                    <span>Instant UPI / Bank Account Credit on Doorstep</span>
+
+                  <div className="flex justify-between items-center text-gray-500 font-medium">
+                    <span className="uppercase text-xs font-extrabold text-gray-400 tracking-wider">PICKUP FEE</span>
+                    <div className="flex items-center gap-2">
+                      <span className="line-through text-gray-400 text-xs">₹100</span>
+                      <span className="font-bold text-[#2563EB]">Free</span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center text-gray-500 font-medium">
+                    <span className="uppercase text-xs font-extrabold text-gray-400 tracking-wider">PROCESSING FEE</span>
+                    <div className="flex items-center gap-2">
+                      <span className="line-through text-gray-400 text-xs">₹100</span>
+                      <span className="font-bold text-gray-900">₹0</span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center text-gray-500 font-medium">
+                    <span className="uppercase text-xs font-extrabold text-gray-400 tracking-wider">PROMO CODE</span>
+                    <span className="font-bold text-[#2563EB]">+₹0</span>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
+                    <span className="text-base font-extrabold text-gray-900">Final Offer</span>
+                    <span className="text-2xl font-black text-gray-900">{formatCurrency(currentPrice)}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Apply Coupon Card */}
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-7 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                    <Ticket size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-gray-900 text-base leading-none mb-1">Apply Coupon</h3>
+                    <p className="text-xs text-gray-400 font-medium">View exciting offers</p>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-3 text-center text-xs font-medium text-gray-500 mb-4 border border-gray-100">
+                  No coupons available at the moment.
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Type coupon code here"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#2563EB]"
+                  />
+                  <button
+                    onClick={() => {
+                      if (couponCode.trim()) {
+                        alert('Coupon code is invalid or expired.');
+                      }
+                    }}
+                    className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+
+              {/* Cancellation Policy Card */}
+              <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-7 shadow-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                    <Shield size={18} />
+                  </div>
+                  <h3 className="font-extrabold text-gray-900 text-base">Cancellation Policy</h3>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed font-medium">
+                  You can cancel your order anytime before the pickup is completed. Once the device is picked up and verified, the order cannot be cancelled. For any help, reach out to our support team.
+                </p>
               </div>
             </div>
           </div>
