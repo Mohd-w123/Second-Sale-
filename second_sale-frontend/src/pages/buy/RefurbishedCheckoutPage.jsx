@@ -48,6 +48,7 @@ export default function RefurbishedCheckoutPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const item = location.state?.item || null;
   const initialPin = item?.pincode || location.state?.initialPincode || "";
 
   const [customer, setCustomer] = useState({
