@@ -431,26 +431,22 @@ export default function Footer() {
         <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             {/* Copyright */}
-            <div className="text-xs text-slate-500 text-center md:text-left">
+            <div className="text-xs text-slate-400 text-center md:text-left whitespace-nowrap">
               {footerConfig?.copyrightText ||
                 `© ${new Date().getFullYear()} SecondSale Technologies Pvt. Ltd. All rights reserved.`}
-              <span className="mx-2 text-slate-700 hidden sm:inline">|</span>
-              <span className="block sm:inline mt-1 sm:mt-0 text-slate-400">
-                India&apos;s leading re-commerce device platform.
-              </span>
             </div>
 
             {/* Security Badges */}
-            <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-400 flex-wrap justify-center">
-              <span className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 shadow-sm">
+            <div className="flex items-center gap-2.5 text-[11px] font-semibold text-slate-400 flex-wrap sm:flex-nowrap justify-center">
+              <span className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 shadow-sm whitespace-nowrap">
                 <Lock size={12} className="text-emerald-400" />
                 256-Bit SSL Encrypted
               </span>
-              <span className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 shadow-sm">
+              <span className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 shadow-sm whitespace-nowrap">
                 <ShieldCheck size={12} className="text-blue-400" />
                 100% Data Protection
               </span>
-              <span className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 shadow-sm">
+              <span className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 shadow-sm whitespace-nowrap">
                 <span>🇮🇳</span>
                 Made in India
               </span>
