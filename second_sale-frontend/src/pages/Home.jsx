@@ -1259,11 +1259,8 @@ export default function HomePage() {
                   <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">EASY PROCESS</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-[#0F2D5B] mb-3 leading-tight">
-                  {sec?.title || (
-                    <>
-                      Sell Your Device in <span className="text-[#2563EB]">4 Simple Steps</span>
-                    </>
-                  )}
+                  How It Works <br />
+                  <span className="text-[#2563EB]">(4 Simple Steps)</span>
                 </h2>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   {sec?.subtitle || "Fast, secure and hassle-free experience from quote to payment."}
