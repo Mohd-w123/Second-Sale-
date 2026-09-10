@@ -1,5 +1,7 @@
 import RefurbishedDevice from '../models/RefurbishedDevice.js';
 import BuyOrder from '../models/BuyOrder.js';
+import User from '../models/User.js';
+
 
 // ─── PUBLIC: List / filter refurbished devices ───────────────────────────────
 export const listRefurbished = async (req, res, next) => {
@@ -120,7 +122,25 @@ export const placeBuyOrder = async (req, res, next) => {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     });
 
+    // Link user if logged in or by matching phone/email
+    let userId = req.user?.id || null;
+    if (!userId && customer) {
+      const orConditions = [];
+      if (customer.phone) {
+        const rawPhone = customer.phone.replace(/\D/g, '');
+        orConditions.push({ phone: customer.phone }, { phone: rawPhone });
+      }
+      if (customer.email) {
+        orConditions.push({ email: customer.email.trim().toLowerCase() });
+      }
+      if (orConditions.length > 0) {
+        const existingUser = await User.findOne({ $or: orConditions }).select('_id').lean();
+        if (existingUser) userId = existingUser._id;
+      }
+    }
+
     const order = await BuyOrder.create({
+      userId,
       customer,
       item: {
         ...item,
@@ -154,6 +174,27 @@ export const getBuyOrder = async (req, res, next) => {
     const order = await BuyOrder.findOne({ orderId: req.params.orderId }).lean();
     if (!order) return res.status(404).json({ message: 'Order not found' });
     res.json(order);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ─── AUTH: Get logged-in user's buy orders ────────────────────────────────────
+export const getMyBuyOrders = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('phone email').lean();
+    const orQuery = [{ userId }];
+    if (user?.phone) {
+      const rawPhone = user.phone.replace(/\D/g, '');
+      orQuery.push({ 'customer.phone': user.phone }, { 'customer.phone': rawPhone });
+    }
+    if (user?.email) {
+      orQuery.push({ 'customer.email': user.email.toLowerCase() });
+    }
+
+    const orders = await BuyOrder.find({ $or: orQuery }).sort({ createdAt: -1 }).lean();
+    res.json(orders);
   } catch (err) {
     next(err);
   }
@@ -240,11 +281,28 @@ export const adminListBuyOrders = async (req, res, next) => {
 
 export const adminUpdateBuyOrderStatus = async (req, res, next) => {
   try {
-    const { orderStatus, trackingNumber, courierPartner } = req.body;
-    const update = { orderStatus };
-    if (trackingNumber) update['deliveryDetails.trackingNumber'] = trackingNumber;
-    if (courierPartner) update['deliveryDetails.courierPartner'] = courierPartner;
-    const order = await BuyOrder.findOneAndUpdate({ orderId: req.params.orderId }, update, { new: true });
+    const {
+      orderStatus,
+      paymentStatus,
+      trackingNumber,
+      courierPartner,
+      transactionId,
+      notes,
+    } = req.body;
+
+    const update = {};
+    if (orderStatus) update.orderStatus = orderStatus;
+    if (paymentStatus) update['payment.status'] = paymentStatus;
+    if (transactionId !== undefined) update['payment.transactionId'] = transactionId;
+    if (trackingNumber !== undefined) update['deliveryDetails.trackingNumber'] = trackingNumber;
+    if (courierPartner !== undefined) update['deliveryDetails.courierPartner'] = courierPartner;
+    if (notes !== undefined) update.notes = notes;
+
+    const order = await BuyOrder.findOneAndUpdate(
+      { orderId: req.params.orderId },
+      update,
+      { new: true }
+    );
     if (!order) return res.status(404).json({ message: 'Order not found' });
     res.json(order);
   } catch (err) {
