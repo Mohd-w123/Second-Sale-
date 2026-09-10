@@ -43,6 +43,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [refurbishedOrders, setRefurbishedOrders] = useState([]);
   const [referral, setReferral] = useState({ referralCode: '', totalReferrals: 0, totalEarnings: 0, referrals: [] });
   const [addresses, setAddresses] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -51,14 +52,16 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      const [userRes, ordersRes, refRes] = await Promise.all([
+      const [userRes, ordersRes, refRes, refBuyRes] = await Promise.all([
         userService.getMe(),
         orderService.getOrders(),
         userService.getReferrals().catch(() => ({ data: { referralCode: 'GENERATE123', totalReferrals: 0, totalEarnings: 0, referrals: [] } })),
+        orderService.getRefurbishedOrders().catch(() => ({ data: [] })),
       ]);
 
       setUser(userRes.data.user);
       setOrders(ordersRes.data || []);
+      setRefurbishedOrders(refBuyRes.data || []);
       setReferral(refRes.data);
       setAddresses(userRes.data.user.addresses || []);
       setPaymentMethods(userRes.data.user.paymentMethods || []);
@@ -222,6 +225,7 @@ export default function DashboardPage() {
             {activeTab === 'Orders' && (
               <OrdersTab
                 orders={orders}
+                refurbishedOrders={refurbishedOrders}
                 setSelectedReportOrder={setSelectedReportOrder}
                 onCancel={handleCancelOrder}
               />
@@ -408,8 +412,9 @@ function ProfileTab({ user, onUpdateProfile }) {
   );
 }
 
-function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
+function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder, onCancel }) {
   const navigate = useNavigate();
+  const [orderType, setOrderType] = useState('sell'); // 'sell' | 'buy'
   const [categoryFilter, setCategoryFilter] = useState('All');
 
   const filteredOrders = orders.filter(order => {
@@ -426,155 +431,315 @@ function OrdersTab({ orders, setSelectedReportOrder, onCancel }) {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* Top Header & Order Type Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
         <div>
-          <h2 className="text-xl font-bold text-[#111827]">Check the status of orders</h2>
-          <p className="text-sm text-gray-500 mt-1">Manage and track your device sales</p>
+          <h2 className="text-xl font-bold text-[#111827]">Order History & Live Tracking</h2>
+          <p className="text-sm text-gray-500 mt-0.5">Track your device selling requests and certified refurbished purchases</p>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
-          {['All', 'Mobile', 'Laptop', 'TV', 'Earbuds', 'Smartwatch', 'Gaming'].map(cat => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className={`px-5 py-2 rounded-lg text-xs font-black transition-all ${categoryFilter === cat ? 'bg-white text-[#2563EB] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Toggle Pill: Sell vs Buy */}
+        <div className="flex items-center gap-2 bg-gray-100/90 p-1 rounded-2xl w-fit self-start sm:self-auto shadow-inner">
+          <button
+            type="button"
+            onClick={() => setOrderType('sell')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border-none cursor-pointer ${
+              orderType === 'sell'
+                ? 'bg-white text-[#2563EB] shadow-sm'
+                : 'bg-transparent text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            <span>Device Sales</span>
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${orderType === 'sell' ? 'bg-blue-50 text-[#2563EB]' : 'bg-gray-200 text-gray-600'}`}>
+              {orders.length}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setOrderType('buy')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border-none cursor-pointer ${
+              orderType === 'buy'
+                ? 'bg-white text-[#2563EB] shadow-sm'
+                : 'bg-transparent text-gray-500 hover:text-gray-900'
+            }`}
+          >
+            <span>Refurbished Purchases</span>
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${orderType === 'buy' ? 'bg-blue-50 text-[#2563EB]' : 'bg-gray-200 text-gray-600'}`}>
+              {refurbishedOrders.length}
+            </span>
+          </button>
         </div>
       </div>
 
-      {filteredOrders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center bg-gray-50/50 rounded-[40px] border border-dashed border-gray-200">
-          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
-            <IconOrders />
+      {/* ─── VIEW 1: REFURBISHED PURCHASES ──────────────────────────────── */}
+      {orderType === 'buy' ? (
+        refurbishedOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center bg-gray-50/50 rounded-[40px] border border-dashed border-gray-200">
+            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm text-blue-600">
+              <IconOrders />
+            </div>
+            <h3 className="text-base font-bold text-gray-800 mb-1">No refurbished purchases yet</h3>
+            <p className="text-gray-500 text-xs mb-6 max-w-sm">
+              Discover certified refurbished smartphones, laptops, and tablets with 6 months warranty and free doorstep delivery.
+            </p>
+            <button
+              onClick={() => navigate('/buy-refurbished')}
+              className="px-6 py-3 bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 border-none cursor-pointer transition-all"
+            >
+              Browse Refurbished Store →
+            </button>
           </div>
-          <p className="text-gray-500 font-bold">You haven't placed any orders yet.</p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-6">
-            {filteredOrders.map((order) => (
-              <div key={order.orderId} className="bg-white border border-gray-100 rounded-[40px] p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
-                {/* Category Tag */}
-                <div className="absolute top-0 right-10">
-                  <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${
-                    order.device?.category === 'tv' 
-                      ? 'bg-purple-100 text-purple-700 font-extrabold'
-                      : order.device?.category === 'laptop' 
-                      ? 'bg-blue-50 text-blue-500' 
-                      : 'bg-[#E6F4FF] text-[#2563EB]'
-                  }`}>
-                    {order.device?.category === 'tv' ? 'Television (TV)' : (order.device?.category || 'Mobile')}
-                  </div>
-                </div>
-                {/* Top Status Bar */}
-                <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-50">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-[#E6F4FF] rounded-full flex items-center justify-center text-[#2563EB]">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
-                    </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              {refurbishedOrders.map((ro) => (
+                <div
+                  key={ro._id || ro.orderId}
+                  className="bg-white border border-gray-100 rounded-[36px] p-6 sm:p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden space-y-6"
+                >
+                  {/* Top Bar: Order ID, Date, Live Status Badges */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gray-50">
                     <div>
-                      <h4 className="text-lg font-black text-[#111827]">
-                        {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Pickup & Inspection Scheduled' :
-                         order.leadStatus === 'quote_sent' ? 'Valuation Quote Sent' :
-                         order.status === 'completed' ? 'Order Completed' :
-                         order.status === 'cancelled' ? 'Order Cancelled' : 'Order Confirmed'}
-                      </h4>
-                      <p className="text-sm font-bold text-gray-400">
-                        {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Inspection team has been scheduled for your device.' :
-                         order.leadStatus === 'quote_sent' ? 'Check your offered price below or wait for pickup.' :
-                         'Your device order has been placed and is being processed.'}
-                      </p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-mono font-black text-[#2563EB] tracking-wider">
+                          #{ro.orderId}
+                        </span>
+                        <span className="text-gray-300">•</span>
+                        <span className="text-xs text-gray-500 font-medium">
+                          {new Date(ro.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Certified Refurbished Device Order</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Order Status Badge */}
+                      <span className={`px-3 py-1 rounded-full text-xs font-black capitalize ${
+                        ro.orderStatus === 'delivered' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                        ro.orderStatus === 'shipped' || ro.orderStatus === 'out_for_delivery' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                        ro.orderStatus === 'confirmed' || ro.orderStatus === 'packed' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                        ro.orderStatus === 'cancelled' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                        'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}>
+                        {ro.orderStatus ? ro.orderStatus.replace(/_/g, ' ') : 'Placed'}
+                      </span>
+
+                      {/* Payment Status Badge */}
+                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+                        ro.payment?.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
+                        ro.payment?.status === 'failed' ? 'bg-rose-100 text-rose-800' :
+                        ro.payment?.status === 'refunded' ? 'bg-purple-100 text-purple-800' :
+                        'bg-amber-100 text-amber-800'
+                      }`}>
+                        {ro.payment?.status === 'confirmed' ? 'Paid / Verified' :
+                         ro.payment?.status === 'failed' ? 'Payment Failed' :
+                         ro.payment?.status === 'refunded' ? 'Refunded' : 'Payment Pending'}
+                      </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => navigate(`/orders/${order.orderId}`)}
-                    className="px-8 py-3 rounded-xl border-2 border-[#2563EB] text-[#2563EB] font-black text-sm hover:bg-[#2563EB] hover:text-white transition-all"
-                  >
-                    View Details
-                  </button>
-                </div>
 
-                {/* Device Info Row */}
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center p-4">
-                    <img
-                      src={order.device?.imageUrl || "https://img.freepik.com/free-photo/mobile-phone-with-blank-screen_23-2148151433.jpg"}
-                      alt={order.device?.modelName}
-                      className="max-h-full object-contain"
-                    />
-                  </div>
+                  {/* Device & Price Details */}
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    {ro.item?.image && (
+                      <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center p-2.5 border border-gray-100 shrink-0">
+                        <img
+                          src={ro.item.image}
+                          alt={ro.item.title}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                    )}
 
-                  <div className="flex-1 text-center md:text-left">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-1">
-                      {new Date(order.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
-                    </p>
-                    <h3 className="text-xl font-black text-[#111827] mb-1">{order.device?.modelName}</h3>
-                    <p className="text-sm font-bold text-gray-400">
-                      {order.device?.category === 'laptop'
-                        ? `${order.device?.processor} / ${order.device?.ram} / ${order.device?.storage}`
-                        : order.device?.category === 'tv'
-                        ? `${order.device?.screenSize || ''} • ${order.device?.tvType || 'Smart TV'} • Condition: ${order.device?.screenCondition || 'Good'}`
-                        : (order.device?.category === 'earbuds' || order.device?.category === 'smartwatch' || order.device?.category === 'gaming' || order.device?.category === 'console')
-                        ? `${order.device?.storage || 'Standard Edition'}`
-                        : `${order.device?.storage} / ${order.device?.ram || '8 GB'}`
-                      }
-                    </p>
-                  </div>
+                    <div className="flex-1 text-center sm:text-left space-y-1">
+                      <h3 className="text-lg font-black text-[#111827]">{ro.item?.title}</h3>
+                      <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap text-xs text-gray-500">
+                        {ro.item?.conditionGrade && (
+                          <span className="px-2 py-0.5 bg-blue-50 text-[#2563EB] rounded-md font-bold capitalize">
+                            {ro.item.conditionGrade} Grade
+                          </span>
+                        )}
+                        {ro.item?.storage && <span>{ro.item.storage}</span>}
+                        {ro.item?.color && <span>• {ro.item.color}</span>}
+                        <span>• 6M Warranty</span>
+                      </div>
 
-                  <div className="flex items-center gap-12">
-                    <div className="text-center md:text-right">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order ID</p>
-                      <p className="font-black text-[#111827] uppercase">{order.orderId}</p>
+                      <div className="text-base font-black text-emerald-600 mt-1">
+                        ₹{Number(ro.item?.price || 0).toLocaleString('en-IN')}
+                      </div>
                     </div>
-                    <div className="text-center md:text-right">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Quote</p>
-                      <p className="text-2xl font-black text-[#111827]">
-                        {order.priceBreakdown?.finalPrice > 0 
-                          ? formatCurrency(order.priceBreakdown.finalPrice) 
-                          : <span className="text-amber-600 text-sm font-extrabold bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">Pending Quote</span>}
-                      </p>
+
+                    <div className="flex flex-col items-center sm:items-end gap-2 w-full sm:w-auto">
+                      <button
+                        onClick={() => navigate(`/buy-refurbished/order-success/${ro.orderId}`)}
+                        className="w-full sm:w-auto px-6 py-2.5 rounded-xl border-2 border-[#2563EB] bg-[#2563EB] text-white hover:bg-blue-700 font-black text-xs transition-all cursor-pointer shadow-sm shadow-blue-500/20"
+                      >
+                        Track Order & View Receipt →
+                      </button>
+
+                      {ro.deliveryDetails?.expectedDate && (
+                        <span className="text-[11px] text-gray-400 font-medium">
+                          Expected: {ro.deliveryDetails.expectedDate}
+                        </span>
+                      )}
+                      {ro.deliveryDetails?.trackingNumber && (
+                        <span className="text-[10px] text-gray-500 font-mono">
+                          AWB: {ro.deliveryDetails.trackingNumber} {ro.deliveryDetails.courierPartner ? `(${ro.deliveryDetails.courierPartner})` : ''}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
-
-                {/* Bottom Actions for Mobile-ish view */}
-                <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={() => setSelectedReportOrder(order)}
-                    className="flex-1 bg-gray-50 text-gray-500 font-bold py-3 rounded-2xl hover:bg-gray-100 transition-all text-sm"
-                  >
-                    Evaluation Report
-                  </button>
-                  {['placed', 'scheduled'].includes(order.status) && (
-                    <button
-                      onClick={() => onCancel(order.orderId)}
-                      className="flex-1 bg-red-50 text-red-500 font-bold py-3 rounded-2xl hover:bg-red-100 transition-all text-sm"
-                    >
-                      Cancel Order
-                    </button>
-                  )}
-                </div>
-              </div>
+              ))}
+            </div>
+          </div>
+        )
+      ) : (
+        /* ─── VIEW 2: DEVICE SELLING REQUESTS ─────────────────────────────── */
+        <>
+          {/* Category Filter */}
+          <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0 w-fit">
+            {['All', 'Mobile', 'Laptop', 'TV', 'Earbuds', 'Smartwatch', 'Gaming'].map(cat => (
+              <button
+                key={cat}
+                onClick={() => setCategoryFilter(cat)}
+                className={`px-5 py-2 rounded-lg text-xs font-black transition-all ${categoryFilter === cat ? 'bg-white text-[#2563EB] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+              >
+                {cat}
+              </button>
             ))}
           </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-center gap-4 mt-10">
-            <button className="flex items-center justify-center w-12 h-12 rounded-2xl border border-gray-100 bg-white text-gray-400 hover:text-[#111827] hover:border-gray-200 transition-all">
-              <IconChevronLeft />
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="w-10 h-10 rounded-xl bg-[#E6F4FF] text-[#2563EB] flex items-center justify-center font-black">1</span>
+          {filteredOrders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center bg-gray-50/50 rounded-[40px] border border-dashed border-gray-200">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                <IconOrders />
+              </div>
+              <p className="text-gray-500 font-bold">You haven't placed any device selling orders yet.</p>
             </div>
-            <button className="flex items-center justify-center w-12 h-12 rounded-2xl border border-gray-100 bg-white text-gray-400 hover:text-[#111827] hover:border-gray-200 transition-all">
-              <IconChevronRight />
-            </button>
-          </div>
-        </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-6">
+                {filteredOrders.map((order) => (
+                  <div key={order.orderId} className="bg-white border border-gray-100 rounded-[40px] p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+                    {/* Category Tag */}
+                    <div className="absolute top-0 right-10">
+                      <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${
+                        order.device?.category === 'tv' 
+                          ? 'bg-purple-100 text-purple-700 font-extrabold'
+                          : order.device?.category === 'laptop' 
+                          ? 'bg-blue-50 text-blue-500' 
+                          : 'bg-[#E6F4FF] text-[#2563EB]'
+                      }`}>
+                        {order.device?.category === 'tv' ? 'Television (TV)' : (order.device?.category || 'Mobile')}
+                      </div>
+                    </div>
+                    {/* Top Status Bar */}
+                    <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-50">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-[#E6F4FF] rounded-full flex items-center justify-center text-[#2563EB]">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-black text-[#111827]">
+                            {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Pickup & Inspection Scheduled' :
+                             order.leadStatus === 'quote_sent' ? 'Valuation Quote Sent' :
+                             order.status === 'completed' ? 'Order Completed' :
+                             order.status === 'cancelled' ? 'Order Cancelled' : 'Order Confirmed'}
+                          </h4>
+                          <p className="text-sm font-bold text-gray-400">
+                            {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Inspection team has been scheduled for your device.' :
+                             order.leadStatus === 'quote_sent' ? 'Check your offered price below or wait for pickup.' :
+                             'Your device order has been placed and is being processed.'}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/orders/${order.orderId}`)}
+                        className="px-8 py-3 rounded-xl border-2 border-[#2563EB] text-[#2563EB] font-black text-sm hover:bg-[#2563EB] hover:text-white transition-all"
+                      >
+                        View Details
+                      </button>
+                    </div>
+
+                    {/* Device Info Row */}
+                    <div className="flex flex-col md:flex-row items-center gap-8">
+                      <div className="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center p-4">
+                        <img
+                          src={order.device?.imageUrl || "https://img.freepik.com/free-photo/mobile-phone-with-blank-screen_23-2148151433.jpg"}
+                          alt={order.device?.modelName}
+                          className="max-h-full object-contain"
+                        />
+                      </div>
+
+                      <div className="flex-1 text-center md:text-left">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-[2px] mb-1">
+                          {new Date(order.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+                        </p>
+                        <h3 className="text-xl font-black text-[#111827] mb-1">{order.device?.modelName}</h3>
+                        <p className="text-sm font-bold text-gray-400">
+                          {order.device?.category === 'laptop'
+                            ? `${order.device?.processor} / ${order.device?.ram} / ${order.device?.storage}`
+                            : order.device?.category === 'tv'
+                            ? `${order.device?.screenSize || ''} • ${order.device?.tvType || 'Smart TV'} • Condition: ${order.device?.screenCondition || 'Good'}`
+                            : (order.device?.category === 'earbuds' || order.device?.category === 'smartwatch' || order.device?.category === 'gaming' || order.device?.category === 'console')
+                            ? `${order.device?.storage || 'Standard Edition'}`
+                            : `${order.device?.storage} / ${order.device?.ram || '8 GB'}`
+                          }
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-12">
+                        <div className="text-center md:text-right">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Order ID</p>
+                          <p className="font-black text-[#111827] uppercase">{order.orderId}</p>
+                        </div>
+                        <div className="text-center md:text-right">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Quote</p>
+                          <p className="text-2xl font-black text-[#111827]">
+                            {order.priceBreakdown?.finalPrice > 0 
+                              ? formatCurrency(order.priceBreakdown.finalPrice) 
+                              : <span className="text-amber-600 text-sm font-extrabold bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">Pending Quote</span>}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Actions for Mobile-ish view */}
+                    <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                      <button
+                        onClick={() => setSelectedReportOrder(order)}
+                        className="flex-1 bg-gray-50 text-gray-500 font-bold py-3 rounded-2xl hover:bg-gray-100 transition-all text-sm"
+                      >
+                        Evaluation Report
+                      </button>
+                      {['placed', 'scheduled'].includes(order.status) && (
+                        <button
+                          onClick={() => onCancel(order.orderId)}
+                          className="flex-1 bg-red-50 text-red-500 font-bold py-3 rounded-2xl hover:bg-red-100 transition-all text-sm"
+                        >
+                          Cancel Order
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-center gap-4 mt-10">
+                <button className="flex items-center justify-center w-12 h-12 rounded-2xl border border-gray-100 bg-white text-gray-400 hover:text-[#111827] hover:border-gray-200 transition-all">
+                  <IconChevronLeft />
+                </button>
+                <div className="flex items-center gap-2">
+                  <span className="w-10 h-10 rounded-xl bg-[#E6F4FF] text-[#2563EB] flex items-center justify-center font-black">1</span>
+                </div>
+                <button className="flex items-center justify-center w-12 h-12 rounded-2xl border border-gray-100 bg-white text-gray-400 hover:text-[#111827] hover:border-gray-200 transition-all">
+                  <IconChevronRight />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

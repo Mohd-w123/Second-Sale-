@@ -19,4 +19,19 @@ const auth = (req, res, next) => {
   }
 };
 
+export const optionalAuth = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const decoded = verifyAccessToken(token);
+      req.user = { id: decoded.id };
+    }
+  } catch {
+    // optional, proceed as guest
+  }
+  next();
+};
+
 export default auth;
+

@@ -122,12 +122,31 @@ export default function RefurbishedOrderSuccessPage() {
           </div>
         </div>
 
+        {/* Cancellation Notice if Cancelled */}
+        {orderData.orderStatus === 'cancelled' && (
+          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 mb-6 text-rose-800 text-xs font-bold flex items-center gap-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+            <span>This order has been marked as Cancelled. For assistance, contact SecondSale support.</span>
+          </div>
+        )}
+
         {/* Tracking & Timeline Card */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm mb-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-bold text-slate-900">Estimated Delivery Date</h2>
-              <p className="text-xs text-slate-500">Tracked Express Insured Courier</p>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-slate-900">Delivery Status:</h2>
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold capitalize ${
+                  orderData.orderStatus === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
+                  orderData.orderStatus === 'shipped' || orderData.orderStatus === 'out_for_delivery' ? 'bg-blue-100 text-blue-800' :
+                  orderData.orderStatus === 'confirmed' || orderData.orderStatus === 'packed' ? 'bg-purple-100 text-purple-800' :
+                  orderData.orderStatus === 'cancelled' ? 'bg-rose-100 text-rose-800' :
+                  'bg-amber-100 text-amber-800'
+                }`}>
+                  {orderData.orderStatus ? orderData.orderStatus.replace(/_/g, ' ') : 'Placed'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">Tracked Express Insured Courier</p>
             </div>
             <div className="flex items-center gap-2 text-sm font-bold text-blue-700 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
               <Calendar className="w-4 h-4 text-blue-600" />
@@ -135,34 +154,102 @@ export default function RefurbishedOrderSuccessPage() {
             </div>
           </div>
 
-          {/* Timeline */}
-          <div className="relative flex flex-col sm:flex-row justify-between gap-4 pt-2">
-            {[
-              { label: "Order Placed", desc: "Just now", status: "done" },
-              { label: "32-Point Verified", desc: "Diagnostics check", status: "active" },
-              { label: "Packed in Box", desc: "Eco-secure packaging", status: "pending" },
-              { label: "Dispatched", desc: "Express courier partner", status: "pending" },
-              { label: "Delivered", desc: "Doorstep handover", status: "pending" },
-            ].map((step, idx) => (
-              <div key={idx} className="flex sm:flex-col items-center sm:text-center gap-3 sm:gap-2 flex-1">
-                <div
-                  className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
-                    step.status === "done"
-                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
-                      : step.status === "active"
-                      ? "bg-blue-600 text-white ring-4 ring-blue-100 animate-pulse"
-                      : "bg-slate-100 text-slate-400"
-                  }`}
-                >
-                  {step.status === "done" ? <Check className="w-4 h-4" /> : idx + 1}
+          {/* Dynamic Timeline */}
+          {orderData.orderStatus !== 'cancelled' ? (
+            <div className="relative flex flex-col sm:flex-row justify-between gap-4 pt-2">
+              {(() => {
+                const status = orderData.orderStatus || 'placed';
+                let currentStageIndex = 0;
+                if (status === 'confirmed') currentStageIndex = 1;
+                else if (status === 'packed') currentStageIndex = 2;
+                else if (status === 'shipped' || status === 'out_for_delivery') currentStageIndex = 3;
+                else if (status === 'delivered') currentStageIndex = 4;
+
+                const steps = [
+                  {
+                    label: "Order Placed",
+                    desc: "Logged & Verified",
+                    status: currentStageIndex >= 0 ? (currentStageIndex === 0 ? "active" : "done") : "pending",
+                  },
+                  {
+                    label: "Confirmed",
+                    desc: "32-Point Diagnostics",
+                    status: currentStageIndex >= 1 ? (currentStageIndex === 1 ? "active" : "done") : "pending",
+                  },
+                  {
+                    label: "Packed in Box",
+                    desc: "Eco-Secure Bubble Packaging",
+                    status: currentStageIndex >= 2 ? (currentStageIndex === 2 ? "active" : "done") : "pending",
+                  },
+                  {
+                    label: status === 'out_for_delivery' ? "Out for Delivery" : "Dispatched",
+                    desc: delivery.courierPartner ? `Via ${delivery.courierPartner}` : "Express Courier Partner",
+                    status: currentStageIndex >= 3 ? (currentStageIndex === 3 ? "active" : "done") : "pending",
+                  },
+                  {
+                    label: "Delivered",
+                    desc: "Doorstep Handover",
+                    status: currentStageIndex >= 4 ? "done" : "pending",
+                  },
+                ];
+
+                return steps.map((step, idx) => (
+                  <div key={idx} className="flex sm:flex-col items-center sm:text-center gap-3 sm:gap-2 flex-1">
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                        step.status === "done"
+                          ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
+                          : step.status === "active"
+                          ? "bg-blue-600 text-white ring-4 ring-blue-100 animate-pulse"
+                          : "bg-slate-100 text-slate-400"
+                      }`}
+                    >
+                      {step.status === "done" ? <Check className="w-4 h-4" /> : idx + 1}
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900">{step.label}</h4>
+                      <p className="text-[10px] text-slate-400">{step.desc}</p>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          ) : (
+            <div className="text-center py-4 text-xs font-bold text-slate-500">
+              This order was cancelled and processing has stopped.
+            </div>
+          )}
+
+          {/* Courier and AWB Tracking Banner */}
+          {(delivery.trackingNumber || delivery.courierPartner) && (
+            <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5">
+                  <Truck className="w-4 h-4 text-blue-600" />
+                  <span className="font-bold text-slate-900">Courier:</span>
+                  <span className="text-blue-700 font-semibold">{delivery.courierPartner || 'Express Air Courier'}</span>
                 </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-900">{step.label}</h4>
-                  <p className="text-[10px] text-slate-400">{step.desc}</p>
-                </div>
+                {delivery.trackingNumber && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-500">AWB Tracking No:</span>
+                    <span className="font-mono font-bold text-slate-900">{delivery.trackingNumber}</span>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
+              {delivery.trackingNumber && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(delivery.trackingNumber);
+                    alert("Tracking number copied to clipboard!");
+                  }}
+                  className="px-3 py-1.5 bg-white hover:bg-slate-50 text-blue-600 font-bold rounded-xl border border-blue-200 shadow-xs cursor-pointer w-fit text-xs"
+                >
+                  Copy AWB Number
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Order Details Grid */}
@@ -231,21 +318,48 @@ export default function RefurbishedOrderSuccessPage() {
                 {orderData.payment?.method || "Pay on Delivery (COD)"}
               </span>
             </div>
+
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-500">Payment Status:</span>
+              <span className={`font-bold px-2 py-0.5 rounded-md uppercase text-[10px] tracking-wider ${
+                orderData.payment?.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
+                orderData.payment?.status === 'failed' ? 'bg-rose-100 text-rose-800' :
+                orderData.payment?.status === 'refunded' ? 'bg-purple-100 text-purple-800' :
+                'bg-amber-100 text-amber-800'
+              }`}>
+                {orderData.payment?.status === 'confirmed' ? 'Paid / Verified' :
+                 orderData.payment?.status === 'failed' ? 'Payment Failed' :
+                 orderData.payment?.status === 'refunded' ? 'Refunded' : 'Payment Pending'}
+              </span>
+            </div>
+
+            {orderData.payment?.transactionId && (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500">Transaction Ref:</span>
+                <span className="font-mono font-semibold text-slate-800">{orderData.payment.transactionId}</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Bottom CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            to="/dashboard"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow-sm transition text-xs"
+          >
+            <span>View All My Orders</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
           <Link
             to="/buy-refurbished"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/20 transition"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/20 transition text-xs"
           >
             <span>Browse More Devices</span>
-            <ArrowRight className="w-4 h-4" />
           </Link>
           <button
             onClick={() => window.print()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-2xl transition"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-2xl transition text-xs cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             <span>Print Receipt</span>

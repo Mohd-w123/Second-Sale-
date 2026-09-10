@@ -7,6 +7,11 @@ const buyOrderSchema = new mongoose.Schema({
     unique: true,
     default: () => 'RBUY-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    index: true,
+  },
   customer: {
     name: { type: String, required: true },
     phone: { type: String, required: true },
@@ -35,7 +40,7 @@ const buyOrderSchema = new mongoose.Schema({
   },
   payment: {
     method: { type: String, enum: ['cod', 'upi', 'netbanking'], required: true },
-    status: { type: String, enum: ['pending', 'confirmed', 'failed'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'confirmed', 'failed', 'refunded'], default: 'pending' },
     upiId: String,
     transactionId: String,
   },
@@ -53,6 +58,7 @@ const buyOrderSchema = new mongoose.Schema({
   notes: { type: String, default: '' },
 }, { timestamps: true });
 
+buyOrderSchema.index({ userId: 1, createdAt: -1 });
 buyOrderSchema.index({ 'customer.phone': 1, createdAt: -1 });
 buyOrderSchema.index({ 'customer.email': 1, createdAt: -1 });
 
