@@ -151,8 +151,8 @@ export default function DashboardPage() {
     { name: 'Orders', icon: <IconOrders /> },
     { name: 'Address', icon: <IconAddress /> },
     { name: 'Payment', icon: <IconPayment /> },
-    // { name: 'Earnings', icon: <IconEarnings /> },
-    // { name: 'Referral', icon: <IconReferral /> },
+    { name: 'Earnings', icon: <IconEarnings /> },
+    { name: 'Referral', icon: <IconReferral /> },
   ];
 
   return (
@@ -244,14 +244,14 @@ export default function DashboardPage() {
                 onDelete={handleDeletePayment}
               />
             )}
-            {/* {activeTab === 'Earnings' && <EarningsTab />} */}
-            {/* {activeTab === 'Referral' && (
+            {activeTab === 'Earnings' && <EarningsTab />}
+            {activeTab === 'Referral' && (
               <ReferralTab
                 referral={referral}
                 copyCode={copyCode}
                 copied={copied}
               />
-            )} */}
+            )}
           </div>
         </div>
       </div>
@@ -443,11 +443,10 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
           <button
             type="button"
             onClick={() => setOrderType('sell')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border-none cursor-pointer ${
-              orderType === 'sell'
-                ? 'bg-white text-[#2563EB] shadow-sm'
-                : 'bg-transparent text-gray-500 hover:text-gray-900'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border-none cursor-pointer ${orderType === 'sell'
+              ? 'bg-white text-[#2563EB] shadow-sm'
+              : 'bg-transparent text-gray-500 hover:text-gray-900'
+              }`}
           >
             <span>Device Sales</span>
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${orderType === 'sell' ? 'bg-blue-50 text-[#2563EB]' : 'bg-gray-200 text-gray-600'}`}>
@@ -457,11 +456,10 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
           <button
             type="button"
             onClick={() => setOrderType('buy')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border-none cursor-pointer ${
-              orderType === 'buy'
-                ? 'bg-white text-[#2563EB] shadow-sm'
-                : 'bg-transparent text-gray-500 hover:text-gray-900'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all border-none cursor-pointer ${orderType === 'buy'
+              ? 'bg-white text-[#2563EB] shadow-sm'
+              : 'bg-transparent text-gray-500 hover:text-gray-900'
+              }`}
           >
             <span>Refurbished Purchases</span>
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${orderType === 'buy' ? 'bg-blue-50 text-[#2563EB]' : 'bg-gray-200 text-gray-600'}`}>
@@ -514,26 +512,24 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
 
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Order Status Badge */}
-                      <span className={`px-3 py-1 rounded-full text-xs font-black capitalize ${
-                        ro.orderStatus === 'delivered' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                      <span className={`px-3 py-1 rounded-full text-xs font-black capitalize ${ro.orderStatus === 'delivered' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
                         ro.orderStatus === 'shipped' || ro.orderStatus === 'out_for_delivery' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
-                        ro.orderStatus === 'confirmed' || ro.orderStatus === 'packed' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
-                        ro.orderStatus === 'cancelled' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                        'bg-amber-50 text-amber-700 border border-amber-200'
-                      }`}>
+                          ro.orderStatus === 'confirmed' || ro.orderStatus === 'packed' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                            ro.orderStatus === 'cancelled' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                              'bg-amber-50 text-amber-700 border border-amber-200'
+                        }`}>
                         {ro.orderStatus ? ro.orderStatus.replace(/_/g, ' ') : 'Placed'}
                       </span>
 
                       {/* Payment Status Badge */}
-                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
-                        ro.payment?.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
+                      <span className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${ro.payment?.status === 'confirmed' ? 'bg-emerald-100 text-emerald-800' :
                         ro.payment?.status === 'failed' ? 'bg-rose-100 text-rose-800' :
-                        ro.payment?.status === 'refunded' ? 'bg-purple-100 text-purple-800' :
-                        'bg-amber-100 text-amber-800'
-                      }`}>
+                          ro.payment?.status === 'refunded' ? 'bg-purple-100 text-purple-800' :
+                            'bg-amber-100 text-amber-800'
+                        }`}>
                         {ro.payment?.status === 'confirmed' ? 'Paid / Verified' :
-                         ro.payment?.status === 'failed' ? 'Payment Failed' :
-                         ro.payment?.status === 'refunded' ? 'Refunded' : 'Payment Pending'}
+                          ro.payment?.status === 'failed' ? 'Payment Failed' :
+                            ro.payment?.status === 'refunded' ? 'Refunded' : 'Payment Pending'}
                       </span>
                     </div>
                   </div>
@@ -623,13 +619,12 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
                   <div key={order.orderId} className="bg-white border border-gray-100 rounded-[40px] p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
                     {/* Category Tag */}
                     <div className="absolute top-0 right-10">
-                      <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${
-                        order.device?.category === 'tv' 
-                          ? 'bg-purple-100 text-purple-700 font-extrabold'
-                          : order.device?.category === 'laptop' 
-                          ? 'bg-blue-50 text-blue-500' 
+                      <div className={`px-4 py-1.5 rounded-b-xl text-[9px] font-black uppercase tracking-widest ${order.device?.category === 'tv'
+                        ? 'bg-purple-100 text-purple-700 font-extrabold'
+                        : order.device?.category === 'laptop'
+                          ? 'bg-blue-50 text-blue-500'
                           : 'bg-[#E6F4FF] text-[#2563EB]'
-                      }`}>
+                        }`}>
                         {order.device?.category === 'tv' ? 'Television (TV)' : (order.device?.category || 'Mobile')}
                       </div>
                     </div>
@@ -642,14 +637,14 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
                         <div>
                           <h4 className="text-lg font-black text-[#111827]">
                             {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Pickup & Inspection Scheduled' :
-                             order.leadStatus === 'quote_sent' ? 'Valuation Quote Sent' :
-                             order.status === 'completed' ? 'Order Completed' :
-                             order.status === 'cancelled' ? 'Order Cancelled' : 'Order Confirmed'}
+                              order.leadStatus === 'quote_sent' ? 'Valuation Quote Sent' :
+                                order.status === 'completed' ? 'Order Completed' :
+                                  order.status === 'cancelled' ? 'Order Cancelled' : 'Order Confirmed'}
                           </h4>
                           <p className="text-sm font-bold text-gray-400">
                             {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Inspection team has been scheduled for your device.' :
-                             order.leadStatus === 'quote_sent' ? 'Check your offered price below or wait for pickup.' :
-                             'Your device order has been placed and is being processed.'}
+                              order.leadStatus === 'quote_sent' ? 'Check your offered price below or wait for pickup.' :
+                                'Your device order has been placed and is being processed.'}
                           </p>
                         </div>
                       </div>
@@ -680,10 +675,10 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
                           {order.device?.category === 'laptop'
                             ? `${order.device?.processor} / ${order.device?.ram} / ${order.device?.storage}`
                             : order.device?.category === 'tv'
-                            ? `${order.device?.screenSize || ''} • ${order.device?.tvType || 'Smart TV'} • Condition: ${order.device?.screenCondition || 'Good'}`
-                            : (order.device?.category === 'earbuds' || order.device?.category === 'smartwatch' || order.device?.category === 'gaming' || order.device?.category === 'console')
-                            ? `${order.device?.storage || 'Standard Edition'}`
-                            : `${order.device?.storage} / ${order.device?.ram || '8 GB'}`
+                              ? `${order.device?.screenSize || ''} • ${order.device?.tvType || 'Smart TV'} • Condition: ${order.device?.screenCondition || 'Good'}`
+                              : (order.device?.category === 'earbuds' || order.device?.category === 'smartwatch' || order.device?.category === 'gaming' || order.device?.category === 'console')
+                                ? `${order.device?.storage || 'Standard Edition'}`
+                                : `${order.device?.storage} / ${order.device?.ram || '8 GB'}`
                           }
                         </p>
                       </div>
@@ -696,8 +691,8 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
                         <div className="text-center md:text-right">
                           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Quote</p>
                           <p className="text-2xl font-black text-[#111827]">
-                            {order.priceBreakdown?.finalPrice > 0 
-                              ? formatCurrency(order.priceBreakdown.finalPrice) 
+                            {order.priceBreakdown?.finalPrice > 0
+                              ? formatCurrency(order.priceBreakdown.finalPrice)
                               : <span className="text-amber-600 text-sm font-extrabold bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">Pending Quote</span>}
                           </p>
                         </div>
