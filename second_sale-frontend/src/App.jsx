@@ -91,6 +91,7 @@ import AdminSiteSettings from './pages/admin/AdminSiteSettings.jsx';
 import AdminRefurbished from './pages/admin/AdminRefurbished.jsx';
 import AdminHomepage from './pages/admin/AdminHomepage.jsx';
 import AdminPages from './pages/admin/AdminPages.jsx';
+import AdminSalesUsers from './pages/admin/AdminSalesUsers.jsx';
 import CustomPageView from './pages/CustomPageView.jsx';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -229,17 +230,18 @@ function App() {
           {/* Admin Flow */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="homepage" element={<AdminHomepage />} />
-            <Route path="pages" element={<AdminPages />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="devices" element={<AdminDevices />} />
-            <Route path="refurbished" element={<AdminRefurbished />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="partners" element={<AdminPartners />} />
-            <Route path="orders" element={<AdminOrders />} />
-            <Route path="pincodes" element={<AdminPincodes />} />
-            <Route path="site-settings" element={<AdminSiteSettings />} />
+            <Route path="dashboard" element={<AdminProtectedRoute requiredPermission="dashboard"><AdminDashboard /></AdminProtectedRoute>} />
+            <Route path="homepage" element={<AdminProtectedRoute requiredPermission="homepage"><AdminHomepage /></AdminProtectedRoute>} />
+            <Route path="pages" element={<AdminProtectedRoute requiredPermission="pages"><AdminPages /></AdminProtectedRoute>} />
+            <Route path="users" element={<AdminProtectedRoute requiredPermission="users"><AdminUsers /></AdminProtectedRoute>} />
+            <Route path="devices" element={<AdminProtectedRoute requiredPermission="devices"><AdminDevices /></AdminProtectedRoute>} />
+            <Route path="refurbished" element={<AdminProtectedRoute requiredPermission="refurbished"><AdminRefurbished /></AdminProtectedRoute>} />
+            <Route path="categories" element={<AdminProtectedRoute requiredPermission="categories"><AdminCategories /></AdminProtectedRoute>} />
+            <Route path="partners" element={<AdminProtectedRoute requiredPermission="partners"><AdminPartners /></AdminProtectedRoute>} />
+            <Route path="orders" element={<AdminProtectedRoute requiredPermission="orders"><AdminOrders /></AdminProtectedRoute>} />
+            <Route path="pincodes" element={<AdminProtectedRoute requiredPermission="pincodes"><AdminPincodes /></AdminProtectedRoute>} />
+            <Route path="site-settings" element={<AdminProtectedRoute requiredPermission="site-settings"><AdminSiteSettings /></AdminProtectedRoute>} />
+            <Route path="sales-users" element={<AdminProtectedRoute requiredPermission="sales-users"><AdminSalesUsers /></AdminProtectedRoute>} />
           </Route>
 
           {/* Dynamic CMS Pages (Supports both direct /:slug and legacy /page/:slug) */}
