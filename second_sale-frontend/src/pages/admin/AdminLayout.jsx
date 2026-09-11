@@ -16,7 +16,9 @@ import {
   ShieldCheck,
   Package,
   Layout,
-  FileText
+  FileText,
+  Users2,
+  ShieldAlert,
 } from 'lucide-react';
 import './admin.css';
 
@@ -25,8 +27,22 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const getAdminUser = () => {
+    try {
+      const stored = localStorage.getItem('adminUser');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const currentUser = getAdminUser();
+  const isSuperAdmin = !currentUser || currentUser.role === 'superadmin' || currentUser.permissions?.includes('*');
+  const userPermissions = currentUser?.permissions || [];
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
     navigate('/admin/login');
   };
 
@@ -43,22 +59,34 @@ export default function AdminLayout() {
     if (path.includes('/orders')) return 'System Orders';
     if (path.includes('/pincodes')) return 'Serviceable Pincodes';
     if (path.includes('/site-settings')) return 'Site Settings';
+    if (path.includes('/sales-users')) return 'Sales Team & Feature Permissions';
     return 'Admin Panel';
   };
 
-  const navItems = [
-    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/admin/homepage', icon: Layout, label: 'Homepage' },
-    { to: '/admin/pages', icon: FileText, label: 'Pages (CMS)' },
-    { to: '/admin/users', icon: Users, label: 'Users' },
-    { to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
-    { to: '/admin/refurbished', icon: Package, label: 'Refurbished' },
-    { to: '/admin/categories', icon: Layers, label: 'Categories' },
-    { to: '/admin/partners', icon: Handshake, label: 'Partners' },
-    { to: '/admin/orders', icon: ClipboardList, label: 'Orders' },
-    { to: '/admin/pincodes', icon: MapPin, label: 'Pincodes' },
-    { to: '/admin/site-settings', icon: Settings2, label: 'Site Settings' },
+  const ALL_NAV_ITEMS = [
+    { key: 'dashboard', to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { key: 'homepage', to: '/admin/homepage', icon: Layout, label: 'Homepage' },
+    { key: 'pages', to: '/admin/pages', icon: FileText, label: 'Pages (CMS)' },
+    { key: 'users', to: '/admin/users', icon: Users, label: 'Users' },
+    { key: 'devices', to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
+    { key: 'refurbished', to: '/admin/refurbished', icon: Package, label: 'Refurbished' },
+    { key: 'categories', to: '/admin/categories', icon: Layers, label: 'Categories' },
+    { key: 'partners', to: '/admin/partners', icon: Handshake, label: 'Partners' },
+    { key: 'orders', to: '/admin/orders', icon: ClipboardList, label: 'Orders' },
+    { key: 'pincodes', to: '/admin/pincodes', icon: MapPin, label: 'Pincodes' },
+    { key: 'site-settings', to: '/admin/site-settings', icon: Settings2, label: 'Site Settings' },
+    { key: 'sales-users', to: '/admin/sales-users', icon: Users2, label: 'Sales Team', superAdminOnly: true },
   ];
+
+  // Filter nav items based on user role & permissions
+  const navItems = ALL_NAV_ITEMS.filter((item) => {
+    if (isSuperAdmin) return true;
+    if (item.superAdminOnly) return false;
+    return userPermissions.includes(item.key);
+  });
+
+  const userName = currentUser?.name || (isSuperAdmin ? 'Super Admin' : 'Staff');
+  const userRoleBadge = isSuperAdmin ? 'Super Admin' : (currentUser?.role === 'sales' ? 'Sales Team' : 'Staff');
 
   return (
     <div className="admin-panel">
@@ -108,6 +136,19 @@ export default function AdminLayout() {
           })}
         </nav>
 
+        {/* Sidebar User Card */}
+        <div className="p-3 mx-3 mb-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-xs font-black shrink-0">
+            {userName.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-white truncate">{userName}</p>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-400 block">
+              {userRoleBadge}
+            </span>
+          </div>
+        </div>
+
         {/* Bottom Logout Section */}
         <div className="admin-sidebar-footer">
           <button onClick={handleLogout} className="admin-logout-btn">
@@ -151,8 +192,8 @@ export default function AdminLayout() {
                 <ShieldCheck size={16} />
               </div>
               <div className="admin-profile-info">
-                <span className="admin-profile-name">Admin</span>
-                <span className="admin-profile-status">Super User</span>
+                <span className="admin-profile-name">{userName}</span>
+                <span className="admin-profile-status">{userRoleBadge}</span>
               </div>
             </div>
 

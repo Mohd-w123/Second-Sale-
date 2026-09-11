@@ -19,7 +19,22 @@ export default function AdminLogin() {
     try {
       const response = await adminService.login({ email, password });
       localStorage.setItem('adminToken', response.data.token);
-      navigate('/admin/dashboard');
+      if (response.data.admin) {
+        localStorage.setItem('adminUser', JSON.stringify(response.data.admin));
+      }
+
+      const user = response.data.admin;
+      if (user?.role === 'sales' && Array.isArray(user.permissions) && user.permissions.length > 0) {
+        if (user.permissions.includes('dashboard')) {
+          navigate('/admin/dashboard');
+        } else {
+          // Direct to first permitted module
+          const firstModule = user.permissions[0];
+          navigate(`/admin/${firstModule}`);
+        }
+      } else {
+        navigate('/admin/dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check credentials.');
     } finally {

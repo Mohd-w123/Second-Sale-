@@ -1,9 +1,11 @@
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import Device from '../models/Device.js';
 import Order from '../models/Order.js';
 import PartnerApplication from '../models/PartnerApplication.js';
 import Pincode from '../models/Pincode.js';
+import AdminUser from '../models/AdminUser.js';
 
 // ─── Admin Login ──────────────────────────────────────────────────────────────
 
@@ -15,23 +17,80 @@ export const adminLogin = async (req, res, next) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@secondsale.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin@123';
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
 
-    if (
-      email.trim().toLowerCase() !== adminEmail.trim().toLowerCase() ||
-      password.trim() !== adminPassword.trim()
-    ) {
-      return res.status(401).json({ message: 'Invalid admin credentials' });
+    // 1. Check Super Admin credentials from environment variables
+    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@secondsale.com').trim().toLowerCase();
+    const adminPassword = (process.env.ADMIN_PASSWORD || 'admin@123').trim();
+
+    if (trimmedEmail === adminEmail && trimmedPassword === adminPassword) {
+      const token = jwt.sign(
+        {
+          id: 'superadmin',
+          email: adminEmail,
+          name: 'Super Admin',
+          role: 'superadmin',
+          permissions: ['*'],
+          isAdmin: true,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      return res.json({
+        token,
+        admin: {
+          id: 'superadmin',
+          name: 'Super Admin',
+          email: adminEmail,
+          role: 'superadmin',
+          permissions: ['*'],
+        },
+      });
     }
 
+    // 2. Check Sales / Staff User in AdminUser database collection
+    const adminUser = await AdminUser.findOne({ email: trimmedEmail });
+    if (!adminUser) {
+      return res.status(401).json({ message: 'Invalid admin or sales credentials' });
+    }
+
+    if (!adminUser.isActive) {
+      return res.status(403).json({ message: 'This account has been deactivated. Please contact Super Admin.' });
+    }
+
+    const isMatch = await bcrypt.compare(trimmedPassword, adminUser.passwordHash);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid admin or sales credentials' });
+    }
+
+    adminUser.lastLogin = new Date();
+    await adminUser.save();
+
     const token = jwt.sign(
-      { email, isAdmin: true },
+      {
+        id: adminUser._id,
+        email: adminUser.email,
+        name: adminUser.name,
+        role: adminUser.role || 'sales',
+        permissions: adminUser.permissions || [],
+        isAdmin: true,
+      },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    res.json({ token, admin: { email } });
+    res.json({
+      token,
+      admin: {
+        id: adminUser._id,
+        name: adminUser.name,
+        email: adminUser.email,
+        role: adminUser.role || 'sales',
+        permissions: adminUser.permissions || [],
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -419,4 +478,88 @@ export const deletePincode = async (req, res, next) => {
     next(error);
   }
 };
+
+// ─── Sales Users / Staff Team Management ─────────────────────────────────────
+
+export const getAllSalesUsers = async (req, res, next) => {
+  try {
+    const users = await AdminUser.find().select('-passwordHash').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createSalesUser = async (req, res, next) => {
+  try {
+    const { name, email, password, role, permissions, isActive } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required.' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const existing = await AdminUser.findOne({ email: cleanEmail });
+    if (existing) {
+      return res.status(409).json({ message: 'A team member with this email already exists.' });
+    }
+
+    const passwordHash = await bcrypt.hash(password.trim(), 10);
+    const newUser = await AdminUser.create({
+      name: name.trim(),
+      email: cleanEmail,
+      passwordHash,
+      role: role || 'sales',
+      permissions: Array.isArray(permissions) ? permissions : ['orders'],
+      isActive: isActive !== undefined ? isActive : true,
+    });
+
+    const userObj = newUser.toObject();
+    delete userObj.passwordHash;
+    res.status(201).json(userObj);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSalesUser = async (req, res, next) => {
+  try {
+    const { name, email, password, role, permissions, isActive } = req.body;
+    const user = await AdminUser.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Sales user not found.' });
+    }
+
+    if (name) user.name = name.trim();
+    if (email) user.email = email.trim().toLowerCase();
+    if (role) user.role = role;
+    if (permissions !== undefined) user.permissions = permissions;
+    if (isActive !== undefined) user.isActive = isActive;
+
+    if (password && password.trim().length > 0) {
+      user.passwordHash = await bcrypt.hash(password.trim(), 10);
+    }
+
+    await user.save();
+    const userObj = user.toObject();
+    delete userObj.passwordHash;
+    res.json(userObj);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteSalesUser = async (req, res, next) => {
+  try {
+    const user = await AdminUser.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'Sales user not found.' });
+    }
+    res.json({ message: 'Sales user deleted successfully.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 
