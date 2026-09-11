@@ -526,10 +526,10 @@ const devices = [
     slug: "apple-iphone-17-pro-max",
     imageUrl: "https://fdn2.gsmarena.com/vv/bigpic/apple-iphone-17-pro-max.jpg",
     variants: [
-      { storage: "256GB", basePrice: 104000 },
-      { storage: "512GB", basePrice: 111000 },
-      { storage: "1TB", basePrice: 115500 },
-      { storage: "2TB", basePrice: 122500 }
+      { storage: "256GB", basePrice: 110000 },
+      { storage: "512GB", basePrice: 119000 },
+      { storage: "1TB", basePrice: 127000 },
+      { storage: "2TB", basePrice: 135000 }
     ]
   },
   {

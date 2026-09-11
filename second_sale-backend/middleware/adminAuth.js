@@ -14,7 +14,13 @@ const adminAuth = (req, res, next) => {
       return res.status(403).json({ message: 'Forbidden. Admin access only.' });
     }
 
-    req.admin = { email: decoded.email };
+    req.admin = {
+      id: decoded.id,
+      email: decoded.email,
+      name: decoded.name || 'Admin',
+      role: decoded.role || (decoded.isAdmin ? 'superadmin' : 'sales'),
+      permissions: decoded.permissions || ['*'],
+    };
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
@@ -22,6 +28,21 @@ const adminAuth = (req, res, next) => {
     }
     return res.status(401).json({ message: 'Invalid admin token' });
   }
+};
+
+export const requirePermission = (permissionKey) => {
+  return (req, res, next) => {
+    if (!req.admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const { role, permissions } = req.admin;
+    if (role === 'superadmin' || permissions?.includes('*') || permissions?.includes(permissionKey)) {
+      return next();
+    }
+    return res.status(403).json({
+      message: `Access denied. You do not have permission to access ${permissionKey}.`,
+    });
+  };
 };
 
 export default adminAuth;

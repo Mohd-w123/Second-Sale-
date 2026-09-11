@@ -91,6 +91,12 @@ export const adminService = {
   uploadFavicon: (formData) => adminApi.post('/site-settings/favicon', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   updateTopBar: (data) => adminApi.put('/site-settings/top-bar', data),
   updateFooter: (data) => adminApi.put('/site-settings/footer', data),
+
+  // Sales Users / Staff Team Management
+  getSalesUsers: () => adminApi.get('/admin/sales-users'),
+  createSalesUser: (data) => adminApi.post('/admin/sales-users', data),
+  updateSalesUser: (id, data) => adminApi.put(`/admin/sales-users/${id}`, data),
+  deleteSalesUser: (id) => adminApi.delete(`/admin/sales-users/${id}`),
 };
 
 export default adminApi;
