@@ -1279,9 +1279,9 @@ export default function HomePage() {
                       <div className="w-14 h-14 bg-[#2563EB] text-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#2563EB]/20 relative z-10">
                         {icon}
                       </div>
-                      <h4 className="text-sm font-black text-[#0F2D5B] mb-1">
-                        <span className="text-[#2563EB] mr-1">{step.num || (i + 1)}</span>
-                        {step.title}
+                      <h4 className="text-sm font-black text-[#0F2D5B] mb-1.5">
+                        <span className="block text-[#2563EB] text-base font-black mb-0.5">{step.num || (i + 1)}</span>
+                        <span className="block leading-snug">{step.title}</span>
                       </h4>
                       <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
                     </div>
