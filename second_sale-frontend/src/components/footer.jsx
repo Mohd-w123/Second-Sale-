@@ -17,6 +17,7 @@ import {
   Mail,
   Clock,
   MapPin,
+  MessageCircle,
   Sparkles
 } from "lucide-react";
 
@@ -134,7 +135,7 @@ export default function Footer() {
       .then((r) => r.json())
       .then((data) => {
         if (data?.logoUrl) setSiteLogo(data.logoUrl);
-        if (data?.footer) setFooterConfig(data.footer);
+        if (data?.footer) setFooterConfig({ ...data.footer, whatsapp: data.whatsappNumber || data.footer?.whatsapp || '7045180009' });
       })
       .catch(() => {});
 
@@ -283,6 +284,19 @@ export default function Footer() {
                   </div>
                   <span>{footerConfig.phone}</span>
                 </div>
+              )}
+              {footerConfig?.whatsapp && (
+                <a
+                  href={`https://wa.me/${String(footerConfig.whatsapp).replace(/\D/g, '').length === 10 ? `91${String(footerConfig.whatsapp).replace(/\D/g, '')}` : String(footerConfig.whatsapp).replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-slate-400 hover:text-emerald-400 transition-colors no-underline"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-slate-800/80 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                    <MessageCircle size={13} />
+                  </div>
+                  <span>+91 {String(footerConfig.whatsapp).replace(/\D/g, '').slice(-10)} (WhatsApp)</span>
+                </a>
               )}
               <div className="flex items-center gap-3 text-slate-400">
                 <div className="w-7 h-7 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-emerald-400 shrink-0">

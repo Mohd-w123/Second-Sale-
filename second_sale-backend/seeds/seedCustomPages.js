@@ -658,7 +658,7 @@ const customPagesData = [
             <div class="w-12 h-12 bg-blue-50 text-[#2563EB] rounded-xl flex items-center justify-center mb-6 text-2xl font-bold">📞</div>
             <h3 class="text-lg font-bold text-gray-900 mb-2">Phone Hotline</h3>
             <p class="text-xs text-gray-400 mb-3">Mon–Sun from 9:30 AM to 7:30 PM IST</p>
-            <a href="tel:+919876543210" class="text-sm font-bold text-[#2563EB] hover:underline">+91 98765 43210</a>
+            <a href="tel:+919876543210" class="text-sm font-bold text-[#2563EB] hover:underline">+91 7045180009</a>
           </div>
           <div class="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 hover:border-[#2563EB]/30 hover:shadow-xl transition-all">
             <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-6 text-2xl font-bold">✉️</div>
@@ -747,7 +747,7 @@ const customPagesData = [
       <section class="py-10 bg-[#F7FAFF] rounded-3xl border border-gray-100 text-center px-4">
         <h2 class="text-lg font-black text-gray-900 mb-2">SecondSale Help Desk in 30 seconds</h2>
         <p class="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto">
-          Need assistance? Our customer experience team is available 7 days a week via phone (+91 98765 43210), email (support@secondsale.com), or WhatsApp.
+          Need assistance? Our customer experience team is available 7 days a week via phone (+91 7045180009), email (support@secondsale.com), or WhatsApp.
         </p>
       </section>
     `

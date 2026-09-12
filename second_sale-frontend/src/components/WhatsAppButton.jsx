@@ -1,16 +1,9 @@
-// WhatsAppButton.jsx
-// Floating WhatsApp button — place this component once in your root layout
-// (e.g. App.jsx, alongside <Navbar /> / <Footer />) so it appears on every page.
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
-// ── CONFIG ──────────────────────────────────────────────────────────────
-// Number format: country code + number, NO "+", spaces, or dashes.
-// e.g. +91 70301 53666  ->  "917030153666"
-const WHATSAPP_NUMBER = "918310732405";
-
-// Pre-filled message shown when the chat opens
-const DEFAULT_MESSAGE =
-  "Hi, I'm interested in selling my device on SecondSale.";
-// ─────────────────────────────────────────────────────────────────────────
+const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const DEFAULT_PHONE = "7045180009";
+const DEFAULT_MESSAGE = "Hi, I'm interested in selling my device on SecondSale.";
 
 const WhatsAppIcon = () => (
   <svg
@@ -26,7 +19,50 @@ const WhatsAppIcon = () => (
 );
 
 export default function WhatsAppButton() {
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
+  const location = useLocation();
+  const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_PHONE);
+  const [isEnabled, setIsEnabled] = useState(true);
+  const [message, setMessage] = useState(DEFAULT_MESSAGE);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/site-settings`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.whatsappNumber) setWhatsappNumber(data.whatsappNumber);
+        else if (data.footer?.whatsapp) setWhatsappNumber(data.footer.whatsapp);
+        if (data.whatsappEnabled !== undefined) setIsEnabled(Boolean(data.whatsappEnabled));
+        if (data.whatsappMessage) setMessage(data.whatsappMessage);
+      })
+      .catch(() => {});
+
+    const onSettingsUpdate = (e) => {
+      const data = e?.detail;
+      if (!data) return;
+      if (data.whatsappNumber) setWhatsappNumber(data.whatsappNumber);
+      else if (data.footer?.whatsapp) setWhatsappNumber(data.footer.whatsapp);
+      if (data.whatsappEnabled !== undefined) setIsEnabled(Boolean(data.whatsappEnabled));
+      if (data.whatsappMessage) setMessage(data.whatsappMessage);
+    };
+
+    window.addEventListener('site-settings-updated', onSettingsUpdate);
+    return () => window.removeEventListener('site-settings-updated', onSettingsUpdate);
+  }, []);
+
+  // NEVER show on admin screens
+  if (location.pathname.startsWith('/admin')) {
+    return null;
+  }
+
+  // If disabled by admin in site settings
+  if (!isEnabled) {
+    return null;
+  }
+
+  // Clean formatting: if 10 digits (e.g. 7045180009), prepend 91 for wa.me
+  const digits = String(whatsappNumber || DEFAULT_PHONE).replace(/\D/g, '');
+  const cleanPhone = digits.length === 10 ? `91${digits}` : digits;
+  const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message || DEFAULT_MESSAGE)}`;
 
   return (
     <a
@@ -34,7 +70,8 @@ export default function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
-      className="fixed bottom-8 right-8 z-[1500] flex items-center justify-center"
+      className="fixed bottom-8 right-8 z-[1500] flex items-center justify-center group"
+      title={`Chat on WhatsApp (${whatsappNumber})`}
     >
       {/* Pulsing ring (animation) */}
       <span className="absolute inline-flex h-14 w-14 rounded-full bg-[#25D366] opacity-75 animate-ping [animation-duration:2.5s]" />

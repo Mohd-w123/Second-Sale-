@@ -30,7 +30,7 @@ export const createOrder = async (req, res, next) => {
       pickup,
       status: "placed",
       partnerName: "Rajesh Kumar",
-      partnerPhone: "+91 98765 43210",
+      partnerPhone: "+91 7045180009",
     });
 
     res.status(201).json({
@@ -102,7 +102,7 @@ export const getUserOrders = async (req, res, next) => {
             date: lead.createdAt,
           },
           partnerName: "TV Inspection Team",
-          partnerPhone: "+91 98765 43210",
+          partnerPhone: "+91 7045180009",
         });
       }
     }
@@ -131,7 +131,7 @@ export const getOrderById = async (req, res, next) => {
 
       const user = await User.findById(req.user.id).select("phone");
       const isOwner = (lead.userId && lead.userId.toString() === req.user.id) ||
-                      (user && user.phone === lead.customer?.phone);
+        (user && user.phone === lead.customer?.phone);
       if (!isOwner) {
         return res.status(403).json({ message: "Access denied" });
       }
@@ -171,7 +171,7 @@ export const getOrderById = async (req, res, next) => {
           date: lead.createdAt,
         },
         partnerName: "TV Inspection Team",
-        partnerPhone: "+91 98765 43210",
+        partnerPhone: "+91 7045180009",
       };
     } else if (order.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: "Access denied" });
@@ -196,7 +196,7 @@ export const cancelOrder = async (req, res, next) => {
 
       const user = await User.findById(req.user.id).select("phone");
       const isOwner = (lead.userId && lead.userId.toString() === req.user.id) ||
-                      (user && user.phone === lead.customer?.phone);
+        (user && user.phone === lead.customer?.phone);
       if (!isOwner) return res.status(403).json({ message: "Access denied" });
 
       lead.status = "cancelled";
