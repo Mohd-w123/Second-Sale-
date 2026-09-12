@@ -1,20 +1,20 @@
 import mongoose from 'mongoose';
 
 const navLinkSchema = new mongoose.Schema({
-  label:       { type: String, required: true },
-  to:          { type: String, default: '/' },
+  label: { type: String, required: true },
+  to: { type: String, default: '/' },
   hasDropdown: { type: Boolean, default: false },
-  isExternal:  { type: Boolean, default: false },
-  order:       { type: Number, default: 0 },
-  isActive:    { type: Boolean, default: true },
+  isExternal: { type: Boolean, default: false },
+  order: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
 }, { _id: true });
 
 const bannerSchema = new mongoose.Schema({
-  imageUrl:  { type: String, required: true },
-  linkTo:    { type: String, default: '/sell-old-mobile-phones/brand' },
-  altText:   { type: String, default: 'Promotional Banner' },
-  order:     { type: Number, default: 0 },
-  isActive:  { type: Boolean, default: true },
+  imageUrl: { type: String, required: true },
+  linkTo: { type: String, default: '/sell-old-mobile-phones/brand' },
+  altText: { type: String, default: 'Promotional Banner' },
+  order: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
 }, { _id: true });
 
 const DEFAULT_NAV_LINKS = [
@@ -28,7 +28,8 @@ const DEFAULT_NAV_LINKS = [
 
 const DEFAULT_FOOTER = {
   aboutText: "SecondSale is India's leading re-commerce platform for selling used electronics and buying certified refurbished gadgets at best prices.",
-  phone: "+91 98765 43210",
+  phone: "+91 7045180009",
+  whatsapp: "7045180009",
   email: "support@secondsale.com",
   address: "SecondSale Technologies Pvt Ltd, HSR Layout, Sector 2, Bengaluru, Karnataka - 560102",
   workingHours: "Monday - Sunday: 9:00 AM - 9:00 PM IST",
@@ -81,19 +82,22 @@ const DEFAULT_FOOTER = {
 };
 
 const siteSettingsSchema = new mongoose.Schema({
-  singleton:   { type: String, default: 'main', unique: true },
-  logoUrl:     { type: String, default: '' },
-  faviconUrl:  { type: String, default: '' },
+  singleton: { type: String, default: 'main', unique: true },
+  logoUrl: { type: String, default: '' },
+  faviconUrl: { type: String, default: '' },
   topBar: {
     isEnabled: { type: Boolean, default: false },
-    text:      { type: String, default: '⚡ Special Offer: Get extra ₹500 on your first device sale! Use code FIRST500' },
-    linkTo:    { type: String, default: '/sell-old-mobile-phones/brand' },
-    bgColor:   { type: String, default: '#2563EB' },
+    text: { type: String, default: '⚡ Special Offer: Get extra ₹500 on your first device sale! Use code FIRST500' },
+    linkTo: { type: String, default: '/sell-old-mobile-phones/brand' },
+    bgColor: { type: String, default: '#2563EB' },
     textColor: { type: String, default: '#FFFFFF' },
   },
-  banners:     [bannerSchema],
-  navLinks:    { type: [navLinkSchema], default: DEFAULT_NAV_LINKS },
-  footer:      { type: mongoose.Schema.Types.Mixed, default: DEFAULT_FOOTER },
+  banners: [bannerSchema],
+  navLinks: { type: [navLinkSchema], default: DEFAULT_NAV_LINKS },
+  footer: { type: mongoose.Schema.Types.Mixed, default: DEFAULT_FOOTER },
+  whatsappNumber: { type: String, default: '7045180009' },
+  whatsappEnabled: { type: Boolean, default: true },
+  whatsappMessage: { type: String, default: "Hi, I'm interested in selling my device on SecondSale." },
 }, { timestamps: true });
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);

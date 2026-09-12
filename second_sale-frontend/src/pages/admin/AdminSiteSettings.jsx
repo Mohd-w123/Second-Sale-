@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { adminService } from '../../services/admin.service';
-import { 
-  Upload, 
-  Trash2, 
-  GripVertical, 
-  Eye, 
-  EyeOff, 
-  Link as LinkIcon, 
-  Save, 
-  Image as ImageIcon, 
-  Sliders, 
-  ChevronDown, 
-  ChevronUp, 
-  Plus, 
-  Check, 
+import {
+  Upload,
+  Trash2,
+  GripVertical,
+  Eye,
+  EyeOff,
+  Link as LinkIcon,
+  Save,
+  Image as ImageIcon,
+  Sliders,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+  Check,
   AlertCircle,
   ExternalLink,
   ChevronsUpDown,
@@ -24,6 +24,7 @@ import {
   Megaphone,
   Phone,
   Mail,
+  MessageCircle,
   X,
   Clock,
   Star,
@@ -63,7 +64,7 @@ const DEFAULT_SUPPORT_LINKS = [
 
 function authHeaders() {
   const token = localStorage.getItem('adminToken');
-  return { 
+  return {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json'
   };
@@ -79,9 +80,16 @@ export default function AdminSiteSettings() {
   const [isBannersOpen, setIsBannersOpen] = useState(true);
   const [isNavOpen, setIsNavOpen] = useState(true);
   const [isTopBarOpen, setIsTopBarOpen] = useState(true);
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(true);
   const [isFooterOpen, setIsFooterOpen] = useState(true);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [isBannerListOpen, setIsBannerListOpen] = useState(true);
+
+  // WhatsApp Support state
+  const [whatsappNumber, setWhatsappNumber] = useState('7045180009');
+  const [whatsappEnabled, setWhatsappEnabled] = useState(true);
+  const [whatsappMessage, setWhatsappMessage] = useState("Hi, I'm interested in selling my device on SecondSale.");
+  const [savingWhatsApp, setSavingWhatsApp] = useState(false);
 
   // Banner upload state
   const [bannerFile, setBannerFile] = useState(null);
@@ -236,6 +244,17 @@ export default function AdminSiteSettings() {
         setFooterTwitter(data.footer.socialLinks?.twitter || '');
         setFooterLinkedin(data.footer.socialLinks?.linkedin || '');
       }
+      if (data.whatsappNumber) {
+        setWhatsappNumber(data.whatsappNumber);
+      } else if (data.footer?.whatsapp) {
+        setWhatsappNumber(data.footer.whatsapp);
+      }
+      if (data.whatsappEnabled !== undefined) {
+        setWhatsappEnabled(Boolean(data.whatsappEnabled));
+      }
+      if (data.whatsappMessage) {
+        setWhatsappMessage(data.whatsappMessage);
+      }
     } catch {
       flash('error', 'Could not load site settings. Please check server connection.');
     } finally {
@@ -297,6 +316,7 @@ export default function AdminSiteSettings() {
         ...currentFooter,
         aboutText: footerAbout,
         phone: footerPhone,
+        whatsapp: whatsappNumber,
         email: footerEmail,
         address: footerAddress,
         hours: footerHours,
@@ -327,13 +347,34 @@ export default function AdminSiteSettings() {
     }
   };
 
+  // WhatsApp handler
+  const saveWhatsApp = async () => {
+    setSavingWhatsApp(true);
+    try {
+      const res = await adminService.updateWhatsApp({
+        number: whatsappNumber,
+        isEnabled: whatsappEnabled,
+        message: whatsappMessage,
+      });
+      broadcastSettingsUpdate(res.data);
+      flash('success', 'WhatsApp chat settings saved successfully!');
+    } catch (err) {
+      flash('error', 'Failed to save WhatsApp settings');
+    } finally {
+      setSavingWhatsApp(false);
+    }
+  };
+
   // Toggle all sections
-  const allExpanded = isLogoOpen && isBannersOpen && isNavOpen;
+  const allExpanded = isLogoOpen && isBannersOpen && isNavOpen && isWhatsAppOpen;
   const toggleAll = () => {
     const nextState = !allExpanded;
     setIsLogoOpen(nextState);
     setIsBannersOpen(nextState);
     setIsNavOpen(nextState);
+    setIsTopBarOpen(nextState);
+    setIsWhatsAppOpen(nextState);
+    setIsFooterOpen(nextState);
     setIsBannerListOpen(nextState);
     if (!nextState) setIsAddFormOpen(false);
   };
@@ -662,15 +703,13 @@ export default function AdminSiteSettings() {
       {/* ── Fixed Floating Toast Alert (Visible At Any Scroll Position) ── */}
       {msg.text && (
         <div className="fixed top-6 right-6 z-[99999] flex items-center gap-3.5 px-5 py-4 rounded-2xl shadow-2xl border transition-all duration-300 animate-in fade-in slide-in-from-top-4 bg-white/95 backdrop-blur-md max-w-md border-slate-200/80">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xs ${
-            msg.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'
-          }`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xs ${msg.type === 'success' ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'
+            }`}>
             {msg.type === 'success' ? <Check size={20} className="stroke-[2.5]" /> : <AlertCircle size={20} className="stroke-[2.5]" />}
           </div>
           <div className="flex-1 min-w-0 pr-1">
-            <h4 className={`text-[11px] font-bold uppercase tracking-wider mb-0.5 ${
-              msg.type === 'success' ? 'text-emerald-700' : 'text-rose-700'
-            }`}>
+            <h4 className={`text-[11px] font-bold uppercase tracking-wider mb-0.5 ${msg.type === 'success' ? 'text-emerald-700' : 'text-rose-700'
+              }`}>
               {msg.type === 'success' ? 'Saved & Deployed' : 'Attention'}
             </h4>
             <p className="text-sm font-semibold text-slate-900 leading-snug break-words">
@@ -690,11 +729,10 @@ export default function AdminSiteSettings() {
 
       {/* ── Inline Banner Notification ────────────────────────── */}
       {msg.text && (
-        <div className={`p-4 rounded-2xl text-sm font-semibold flex items-center justify-between gap-3 border transition-all animate-in fade-in slide-in-from-top-2 ${
-          msg.type === 'success' 
-            ? 'bg-emerald-50/90 text-emerald-900 border-emerald-200 shadow-xs' 
-            : 'bg-rose-50/90 text-rose-900 border-rose-200 shadow-xs'
-        }`}>
+        <div className={`p-4 rounded-2xl text-sm font-semibold flex items-center justify-between gap-3 border transition-all animate-in fade-in slide-in-from-top-2 ${msg.type === 'success'
+          ? 'bg-emerald-50/90 text-emerald-900 border-emerald-200 shadow-xs'
+          : 'bg-rose-50/90 text-rose-900 border-rose-200 shadow-xs'
+          }`}>
           <div className="flex items-center gap-3">
             {msg.type === 'success' ? <Check size={18} className="text-emerald-600 shrink-0 stroke-[2.5]" /> : <AlertCircle size={18} className="text-rose-600 shrink-0 stroke-[2.5]" />}
             <span>{msg.text}</span>
@@ -711,7 +749,7 @@ export default function AdminSiteSettings() {
 
       {/* ── SECTION 1: WEBSITE LOGO (Collapsible Card) ────────── */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
-        <div 
+        <div
           onClick={() => setIsLogoOpen(!isLogoOpen)}
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
@@ -724,11 +762,10 @@ export default function AdminSiteSettings() {
                 <h3 className="text-base sm:text-lg font-bold text-slate-900">
                   Website Brand Logo
                 </h3>
-                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
-                  settings?.logoUrl 
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                    : 'bg-slate-100 text-slate-600 border-slate-200'
-                }`}>
+                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${settings?.logoUrl
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-slate-100 text-slate-600 border-slate-200'
+                  }`}>
                   {settings?.logoUrl ? 'Custom Logo Active' : 'Default Asset'}
                 </span>
               </div>
@@ -910,7 +947,7 @@ export default function AdminSiteSettings() {
 
       {/* ── SECTION 2: HOMEPAGE BANNER SLIDER (Collapsible Card) ─ */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
-        <div 
+        <div
           onClick={() => setIsBannersOpen(!isBannersOpen)}
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
@@ -951,7 +988,7 @@ export default function AdminSiteSettings() {
           <div className="p-5 sm:p-6 bg-white space-y-6 animate-in fade-in duration-200">
             {/* Add Banner Inner Subsection */}
             <div className="rounded-2xl border border-blue-200 bg-blue-50/50 overflow-hidden transition-all">
-              <div 
+              <div
                 onClick={() => setIsAddFormOpen(!isAddFormOpen)}
                 className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-blue-100/40 select-none transition-colors border-b border-blue-100"
               >
@@ -1080,7 +1117,7 @@ export default function AdminSiteSettings() {
 
             {/* Banners List Inner Subsection */}
             <div className="rounded-2xl border border-slate-200 overflow-hidden">
-              <div 
+              <div
                 onClick={() => setIsBannerListOpen(!isBannerListOpen)}
                 className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50 select-none transition-colors border-b border-slate-100 bg-slate-50/60"
               >
@@ -1119,11 +1156,10 @@ export default function AdminSiteSettings() {
                     settings.banners.map((banner, idx) => (
                       <div
                         key={banner._id}
-                        className={`flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border transition-all ${
-                          banner.isActive
-                            ? 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-xs'
-                            : 'border-slate-200 bg-slate-50 opacity-60'
-                        }`}
+                        className={`flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border transition-all ${banner.isActive
+                          ? 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-xs'
+                          : 'border-slate-200 bg-slate-50 opacity-60'
+                          }`}
                       >
                         <div className="flex items-center gap-3 shrink-0">
                           <GripVertical size={18} className="text-slate-300 cursor-grab shrink-0" />
@@ -1140,11 +1176,10 @@ export default function AdminSiteSettings() {
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs font-bold text-slate-400">#{idx + 1}</span>
                             <span className="text-xs font-bold text-slate-700 truncate">{banner.altText || 'Promotional Banner'}</span>
-                            <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full border ${
-                              banner.isActive 
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                                : 'bg-slate-200 text-slate-500 border-slate-300'
-                            }`}>
+                            <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full border ${banner.isActive
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-slate-200 text-slate-500 border-slate-300'
+                              }`}>
                               {banner.isActive ? 'Active' : 'Hidden'}
                             </span>
                           </div>
@@ -1193,11 +1228,10 @@ export default function AdminSiteSettings() {
                           <button
                             type="button"
                             onClick={() => toggleBanner(banner._id, banner.isActive)}
-                            className={`p-2 rounded-xl transition-all border ${
-                              banner.isActive
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                                : 'bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-200'
-                            }`}
+                            className={`p-2 rounded-xl transition-all border ${banner.isActive
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                              : 'bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-200'
+                              }`}
                             title={banner.isActive ? 'Active on site — click to hide' : 'Hidden from site — click to activate'}
                           >
                             {banner.isActive ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -1223,7 +1257,7 @@ export default function AdminSiteSettings() {
 
       {/* ── SECTION 3: HEADER NAVIGATION (Collapsible Card) ───── */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
-        <div 
+        <div
           onClick={() => setIsNavOpen(!isNavOpen)}
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
@@ -1353,11 +1387,10 @@ export default function AdminSiteSettings() {
                 settings.navLinks.map((item, index) => (
                   <div
                     key={item._id}
-                    className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${
-                      item.isActive 
-                        ? 'border-slate-200 bg-white hover:border-blue-300' 
-                        : 'border-slate-200 bg-slate-50 opacity-60'
-                    }`}
+                    className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${item.isActive
+                      ? 'border-slate-200 bg-white hover:border-blue-300'
+                      : 'border-slate-200 bg-slate-50 opacity-60'
+                      }`}
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold shrink-0">
@@ -1494,11 +1527,10 @@ export default function AdminSiteSettings() {
                       <button
                         type="button"
                         onClick={() => toggleNavLink(item)}
-                        className={`p-2 rounded-xl transition-all border ${
-                          item.isActive
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-                            : 'bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-200'
-                        }`}
+                        className={`p-2 rounded-xl transition-all border ${item.isActive
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-slate-100 text-slate-400 border-slate-200 hover:bg-slate-200'
+                          }`}
                         title={item.isActive ? 'Active — click to disable' : 'Disabled — click to enable'}
                       >
                         {togglingNavId === item._id ? <RefreshCw size={15} className="animate-spin text-blue-600" /> : item.isActive ? <Eye size={15} /> : <EyeOff size={15} />}
@@ -1522,7 +1554,7 @@ export default function AdminSiteSettings() {
 
       {/* ── SECTION 4: TOP ANNOUNCEMENT BAR ───────────────────────── */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
-        <div 
+        <div
           onClick={() => setIsTopBarOpen(!isTopBarOpen)}
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
@@ -1535,9 +1567,8 @@ export default function AdminSiteSettings() {
                 <h3 className="text-base sm:text-lg font-bold text-slate-900">
                   Top Announcement Bar
                 </h3>
-                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
-                  topBarEnabled ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
-                }`}>
+                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${topBarEnabled ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
+                  }`}>
                   {topBarEnabled ? 'Active' : 'Disabled'}
                 </span>
               </div>
@@ -1645,9 +1676,137 @@ export default function AdminSiteSettings() {
         )}
       </div>
 
-      {/* ── SECTION 5: FOOTER INFORMATION & SOCIAL LINKS ───────────── */}
+      {/* ── SECTION 5: WHATSAPP CHAT SUPPORT (Collapsible Card) ─────── */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
         <div 
+          onClick={() => setIsWhatsAppOpen(!isWhatsAppOpen)}
+          className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+              <MessageCircle size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  WhatsApp Chat & Floating Support
+                </h3>
+                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${
+                  whatsappEnabled 
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                }`}>
+                  {whatsappEnabled ? 'Chat Active on Website' : 'Chat Disabled'}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Configure the floating WhatsApp button for website visitors (automatically hidden in Admin Panel)
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setIsWhatsAppOpen(!isWhatsAppOpen); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-all shadow-xs"
+            >
+              <span>{isWhatsAppOpen ? 'Collapse' : 'Expand'}</span>
+              {isWhatsAppOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+          </div>
+        </div>
+
+        {isWhatsAppOpen && (
+          <div className="p-5 sm:p-6 bg-white space-y-5 animate-in fade-in duration-200">
+            {/* Info notice: only on website, not in admin */}
+            <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-xs text-emerald-900 flex items-start gap-2.5">
+              <span className="text-base leading-none">💬</span>
+              <div>
+                <strong className="font-bold">Website-Only Floating Widget:</strong> The WhatsApp floating button is displayed on all customer-facing website pages (Home, Brands, Quotations, FAQs, etc.) and is strictly removed from all admin screens.
+              </div>
+            </div>
+
+            {/* Toggle Enable/Disable */}
+            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <div>
+                <p className="text-xs font-bold text-slate-800">Show Floating WhatsApp Button</p>
+                <p className="text-[11px] text-slate-500">Enable or disable the floating WhatsApp icon across the public website</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={whatsappEnabled}
+                  onChange={(e) => setWhatsappEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  WhatsApp Support Phone Number
+                </label>
+                <input
+                  type="text"
+                  placeholder="7045180009 or +91 7045180009"
+                  value={whatsappNumber}
+                  onChange={(e) => setWhatsappNumber(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono text-slate-900 font-bold"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Target WhatsApp link: <code className="bg-slate-100 px-1 py-0.5 rounded text-emerald-700 font-mono">https://wa.me/{whatsappNumber.replace(/\D/g, '').length === 10 ? `91${whatsappNumber.replace(/\D/g, '')}` : whatsappNumber.replace(/\D/g, '')}</code>
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Pre-filled Chat Message
+                </label>
+                <input
+                  type="text"
+                  placeholder="Hi, I'm interested in selling my device on SecondSale."
+                  value={whatsappMessage}
+                  onChange={(e) => setWhatsappMessage(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white text-slate-900"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  This message automatically appears in WhatsApp when user clicks the chat button.
+                </p>
+              </div>
+            </div>
+
+            {/* Actions Bar */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+              <a
+                href={`https://wa.me/${whatsappNumber.replace(/\D/g, '').length === 10 ? `91${whatsappNumber.replace(/\D/g, '')}` : whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMessage || "Hi, I'm interested in selling my device on SecondSale.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <ExternalLink size={13} />
+                <span>Test WhatsApp Link in New Tab</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={saveWhatsApp}
+                disabled={savingWhatsApp}
+                className="ml-auto px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
+              >
+                {savingWhatsApp ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
+                <span>Save WhatsApp Settings</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── SECTION 6: FOOTER INFORMATION & SOCIAL LINKS ───────────── */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div
           onClick={() => setIsFooterOpen(!isFooterOpen)}
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
@@ -1696,7 +1855,7 @@ export default function AdminSiteSettings() {
             </div>
 
             {/* Contact Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   Support Phone Number
@@ -1707,6 +1866,19 @@ export default function AdminSiteSettings() {
                   value={footerPhone}
                   onChange={(e) => setFooterPhone(e.target.value)}
                   className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  WhatsApp Chat Number
+                </label>
+                <input
+                  type="text"
+                  placeholder="7045180009"
+                  value={whatsappNumber}
+                  onChange={(e) => setWhatsappNumber(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono text-emerald-700 font-bold"
                 />
               </div>
 
@@ -1855,16 +2027,14 @@ export default function AdminSiteSettings() {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveFooterTab(tab.id)}
-                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      activeFooterTab === tab.id
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-                    }`}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeFooterTab === tab.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                      }`}
                   >
                     <span>{tab.label}</span>
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                      activeFooterTab === tab.id ? 'bg-blue-700 text-blue-100' : 'bg-slate-100 text-slate-500'
-                    }`}>
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeFooterTab === tab.id ? 'bg-blue-700 text-blue-100' : 'bg-slate-100 text-slate-500'
+                      }`}>
                       {tab.count}
                     </span>
                   </button>
@@ -1892,8 +2062,8 @@ export default function AdminSiteSettings() {
                     activeFooterTab === 'sellDevices'
                       ? footerSellDevices
                       : activeFooterTab === 'company'
-                      ? footerCompanyLinks
-                      : footerSupportLinks;
+                        ? footerCompanyLinks
+                        : footerSupportLinks;
 
                   const updateCurrentList = (newList) => {
                     if (activeFooterTab === 'sellDevices') setFooterSellDevices(newList);

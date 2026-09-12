@@ -6,7 +6,7 @@ export const DEFAULT_DESCRIPTION =
   "SecondSale is India's trusted device buyback platform. Sell old mobile phones, tablets, laptops and iMac online with free doorstep pickup and instant payment across 2,000+ cities.";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.svg`;
 export const PHONE = '+91-8310732405';
-export const WHATSAPP = '918310732405';
+export const WHATSAPP = '917045180009';
 export const SUPPORT_EMAIL = 'support@secondsale.in';
 
 export const SOCIAL_LINKS = {

@@ -15,6 +15,7 @@ import {
   uploadFavicon,
   updateTopBar,
   updateFooter,
+  updateWhatsApp,
   upload,
 } from '../controllers/siteSettings.controller.js';
 
@@ -29,6 +30,7 @@ router.post('/logo', upload.single('logo'), uploadLogo);
 router.post('/favicon', upload.single('favicon'), uploadFavicon);
 router.put('/top-bar', updateTopBar);
 router.put('/footer', updateFooter);
+router.put('/whatsapp', updateWhatsApp);
 router.post('/banners', upload.single('banner'), addBanner);
 router.patch('/banners/:bannerId', updateBanner);
 router.delete('/banners/:bannerId', deleteBanner);

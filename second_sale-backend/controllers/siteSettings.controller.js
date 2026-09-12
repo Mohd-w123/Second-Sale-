@@ -48,10 +48,28 @@ export const getSettings = async (req, res) => {
   try {
     let settings = await SiteSettings.findOne({ singleton: 'main' });
     if (!settings) {
-      settings = await SiteSettings.create({ singleton: 'main', banners: [], navLinks: DEFAULT_NAV_LINKS });
-    } else if (!settings.navLinks || settings.navLinks.length === 0) {
-      settings.navLinks = DEFAULT_NAV_LINKS;
-      await settings.save();
+      settings = await SiteSettings.create({
+        singleton: 'main',
+        banners: [],
+        navLinks: DEFAULT_NAV_LINKS,
+        whatsappNumber: '7045180009',
+        whatsappEnabled: true,
+      });
+    } else {
+      let changed = false;
+      if (!settings.navLinks || settings.navLinks.length === 0) {
+        settings.navLinks = DEFAULT_NAV_LINKS;
+        changed = true;
+      }
+      if (!settings.whatsappNumber) {
+        settings.whatsappNumber = '7045180009';
+        changed = true;
+      }
+      if (settings.whatsappEnabled === undefined) {
+        settings.whatsappEnabled = true;
+        changed = true;
+      }
+      if (changed) await settings.save();
     }
     res.json(settings);
   } catch (err) {
@@ -286,6 +304,36 @@ export const updateFooter = async (req, res) => {
     let settings = await SiteSettings.findOne({ singleton: 'main' });
     if (!settings) settings = new SiteSettings({ singleton: 'main' });
     settings.footer = footer;
+    if (footer?.whatsapp) {
+      settings.whatsappNumber = String(footer.whatsapp).trim();
+    }
+    await settings.save();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── UPDATE WhatsApp Support Settings ───────────────────────────
+export const updateWhatsApp = async (req, res) => {
+  try {
+    const { number, isEnabled, message } = req.body;
+    let settings = await SiteSettings.findOne({ singleton: 'main' });
+    if (!settings) settings = new SiteSettings({ singleton: 'main' });
+
+    if (number !== undefined) {
+      const clean = String(number).trim();
+      settings.whatsappNumber = clean;
+      if (!settings.footer) settings.footer = {};
+      settings.footer.whatsapp = clean;
+    }
+    if (isEnabled !== undefined) {
+      settings.whatsappEnabled = Boolean(isEnabled);
+    }
+    if (message !== undefined) {
+      settings.whatsappMessage = String(message).trim();
+    }
+
     await settings.save();
     res.json(settings);
   } catch (err) {

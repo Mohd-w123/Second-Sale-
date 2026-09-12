@@ -87,10 +87,11 @@ export const adminService = {
   updatePage: (id, data) => adminApi.put(`/pages/admin/${id}`, data),
   deletePage: (id) => adminApi.delete(`/pages/admin/${id}`),
 
-  // Site Settings (Favicon, Top Bar, Footer)
+  // Site Settings (Favicon, Top Bar, Footer, WhatsApp)
   uploadFavicon: (formData) => adminApi.post('/site-settings/favicon', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   updateTopBar: (data) => adminApi.put('/site-settings/top-bar', data),
   updateFooter: (data) => adminApi.put('/site-settings/footer', data),
+  updateWhatsApp: (data) => adminApi.put('/site-settings/whatsapp', data),
 
   // Sales Users / Staff Team Management
   getSalesUsers: () => adminApi.get('/admin/sales-users'),
