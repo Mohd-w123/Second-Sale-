@@ -45,6 +45,8 @@ export function calculatePrice({
   basePrice,
   deviceAge,
   ableToMakeCalls,
+  doesTabletSwitchOn,
+  isCellularNetworkWorking,
   isTouchScreenWorking,
   isScreenOriginal,
   underWarranty,
@@ -71,9 +73,15 @@ export function calculatePrice({
   const agePct = isSpecial ? 0 : (ageDeductions[deviceAge] ?? 7);
   if (agePct > 0) applyDeduction('age', agePct);
 
-  // 2. Dead device (cannot make calls) — 90%
-  if (ableToMakeCalls === false) {
+  // 2. Dead device (cannot make calls / does not switch on) — 90%
+  const isDead = (doesTabletSwitchOn === false) || (ableToMakeCalls === false);
+  if (isDead) {
     applyDeduction('dead', 90);
+  }
+
+  // 2b. Cellular / Network issue — 20%
+  if (isCellularNetworkWorking === false) {
+    applyDeduction('cellularNetworkFaulty', 20);
   }
 
   // 3. Touch screen faulty — 65%

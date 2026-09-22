@@ -369,7 +369,24 @@ function DeviceEvaluationReportModal({ order, onClose }) {
                   {supportsESIM(order.device?.modelName) && order.device?.eSIMSupport && (
                     <ReportRow label="eSIM Support" value={order.device.eSIMSupport === 'esim_only_global' ? 'Dual eSIM Only' : 'Physical + eSIM'} />
                   )}
-                  <ReportRow label="Calls Functional" value={order.device?.ableToMakeCalls ? 'Yes' : 'No'} isAlert={!order.device?.ableToMakeCalls} />
+                  {order.device?.category === 'tablet' ? (
+                    <>
+                      <ReportRow 
+                        label="Tablet Switches On" 
+                        value={order.device?.doesTabletSwitchOn !== undefined ? (order.device?.doesTabletSwitchOn ? 'Yes' : 'No') : (order.device?.ableToMakeCalls ? 'Yes' : 'No')} 
+                        isAlert={order.device?.doesTabletSwitchOn === false || order.device?.ableToMakeCalls === false} 
+                      />
+                      {order.device?.isCellularNetworkWorking !== undefined && (
+                        <ReportRow 
+                          label="Cellular Network" 
+                          value={order.device?.isCellularNetworkWorking ? 'Working' : 'Faulty'} 
+                          isAlert={!order.device?.isCellularNetworkWorking} 
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <ReportRow label="Calls Functional" value={order.device?.ableToMakeCalls ? 'Yes' : 'No'} isAlert={!order.device?.ableToMakeCalls} />
+                  )}
                   <ReportRow label="Touch screen working" value={order.device?.isTouchScreenWorking ? 'Yes' : 'No'} isAlert={!order.device?.isTouchScreenWorking} />
                   <ReportRow label="Screen Original" value={order.device?.isScreenOriginal ? 'Yes' : 'No'} isAlert={!order.device?.isScreenOriginal} />
                   <ReportRow label="Accessories" value={Array.isArray(order.device?.accessories) ? order.device.accessories.join(', ') : 'None'} />

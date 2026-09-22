@@ -114,8 +114,14 @@ function OrderDetailModal({ order, onClose }) {
             <InfoRow label="Touchscreen Working" value={d.isTouchScreenWorking === true ? "Yes" : d.isTouchScreenWorking === false ? "No" : null} />
             <InfoRow label="Screen Original" value={d.isScreenOriginal === true ? "Yes" : d.isScreenOriginal === false ? "No" : null} />
             <InfoRow label="Under Warranty" value={d.underWarranty === true ? "Yes" : d.underWarranty === false ? "No" : null} />
-            <InfoRow label="Has GST Bill" value={d.hasGSTBill === true ? "Yes" : d.hasGSTBill === false ? "No" : null} />
-            <InfoRow label="Able to Make Calls" value={d.ableToMakeCalls === true ? "Yes" : d.ableToMakeCalls === false ? "No" : null} />
+            {d.category === 'tablet' ? (
+              <>
+                <InfoRow label="Tablet Switches On" value={d.doesTabletSwitchOn === true ? "Yes" : d.doesTabletSwitchOn === false ? "No" : (d.ableToMakeCalls === true ? "Yes" : d.ableToMakeCalls === false ? "No" : null)} />
+                <InfoRow label="Cellular Network Working" value={d.isCellularNetworkWorking === true ? "Yes" : d.isCellularNetworkWorking === false ? "No" : null} />
+              </>
+            ) : (
+              <InfoRow label="Able to Make Calls" value={d.ableToMakeCalls === true ? "Yes" : d.ableToMakeCalls === false ? "No" : null} />
+            )}
             <InfoRow label="Physical Issues" value={formatList(d.physicalIssues)} />
             <InfoRow label="Technical Issues" value={formatList(d.technicalIssues)} />
             <InfoRow label="Functional Issues" value={formatList(d.functionalIssues)} />
