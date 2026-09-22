@@ -46,9 +46,10 @@ export default function TabletConditionQuizPage() {
   const [underWarranty, setUnderWarranty] = useState(null);
   const [eSIMSupport, seteSIMSupport] = useState('physical+esim');
 
-  const [ableToMakeCalls, setAbleToMakeCalls] = useState(null);
+  const [doesTabletSwitchOn, setDoesTabletSwitchOn] = useState(null);
   const [isTouchScreenWorking, setIsTouchScreenWorking] = useState(null);
   const [isScreenOriginal, setIsScreenOriginal] = useState(null);
+  const [isCellularNetworkWorking, setIsCellularNetworkWorking] = useState(null);
 
   const [physicalIssues, setPhysicalIssues] = useState([]);
   const [technicalIssues, setTechnicalIssues] = useState([]);
@@ -58,6 +59,8 @@ export default function TabletConditionQuizPage() {
   const [priceAnimating, setPriceAnimating] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [breakdown, setBreakdown] = useState(null);
+
+  const isWifiOnly = /wi-?fi only/i.test(device?.modelName || '') || /wifi-only/i.test(device?.slug || '');
 
   useEffect(() => {
     deviceService.getDevice(slug).then(res => {
@@ -84,7 +87,9 @@ export default function TabletConditionQuizPage() {
     const result = calculatePrice({
       basePrice: variant.basePrice,
       deviceAge,
-      ableToMakeCalls: ableToMakeCalls ?? true,
+      ableToMakeCalls: doesTabletSwitchOn ?? true,
+      doesTabletSwitchOn: doesTabletSwitchOn ?? true,
+      isCellularNetworkWorking: isCellularNetworkWorking ?? true,
       isTouchScreenWorking: isTouchScreenWorking ?? true,
       isScreenOriginal: isScreenOriginal ?? true,
       underWarranty: underWarranty ?? true,
@@ -103,7 +108,8 @@ export default function TabletConditionQuizPage() {
   }, [
     device, 
     deviceAge, 
-    ableToMakeCalls, 
+    doesTabletSwitchOn, 
+    isCellularNetworkWorking,
     isTouchScreenWorking, 
     isScreenOriginal, 
     underWarranty, 
@@ -123,7 +129,9 @@ export default function TabletConditionQuizPage() {
         imageUrl: device.imageUrl || '',
         storage: storage || device.variants[0].storage,
         deviceAge,
-        ableToMakeCalls,
+        ableToMakeCalls: doesTabletSwitchOn,
+        doesTabletSwitchOn,
+        isCellularNetworkWorking,
         isTouchScreenWorking,
         isScreenOriginal,
         underWarranty,
@@ -250,9 +258,14 @@ export default function TabletConditionQuizPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                   <EvaluationRow label="Device Age" value={deviceAge} color="#2563EB" />
                   <EvaluationRow label="Under Warranty" value={underWarranty ? 'Yes' : 'No'} color={underWarranty ? '#2563EB' : '#EF4444'} />
-                  <EvaluationRow label="Calls Functional" value={ableToMakeCalls ? 'Yes' : 'No (Dead)'} color={ableToMakeCalls ? '#2563EB' : '#EF4444'} />
+                  <EvaluationRow label="Tablet Switches On" value={doesTabletSwitchOn ? 'Yes' : 'No (Dead)'} color={doesTabletSwitchOn ? '#2563EB' : '#EF4444'} />
                   <EvaluationRow label="Touch Screen working" value={isTouchScreenWorking ? 'Yes' : 'No'} color={isTouchScreenWorking ? '#2563EB' : '#EF4444'} />
                   <EvaluationRow label="Screen Original" value={isScreenOriginal ? 'Yes' : 'No (Copy Screen)'} color={isScreenOriginal ? '#2563EB' : '#EF4444'} />
+                  <EvaluationRow 
+                    label={isWifiOnly ? "Wi-Fi Network" : "Cellular Network"} 
+                    value={isCellularNetworkWorking ? 'Working' : 'Faulty'} 
+                    color={isCellularNetworkWorking ? '#2563EB' : '#EF4444'} 
+                  />
                   <EvaluationRow label="Physical Issues" value={physicalIssues.length > 0 ? physicalIssues.join(', ') : 'No Issues'} color={physicalIssues.length > 0 ? '#EF4444' : '#2563EB'} />
                   <EvaluationRow label="Technical Issues" value={technicalIssues.length > 0 ? technicalIssues.join(', ') : 'No Issues'} color={technicalIssues.length > 0 ? '#EF4444' : '#2563EB'} />
                   <EvaluationRow label="Accessories" value={selectedAccessories.join(', ') || 'None'} color="#2563EB" />
@@ -430,26 +443,29 @@ export default function TabletConditionQuizPage() {
                   </div>
                 )}
 
-                {/* STEP 1: Calls & Screen */}
+                {/* STEP 1: General & Screen */}
                 {currentStepIndex === 1 && (
                   <div className="space-y-10">
-                    {/* Q1: Calls */}
+                    {/* Q1: Tablet Switches On */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-bold text-[#111827]">1. Are you able to make and receive calls?</h3>
+                      <div>
+                        <h3 className="text-lg font-bold text-[#111827]">1. Does the tablet switch on?</h3>
+                        <p className="text-xs text-gray-500 font-medium mt-1">We currently only accept devices that switch on without any issues.</p>
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <button
-                          onClick={() => setAbleToMakeCalls(true)}
+                          onClick={() => setDoesTabletSwitchOn(true)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
-                            ${ableToMakeCalls === true 
+                            ${doesTabletSwitchOn === true 
                               ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           Yes
                         </button>
                         <button
-                          onClick={() => setAbleToMakeCalls(false)}
+                          onClick={() => setDoesTabletSwitchOn(false)}
                           className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
-                            ${ableToMakeCalls === false 
+                            ${doesTabletSwitchOn === false 
                               ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
@@ -504,6 +520,40 @@ export default function TabletConditionQuizPage() {
                               : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
                         >
                           No (Copy Screen)
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Q4: Cellular / Network */}
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-[#111827]">
+                          4. {isWifiOnly ? "Is your device's Wi-Fi network working properly?" : "Is your device's cellular network working properly?"}
+                        </h3>
+                        <p className="text-xs text-gray-500 font-medium mt-1">
+                          {isWifiOnly 
+                            ? "Check your device for wireless / Wi-Fi network connectivity issues."
+                            : "Check your device for cellular network connectivity issues."}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button
+                          onClick={() => setIsCellularNetworkWorking(true)}
+                          className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
+                            ${isCellularNetworkWorking === true 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
+                              : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={() => setIsCellularNetworkWorking(false)}
+                          className={`py-4 rounded-xl border-2 font-bold text-sm transition-all
+                            ${isCellularNetworkWorking === false 
+                              ? 'border-[#2563EB] bg-[#E6F4FF] text-[#2563EB]' 
+                              : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'}`}
+                        >
+                          No
                         </button>
                       </div>
                     </div>
@@ -660,7 +710,12 @@ export default function TabletConditionQuizPage() {
                     onClick={() => setCurrentStepIndex(prev => prev + 1)}
                     disabled={
                       (currentStepIndex === 0 && (underWarranty === null || eSIMSupport === null)) ||
-                      (currentStepIndex === 1 && (ableToMakeCalls === null || isTouchScreenWorking === null || isScreenOriginal === null))
+                      (currentStepIndex === 1 && (
+                        doesTabletSwitchOn === null || 
+                        isTouchScreenWorking === null || 
+                        isScreenOriginal === null || 
+                        isCellularNetworkWorking === null
+                      ))
                     }
                     className="bg-[#2563EB] text-white font-bold px-8 py-4 rounded-xl hover:bg-[#1D4ED8] transition-all disabled:opacity-50"
                   >
@@ -689,7 +744,11 @@ export default function TabletConditionQuizPage() {
             <div className="space-y-6">
               <SummaryItem label="Device Age" value={deviceAge} active />
               <SummaryItem label="Warranty" value={underWarranty === null ? 'Not answered' : (underWarranty ? 'Under Warranty' : 'Out of Warranty')} active={underWarranty !== null} />
-              <SummaryItem label="General & Screen" value={ableToMakeCalls === null ? 'Not answered' : `Calls: ${ableToMakeCalls ? 'Yes' : 'No'}, Touch: ${isTouchScreenWorking ? 'Yes' : 'No'}, Original: ${isScreenOriginal ? 'Yes' : 'No'}`} active={ableToMakeCalls !== null} />
+              <SummaryItem 
+                label="General & Screen" 
+                value={doesTabletSwitchOn === null ? 'Not answered' : `Power: ${doesTabletSwitchOn ? 'Yes' : 'No'}, Touch: ${isTouchScreenWorking ? 'Yes' : 'No'}, Original: ${isScreenOriginal ? 'Yes' : 'No'}, Network: ${isCellularNetworkWorking ? 'Yes' : 'No'}`} 
+                active={doesTabletSwitchOn !== null} 
+              />
               <SummaryItem label="Physical Issues" value={physicalIssues.length > 0 ? `${physicalIssues.length} issues selected` : 'No Issues'} active={currentStepIndex >= 2} />
               <SummaryItem label="Technical Issues" value={technicalIssues.length > 0 ? `${technicalIssues.length} issues selected` : 'No Issues'} active={currentStepIndex >= 3} />
               <SummaryItem label="Accessories" value={selectedAccessories.length > 0 ? selectedAccessories.join(', ') : 'None selected'} active={currentStepIndex >= 4} />

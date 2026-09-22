@@ -19,9 +19,11 @@ const orderSchema = new mongoose.Schema({
     modelName: String,
     slug: String,
     storage: String,
-    // Mobile v2 fields (percentage-based model)
+    // Mobile & Tablet v2 fields (percentage-based model)
     deviceAge: String,
     ableToMakeCalls: Boolean,
+    doesTabletSwitchOn: Boolean,
+    isCellularNetworkWorking: Boolean,
     isTouchScreenWorking: Boolean,
     isScreenOriginal: Boolean,
     underWarranty: Boolean,
