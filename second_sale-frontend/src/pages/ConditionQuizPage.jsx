@@ -44,6 +44,27 @@ import {
   DefectScreenSpotsLinesIcon,
   DefectBodyScratchDentIcon,
   DefectPanelMissingBrokenIcon,
+  ScreenCrackedGlassIcon,
+  ScreenChippedOutsideIcon,
+  ScreenScratchesHeavyIcon,
+  ScreenScratchesMinorIcon,
+  DisplaySpotsHeavyIcon,
+  DisplaySpotsMultipleIcon,
+  DisplaySpotsMinorIcon,
+  CleanPhoneWithSparkleIcon,
+  DisplayLinesVisibleIcon,
+  DisplayLinesFadedIcon,
+  DisplayDiscolorationMajorIcon,
+  DisplayDiscolorationMinorIcon,
+  BodyScratchesHeavyIcon,
+  BodyScratchesMinorIcon,
+  BodyDentMajorIcon,
+  BodyDentMinorIcon,
+  PanelBrokenIcon,
+  PanelMissingIcon,
+  PanelBentIcon,
+  PanelLooseScreenIcon,
+  PanelStraightIcon,
 } from '../components/quiz/QuizIcons';
 
 // --- Steps matching Cashify Mobile Flow ---
@@ -54,7 +75,7 @@ const STEPS = [
   { id: 'accessories', label: 'Accessories' },
 ];
 
-// Screen & Body Defects (Cashify Step 2)
+// Screen & Body Defects (Cashify Step 2 - Primary Selection)
 const CASHIFY_SCREEN_BODY_DEFECTS = [
   {
     id: 'defect_screen_broken_scratch',
@@ -81,6 +102,116 @@ const CASHIFY_SCREEN_BODY_DEFECTS = [
     icon: DefectPanelMissingBrokenIcon,
   },
 ];
+
+// ─── CASHIFY SUB-STEP DEFECT SPECIFICATIONS ────────────────────────────────
+const SUB_DEFECT_CONFIGS = {
+  defect_screen_broken_scratch: {
+    header: 'Tell us more about your device screen defects?',
+    subtitle: '(Because you selected screen defect)',
+    sections: [
+      {
+        id: 'screen_physical_condition',
+        title: 'Screen Physical Condition',
+        subtitle: 'Check physical condition of Display Screen',
+        options: [
+          { id: 'screen_cracked', label: 'Screen cracked/ glass broken', icon: ScreenCrackedGlassIcon, deductionKey: 'screen_cracked' },
+          { id: 'screen_chipped', label: 'Chipped/cracked outside display area', icon: ScreenChippedOutsideIcon, deductionKey: 'screen_chipped' },
+          { id: 'screen_scratches_heavy', label: 'More than 2 scratches on screen', icon: ScreenScratchesHeavyIcon, deductionKey: 'screen_scratches_major' },
+          { id: 'screen_scratches_minor', label: '1-2 scratches on screen', icon: ScreenScratchesMinorIcon, deductionKey: 'screen_scratches_minor' },
+        ],
+      },
+    ],
+  },
+  defect_screen_spots_lines: {
+    header: "Tell us more about your device's screen defects?",
+    subtitle: '(because you selected defective screen)',
+    sections: [
+      {
+        id: 'screen_spots',
+        title: '1. Dead Pixels/Spots on Screen',
+        subtitle: "Check your device's screen for visible spots",
+        options: [
+          { id: 'spots_heavy', label: 'Large/ heavy visible spots on screen', icon: DisplaySpotsHeavyIcon, deductionKey: 'deadPixels' },
+          { id: 'spots_multiple', label: '3 or more minor spots on screen', icon: DisplaySpotsMultipleIcon, deductionKey: 'dead_spots_lines' },
+          { id: 'spots_minor', label: '1-2 minor spots on screen', icon: DisplaySpotsMinorIcon, deductionKey: 'screen_spots_minor' },
+          { id: 'spots_none', label: 'No spots on screen', icon: CleanPhoneWithSparkleIcon, deductionKey: null },
+        ],
+      },
+      {
+        id: 'screen_lines',
+        title: '2. Visible Lines on Screen',
+        subtitle: "Check your device's screen for visible lines",
+        options: [
+          { id: 'lines_visible', label: 'Visible line(s) on display', icon: DisplayLinesVisibleIcon, deductionKey: 'screen_lines' },
+          { id: 'lines_faded', label: 'Display faded along edges', icon: DisplayLinesFadedIcon, deductionKey: 'screen_faded' },
+          { id: 'lines_none', label: 'No line(s) on Display', icon: CleanPhoneWithSparkleIcon, deductionKey: null },
+        ],
+      },
+      {
+        id: 'screen_discoloration',
+        title: '3. Discoloration on Screen',
+        subtitle: "Check your device's screen for discoloration",
+        options: [
+          { id: 'discoloration_major', label: 'Major Discoloration', icon: DisplayDiscolorationMajorIcon, deductionKey: 'screen_discoloration_major' },
+          { id: 'discoloration_minor', label: 'Minor Discoloration', icon: DisplayDiscolorationMinorIcon, deductionKey: 'screen_discoloration_minor' },
+          { id: 'discoloration_none', label: 'No Discoloration', icon: CleanPhoneWithSparkleIcon, deductionKey: null },
+        ],
+      },
+    ],
+  },
+  defect_body_scratch_dent: {
+    header: "Tell us more about your device's body defects?",
+    subtitle: "(Because you selected device's body defect)",
+    sections: [
+      {
+        id: 'body_scratches',
+        title: '1. Scratches on device Body',
+        subtitle: 'Check for scratches on device body',
+        options: [
+          { id: 'scratches_heavy', label: 'More than 2 scratches', icon: BodyScratchesHeavyIcon, deductionKey: 'scratches' },
+          { id: 'scratches_minor', label: '1-2 scratches', icon: BodyScratchesMinorIcon, deductionKey: 'body_scratches_minor' },
+          { id: 'scratches_none', label: 'No scratches', icon: CleanPhoneWithSparkleIcon, deductionKey: null },
+        ],
+      },
+      {
+        id: 'body_dents',
+        title: '2. Dents on device Body',
+        subtitle: 'Check for dents on device body',
+        options: [
+          { id: 'dents_major', label: 'Major dent(s) or more than 2', icon: BodyDentMajorIcon, deductionKey: 'bent_curved' },
+          { id: 'dents_minor', label: '1-2 minor dents', icon: BodyDentMinorIcon, deductionKey: 'body_scratches_dents' },
+          { id: 'dents_none', label: 'No dents', icon: CleanPhoneWithSparkleIcon, deductionKey: null },
+        ],
+      },
+    ],
+  },
+  defect_panel_missing_broken: {
+    header: "Tell us more about your device's body defects?",
+    subtitle: "(Because you selected device's body defect)",
+    sections: [
+      {
+        id: 'panel_condition',
+        title: '1. Device Side/Back Panel Condition',
+        subtitle: "Check your device's side & back panels",
+        options: [
+          { id: 'panel_broken', label: 'Cracked/ broken side or back panel', icon: PanelBrokenIcon, deductionKey: 'panel_cracked' },
+          { id: 'panel_missing', label: 'Missing side or back panel', icon: PanelMissingIcon, deductionKey: 'panel_missing' },
+          { id: 'panel_none', label: 'No defect on side or back panel', icon: PanelStraightIcon, deductionKey: null },
+        ],
+      },
+      {
+        id: 'panel_bent_loose',
+        title: '2. Device Bent/Screen loose',
+        subtitle: 'Check if your device is bent or display screen is loose',
+        options: [
+          { id: 'panel_bent', label: 'Bent/ curved panel', icon: PanelBentIcon, deductionKey: 'bent_curved' },
+          { id: 'panel_loose', label: 'Loose screen (Gap in screen and body)', icon: PanelLooseScreenIcon, deductionKey: 'loose_screen' },
+          { id: 'panel_straight', label: 'Phone not bent', icon: PanelStraightIcon, deductionKey: null },
+        ],
+      },
+    ],
+  },
+};
 
 // 18 Cashify Hardware & Physical Defects
 const FUNCTIONAL_PROBLEMS = [
@@ -152,6 +283,8 @@ export default function ConditionQuizPage() {
 
   // Step 2: Screen & Body Defects (Cashify Step 2)
   const [screenBodyDefects, setScreenBodyDefects] = useState([]);
+  const [isSubDefectView, setIsSubDefectView] = useState(false);
+  const [subDefectAnswers, setSubDefectAnswers] = useState({});
 
   // Step 3: Functional Problems (Cashify Step 3)
   const [functionalProblems, setFunctionalProblems] = useState([]);
@@ -206,6 +339,32 @@ export default function ConditionQuizPage() {
     ? (underWarranty ? '0 - 3 Months' : 'Above 11 Months')
     : 'Above 11 Months';
 
+  // Extract all active sub-defect deduction keys
+  const activeSubDefectDeductionKeys = [];
+  screenBodyDefects.forEach(defectId => {
+    const config = SUB_DEFECT_CONFIGS[defectId];
+    if (config) {
+      let hasAnsweredAny = false;
+      config.sections.forEach(sec => {
+        const val = subDefectAnswers[sec.id];
+        const selectedIds = Array.isArray(val) ? val : (val ? [val] : []);
+        selectedIds.forEach(chosenOptId => {
+          hasAnsweredAny = true;
+          const opt = sec.options.find(o => o.id === chosenOptId);
+          if (opt && opt.deductionKey) {
+            activeSubDefectDeductionKeys.push(opt.deductionKey);
+          }
+        });
+      });
+      // If user selected this defect category on step 2, but has not answered sub-defect yet, fallback to defectId
+      if (!hasAnsweredAny) {
+        activeSubDefectDeductionKeys.push(defectId);
+      }
+    } else {
+      activeSubDefectDeductionKeys.push(defectId);
+    }
+  });
+
   const breakdown = device ? calculatePrice({
     brand: device.brand,
     modelName: device.modelName,
@@ -219,9 +378,16 @@ export default function ConditionQuizPage() {
     underWarranty: isWarrantyEligible ? (underWarranty ?? true) : false,
     hasGSTBill: isWarrantyEligible ? (hasGSTBill ?? true) : false,
     eSIMSupport: eSIMSupport === 'dual_esim' ? 'dual_esim' : 'single_esim',
-    screenCondition: screenBodyDefects.includes('defect_screen_broken_scratch') ? 'cracked' : 'none',
-    bodyCondition: screenBodyDefects.includes('defect_body_scratch_dent') ? 'average' : 'good',
-    physicalIssues: screenBodyDefects,
+    screenCondition: (
+      subDefectAnswers.screen_physical_condition === 'screen_cracked' ||
+      screenBodyDefects.includes('defect_screen_broken_scratch')
+    ) ? 'cracked' : 'none',
+    bodyCondition: (
+      subDefectAnswers.body_dents === 'dents_major' ||
+      subDefectAnswers.body_scratches === 'scratches_heavy' ||
+      screenBodyDefects.includes('defect_body_scratch_dent')
+    ) ? 'average' : 'good',
+    physicalIssues: activeSubDefectDeductionKeys,
     technicalIssues: functionalProblems,
     hasBox,
     hasCharger: bundlesCharger(device.brand, device.modelName) ? hasCharger : true,
@@ -248,6 +414,7 @@ export default function ConditionQuizPage() {
         isWarrantyEligible,
         eSIMSupport,
         screenBodyDefects,
+        subDefectAnswers,
         functionalProblems,
         accessories: [
           hasBox ? 'Original Box' : null,
@@ -278,6 +445,79 @@ export default function ConditionQuizPage() {
     isScreenOriginal !== null &&
     (!isWarrantyEligible || (underWarranty !== null && hasGSTBill !== null)) &&
     (!isEsimDevice || eSIMSupport !== null);
+
+  // Validation for Step 2 Sub-defects
+  const isSubDefectsComplete = !isSubDefectView || screenBodyDefects.every(d => {
+    const config = SUB_DEFECT_CONFIGS[d];
+    if (!config) return true;
+    return config.sections.every(sec => {
+      const vals = subDefectAnswers[sec.id];
+      return Array.isArray(vals) ? vals.length > 0 : Boolean(vals);
+    });
+  });
+
+  const isNextDisabled =
+    (currentStepIndex === 0 && !isStep1Valid) ||
+    (currentStepIndex === 1 && isSubDefectView && !isSubDefectsComplete);
+
+  const handleNextStep = () => {
+    if (currentStepIndex === 0) {
+      if (!isStep1Valid) return;
+      setCurrentStepIndex(1);
+      setIsSubDefectView(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (currentStepIndex === 1) {
+      if (!isSubDefectView) {
+        if (screenBodyDefects.length === 0) {
+          setCurrentStepIndex(2);
+        } else {
+          setIsSubDefectView(true);
+        }
+      } else {
+        setIsSubDefectView(false);
+        setCurrentStepIndex(2);
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (currentStepIndex === 2) {
+      setCurrentStepIndex(3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (currentStepIndex === 3) {
+      handleGetBestPrice();
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStepIndex === 1) {
+      if (isSubDefectView) {
+        setIsSubDefectView(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      setCurrentStepIndex(0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (currentStepIndex === 2) {
+      if (screenBodyDefects.length > 0) {
+        setCurrentStepIndex(1);
+        setIsSubDefectView(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      setCurrentStepIndex(1);
+      setIsSubDefectView(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    setCurrentStepIndex(prev => Math.max(prev - 1, 0));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Result / Final Quote View
   if (showResult) {
@@ -414,12 +654,39 @@ export default function ConditionQuizPage() {
                     <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
                       SCREEN & BODY DEFECTS
                     </span>
-                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                      {screenBodyDefects.length === 0
-                        ? 'Flawless (No defects)'
-                        : screenBodyDefects.map(d => CASHIFY_SCREEN_BODY_DEFECTS.find(x => x.id === d)?.label || d).join(', ')}
-                    </p>
+                    {screenBodyDefects.length === 0 ? (
+                      <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Flawless (No defects)
+                      </p>
+                    ) : (
+                      <div className="space-y-2 mt-1">
+                        {screenBodyDefects.map(d => {
+                          const catLabel = CASHIFY_SCREEN_BODY_DEFECTS.find(x => x.id === d)?.label || d;
+                          const config = SUB_DEFECT_CONFIGS[d];
+                          const subLabels = config?.sections
+                            .flatMap(sec => {
+                              const chosen = subDefectAnswers[sec.id];
+                              const ids = Array.isArray(chosen) ? chosen : (chosen ? [chosen] : []);
+                              return ids.map(id => sec.options.find(o => o.id === id)?.label).filter(Boolean);
+                            }) || [];
+
+                          return (
+                            <div key={d} className="text-sm font-bold text-gray-800 flex items-start gap-2">
+                              <span className="w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0"></span>
+                              <div>
+                                <span>{catLabel}</span>
+                                {subLabels.length > 0 && (
+                                  <p className="text-xs text-gray-500 font-medium">
+                                    {subLabels.join(' • ')}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -512,19 +779,34 @@ export default function ConditionQuizPage() {
             {/* Stepper Progress */}
             <div className="px-8 py-4 bg-gray-50/50 border-b border-gray-50">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4">
-                {STEPS.map((s, idx) => (
-                  <div key={s.id} className="flex items-center gap-2">
-                    <span className={`text-xs font-bold ${idx === currentStepIndex ? 'text-[#087F8C]' : 'text-gray-400'}`}>
-                      {s.label}
-                    </span>
-                    {idx < STEPS.length - 1 && <span className="text-gray-300 text-xs font-bold">&gt;</span>}
-                  </div>
-                ))}
+                {STEPS.map((s, idx) => {
+                  const isCurrent = idx === currentStepIndex;
+                  const isCompleted = idx < currentStepIndex;
+                  return (
+                    <div key={s.id} className="flex items-center gap-2">
+                      <span className={`text-xs font-bold ${isCurrent ? 'text-[#087F8C]' : isCompleted ? 'text-gray-700' : 'text-gray-400'}`}>
+                        {s.label}
+                        {isCurrent && currentStepIndex === 1 && isSubDefectView && (
+                          <span className="text-[#087F8C]/80 font-semibold ml-1">
+                            (Details)
+                          </span>
+                        )}
+                      </span>
+                      {idx < STEPS.length - 1 && <span className="text-gray-300 text-xs font-bold">&gt;</span>}
+                    </div>
+                  );
+                })}
               </div>
               <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] transition-all duration-500"
-                  style={{ width: `${((currentStepIndex + 1) / STEPS.length) * 100}%` }}
+                  style={{
+                    width: `${
+                      currentStepIndex === 1 && isSubDefectView
+                        ? (1.75 / STEPS.length) * 100
+                        : ((currentStepIndex + 1) / STEPS.length) * 100
+                    }%`
+                  }}
                 />
               </div>
             </div>
@@ -749,7 +1031,7 @@ export default function ConditionQuizPage() {
                 )}
 
                 {/* ─── STEP 2: Screen & Body Defects (Cashify Step 2) ─── */}
-                {STEPS[currentStepIndex]?.id === 'screen_body_defects' && (
+                {STEPS[currentStepIndex]?.id === 'screen_body_defects' && !isSubDefectView && (
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-2xl font-black text-gray-900">
@@ -769,11 +1051,23 @@ export default function ConditionQuizPage() {
                             key={defect.id}
                             type="button"
                             onClick={() => {
-                              setScreenBodyDefects(prev =>
-                                prev.includes(defect.id)
-                                  ? prev.filter(x => x !== defect.id)
-                                  : [...prev, defect.id]
-                              );
+                              setScreenBodyDefects(prev => {
+                                const isAlready = prev.includes(defect.id);
+                                if (isAlready) {
+                                  // Clear answers for this defect's sections
+                                  const config = SUB_DEFECT_CONFIGS[defect.id];
+                                  if (config) {
+                                    setSubDefectAnswers(curr => {
+                                      const next = { ...curr };
+                                      config.sections.forEach(s => delete next[s.id]);
+                                      return next;
+                                    });
+                                  }
+                                  return prev.filter(x => x !== defect.id);
+                                } else {
+                                  return [...prev, defect.id];
+                                }
+                              });
                             }}
                             className={`p-6 rounded-2xl border-2 text-left transition-all flex items-center gap-5 cursor-pointer ${
                               isSelected
@@ -809,13 +1103,114 @@ export default function ConditionQuizPage() {
                       {screenBodyDefects.length > 0 && (
                         <button
                           type="button"
-                          onClick={() => setScreenBodyDefects([])}
+                          onClick={() => {
+                            setScreenBodyDefects([]);
+                            setSubDefectAnswers({});
+                          }}
                           className="text-xs font-bold text-[#087F8C] hover:underline cursor-pointer"
                         >
                           Clear all defects
                         </button>
                       )}
                     </div>
+                  </div>
+                )}
+
+                {/* ─── STEP 2 SUB-QUESTIONS: Display All Selected Defects Together ─── */}
+                {STEPS[currentStepIndex]?.id === 'screen_body_defects' && isSubDefectView && (
+                  <div className="space-y-10 animate-fadeIn">
+                    {screenBodyDefects.map((defectId, dIdx) => {
+                      const currentConfig = SUB_DEFECT_CONFIGS[defectId];
+                      if (!currentConfig) return null;
+
+                      return (
+                        <div key={defectId} className="space-y-6 pb-8 border-b border-gray-100 last:border-b-0">
+                          {/* Header & Subtitle */}
+                          <div className="pb-3 border-b border-gray-50">
+                            <h2 className="text-xl sm:text-2xl font-black text-gray-900 leading-snug">
+                              {currentConfig.header}
+                            </h2>
+                            <p className="text-sm font-medium text-gray-400 mt-1">
+                              {currentConfig.subtitle}
+                            </p>
+                          </div>
+
+                          {/* Dynamic Sections */}
+                          <div className="space-y-8">
+                            {currentConfig.sections.map((section) => {
+                              const currentVals = Array.isArray(subDefectAnswers[section.id])
+                                ? subDefectAnswers[section.id]
+                                : (subDefectAnswers[section.id] ? [subDefectAnswers[section.id]] : []);
+
+                              return (
+                                <div key={section.id} className="space-y-3">
+                                  <div>
+                                    <h3 className="text-base font-bold text-gray-900">{section.title}</h3>
+                                    {section.subtitle && (
+                                      <p className="text-xs text-gray-400 mt-0.5">{section.subtitle}</p>
+                                    )}
+                                  </div>
+
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {section.options.map((opt) => {
+                                      const IconComponent = opt.icon;
+                                      const isSelected = currentVals.includes(opt.id);
+                                      return (
+                                        <button
+                                          key={opt.id}
+                                          type="button"
+                                          onClick={() => {
+                                            setSubDefectAnswers(prev => {
+                                              const existing = Array.isArray(prev[section.id])
+                                                ? prev[section.id]
+                                                : (prev[section.id] ? [prev[section.id]] : []);
+
+                                              const isNoneOption = opt.id.includes('none') || opt.id.includes('straight');
+                                              if (isNoneOption) {
+                                                return { ...prev, [section.id]: [opt.id] };
+                                              }
+
+                                              // If selecting a defect option, remove any 'none' options
+                                              const withoutNone = existing.filter(x => !x.includes('none') && !x.includes('straight'));
+                                              const updated = withoutNone.includes(opt.id)
+                                                ? withoutNone.filter(x => x !== opt.id)
+                                                : [...withoutNone, opt.id];
+
+                                              return { ...prev, [section.id]: updated };
+                                            });
+                                          }}
+                                          className={`p-5 rounded-2xl border-2 text-left transition-all flex items-center gap-4 cursor-pointer ${
+                                            isSelected
+                                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
+                                              : 'border-gray-100 bg-white hover:border-gray-200'
+                                          }`}
+                                        >
+                                          <div className="w-12 h-14 shrink-0 flex items-center justify-center">
+                                            {IconComponent && <IconComponent className="w-12 h-14" />}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <p className={`font-black text-sm leading-snug ${isSelected ? 'text-[#087F8C]' : 'text-gray-900'}`}>
+                                              {opt.label}
+                                            </p>
+                                          </div>
+                                          <div
+                                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                              isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
+                                            }`}
+                                          >
+                                            {isSelected && <Check size={14} className="text-white" strokeWidth={3} />}
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -953,7 +1348,7 @@ export default function ConditionQuizPage() {
               <div className="flex justify-between items-center mt-10 pt-6 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={() => setCurrentStepIndex(prev => Math.max(prev - 1, 0))}
+                  onClick={handlePrevStep}
                   disabled={currentStepIndex === 0}
                   className="px-8 py-3.5 rounded-xl border border-gray-200 font-bold text-gray-500 hover:bg-gray-50 transition-all disabled:opacity-40 cursor-pointer"
                 >
@@ -963,8 +1358,8 @@ export default function ConditionQuizPage() {
                 {currentStepIndex < STEPS.length - 1 ? (
                   <button
                     type="button"
-                    onClick={() => setCurrentStepIndex(prev => prev + 1)}
-                    disabled={currentStepIndex === 0 && !isStep1Valid}
+                    onClick={handleNextStep}
+                    disabled={isNextDisabled}
                     className="btn-gradient text-white font-bold px-8 py-3.5 rounded-xl transition-all disabled:opacity-40 cursor-pointer shadow-md shadow-[#087F8C]/15"
                   >
                     Continue →
@@ -1034,11 +1429,33 @@ export default function ConditionQuizPage() {
 
               <div className="pb-3 border-b border-gray-50">
                 <p className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider mb-1">Screen & Body Defects</p>
-                <p className="text-xs font-semibold text-gray-800">
-                  {screenBodyDefects.length === 0
-                    ? 'No Defects (Flawless)'
-                    : `${screenBodyDefects.length} defect(s) reported`}
-                </p>
+                {screenBodyDefects.length === 0 ? (
+                  <p className="text-xs font-semibold text-gray-800">No Defects (Flawless)</p>
+                ) : (
+                  <div className="space-y-1.5 mt-1">
+                    {screenBodyDefects.map(d => {
+                      const catLabel = CASHIFY_SCREEN_BODY_DEFECTS.find(x => x.id === d)?.label || d;
+                      const config = SUB_DEFECT_CONFIGS[d];
+                      const subLabels = config?.sections
+                        .flatMap(sec => {
+                          const chosen = subDefectAnswers[sec.id];
+                          const ids = Array.isArray(chosen) ? chosen : (chosen ? [chosen] : []);
+                          return ids.map(id => sec.options.find(o => o.id === id)?.label).filter(Boolean);
+                        }) || [];
+
+                      return (
+                        <div key={d} className="text-xs">
+                          <p className="font-bold text-gray-900">• {catLabel}</p>
+                          {subLabels.length > 0 && (
+                            <p className="text-[11px] text-gray-500 pl-2.5">
+                              {subLabels.join(' • ')}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <div className="pb-3 border-b border-gray-50">

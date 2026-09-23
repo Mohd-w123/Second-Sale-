@@ -813,5 +813,211 @@ export const BatteryWarningYellowIcon = ({ className = "w-7 h-7" }) => (
   </svg>
 );
 
+// ─── CASHIFY SUB-STEP DEFECT DETAIL ICONS ──────────────────────────────────
+
+// 1. Screen Physical Condition Icons
+export const ScreenCrackedGlassIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <path d="M14 18L24 28L20 40L32 30L34 46" stroke="#087F8C" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M24 28L30 20" stroke="#087F8C" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
+export const ScreenChippedOutsideIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="11" y="10" width="26" height="42" rx="2" stroke="#94A3B8" strokeWidth="1" fill="#F8FAFC" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <circle cx="24" cy="56" r="2" fill="#94A3B8" />
+    {/* Chipped top corner */}
+    <path d="M8 12L14 4" stroke="#087F8C" strokeWidth="2" strokeLinecap="round" />
+    <path d="M9 16L17 6" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const ScreenScratchesHeavyIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <path d="M14 16L22 28" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M26 22L34 32" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M16 38L24 48" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M28 40L34 46" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const ScreenScratchesMinorIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <path d="M18 24L26 34" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M22 36L28 44" stroke="#087F8C" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
+// 2. Dead Pixels / Visible Lines / Discoloration Icons
+export const DisplaySpotsHeavyIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <circle cx="16" cy="20" r="4" fill="#087F8C" />
+    <circle cx="30" cy="38" r="5" fill="#087F8C" />
+    <circle cx="20" cy="46" r="3.5" fill="#087F8C" />
+  </svg>
+);
+
+export const DisplaySpotsMultipleIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <circle cx="18" cy="24" r="2" fill="#087F8C" />
+    <circle cx="28" cy="34" r="2.5" fill="#087F8C" />
+    <circle cx="20" cy="44" r="2" fill="#087F8C" />
+  </svg>
+);
+
+export const DisplaySpotsMinorIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <circle cx="24" cy="32" r="2" fill="#087F8C" />
+  </svg>
+);
+
+export const CleanPhoneWithSparkleIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    {/* Clean sparkles */}
+    <path d="M40 8L41.5 11.5L45 13L41.5 14.5L40 18L38.5 14.5L35 13L38.5 11.5L40 8Z" fill="#087F8C" />
+    <path d="M34 20L35 22L37 23L35 24L34 26L33 24L31 23L33 22L34 20Z" fill="#087F8C" />
+  </svg>
+);
+
+export const DisplayLinesVisibleIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <line x1="20" y1="12" x2="20" y2="52" stroke="#10B981" strokeWidth="2" />
+    <line x1="26" y1="12" x2="26" y2="52" stroke="#EF4444" strokeWidth="1.5" />
+  </svg>
+);
+
+export const DisplayLinesFadedIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    {/* Faded curved edge effect */}
+    <path d="M12 10C24 18 24 46 12 54" stroke="#087F8C" strokeWidth="3" opacity="0.6" strokeLinecap="round" />
+    <circle cx="28" cy="32" r="5" stroke="#087F8C" strokeWidth="1.5" opacity="0.4" />
+  </svg>
+);
+
+export const DisplayDiscolorationMajorIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <rect x="12" y="14" width="24" height="36" rx="3" fill="#EAB308" fillOpacity="0.45" stroke="#EAB308" strokeWidth="1" />
+  </svg>
+);
+
+export const DisplayDiscolorationMinorIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="18" y="6" width="12" height="2" rx="1" fill="#94A3B8" />
+    <circle cx="24" cy="32" r="9" fill="#EAB308" fillOpacity="0.3" />
+  </svg>
+);
+
+// 3. Body Scratches & Dents Icons
+export const BodyScratchesHeavyIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="12" y="8" width="8" height="12" rx="2" stroke="#1E293B" strokeWidth="1.5" fill="#F8FAFC" />
+    <path d="M16 26L24 38" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M26 30L34 42" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M18 44L26 52" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const BodyScratchesMinorIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="8" y="4" width="32" height="56" rx="6" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="12" y="8" width="8" height="12" rx="2" stroke="#1E293B" strokeWidth="1.5" fill="#F8FAFC" />
+    <path d="M20 28L26 38" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const BodyDentMajorIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path
+      d="M14 4H34C37.3137 4 40 6.68629 40 10V22L37 25L40 28V54C40 57.3137 37.3137 60 34 60H14C10.6863 60 8 57.3137 8 54V40L11 37L8 34V10C8 6.68629 10.6863 4 14 4Z"
+      stroke="#1E293B"
+      strokeWidth="2"
+      fill="#FFFFFF"
+    />
+    <path d="M40 22L36 25L40 28" stroke="#087F8C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8 34L12 37L8 40" stroke="#087F8C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export const BodyDentMinorIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path
+      d="M14 4H34C37.3137 4 40 6.68629 40 10V24L37 27L40 30V54C40 57.3137 37.3137 60 34 60H14C10.6863 60 8 57.3137 8 54V10C8 6.68629 10.6863 4 14 4Z"
+      stroke="#1E293B"
+      strokeWidth="2"
+      fill="#FFFFFF"
+    />
+    <path d="M40 24L37 27L40 30" stroke="#087F8C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// 4. Panel Missing / Bent / Screen Loose Icons
+export const PanelBrokenIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="20" y="4" width="8" height="56" rx="4" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <circle cx="24" cy="14" r="1.5" fill="#1E293B" />
+    <circle cx="34" cy="28" r="8" stroke="#087F8C" strokeWidth="1.5" fill="#F0FDFA" />
+    <path d="M30 24L38 32M38 24L30 32" stroke="#087F8C" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const PanelMissingIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="20" y="4" width="8" height="56" rx="4" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    {/* Gap / warning badge */}
+    <rect x="18" y="24" width="12" height="12" rx="2" fill="#FEF2F2" stroke="#EF4444" strokeWidth="1.5" />
+    <path d="M24 27V31M24 33.5V34" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const PanelBentIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Curved / bent side chassis */}
+    <path d="M22 6C22 6 28 32 22 58" stroke="#087F8C" strokeWidth="4" strokeLinecap="round" />
+    <path d="M25 6C25 6 31 32 25 58" stroke="#1E293B" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const PanelLooseScreenIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Side chassis with gap */}
+    <rect x="22" y="6" width="6" height="52" rx="3" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <line x1="16" y1="12" x2="16" y2="40" stroke="#087F8C" strokeWidth="2.5" strokeLinecap="round" />
+    <path d="M16 26H22" stroke="#087F8C" strokeWidth="1.5" strokeDasharray="2 2" />
+  </svg>
+);
+
+export const PanelStraightIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="21" y="6" width="6" height="52" rx="3" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M34 10L35.5 13.5L39 15L35.5 16.5L34 20L32.5 16.5L29 15L32.5 13.5L34 10Z" fill="#087F8C" />
+  </svg>
+);
+
+
 
 
