@@ -85,7 +85,7 @@ export default function RefurbishedCheckoutPage() {
           </p>
           <Link
             to="/buy-refurbished"
-            className="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            className="inline-flex items-center justify-center px-6 py-2.5 btn-gradient text-white font-semibold rounded-xl transition"
           >
             Browse Refurbished Devices
           </Link>
@@ -240,7 +240,7 @@ export default function RefurbishedCheckoutPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <Link
             to={`/buy-refurbished/product/${item.slug}`}
-            className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-blue-600 transition"
+            className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-[#087F8C] transition"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Product</span>
@@ -267,7 +267,7 @@ export default function RefurbishedCheckoutPage() {
             {/* Step 1: Shipping Details */}
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-5">
               <div className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+                <span className="w-7 h-7 rounded-full bg-[#087F8C] text-white font-bold text-xs flex items-center justify-center">
                   1
                 </span>
                 <h2 className="text-lg font-bold text-slate-900">Delivery Address</h2>
@@ -361,11 +361,11 @@ export default function RefurbishedCheckoutPage() {
                       type="button"
                       onClick={handleDetectLocation}
                       disabled={detectingLocation}
-                      className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-none p-0 disabled:opacity-50"
+                      className="text-xs font-bold text-[#087F8C] hover:text-[#087F8C] hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-none p-0 disabled:opacity-50"
                     >
                       {detectingLocation ? (
                         <span className="flex items-center gap-1">
-                          <span className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin inline-block" />
+                          <span className="w-3 h-3 border-2 border-[#087F8C] border-t-transparent rounded-full animate-spin inline-block" />
                           Detecting...
                         </span>
                       ) : (
@@ -425,7 +425,7 @@ export default function RefurbishedCheckoutPage() {
             {/* Step 2: Native Payment Options (SecondSale Native Flow) */}
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-5">
               <div className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+                <span className="w-7 h-7 rounded-full bg-[#087F8C] text-white font-bold text-xs flex items-center justify-center">
                   2
                 </span>
                 <div>
@@ -444,7 +444,7 @@ export default function RefurbishedCheckoutPage() {
                       onClick={() => setPaymentMethod(pm.id)}
                       className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-3.5 ${
                         isSelected
-                          ? "border-blue-600 bg-blue-50/40 shadow-xs"
+                          ? "border-[#087F8C] bg-[#E8F6F7] shadow-xs"
                           : "border-slate-200 hover:border-slate-300 bg-white"
                       }`}
                     >
@@ -453,12 +453,12 @@ export default function RefurbishedCheckoutPage() {
                         name="paymentMethod"
                         checked={isSelected}
                         onChange={() => setPaymentMethod(pm.id)}
-                        className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                        className="mt-1 h-4 w-4 text-[#087F8C] focus:ring-blue-500"
                       />
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-2">
-                            <Icon className={`w-4 h-4 ${isSelected ? "text-blue-600" : "text-slate-600"}`} />
+                            <Icon className={`w-4 h-4 ${isSelected ? "text-[#087F8C]" : "text-slate-600"}`} />
                             <span className="text-sm font-bold text-slate-900">{pm.title}</span>
                           </div>
                           {pm.badge && (
@@ -528,7 +528,7 @@ export default function RefurbishedCheckoutPage() {
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-bold text-slate-900 truncate">{item.title}</h4>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 capitalize">
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#E8F6F7] text-[#087F8C] capitalize">
                         {item.grade} Grade
                       </span>
                       {item.storage && (
@@ -586,7 +586,7 @@ export default function RefurbishedCheckoutPage() {
                 <button
                   onClick={handleSubmitOrder}
                   disabled={submitting}
-                  className="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-base shadow-lg shadow-blue-600/25 transition transform active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-4 px-6 rounded-2xl btn-gradient text-white font-extrabold text-base shadow-lg shadow-[#087F8C]/25 transition transform active:scale-98 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

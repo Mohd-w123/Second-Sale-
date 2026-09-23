@@ -19,6 +19,7 @@ import {
   FileText,
   Users2,
   ShieldAlert,
+  HelpCircle,
 } from 'lucide-react';
 import './admin.css';
 
@@ -59,6 +60,7 @@ export default function AdminLayout() {
     if (path.includes('/orders')) return 'System Orders';
     if (path.includes('/pincodes')) return 'Serviceable Pincodes';
     if (path.includes('/site-settings')) return 'Site Settings';
+    if (path.includes('/quiz')) return 'Dynamic Quiz & Deductions';
     if (path.includes('/sales-users')) return 'Sales Team & Feature Permissions';
     return 'Admin Panel';
   };
@@ -69,6 +71,7 @@ export default function AdminLayout() {
     { key: 'pages', to: '/admin/pages', icon: FileText, label: 'Pages (CMS)' },
     { key: 'users', to: '/admin/users', icon: Users, label: 'Users' },
     { key: 'devices', to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
+    { key: 'quiz', to: '/admin/quiz', icon: HelpCircle, label: 'Quiz & Deductions' },
     { key: 'refurbished', to: '/admin/refurbished', icon: Package, label: 'Refurbished' },
     { key: 'categories', to: '/admin/categories', icon: Layers, label: 'Categories' },
     { key: 'partners', to: '/admin/partners', icon: Handshake, label: 'Partners' },
@@ -138,7 +141,7 @@ export default function AdminLayout() {
 
         {/* Sidebar User Card */}
         <div className="p-3 mx-3 mb-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-xs font-black shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#087F8C] text-white flex items-center justify-center text-xs font-black shrink-0">
             {userName.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">

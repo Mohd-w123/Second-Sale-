@@ -43,7 +43,7 @@ export default function HelpCenterPage() {
             </h1>
             <p className="text-lg text-gray-600">Get in touch with our support team for any queries or assistance.</p>
             <p className="mt-3">
-              <Link to="/faq" className="text-[#2563EB] font-bold hover:underline">
+              <Link to="/faq" className="text-[#087F8C] font-bold hover:underline">
                 Browse FAQs →
               </Link>
             </p>
@@ -54,7 +54,7 @@ export default function HelpCenterPage() {
           <div className="grid grid-cols-1 md:grid-cols-2">
             
             {/* Contact Info */}
-            <div className="bg-[#2563EB] p-10 text-white">
+            <div className="bg-gradient-to-br from-[#116466] to-[#087F8C] p-10 text-white">
               <h2 className="text-2xl font-bold mb-8">Contact Information</h2>
               
               <div className="space-y-8">
@@ -92,17 +92,17 @@ export default function HelpCenterPage() {
               <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert('Thank you for reaching out. Our support team will contact you shortly!'); }}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                  <input type="text" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]" placeholder="Your name" />
+                  <input type="text" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#087F8C] focus:ring-1 focus:ring-[#087F8C]" placeholder="Your name" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input type="email" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]" placeholder="your@email.com" />
+                  <input type="email" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#087F8C] focus:ring-1 focus:ring-[#087F8C]" placeholder="your@email.com" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                  <textarea rows="4" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB]" placeholder="How can we help you?"></textarea>
+                  <textarea rows="4" required className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#087F8C] focus:ring-1 focus:ring-[#087F8C]" placeholder="How can we help you?"></textarea>
                 </div>
-                <button type="submit" className="w-full bg-[#2563EB] text-white font-bold rounded-xl py-3 hover:bg-blue-700 transition duration-200 cursor-pointer">
+                <button type="submit" className="w-full btn-gradient text-white font-bold rounded-xl py-3 shadow-md shadow-[#087F8C]/20 transition duration-200 cursor-pointer">
                   Send Message
                 </button>
               </form>

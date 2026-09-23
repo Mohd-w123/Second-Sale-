@@ -6,7 +6,7 @@ export default function PageLoader({ text = "Loading SecondSale..." }) {
       <div className="flex flex-col items-center max-w-xs text-center px-4">
         {/* Brand Logo with gentle breathing pulse */}
         <div className="relative mb-6 flex items-center justify-center">
-          <div className="absolute w-24 h-24 rounded-full bg-blue-400/15 animate-ping opacity-60" />
+          <div className="absolute w-24 h-24 rounded-full bg-[#087F8C]/15 animate-ping opacity-60" />
           <img
             src={logo}
             alt="SecondSale"
@@ -16,7 +16,7 @@ export default function PageLoader({ text = "Loading SecondSale..." }) {
 
         {/* Smooth indeterminate progress line */}
         <div className="w-48 h-1.5 bg-slate-100 rounded-full overflow-hidden relative shadow-inner mb-3.5">
-          <div className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 rounded-full w-24 animate-[shimmer_1.5s_infinite_linear]" 
+          <div className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] rounded-full w-24 animate-[shimmer_1.5s_infinite_linear]" 
                style={{
                  animation: 'loaderSlide 1.4s ease-in-out infinite'
                }}

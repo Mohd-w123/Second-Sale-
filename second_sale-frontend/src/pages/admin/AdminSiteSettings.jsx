@@ -114,7 +114,7 @@ export default function AdminSiteSettings() {
   const [topBarEnabled, setTopBarEnabled] = useState(false);
   const [topBarText, setTopBarText] = useState('');
   const [topBarLink, setTopBarLink] = useState('');
-  const [topBarBg, setTopBarBg] = useState('#2563EB');
+  const [topBarBg, setTopBarBg] = useState('#087F8C');
   const [topBarTextColor, setTopBarTextColor] = useState('#FFFFFF');
   const [savingTopBar, setSavingTopBar] = useState(false);
 
@@ -212,7 +212,7 @@ export default function AdminSiteSettings() {
         setTopBarEnabled(Boolean(data.topBar.isEnabled));
         setTopBarText(data.topBar.text || '');
         setTopBarLink(data.topBar.linkTo || '');
-        setTopBarBg(data.topBar.bgColor || '#2563EB');
+        setTopBarBg(data.topBar.bgColor || '#087F8C');
         setTopBarTextColor(data.topBar.textColor || '#FFFFFF');
       }
       if (data.footer) {

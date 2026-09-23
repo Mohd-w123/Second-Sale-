@@ -1,6 +1,6 @@
 const variants = {
-  primary: 'bg-primary hover:bg-primary-dark text-white shadow-[0_4px_14px_rgba(5,101,230,0.25)] hover:shadow-[0_6px_20px_rgba(5,101,230,0.30)]',
-  secondary: 'bg-white border-2 border-primary text-primary hover:bg-primary-light',
+  primary: 'bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] hover:from-[#0D4E50] hover:via-[#066772] hover:to-[#0284C7] text-white shadow-[0_4px_14px_rgba(8,127,140,0.28)] hover:shadow-[0_6px_20px_rgba(8,127,140,0.38)]',
+  secondary: 'bg-white border-2 border-[#087F8C] text-[#087F8C] hover:bg-[#E8F6F7]',
   ghost: 'bg-transparent text-text-muted hover:bg-gray-100 hover:text-text-primary',
 };
 const sizes = {

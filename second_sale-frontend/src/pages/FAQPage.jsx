@@ -59,7 +59,7 @@ export default function FAQPage() {
 
             <p className="mt-12 text-sm text-gray-500 pt-6 border-t border-gray-100">
               Still have questions?{' '}
-              <Link to="/help-center" className="text-[#2563EB] font-bold hover:underline">
+              <Link to="/help-center" className="text-[#087F8C] font-bold hover:underline">
                 Contact our support team
               </Link>
               .

@@ -6,7 +6,7 @@ export default function NotFoundPage() {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center px-4 text-center">
       <SEOHead title="Page Not Found" description="The page you are looking for does not exist." path="/404" noindex />
-      <div className="text-8xl font-extrabold text-[#2563EB]/20 mb-4 select-none">404</div>
+      <div className="text-8xl font-extrabold text-[#087F8C]/20 mb-4 select-none">404</div>
       <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary mb-3">Page Not Found</h1>
       <p className="text-sm text-text-muted mb-8 max-w-md">
         The page you're looking for doesn't exist or has been moved.

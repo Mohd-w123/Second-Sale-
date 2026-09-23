@@ -729,7 +729,7 @@ export default function AdminOrders() {
                               fontSize: 11,
                               fontWeight: 700,
                               background: "#EFF6FF",
-                              color: "#2563EB",
+                              color: "#087F8C",
                               border: "1px solid #BFDBFE",
                               cursor: "pointer",
                               transition: "all 0.15s ease",

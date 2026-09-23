@@ -1,29 +1,30 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Modal from './ui/Modal';
 import { 
   WINDOWS_PROCESSORS,
   MAC_PROCESSORS,
+  MAC_RAM,
+  MAC_STORAGE,
   MASTER_RAM, 
   MASTER_STORAGE 
 } from '../utils/laptopSpecs';
 
 export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, initialValues }) {
-  const [selectedProcessor, setSelectedProcessor] = useState(null);
-  const [selectedRam, setSelectedRam] = useState(null);
-  const [selectedStorage, setSelectedStorage] = useState(null);
+  const [selectedProcessor, setSelectedProcessor] = useState(() => initialValues?.processor || null);
+  const [selectedRam, setSelectedRam] = useState(() => initialValues?.ram || null);
+  const [selectedStorage, setSelectedStorage] = useState(() => initialValues?.storage || null);
   const [openDropdown, setOpenDropdown] = useState(null);
+
+  const [prevInitialValues, setPrevInitialValues] = useState(initialValues);
+  if (initialValues !== prevInitialValues) {
+    setPrevInitialValues(initialValues);
+    setSelectedProcessor(initialValues?.processor || null);
+    setSelectedRam(initialValues?.ram || null);
+    setSelectedStorage(initialValues?.storage || null);
+  }
 
   // Detect if device is Apple/Mac — no Generation question for Mac
   const isMac = device?.brand === 'Apple' || device?.processorFamily?.startsWith('Apple');
-
-  // Load initial values when modal opens
-  useEffect(() => {
-    if (isOpen && initialValues) {
-      setSelectedProcessor(initialValues.processor || null);
-      setSelectedRam(initialValues.ram || null);
-      setSelectedStorage(initialValues.storage || null);
-    }
-  }, [isOpen, initialValues]);
 
   if (!device) return null;
 
@@ -87,8 +88,8 @@ export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, i
             disabled={!isComplete}
             className={`w-full py-4 rounded-xl font-black transition-all flex items-center justify-center gap-2 text-base
               ${isComplete 
-                ? 'bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-[0_0_15px_rgba(5,101,230,0.3)] scale-[1.01]' 
-                : 'bg-[#93C5B5]/50 text-white cursor-not-allowed'}`}
+                ? 'btn-gradient text-white shadow-xl shadow-[#087F8C]/25 scale-[1.01]' 
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
           >
             Next →
           </button>
@@ -125,7 +126,7 @@ function SpecSelect({ label, value, disabled, setOpen }) {
           {label} 
           <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400 font-bold cursor-help">?</span>
         </label>
-        {value && <span className="text-[9px] font-black text-[#2563EB] uppercase tracking-wider">Selected</span>}
+        {value && <span className="text-[9px] font-black text-[#087F8C] uppercase tracking-wider">Selected</span>}
       </div>
 
       <button 
@@ -146,13 +147,13 @@ function SpecSelect({ label, value, disabled, setOpen }) {
   );
 }
 
-function OverlayList({ type, isMac, onSelect, onClose }) {
+function OverlayList({ type, isMac, onSelect }) {
   const [search, setSearch] = useState('');
   
   const options = {
     processor: isMac ? MAC_PROCESSORS : WINDOWS_PROCESSORS,
-    ram: MASTER_RAM,
-    storage: MASTER_STORAGE
+    ram: isMac ? MAC_RAM : MASTER_RAM,
+    storage: isMac ? MAC_STORAGE : MASTER_STORAGE
   }[type] || [];
 
   const filteredOptions = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
@@ -175,7 +176,7 @@ function OverlayList({ type, isMac, onSelect, onClose }) {
             <button 
               key={opt}
               onClick={() => onSelect(opt)}
-              className="w-full text-left px-8 py-5 text-base font-bold text-gray-700 hover:bg-gray-50 hover:text-[#2563EB] transition-all border-b border-gray-50 last:border-none"
+              className="w-full text-left px-8 py-5 text-base font-bold text-gray-700 hover:bg-gray-50 hover:text-[#087F8C] transition-all border-b border-gray-50 last:border-none"
             >
               {opt}
             </button>

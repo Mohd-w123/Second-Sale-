@@ -212,7 +212,7 @@ export default function AdminSalesUsers() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-gray-900 flex items-center gap-2.5">
-            <Users2 className="text-[#2563EB]" size={26} />
+            <Users2 className="text-[#087F8C]" size={26} />
             <span>Sales Team & Feature Access</span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -222,7 +222,7 @@ export default function AdminSalesUsers() {
 
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/10 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 btn-gradient text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/10 transition-all cursor-pointer"
         >
           <UserPlus size={18} />
           <span>Add Sales User</span>
@@ -257,7 +257,7 @@ export default function AdminSalesUsers() {
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#087F8C] flex items-center justify-center">
             <Users2 size={24} />
           </div>
           <div>
@@ -346,7 +346,7 @@ export default function AdminSalesUsers() {
                       </td>
 
                       <td className="py-4 px-6">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#2563EB] border border-blue-100 uppercase tracking-wide">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#087F8C] border border-blue-100 uppercase tracking-wide">
                           <Shield size={12} />
                           {user.role === 'admin' ? 'Administrator' : 'Sales Team'}
                         </span>
@@ -410,7 +410,7 @@ export default function AdminSalesUsers() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openEditModal(user)}
-                            className="p-2 text-gray-400 hover:text-[#2563EB] hover:bg-blue-50 rounded-xl transition-all cursor-pointer"
+                            className="p-2 text-gray-400 hover:text-[#087F8C] hover:bg-blue-50 rounded-xl transition-all cursor-pointer"
                             title="Edit Permissions & Details"
                           >
                             <Edit2 size={16} />
@@ -472,7 +472,7 @@ export default function AdminSalesUsers() {
                       placeholder="e.g. Ramesh Kumar"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                     />
                   </div>
                 </div>
@@ -489,7 +489,7 @@ export default function AdminSalesUsers() {
                       placeholder="e.g. ramesh@secondsale.com"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                     />
                   </div>
                 </div>
@@ -509,7 +509,7 @@ export default function AdminSalesUsers() {
                       placeholder={showCreateModal ? '••••••••' : 'Leave blank to keep unchanged'}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                     />
                   </div>
                 </div>
@@ -521,7 +521,7 @@ export default function AdminSalesUsers() {
                   <select
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                   >
                     <option value="sales">Sales Team (Restricted)</option>
                     <option value="admin">Administrator</option>
@@ -536,7 +536,7 @@ export default function AdminSalesUsers() {
                   id="user-active-toggle"
                   checked={formData.isActive}
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="w-4 h-4 rounded border-gray-300 text-[#2563EB] focus:ring-[#2563EB]"
+                  className="w-4 h-4 rounded border-gray-300 text-[#087F8C] focus:ring-[#087F8C]"
                 />
                 <label htmlFor="user-active-toggle" className="text-sm font-semibold text-gray-800 cursor-pointer">
                   Account is Active (Allow login)
@@ -579,13 +579,13 @@ export default function AdminSalesUsers() {
                         onClick={() => handleTogglePermission(mod.id)}
                         className={`p-3.5 rounded-2xl border transition-all flex items-start gap-3 cursor-pointer ${
                           isChecked
-                            ? 'bg-blue-50/50 border-[#2563EB] text-[#2563EB]'
+                            ? 'bg-blue-50/50 border-[#087F8C] text-[#087F8C]'
                             : 'bg-gray-50/50 border-gray-100 hover:border-gray-200 text-gray-700'
                         }`}
                       >
                         <div
                           className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                            isChecked ? 'bg-[#2563EB] text-white' : 'border-2 border-gray-300'
+                            isChecked ? 'bg-[#087F8C] text-white' : 'border-2 border-gray-300'
                           }`}
                         >
                           {isChecked && <Check size={14} strokeWidth={3} />}
@@ -593,7 +593,7 @@ export default function AdminSalesUsers() {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <Icon size={14} className={isChecked ? 'text-[#2563EB]' : 'text-gray-400'} />
+                            <Icon size={14} className={isChecked ? 'text-[#087F8C]' : 'text-gray-400'} />
                             <span className="text-xs font-bold text-gray-900 block truncate">{mod.label}</span>
                           </div>
                           <span className="text-[11px] text-gray-400 block mt-0.5 line-clamp-1">{mod.desc}</span>
@@ -618,7 +618,7 @@ export default function AdminSalesUsers() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                  className="px-6 py-2.5 btn-gradient text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/20 transition-all cursor-pointer"
                 >
                   {showCreateModal ? 'Create User' : 'Save Changes'}
                 </button>

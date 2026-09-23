@@ -76,7 +76,7 @@ export default function RefurbishedOrderSuccessPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#087F8C] border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-600 font-medium">Loading order confirmation...</p>
         </div>
       </div>
@@ -148,8 +148,8 @@ export default function RefurbishedOrderSuccessPage() {
               </div>
               <p className="text-xs text-slate-500 mt-0.5">Tracked Express Insured Courier</p>
             </div>
-            <div className="flex items-center gap-2 text-sm font-bold text-blue-700 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100">
-              <Calendar className="w-4 h-4 text-blue-600" />
+            <div className="flex items-center gap-2 text-sm font-bold text-[#087F8C] bg-[#E8F6F7] px-4 py-2 rounded-xl border border-blue-100">
+              <Calendar className="w-4 h-4 text-[#087F8C]" />
               <span>{delivery.expectedDate || "Within 3-5 Business Days"}</span>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function RefurbishedOrderSuccessPage() {
                         step.status === "done"
                           ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
                           : step.status === "active"
-                          ? "bg-blue-600 text-white ring-4 ring-blue-100 animate-pulse"
+                          ? "bg-[#087F8C] text-white ring-4 ring-[#087F8C]/20 animate-pulse"
                           : "bg-slate-100 text-slate-400"
                       }`}
                     >
@@ -222,12 +222,12 @@ export default function RefurbishedOrderSuccessPage() {
 
           {/* Courier and AWB Tracking Banner */}
           {(delivery.trackingNumber || delivery.courierPartner) && (
-            <div className="p-3.5 bg-blue-50/70 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="p-3.5 bg-[#E8F6F7]/70 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
               <div className="space-y-0.5">
                 <div className="flex items-center gap-1.5">
-                  <Truck className="w-4 h-4 text-blue-600" />
+                  <Truck className="w-4 h-4 text-[#087F8C]" />
                   <span className="font-bold text-slate-900">Courier:</span>
-                  <span className="text-blue-700 font-semibold">{delivery.courierPartner || 'Express Air Courier'}</span>
+                  <span className="text-[#087F8C] font-semibold">{delivery.courierPartner || 'Express Air Courier'}</span>
                 </div>
                 {delivery.trackingNumber && (
                   <div className="flex items-center gap-1.5">
@@ -243,7 +243,7 @@ export default function RefurbishedOrderSuccessPage() {
                     navigator.clipboard.writeText(delivery.trackingNumber);
                     alert("Tracking number copied to clipboard!");
                   }}
-                  className="px-3 py-1.5 bg-white hover:bg-slate-50 text-blue-600 font-bold rounded-xl border border-blue-200 shadow-xs cursor-pointer w-fit text-xs"
+                  className="px-3 py-1.5 bg-white hover:bg-slate-50 text-[#087F8C] font-bold rounded-xl border border-[#087F8C]/30 shadow-xs cursor-pointer w-fit text-xs"
                 >
                   Copy AWB Number
                 </button>
@@ -257,7 +257,7 @@ export default function RefurbishedOrderSuccessPage() {
           {/* Item Details */}
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-blue-600" />
+              <Smartphone className="w-4 h-4 text-[#087F8C]" />
               <span>Device Summary</span>
             </h3>
 
@@ -295,7 +295,7 @@ export default function RefurbishedOrderSuccessPage() {
           {/* Delivery & Customer Info */}
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-blue-600" />
+              <MapPin className="w-4 h-4 text-[#087F8C]" />
               <span>Delivery Details</span>
             </h3>
 
@@ -353,7 +353,7 @@ export default function RefurbishedOrderSuccessPage() {
           </Link>
           <Link
             to="/buy-refurbished"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-600/20 transition text-xs"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 btn-gradient text-white font-bold rounded-2xl shadow-lg shadow-[#087F8C]/25 transition text-xs"
           >
             <span>Browse More Devices</span>
           </Link>

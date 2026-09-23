@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../../services/admin.service';
 import { categoryService } from '../../services/category.service';
+import { quizService } from '../../services/quiz.service';
 import {
   Search, ChevronLeft, ChevronRight, X, Plus, Trash2,
-  Smartphone, Monitor, Laptop, Headphones, Watch, Gamepad2, FileText, Percent, Info, ToggleLeft, ToggleRight
+  Smartphone, Monitor, Laptop, Headphones, Watch, Gamepad2, FileText, Percent, Info, ToggleLeft, ToggleRight,
+  HelpCircle, CheckCircle2, ChevronDown, ChevronUp, Sparkles
 } from 'lucide-react';
 import './admin.css';
 
@@ -13,15 +15,148 @@ const DEFAULT_MULTIPLIERS = {
   batteryDeductions: { above80: 0, above60: 1000, below60: 2500 },
   ageMultipliers: { lessThan3: 1.0, threeToEleven: 0.88, aboveEleven: 0.75, lessThan1: 0.92, oneToTwo: 0.78, twoToThree: 0.62 },
   functionalDeductions: {
-    batteryLow: 2000, cameraIssue: 3000, speakerIssue: 1500, biometricIssue: 4000, chargingIssue: 1000,
-    battery: 2000, keyboard: 2500, trackpad: 1500, speakers: 1000, webcam: 800, ports: 1200, hinge: 2000, overheat: 1500, gpu: 3000,
-    screenChanged: 3000, wifi: 1200, biometric: 1500, charging: 1500, cdDrive: 1000, chargerIssue: 1200, hardDisk: 3500, displayIssue: 4000, motherboard: 6000
+    // Mobile Cashify Hardware & Functional (%)
+    front_camera: 8,
+    back_camera: 15,
+    volume_button: 4,
+    finger_touch: 26,
+    face_sensor: 26,
+    speaker_faulty: 4,
+    power_button: 2,
+    charging_port: 10,
+    audio_receiver: 7,
+    camera_glass_broken: 8,
+    bluetooth: 39,
+    vibrator: 2,
+    microphone: 2,
+    proximity_sensor: 3,
+    battery_service: 13,
+    battery_80_85: 6,
+    silent_button: 3,
+    wifi_issue: 39,
+    // Mobile General Details (%)
+    dead: 90,
+    screenFaulty: 65,
+    copyScreen: 50,
+    outOfWarranty: 20,
+    noBill: 21,
+    eSIM: 6,
+    noBox: 5,
+    noCharger: 3,
+    // Laptop functional issues (%)
+    battery: 6,
+    keyboard: 7,
+    trackpad: 18,
+    speakers: 3,
+    webcam: 6,
+    ports: 8,
+    hinge: 2000,
+    overheat: 1500,
+    gpu: 3000,
+    screenChanged: 3000,
+    wifi: 5,
+    biometric: 1500,
+    charging: 8,
+    cdDrive: 7,
+    chargerIssue: 1200,
+    hardDisk: 10,
+    displayIssue: 4000,
+    motherboard: 35,
+    // Legacy mobile
+    batteryLow: 2000,
+    cameraIssue: 3000,
+    speakerIssue: 1500,
+    biometricIssue: 4000,
+    chargingIssue: 1000,
   },
-  screenDeductions: { screenCracked: 18, lineDiscolour: 18 },
-  bodyDeductions: { minorDentTop: 8, minorDentBase: 8, majorDentTop: 35, majorDentBase: 40, minorScratch: 5, majorScratch: 8 },
+  screenDeductions: {
+    // Mobile Screen Defects (%)
+    defect_screen_broken_scratch: 25,
+    defect_screen_spots_lines: 30,
+    // Laptop Screen Defects (%)
+    screen_scratches_minor: 5,
+    screen_scratches_major: 10,
+    screen_cracked: 25,
+    screen_discolour_minor: 8,
+    screen_discolour_major: 18,
+    screen_spots_minor: 8,
+    screen_spots_major: 18,
+    screen_lines_visible: 18,
+    screen_lines_flickering: 20,
+    screen_lines_black_dots: 15,
+  },
+  bodyDeductions: {
+    // Mobile Body Defects (%)
+    defect_body_scratch_dent: 10,
+    defect_panel_missing_broken: 15,
+    // Laptop Body Defects (%)
+    minorDentTop: 8,
+    minorDentBase: 8,
+    majorDentTop: 35,
+    majorDentBase: 40,
+    minorScratch: 5,
+    majorScratch: 8,
+  },
   screenSizeMultipliers: { '10-12': 0.95, '13-14': 1.0, '15-16': 1.05, '16+': 1.1 },
   dedicatedGpuBonus: { 'GTX 1650': 2000, 'RTX 2050': 2500, 'RTX 3050': 3500, 'RTX 4050': 5000, 'RTX 4060': 7000, 'RTX 4070': 10000, 'RTX 4080': 15000, 'RTX 4090': 25000 },
   accessoriesBonus: { bill: 300, box: 500, charger: 800, withBoxAndCharger: 800, originalCharger: 500, thirdPartyCharger: 200, none: 0 }
+};
+
+const SCREEN_DEDUCTION_LABELS = {
+  defect_screen_broken_scratch: 'Broken/scratch on device screen (%)',
+  defect_screen_spots_lines: 'Dead Spot/Visible line & Discoloration (%)',
+  screen_scratches_minor: '1-2 Scratches on Screen (%)',
+  screen_scratches_major: 'More than 2 Scratches (%)',
+  screen_cracked: 'Screen Cracked / Broken (%)',
+  screen_discolour_minor: 'Minor Discolouration (%)',
+  screen_discolour_major: 'Major Discolouration (%)',
+  screen_spots_minor: '1-2 Minor Spots on Screen (%)',
+  screen_spots_major: 'Large / Heavy Visible Spots (%)',
+  screen_lines_visible: 'Visible Lines on Screen (%)',
+  screen_lines_flickering: 'Display Flickering (%)',
+  screen_lines_black_dots: 'Black Dots on Screen (%)',
+  screenCracked: 'Legacy Cracked (%)',
+  lineDiscolour: 'Legacy Discolour (%)',
+};
+
+const BODY_DEDUCTION_LABELS = {
+  defect_body_scratch_dent: 'Scratch/Dent on device body (%)',
+  defect_panel_missing_broken: 'Device panel missing/broken (%)',
+  minorDentTop: 'Minor Dent Top Panel (%)',
+  minorDentBase: 'Minor Dent Base Panel (%)',
+  majorDentTop: 'Major Dent Top Panel (%)',
+  majorDentBase: 'Major Dent Base Panel (%)',
+  minorScratch: 'Minor Scratches (%)',
+  majorScratch: 'Major Scratches (%)',
+};
+
+const MOBILE_FUNCTIONAL_LABELS = {
+  front_camera: 'Front Camera not working (%)',
+  back_camera: 'Back Camera not working (%)',
+  volume_button: 'Volume Button not working (%)',
+  finger_touch: 'Finger Touch / Face ID (%)',
+  face_sensor: 'Face Sensor not working (%)',
+  speaker_faulty: 'Speaker Faulty (%)',
+  power_button: 'Power Button not working (%)',
+  charging_port: 'Charging Port not working (%)',
+  audio_receiver: 'Audio Receiver not working (%)',
+  camera_glass_broken: 'Camera Glass Broken (%)',
+  bluetooth: 'Bluetooth not working (%)',
+  vibrator: 'Vibrator not working (%)',
+  microphone: 'Microphone not working (%)',
+  proximity_sensor: 'Proximity Sensor not working (%)',
+  battery_service: 'Battery in Service (<80% health) (%)',
+  battery_80_85: 'Battery Health 80-85% (%)',
+  silent_button: 'Silent Button not working (%)',
+  wifi_issue: 'WiFi not working (%)',
+  dead: 'Unable to Make Calls / Dead (%)',
+  screenFaulty: 'Touch Screen Faulty (%)',
+  copyScreen: 'Screen Changed / Not Original (%)',
+  outOfWarranty: 'Device Out of Warranty (%)',
+  noBill: 'No Valid GST Bill (%)',
+  eSIM: 'eSIM Only Global Variant (%)',
+  noBox: 'Original Box Missing (%)',
+  noCharger: 'Original Charger Missing (%)',
 };
 
 export default function AdminDevices() {
@@ -37,7 +172,9 @@ export default function AdminDevices() {
 
   // Form State
   const [showModal, setShowModal] = useState(false);
-  const [modalTab, setModalTab] = useState('core'); // core | variants | multipliers | deductions
+  const [modalTab, setModalTab] = useState('core'); // core | variants | multipliers | deductions | quiz
+  const [openCustomQuizStepIndex, setOpenCustomQuizStepIndex] = useState(0);
+  const [cloningQuiz, setCloningQuiz] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null); // null if creating
   const [formData, setFormData] = useState({});
 
@@ -50,29 +187,34 @@ export default function AdminDevices() {
     return () => clearTimeout(timer);
   }, [search]);
 
+  const [refreshKey, setRefreshKey] = useState(0);
+  const fetchDevices = () => setRefreshKey(k => k + 1);
+
   // Fetch devices
-  const fetchDevices = () => {
-    setLoading(true);
+  useEffect(() => {
+    let ignore = false;
     const params = { page, limit: 12 };
     if (debouncedSearch) params.search = debouncedSearch;
     if (category) params.category = category;
 
     adminService.getDevices(params)
       .then((res) => {
-        setDevices(res.data.devices);
-        setTotal(res.data.total);
-        setTotalPages(res.data.totalPages);
-        setLoading(false);
+        if (!ignore) {
+          setDevices(res.data.devices);
+          setTotal(res.data.total);
+          setTotalPages(res.data.totalPages);
+          setLoading(false);
+        }
       })
       .catch((err) => {
-        console.error('Failed to load devices', err);
-        setLoading(false);
+        if (!ignore) {
+          console.error('Failed to load devices', err);
+          setLoading(false);
+        }
       });
-  };
 
-  useEffect(() => {
-    fetchDevices();
-  }, [debouncedSearch, category, page]);
+    return () => { ignore = true; };
+  }, [page, debouncedSearch, category, refreshKey]);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -82,12 +224,10 @@ export default function AdminDevices() {
           setCategoryOptions(res.data);
         }
       } catch (err) {
-        console.error('Failed to load categories in AdminDevices:', err);
+        console.error('Failed to fetch categories:', err);
       }
     };
     loadCategories();
-    window.addEventListener('categories-updated', loadCategories);
-    return () => window.removeEventListener('categories-updated', loadCategories);
   }, []);
 
   // Open modal for Create
@@ -105,6 +245,8 @@ export default function AdminDevices() {
       isGamingLaptop: false,
       tier: 'Mid-range',
       isActive: true,
+      hasCustomQuiz: false,
+      customQuiz: null,
       variants: [],
       ...JSON.parse(JSON.stringify(DEFAULT_MULTIPLIERS))
     });
@@ -119,7 +261,21 @@ export default function AdminDevices() {
     const cloned = JSON.parse(JSON.stringify(device));
     const merged = {
       ...JSON.parse(JSON.stringify(DEFAULT_MULTIPLIERS)),
-      ...cloned
+      ...cloned,
+      hasCustomQuiz: Boolean(cloned.hasCustomQuiz),
+      customQuiz: cloned.customQuiz || null,
+      screenDeductions: {
+        ...DEFAULT_MULTIPLIERS.screenDeductions,
+        ...(cloned.screenDeductions || {})
+      },
+      functionalDeductions: {
+        ...DEFAULT_MULTIPLIERS.functionalDeductions,
+        ...(cloned.functionalDeductions || {})
+      },
+      bodyDeductions: {
+        ...DEFAULT_MULTIPLIERS.bodyDeductions,
+        ...(cloned.bodyDeductions || {})
+      }
     };
     setFormData(merged);
     setModalTab('core');
@@ -186,6 +342,179 @@ export default function AdminDevices() {
       return v;
     });
     setFormData(prev => ({ ...prev, variants: updated }));
+  };
+
+  // Model-specific Custom Quiz Handlers
+  const handleToggleCustomQuiz = async (enable) => {
+    if (!enable) {
+      setFormData(prev => ({
+        ...prev,
+        hasCustomQuiz: false,
+      }));
+      return;
+    }
+
+    // If enabling and customQuiz is empty, clone from Category Master Quiz
+    if (!formData.customQuiz?.steps?.length) {
+      setCloningQuiz(true);
+      try {
+        const cat = formData.category || 'mobile';
+        const res = await quizService.getQuizByCategory(cat);
+        const masterQuiz = res?.data?.quiz || res?.data || res;
+        setFormData(prev => ({
+          ...prev,
+          hasCustomQuiz: true,
+          customQuiz: JSON.parse(JSON.stringify(masterQuiz || { steps: [] })),
+        }));
+      } catch (err) {
+        console.error('Failed to clone category quiz:', err);
+        setFormData(prev => ({
+          ...prev,
+          hasCustomQuiz: true,
+          customQuiz: { steps: [] },
+        }));
+      } finally {
+        setCloningQuiz(false);
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        hasCustomQuiz: true,
+      }));
+    }
+  };
+
+  const handleCustomQuizStepField = (sIdx, field, val) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = [...quiz.steps];
+      steps[sIdx] = { ...steps[sIdx], [field]: val };
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
+  };
+
+  const handleCustomQuizQuestionField = (sIdx, qIdx, field, val) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = [...quiz.steps];
+      const questions = [...steps[sIdx].questions];
+      questions[qIdx] = { ...questions[qIdx], [field]: val };
+      steps[sIdx] = { ...steps[sIdx], questions };
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
+  };
+
+  const handleCustomQuizOptionField = (sIdx, qIdx, oIdx, field, val) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = [...quiz.steps];
+      const questions = [...steps[sIdx].questions];
+      const options = [...questions[qIdx].options];
+      options[oIdx] = { ...options[oIdx], [field]: field === 'deductionValue' ? (val === '' ? '' : Number(val)) : val };
+      questions[qIdx] = { ...questions[qIdx], options };
+      steps[sIdx] = { ...steps[sIdx], questions };
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
+  };
+
+  const handleCustomQuizDeleteQuestion = (sIdx, qIdx) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = [...quiz.steps];
+      const questions = steps[sIdx].questions.filter((_, idx) => idx !== qIdx);
+      steps[sIdx] = { ...steps[sIdx], questions };
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
+  };
+
+  const handleCustomQuizAddQuestion = (sIdx) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = [...quiz.steps];
+      const questions = [
+        ...steps[sIdx].questions,
+        {
+          id: `custom_q_${Date.now()}`,
+          title: 'New Evaluation Question',
+          subtitle: 'Please provide accurate details',
+          type: 'yes_no',
+          required: true,
+          options: [
+            { id: 'yes', label: 'Yes', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+            { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+          ],
+        },
+      ];
+      steps[sIdx] = { ...steps[sIdx], questions };
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
+  };
+
+  const handleCustomQuizDeleteOption = (sIdx, qIdx, oIdx) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = [...quiz.steps];
+      const questions = [...steps[sIdx].questions];
+      const options = questions[qIdx].options.filter((_, idx) => idx !== oIdx);
+      questions[qIdx] = { ...questions[qIdx], options };
+      steps[sIdx] = { ...steps[sIdx], questions };
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
+  };
+
+  const handleCustomQuizAddOption = (sIdx, qIdx) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = [...quiz.steps];
+      const questions = [...steps[sIdx].questions];
+      const options = [
+        ...questions[qIdx].options,
+        {
+          id: `opt_${Date.now()}`,
+          label: 'New Condition / Option',
+          description: '',
+          deductionType: 'percentage',
+          deductionValue: 5,
+          isNegative: true,
+        },
+      ];
+      questions[qIdx] = { ...questions[qIdx], options };
+      steps[sIdx] = { ...steps[sIdx], questions };
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
+  };
+
+  const handleCustomQuizAddStep = () => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const newStep = {
+        id: `step_${Date.now()}`,
+        label: 'New Evaluation Step',
+        subtitle: 'Questions for this step',
+        questions: [
+          {
+            id: `q_${Date.now()}`,
+            title: 'New Question',
+            subtitle: 'Please provide details',
+            type: 'yes_no',
+            required: true,
+            options: [
+              { id: 'yes', label: 'Yes', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+            ],
+          },
+        ],
+      };
+      return { ...prev, customQuiz: { ...quiz, steps: [...(quiz.steps || []), newStep] } };
+    });
+  };
+
+  const handleCustomQuizDeleteStep = (sIdx) => {
+    setFormData(prev => {
+      const quiz = prev.customQuiz || { steps: [] };
+      const steps = quiz.steps.filter((_, idx) => idx !== sIdx);
+      return { ...prev, customQuiz: { ...quiz, steps } };
+    });
   };
 
   // Submit Device Form
@@ -444,6 +773,14 @@ export default function AdminDevices() {
                   <Percent size={14} className="inline mr-1" />
                   Deductions & Bonuses
                 </button>
+                <button
+                  type="button"
+                  className={`admin-tab ${modalTab === 'quiz' ? 'active' : ''}`}
+                  onClick={() => setModalTab('quiz')}
+                >
+                  <HelpCircle size={14} className="inline mr-1" />
+                  Model Quiz {formData.hasCustomQuiz ? '(Custom)' : '(Default)'}
+                </button>
               </div>
             </div>
 
@@ -608,6 +945,344 @@ export default function AdminDevices() {
                       <span className="text-xs font-bold uppercase tracking-wider">Device Is Active (Available for Trade-In)</span>
                     </button>
                   </div>
+                </div>
+              )}
+
+              {/* TAB 5: MODEL-SPECIFIC QUIZ */}
+              {modalTab === 'quiz' && (
+                <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
+                  {/* Mode Selector Card */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <HelpCircle className="w-4 h-4 text-emerald-600" />
+                        Model Evaluation Quiz & Deductions
+                      </h4>
+                      <p className="text-xs text-slate-500 mt-1">
+                        Control how this specific model is evaluated. You can inherit the global category questions or configure custom questions & deductions exclusively for this model.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {/* Option 1: Category Master */}
+                      <div
+                        onClick={() => handleToggleCustomQuiz(false)}
+                        className={`cursor-pointer p-4 rounded-xl border-2 transition flex items-start gap-3 ${
+                          !formData.hasCustomQuiz
+                            ? 'border-emerald-600 bg-white shadow-sm'
+                            : 'border-slate-200 bg-white/60 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
+                          !formData.hasCustomQuiz ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
+                        }`}>
+                          {!formData.hasCustomQuiz && <div className="w-2 h-2 rounded-full bg-white" />}
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-slate-900 block">
+                            Category Master Quiz (Default)
+                          </span>
+                          <span className="text-xs text-slate-500 mt-0.5 block">
+                            Inherits standard questions and deductions from the {formData.category?.toUpperCase() || 'MOBILE'} category template.
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Option 2: Custom Quiz for this Model */}
+                      <div
+                        onClick={() => handleToggleCustomQuiz(true)}
+                        className={`cursor-pointer p-4 rounded-xl border-2 transition flex items-start gap-3 ${
+                          formData.hasCustomQuiz
+                            ? 'border-emerald-600 bg-white shadow-sm'
+                            : 'border-slate-200 bg-white/60 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
+                          formData.hasCustomQuiz ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
+                        }`}>
+                          {formData.hasCustomQuiz && <div className="w-2 h-2 rounded-full bg-white" />}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-semibold text-slate-900 block">
+                              Custom Quiz Override
+                            </span>
+                            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                          </div>
+                          <span className="text-xs text-slate-500 mt-0.5 block">
+                            Set custom questions, defect options, and tailored deduction rates (% or ₹) exclusively for this model.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* If Inheriting Category Master */}
+                  {!formData.hasCustomQuiz && (
+                    <div className="bg-emerald-50/60 border border-emerald-200 rounded-xl p-6 text-center space-y-3">
+                      <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                        <CheckCircle2 className="w-6 h-6" />
+                      </div>
+                      <h4 className="text-sm font-bold text-slate-900">
+                        Using Global {formData.category?.toUpperCase() || 'MOBILE'} Quiz
+                      </h4>
+                      <p className="text-xs text-slate-600 max-w-md mx-auto">
+                        This phone currently uses the standard category questionnaire. Any question or deduction updates made in the <strong>Quiz & Deductions</strong> manager automatically apply to this model.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleCustomQuiz(true)}
+                        disabled={cloningQuiz}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm transition disabled:opacity-50"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                        {cloningQuiz ? 'Cloning Category Quiz...' : 'Customize Quiz for this Model'}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* If Custom Quiz is Active */}
+                  {formData.hasCustomQuiz && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3.5 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-600" />
+                          <span className="text-xs font-semibold text-amber-900">
+                            Custom Questionnaire Active for {formData.brand} {formData.modelName}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleCustomQuiz(false)}
+                          className="text-xs font-medium text-slate-600 hover:text-red-600 underline"
+                        >
+                          Revert to Category Default
+                        </button>
+                      </div>
+
+                      {/* Custom Steps Accordion */}
+                      <div className="space-y-4">
+                        {(formData.customQuiz?.steps || []).map((step, sIdx) => {
+                          const isOpen = openCustomQuizStepIndex === sIdx;
+                          return (
+                            <div
+                              key={step.id || sIdx}
+                              className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm"
+                            >
+                              {/* Step Header */}
+                              <div
+                                onClick={() => setOpenCustomQuizStepIndex(isOpen ? null : sIdx)}
+                                className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100 cursor-pointer select-none border-b border-slate-200"
+                              >
+                                <div className="flex items-center gap-2.5">
+                                  <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center justify-center">
+                                    {sIdx + 1}
+                                  </span>
+                                  <div>
+                                    <span className="text-sm font-semibold text-slate-900">{step.label}</span>
+                                    <span className="text-xs text-slate-500 ml-2">({step.questions?.length || 0} questions)</span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCustomQuizDeleteStep(sIdx);
+                                    }}
+                                    className="p-1 text-slate-400 hover:text-red-600 rounded transition"
+                                    title="Delete Step Section"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                                  </button>
+                                  {isOpen ? (
+                                    <ChevronUp className="w-4 h-4 text-slate-500" />
+                                  ) : (
+                                    <ChevronDown className="w-4 h-4 text-slate-500" />
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Step Body */}
+                              {isOpen && (
+                                <div className="p-4 space-y-4">
+                                  {/* Step Titles */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-md border border-slate-200">
+                                    <div>
+                                      <label className="block text-xs font-semibold text-slate-700 mb-1">Step Label</label>
+                                      <input
+                                        type="text"
+                                        value={step.label || ''}
+                                        onChange={(e) => handleCustomQuizStepField(sIdx, 'label', e.target.value)}
+                                        className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs font-semibold text-slate-700 mb-1">Step Subtitle</label>
+                                      <input
+                                        type="text"
+                                        value={step.subtitle || ''}
+                                        onChange={(e) => handleCustomQuizStepField(sIdx, 'subtitle', e.target.value)}
+                                        className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Questions */}
+                                  <div className="space-y-4">
+                                    {(step.questions || []).map((q, qIdx) => (
+                                      <div
+                                        key={q.id || qIdx}
+                                        className="border border-slate-200 rounded-md p-4 bg-white space-y-3 shadow-xs"
+                                      >
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                                            <div className="md:col-span-2">
+                                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                                Question Title
+                                              </label>
+                                              <input
+                                                type="text"
+                                                value={q.title || ''}
+                                                onChange={(e) => handleCustomQuizQuestionField(sIdx, qIdx, 'title', e.target.value)}
+                                                className="w-full text-xs font-medium px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                                              />
+                                            </div>
+                                            <div>
+                                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                                Type
+                                              </label>
+                                              <select
+                                                value={q.type || 'yes_no'}
+                                                onChange={(e) => handleCustomQuizQuestionField(sIdx, qIdx, 'type', e.target.value)}
+                                                className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                                              >
+                                                <option value="yes_no">Yes / No</option>
+                                                <option value="single_choice">Single Choice</option>
+                                                <option value="multi_choice">Multi Choice</option>
+                                              </select>
+                                            </div>
+                                            <div className="md:col-span-3">
+                                              <input
+                                                type="text"
+                                                placeholder="Helper subtitle..."
+                                                value={q.subtitle || ''}
+                                                onChange={(e) => handleCustomQuizQuestionField(sIdx, qIdx, 'subtitle', e.target.value)}
+                                                className="w-full text-xs px-2.5 py-1 bg-slate-50 border border-slate-300 rounded focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                                              />
+                                            </div>
+                                          </div>
+
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleCustomQuizDeleteQuestion(sIdx, qIdx);
+                                            }}
+                                            className="p-1.5 text-slate-400 hover:text-red-600 rounded hover:bg-red-50 transition"
+                                            title="Delete Question"
+                                          >
+                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                          </button>
+                                        </div>
+
+                                        {/* Options */}
+                                        <div className="border-t border-slate-100 pt-2 space-y-2">
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                              Answer Options & Deductions
+                                            </span>
+                                            <button
+                                              type="button"
+                                              onClick={() => handleCustomQuizAddOption(sIdx, qIdx)}
+                                              className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                                            >
+                                              <Plus className="w-3 h-3" />
+                                              Add Option
+                                            </button>
+                                          </div>
+
+                                          <div className="space-y-1.5">
+                                            {(q.options || []).map((opt, oIdx) => (
+                                              <div
+                                                key={opt.id || oIdx}
+                                                className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center bg-slate-50 p-2 rounded border border-slate-200"
+                                              >
+                                                <div className="md:col-span-5">
+                                                  <input
+                                                    type="text"
+                                                    placeholder="Option label"
+                                                    value={opt.label || ''}
+                                                    onChange={(e) => handleCustomQuizOptionField(sIdx, qIdx, oIdx, 'label', e.target.value)}
+                                                    className="w-full text-xs px-2 py-1 bg-white border border-slate-300 rounded focus:outline-none"
+                                                  />
+                                                </div>
+
+                                                <div className="md:col-span-3">
+                                                  <select
+                                                    value={opt.deductionType || 'percentage'}
+                                                    onChange={(e) => handleCustomQuizOptionField(sIdx, qIdx, oIdx, 'deductionType', e.target.value)}
+                                                    className="w-full text-xs px-2 py-1 bg-white border border-slate-300 rounded focus:outline-none"
+                                                  >
+                                                    <option value="percentage">% Percentage</option>
+                                                    <option value="flat_inr">₹ Flat INR</option>
+                                                  </select>
+                                                </div>
+
+                                                <div className="md:col-span-3">
+                                                  <input
+                                                    type="number"
+                                                    placeholder="Deduction"
+                                                    value={opt.deductionValue ?? ''}
+                                                    onChange={(e) => handleCustomQuizOptionField(sIdx, qIdx, oIdx, 'deductionValue', e.target.value)}
+                                                    className="w-full text-xs px-2 py-1 bg-white border border-slate-300 rounded focus:outline-none font-semibold text-red-600"
+                                                  />
+                                                </div>
+
+                                                <div className="md:col-span-1 flex justify-end">
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => handleCustomQuizDeleteOption(sIdx, qIdx, oIdx)}
+                                                    className="p-1 text-slate-400 hover:text-red-500"
+                                                    title="Remove option"
+                                                  >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCustomQuizAddQuestion(sIdx)}
+                                      className="w-full py-2 border-2 border-dashed border-slate-300 hover:border-emerald-500 text-slate-600 hover:text-emerald-700 rounded-md text-xs font-semibold flex items-center justify-center gap-1 transition"
+                                    >
+                                      <Plus className="w-3.5 h-3.5" />
+                                      Add Question to {step.label}
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+
+                        <button
+                          type="button"
+                          onClick={handleCustomQuizAddStep}
+                          className="w-full py-2.5 border-2 border-dashed border-slate-300 hover:border-emerald-500 text-slate-600 hover:text-emerald-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition"
+                        >
+                          <Plus className="w-4 h-4 text-emerald-600" />
+                          Add New Step Section
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -845,47 +1520,101 @@ export default function AdminDevices() {
               {modalTab === 'deductions' && (
                 <div className="space-y-6 max-h-[450px] overflow-y-auto pr-2">
 
-                  {/* Functional Deductions */}
-                  <div>
-                    <h4 className="admin-section-title">Functional Deductions (Flat Deductions in INR)</h4>
-                    <div className="admin-multiplier-grid">
-                      {Object.keys(formData.functionalDeductions || {}).map((issue) => {
-                        // Filter keys depending on category
-                        const isLaptopIssue = ['battery', 'keyboard', 'trackpad', 'speakers', 'webcam', 'ports', 'hinge', 'overheat', 'gpu', 'screenChanged', 'wifi', 'biometric', 'charging', 'cdDrive', 'chargerIssue', 'hardDisk', 'displayIssue', 'motherboard'].includes(issue);
-                        const isMobileIssue = ['batteryLow', 'cameraIssue', 'speakerIssue', 'biometricIssue', 'chargingIssue'].includes(issue);
-
-                        if (formData.category === 'mobile' || formData.category === 'tablet') {
-                          if (isLaptopIssue) return null;
-                        } else {
-                          if (isMobileIssue) return null;
-                        }
-
-                        return (
-                          <div key={issue} className="admin-multiplier-item">
-                            <label>{issue}</label>
-                            <input
-                              type="number"
-                              value={formData.functionalDeductions[issue]}
-                              onChange={(e) => handleNestedChange('functionalDeductions', issue, e.target.value)}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Battery Deductions (Mobile) */}
+                  {/* MOBILE & TABLET DEDUCTIONS */}
                   {(formData.category === 'mobile' || formData.category === 'tablet') && (
+                    <>
+                      {/* 1. Cashify Screen & Body Defects */}
+                      <div>
+                        <h4 className="admin-section-title">Screen & Body Defects (Percentage %)</h4>
+                        <p className="text-xs text-slate-500 mb-2">Step 2: Applied if user selects physical defects</p>
+                        <div className="admin-multiplier-grid">
+                          {['defect_screen_broken_scratch', 'defect_screen_spots_lines'].map((key) => (
+                            <div key={key} className="admin-multiplier-item">
+                              <label>{SCREEN_DEDUCTION_LABELS[key] || key}</label>
+                              <input
+                                type="number"
+                                value={formData.screenDeductions?.[key] ?? ''}
+                                onChange={(e) => handleNestedChange('screenDeductions', key, e.target.value)}
+                              />
+                            </div>
+                          ))}
+                          {['defect_body_scratch_dent', 'defect_panel_missing_broken'].map((key) => (
+                            <div key={key} className="admin-multiplier-item">
+                              <label>{BODY_DEDUCTION_LABELS[key] || key}</label>
+                              <input
+                                type="number"
+                                value={formData.bodyDeductions?.[key] ?? ''}
+                                onChange={(e) => handleNestedChange('bodyDeductions', key, e.target.value)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 2. Cashify 18 Functional Problems */}
+                      <div>
+                        <h4 className="admin-section-title">Hardware & Functional Problems (Percentage %)</h4>
+                        <p className="text-xs text-slate-500 mb-2">Step 3: Applied if user selects hardware/camera/sensor issues</p>
+                        <div className="admin-multiplier-grid">
+                          {[
+                            'front_camera', 'back_camera', 'volume_button', 'finger_touch',
+                            'face_sensor', 'speaker_faulty', 'power_button', 'charging_port',
+                            'audio_receiver', 'camera_glass_broken', 'bluetooth', 'vibrator',
+                            'microphone', 'proximity_sensor', 'battery_service', 'battery_80_85',
+                            'silent_button', 'wifi_issue'
+                          ].map((key) => (
+                            <div key={key} className="admin-multiplier-item">
+                              <label>{MOBILE_FUNCTIONAL_LABELS[key] || key}</label>
+                              <input
+                                type="number"
+                                value={formData.functionalDeductions?.[key] ?? ''}
+                                onChange={(e) => handleNestedChange('functionalDeductions', key, e.target.value)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 3. General Evaluation & Accessories */}
+                      <div>
+                        <h4 className="admin-section-title">General Device & Accessories Deductions (Percentage %)</h4>
+                        <p className="text-xs text-slate-500 mb-2">Step 1 & 4: Applied for calls, screen original, warranty, bill, eSIM, box, charger</p>
+                        <div className="admin-multiplier-grid">
+                          {[
+                            'dead', 'screenFaulty', 'copyScreen', 'outOfWarranty',
+                            'noBill', 'eSIM', 'noBox', 'noCharger'
+                          ].map((key) => (
+                            <div key={key} className="admin-multiplier-item">
+                              <label>{MOBILE_FUNCTIONAL_LABELS[key] || key}</label>
+                              <input
+                                type="number"
+                                value={formData.functionalDeductions?.[key] ?? ''}
+                                onChange={(e) => handleNestedChange('functionalDeductions', key, e.target.value)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* LAPTOP & MAC FUNCTIONAL DEDUCTIONS */}
+                  {(formData.category === 'laptop' || formData.category === 'mac') && (
                     <div>
-                      <h4 className="admin-section-title">Battery Health Deductions (INR)</h4>
+                      <h4 className="admin-section-title">Laptop Functional Deductions (Percentage %)</h4>
                       <div className="admin-multiplier-grid">
-                        {Object.keys(formData.batteryDeductions || {}).map((b) => (
-                          <div key={b} className="admin-multiplier-item">
-                            <label>{b}% Health</label>
+                        {[
+                          'battery', 'keyboard', 'trackpad', 'speakers', 'webcam',
+                          'ports', 'hinge', 'overheat', 'gpu', 'screenChanged',
+                          'wifi', 'biometric', 'charging', 'cdDrive', 'chargerIssue',
+                          'hardDisk', 'displayIssue', 'motherboard'
+                        ].map((issue) => (
+                          <div key={issue} className="admin-multiplier-item">
+                            <label>{issue} (%)</label>
                             <input
                               type="number"
-                              value={formData.batteryDeductions[b]}
-                              onChange={(e) => handleNestedChange('batteryDeductions', b, e.target.value)}
+                              value={formData.functionalDeductions?.[issue] ?? ''}
+                              onChange={(e) => handleNestedChange('functionalDeductions', issue, e.target.value)}
                             />
                           </div>
                         ))}
@@ -901,7 +1630,7 @@ export default function AdminDevices() {
                         <div className="admin-multiplier-grid">
                           {Object.keys(formData.screenDeductions || {}).map((sd) => (
                             <div key={sd} className="admin-multiplier-item">
-                              <label>{sd}</label>
+                              <label>{SCREEN_DEDUCTION_LABELS[sd] || sd}</label>
                               <input
                                 type="number"
                                 value={formData.screenDeductions[sd]}

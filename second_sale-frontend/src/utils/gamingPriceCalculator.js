@@ -37,11 +37,18 @@ export const GAMING_PERCENTAGES = {
   }
 };
 
-export function calculateGamingPrice({ basePrice, answers = {} }) {
+export function calculateGamingPrice({ basePrice, answers = {}, device = {} }) {
   let currentPrice = Number(basePrice) || 0;
   if (currentPrice <= 0) return { finalPrice: 0, deductions: [] };
 
   const deductions = [];
+
+  const resolveDeduction = (category, key, defaultVal) => {
+    if (!key) return 0;
+    if (device?.[category]?.[key] !== undefined) return Number(device[category][key]);
+    if (device?.deductions?.[key] !== undefined) return Number(device.deductions[key]);
+    return defaultVal !== undefined ? defaultVal : 0;
+  };
 
   const applyDeduction = (pct, label) => {
     if (!pct || pct === 0) return;

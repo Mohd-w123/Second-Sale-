@@ -151,7 +151,7 @@ export default function GamingBrandSelectionPage() {
               </div>
 
               {b.maxPrice > 0 && (
-                <div className="mt-4 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+                <div className="mt-4 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
                   Up to ₹{b.maxPrice.toLocaleString("en-IN")}
                 </div>
               )}

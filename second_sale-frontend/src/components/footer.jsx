@@ -502,7 +502,7 @@ export default function Footer() {
                   href={s.href || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-xl bg-slate-800/90 border border-slate-700/60 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[#2563EB] hover:border-[#2563EB] hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300 no-underline"
+                  className="w-8 h-8 rounded-xl bg-slate-800/90 border border-slate-700/60 flex items-center justify-center text-slate-400 hover:text-white hover:bg-[#087F8C] hover:border-[#087F8C] hover:shadow-lg hover:shadow-[#087F8C]/25 transition-all duration-300 no-underline"
                   aria-label={s.name}
                   title={s.name}
                 >

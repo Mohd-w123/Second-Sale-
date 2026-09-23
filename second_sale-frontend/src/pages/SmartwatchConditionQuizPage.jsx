@@ -7,134 +7,24 @@ import { calculateSmartwatchPrice } from "../utils/smartwatchPriceCalculator";
 import Loader from "../components/ui/Loader";
 import SEOHead from "../components/seo/SEOHead";
 import {
-  Watch, CheckCircle2, XCircle, ArrowRight, ArrowLeft,
-  RotateCcw, Sparkles, Box, BatteryCharging, Cable, FileText,
-  AlertTriangle, Check, ShieldCheck, Battery, Wifi, Volume2,
-  Sliders, Activity, Bluetooth, Info
+  WatchScreenScratchesIcon,
+  WatchScreenCrackedIcon,
+  WatchBodyGoodIcon,
+  WatchBodyAverageIcon,
+  WatchBodyDamagedIcon,
+  WatchStrapIcon,
+  MagneticChargerIcon,
+  BoxPackagingIcon,
+  BillDocumentIcon
+} from "../components/quiz/QuizIcons";
+import {
+  ArrowRight, ArrowLeft, RotateCcw, Sparkles, AlertTriangle,
+  CheckCircle2, XCircle, Check, ShieldCheck, Info, Lock
 } from "lucide-react";
-
-const STEPS = [
-  {
-    id: "powerOn",
-    title: "Power On",
-    question: "Does your smartwatch power on and boot up normally?",
-    desc: "We currently only accept smartwatches that turn on and operate normally.",
-    choiceType: "single",
-    options: [
-      {
-        id: "power_yes",
-        label: "Yes, Powers On",
-        isPositive: true,
-        bullets: ["Watch boots up to home/watch face!", "Operating system runs smoothly!"]
-      },
-      {
-        id: "power_no",
-        label: "No, Does Not Turn On",
-        isPositive: false,
-        bullets: ["Watch does not turn on or is bricked!", "Screen remains completely black or loops!"]
-      }
-    ]
-  },
-  {
-    id: "screenCondition",
-    title: "Screen Condition",
-    question: "What is the condition of the screen / display?",
-    desc: "Examine the front glass and display panel in good lighting.",
-    choiceType: "single",
-    options: [
-      {
-        id: "flawless",
-        label: "Flawless",
-        isPositive: true,
-        bullets: ["Zero scratches, like new!", "Touch response is 100% accurate, no dead pixels!"]
-      },
-      {
-        id: "good",
-        label: "Good",
-        isPositive: true,
-        bullets: ["Minor hairline scratches visible under light!", "No cracks, fully working display!"]
-      },
-      {
-        id: "average",
-        label: "Average",
-        isPositive: false,
-        bullets: ["Noticeable scratches on display!", "No cracks, but visible wear from daily use!"]
-      },
-      {
-        id: "damaged",
-        label: "Cracked / Damaged",
-        isPositive: false,
-        bullets: ["Cracked glass, lines on screen, or blank spots!", "Touch not working properly!"]
-      }
-    ]
-  },
-  {
-    id: "bodyCondition",
-    title: "Physical Body",
-    question: "What is the physical condition of the watch body / casing?",
-    desc: "Check the metallic/ceramic housing, bezel, and case back.",
-    choiceType: "single",
-    options: [
-      {
-        id: "flawless",
-        label: "Flawless",
-        isPositive: true,
-        bullets: ["Pristine casing with no dents or scratches!", "Ceramic / sensor back is clean!"]
-      },
-      {
-        id: "good",
-        label: "Good",
-        isPositive: true,
-        bullets: ["Minor signs of gentle use or tiny scratches!", "No deep dents or bent chassis!"]
-      },
-      {
-        id: "average",
-        label: "Average",
-        isPositive: false,
-        bullets: ["Visible scratches, scuffs or minor corner dents!", "Color fading or paint chipping!"]
-      },
-      {
-        id: "broken",
-        label: "Heavy Dents / Broken Back",
-        isPositive: false,
-        bullets: ["Deep dents, cracked back glass/sensor!", "Bent or loose watch casing!"]
-      }
-    ]
-  },
-  {
-    id: "functionalIssues",
-    title: "Functional Issues",
-    question: "Are there any functional issues with your smartwatch?",
-    desc: "Select any issues your watch has. If none, simply click Continue.",
-    choiceType: "multi_issues",
-    options: [
-      { id: "battery", label: "Battery Drain / Poor Backup", icon: Battery },
-      { id: "wifi", label: "Wi-Fi Connectivity Faulty", icon: Wifi },
-      { id: "speakers", label: "Speaker / Mic Issue", icon: Volume2 },
-      { id: "charging", label: "Charging / Dock Faulty", icon: BatteryCharging },
-      { id: "crown", label: "Digital Crown / Dial Faulty", icon: Sliders },
-      { id: "side_button", label: "Side / Action Button Issue", icon: Sliders },
-      { id: "heart_rate", label: "Heart Rate / Sensor Issue", icon: Activity },
-      { id: "bluetooth", label: "Bluetooth Pairing Issue", icon: Bluetooth }
-    ]
-  },
-  {
-    id: "accessories",
-    title: "Original Accessories",
-    question: "Select Original Accessories You Have",
-    desc: "Original accessories increase the pickup offer value.",
-    choiceType: "multi_accessories",
-    options: [
-      { id: "acc_charger", label: "Original Charger / Dock", icon: Cable },
-      { id: "acc_strap", label: "Original Strap / Band", icon: Watch },
-      { id: "acc_box", label: "Original Box", icon: Box },
-      { id: "acc_bill", label: "Valid Bill / Invoice", icon: FileText }
-    ]
-  }
-];
+import EvaluationOtpModal from "../components/quiz/EvaluationOtpModal";
 
 export default function SmartwatchConditionQuizPage() {
-  const { brand, slug } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const variant = searchParams.get("variant") || searchParams.get("storage") || "";
@@ -145,14 +35,18 @@ export default function SmartwatchConditionQuizPage() {
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stepIndex, setStepIndex] = useState(0);
+
+  // Exact Cashify live answers
   const [answers, setAnswers] = useState({
-    powerOn: null,
-    screenCondition: null,
-    bodyCondition: null,
-    functionalIssues: [],
-    accessories: []
+    powerOn: "yes",            // "yes" | "no"
+    screenCondition: "flawless", // "flawless" | "good" | "average" | "damaged"
+    bodyCondition: "flawless",   // "flawless" | "good" | "average" | "below_average"
+    accessories: ["acc_charger", "acc_strap", "acc_box", "acc_bill"],
+    age: "Below 6 Months"       // "Below 6 Months" | "6 to 11 Months" | "Above 11 Months"
   });
+
   const [showResult, setShowResult] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
   const [showBreakdownModal, setShowBreakdownModal] = useState(false);
 
   useEffect(() => {
@@ -177,36 +71,152 @@ export default function SmartwatchConditionQuizPage() {
   const valuation = useMemo(() => {
     return calculateSmartwatchPrice({
       basePrice,
-      answers: {
-        powerOn: answers.powerOn === "power_yes" ? "yes" : answers.powerOn === "power_no" ? "no" : undefined,
-        screenCondition: answers.screenCondition,
-        bodyCondition: answers.bodyCondition,
-        functionalIssues: answers.functionalIssues || [],
-        accessories: {
-          charger: (answers.accessories || []).includes("acc_charger"),
-          strap: (answers.accessories || []).includes("acc_strap"),
-          box: (answers.accessories || []).includes("acc_box"),
-          bill: (answers.accessories || []).includes("acc_bill")
-        }
-      }
+      answers,
+      device: device || {}
     });
-  }, [basePrice, answers]);
+  }, [basePrice, answers, device]);
+
+  // Exact 5 Cashify Steps
+  const STEPS = [
+    {
+      id: "powerOn",
+      stepNum: 1,
+      title: "Does the watch Switch On ?",
+      subtitle: "We currently only accept devices that switch on",
+      type: "power",
+      options: [
+        { id: "yes", label: "Yes" },
+        { id: "no", label: "No" }
+      ]
+    },
+    {
+      id: "screenCondition",
+      stepNum: 2,
+      title: "Screen Condition",
+      subtitle: "Please select your device screen condition",
+      type: "cards",
+      options: [
+        {
+          id: "flawless",
+          title: "Flawless",
+          bullets: ["No scratches", "No screen issue", "Touch Working"],
+          badge: "Flawless",
+          badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          icon: WatchBodyGoodIcon
+        },
+        {
+          id: "good",
+          title: "Good",
+          bullets: ["1-2 minor scratches", "No screen issue", "Touch Working"],
+          badge: "Minor Wear",
+          badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+          icon: WatchScreenScratchesIcon
+        },
+        {
+          id: "average",
+          title: "Average",
+          bullets: ["Multiple scratches", "No screen issue", "Touch Working"],
+          badge: "Normal Wear",
+          badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+          icon: WatchScreenScratchesIcon
+        },
+        {
+          id: "damaged",
+          title: "Damaged",
+          bullets: ["Cracked screen / lines / spots / touch not working"],
+          badge: "Defective",
+          badgeColor: "bg-red-50 text-red-700 border-red-200",
+          icon: WatchScreenCrackedIcon
+        }
+      ]
+    },
+    {
+      id: "bodyCondition",
+      stepNum: 3,
+      title: "Physical Condition",
+      subtitle: "Please select your device physical condition",
+      type: "cards",
+      options: [
+        {
+          id: "flawless",
+          title: "Flawless",
+          bullets: ["Like new, no dents", "No scratches", "Buttons working"],
+          badge: "Flawless",
+          badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
+          icon: WatchBodyGoodIcon
+        },
+        {
+          id: "good",
+          title: "Good",
+          bullets: ["1-2 minor scratches, no dents", "Buttons working"],
+          badge: "Good",
+          badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+          icon: WatchBodyGoodIcon
+        },
+        {
+          id: "average",
+          title: "Average",
+          bullets: ["Multiple scratches/dents", "Body discoloured", "Buttons working"],
+          badge: "Average",
+          badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+          icon: WatchBodyAverageIcon
+        },
+        {
+          id: "below_average",
+          title: "Below Average/Broken",
+          bullets: ["Severe dents, broken body", "Buttons not working"],
+          badge: "Damaged",
+          badgeColor: "bg-red-50 text-red-700 border-red-200",
+          icon: WatchBodyDamagedIcon
+        }
+      ]
+    },
+    {
+      id: "accessories",
+      stepNum: 4,
+      title: "Do you have the following?",
+      subtitle: "Please select accessories which are available",
+      type: "accessories",
+      options: [
+        { id: "acc_charger", label: "Charger available", icon: MagneticChargerIcon },
+        { id: "acc_strap", label: "Strap Available", icon: WatchStrapIcon },
+        { id: "acc_box", label: "Box available", icon: BoxPackagingIcon },
+        { id: "acc_bill", label: "Valid GST Bill Available", icon: BillDocumentIcon }
+      ]
+    },
+    {
+      id: "age",
+      stepNum: 5,
+      title: "Age of your device",
+      subtitle: "Let us know how old is your device. Valid bill is needed for devices less than 11 months.",
+      type: "age",
+      options: [
+        {
+          id: "Below 6 Months",
+          label: "Below 6 Months",
+          badge: "Brand Warranty",
+          badgeColor: "bg-emerald-100 text-emerald-700",
+          desc: "Under official brand warranty with invoice"
+        },
+        {
+          id: "6 to 11 Months",
+          label: "6 to 11 Months",
+          badge: "In Warranty",
+          badgeColor: "bg-blue-100 text-blue-700",
+          desc: "Between 6 to 11 months old"
+        },
+        {
+          id: "Above 11 Months",
+          label: "Above 11 Months",
+          badge: "Out of Warranty",
+          badgeColor: "bg-slate-100 text-slate-700",
+          desc: "Manufacturer warranty has expired"
+        }
+      ]
+    }
+  ];
 
   const currentStep = STEPS[stepIndex];
-
-  const handleSingleSelect = (val) => {
-    setAnswers(prev => ({ ...prev, [currentStep.id]: val }));
-  };
-
-  const handleToggleIssue = (issueId) => {
-    setAnswers(prev => {
-      const current = Array.isArray(prev.functionalIssues) ? prev.functionalIssues : [];
-      const updated = current.includes(issueId)
-        ? current.filter(x => x !== issueId)
-        : [...current, issueId];
-      return { ...prev, functionalIssues: updated };
-    });
-  };
 
   const handleToggleAccessory = (accId) => {
     setAnswers(prev => {
@@ -218,28 +228,49 @@ export default function SmartwatchConditionQuizPage() {
     });
   };
 
-  const hasBoxOrBill = Array.isArray(answers.accessories) && (
-    answers.accessories.includes("acc_box") || answers.accessories.includes("acc_bill")
-  );
+  const finalizeAndShowResult = () => {
+    const quotePayload = {
+      device: {
+        brand: device.brand,
+        modelName: device.modelName,
+        slug: device.slug,
+        category: "smartwatch",
+        imageUrl: device.imageUrl || "",
+        variant: variant,
+        quizAnswers: answers,
+        answerSummary: [
+          { question: "Does the watch Switch On ?", answer: answers.powerOn === "yes" ? "Yes" : "No" },
+          { question: "Screen Condition", answer: answers.screenCondition },
+          { question: "Physical Condition", answer: answers.bodyCondition },
+          { question: "Accessories Available", answer: answers.accessories.join(", ") },
+          { question: "Age of your device", answer: answers.age }
+        ]
+      },
+      priceBreakdown: {
+        basePrice: valuation.basePrice,
+        finalPrice: valuation.finalPrice,
+        totalDeductionPct: valuation.totalDeductionPct,
+        deductions: valuation.deductions
+      }
+    };
 
-  const isCurrentStepValid = () => {
-    if (!currentStep) return false;
-    if (currentStep.id === "powerOn") return answers.powerOn === "power_yes";
-    if (currentStep.id === "screenCondition") return !!answers.screenCondition;
-    if (currentStep.id === "bodyCondition") return !!answers.bodyCondition;
-    if (currentStep.id === "functionalIssues") return true; // Optional, can be none
-    if (currentStep.id === "accessories") return hasBoxOrBill;
-    return true;
+    updateQuote(quotePayload);
+    try {
+      localStorage.setItem("quote", JSON.stringify(quotePayload));
+    } catch {
+      // ignore
+    }
+    setShowResult(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleNext = () => {
-    if (!isCurrentStepValid()) return;
+    if (currentStep.id === "powerOn" && answers.powerOn === "no") return;
     if (stepIndex < STEPS.length - 1) {
       setStepIndex(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      setShowResult(true);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setShowOtpModal(true);
     }
   };
 
@@ -260,13 +291,20 @@ export default function SmartwatchConditionQuizPage() {
         slug: device.slug,
         category: "smartwatch",
         imageUrl: device.imageUrl || "",
-        storage: variant || "Standard",
+        variant: variant,
         quizAnswers: answers,
-        answerSummary: Object.entries(answers).map(([k, v]) => ({ key: k, value: v }))
+        answerSummary: [
+          { question: "Does the watch Switch On ?", answer: answers.powerOn === "yes" ? "Yes" : "No" },
+          { question: "Screen Condition", answer: answers.screenCondition },
+          { question: "Physical Condition", answer: answers.bodyCondition },
+          { question: "Accessories Available", answer: answers.accessories.join(", ") },
+          { question: "Age of your device", answer: answers.age }
+        ]
       },
       priceBreakdown: {
-        basePrice,
+        basePrice: valuation.basePrice,
         finalPrice: valuation.finalPrice,
+        totalDeductionPct: valuation.totalDeductionPct,
         deductions: valuation.deductions
       }
     };
@@ -274,7 +312,9 @@ export default function SmartwatchConditionQuizPage() {
     updateQuote(quotePayload);
     try {
       localStorage.setItem("quote", JSON.stringify(quotePayload));
-    } catch (e) {}
+    } catch {
+      // storage error
+    }
 
     if (isAuthenticated) {
       navigate("/schedule-pickup");
@@ -286,9 +326,7 @@ export default function SmartwatchConditionQuizPage() {
   if (loading) return <Loader />;
   if (!device) return null;
 
-  const brandName = brand ? brand.charAt(0).toUpperCase() + brand.slice(1) : "";
-
-  // Result Valuation Screen
+  // --- RESULT VIEW ---
   if (showResult) {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-8 py-10 sm:py-16">
@@ -298,20 +336,17 @@ export default function SmartwatchConditionQuizPage() {
         />
 
         <div className="bg-white rounded-[32px] border border-slate-100 p-6 sm:p-10 shadow-xl text-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4">
             <Sparkles size={32} />
           </div>
 
-          <span className="inline-block text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full mb-2">
+          <span className="inline-block text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-2">
             Final Buyback Offer
           </span>
 
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">
             {device.modelName}
           </h1>
-          {variant && (
-            <p className="text-xs font-semibold text-slate-400 mb-4">{variant}</p>
-          )}
 
           <div className="my-6 py-6 bg-slate-50 rounded-3xl border border-slate-100">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
@@ -337,7 +372,7 @@ export default function SmartwatchConditionQuizPage() {
             <button
               type="button"
               onClick={handleSchedulePickup}
-              className="w-full py-4 sm:py-5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black rounded-2xl text-base sm:text-lg shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-2 cursor-pointer group"
+              className="w-full py-4 sm:py-5 btn-gradient text-white font-black rounded-2xl text-base sm:text-lg shadow-xl shadow-[#087F8C]/25 transition-all flex items-center justify-center gap-2 cursor-pointer group"
             >
               <span>Schedule Free Pickup</span>
               <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
@@ -394,14 +429,14 @@ export default function SmartwatchConditionQuizPage() {
 
                 <div className="flex justify-between font-black text-sm text-slate-900 pt-3 border-t border-slate-200">
                   <span>Final Value</span>
-                  <span className="text-emerald-600">₹{valuation.finalPrice.toLocaleString("en-IN")}</span>
+                  <span className="text-blue-600">₹{valuation.finalPrice.toLocaleString("en-IN")}</span>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setShowBreakdownModal(false)}
-                className="w-full mt-6 py-3 bg-slate-900 text-white font-bold rounded-xl text-xs"
+                className="w-full mt-6 py-3 bg-slate-900 text-white font-bold rounded-xl text-xs cursor-pointer"
               >
                 Close
               </button>
@@ -413,202 +448,414 @@ export default function SmartwatchConditionQuizPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <SEOHead
-        title={`Sell ${device.modelName} — Condition Evaluation | SecondSale`}
-        description={`Answer a few simple questions about your ${device.modelName} to get the best cash valuation instantly.`}
+        title={`Sell ${device.modelName} — Cashify-Style Valuation | SecondSale`}
+        description={`Answer a few simple questions to evaluate the exact condition and get the best price for ${device.modelName}.`}
       />
 
       {/* Top Header */}
-      <div className="flex items-center justify-between mb-6">
-        <button
-          type="button"
-          onClick={handlePrev}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors"
-        >
-          <ArrowLeft size={16} />
-          Back
-        </button>
-
-        <div className="text-right">
-          <span className="text-xs font-bold text-slate-400">Step {stepIndex + 1} of {STEPS.length}</span>
-        </div>
-      </div>
-
-      {/* Step Progress Bar */}
-      <div className="w-full bg-slate-100 h-2 rounded-full mb-8 overflow-hidden">
-        <div
-          className="bg-blue-600 h-full transition-all duration-300 rounded-full"
-          style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
-        />
-      </div>
-
-      {/* Main Card */}
-      <div className="bg-white rounded-[32px] border border-slate-100 p-6 sm:p-10 shadow-sm">
-        <div className="text-center max-w-xl mx-auto mb-8">
-          <span className="inline-block text-[11px] font-black uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full mb-2 border border-blue-100">
-            {currentStep.title}
-          </span>
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 mb-2 leading-snug">
-            {currentStep.question}
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            {currentStep.desc}
-          </p>
-        </div>
-
-        {/* Step 4: Multi-select Functional Issues */}
-        {currentStep.id === "functionalIssues" ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-w-2xl mx-auto">
-            {currentStep.options.map(opt => {
-              const IconComp = opt.icon;
-              const isSelected = Array.isArray(answers.functionalIssues) && answers.functionalIssues.includes(opt.id);
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => handleToggleIssue(opt.id)}
-                  className={`rounded-2xl border-2 p-3 sm:p-4 text-center transition-all cursor-pointer flex flex-col items-center justify-between h-32 ${
-                    isSelected
-                      ? "border-red-500 bg-red-50/50 shadow-xs ring-2 ring-red-100"
-                      : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${
-                    isSelected ? "bg-red-500 text-white" : "bg-slate-100 text-slate-500"
-                  }`}>
-                    <IconComp size={20} />
-                  </div>
-                  <span className={`text-xs font-bold leading-tight ${
-                    isSelected ? "text-red-700 font-black" : "text-slate-700"
-                  }`}>
-                    {opt.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        ) : currentStep.id === "accessories" ? (
-          <>
-            {/* Step 5: Accessories */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
-              {currentStep.options.map(opt => {
-                const IconComp = opt.icon;
-                const isSelected = Array.isArray(answers.accessories) && answers.accessories.includes(opt.id);
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => handleToggleAccessory(opt.id)}
-                    className={`rounded-2xl border-2 p-4 text-center transition-all cursor-pointer flex flex-col items-center justify-between h-32 ${
-                      isSelected
-                        ? "border-blue-600 bg-blue-50/50 shadow-xs"
-                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
-                    }`}
-                  >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-2 ${
-                      isSelected ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"
-                    }`}>
-                      <IconComp size={22} />
-                    </div>
-                    <span className={`text-xs font-bold leading-tight ${
-                      isSelected ? "text-blue-700 font-black" : "text-slate-700"
-                    }`}>
-                      {opt.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Mandatory Warning Banner */}
-            <div className="mt-6 max-w-2xl mx-auto p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] text-[#92400E] text-xs sm:text-sm font-semibold flex items-center gap-2.5 shadow-xs">
-              <AlertTriangle size={18} className="text-[#D97706] shrink-0" />
-              <span>Either genuine bill or box is required for device to be acceptable at pickup!</span>
-            </div>
-          </>
-        ) : (
-          /* Single Select Cards (Power On, Screen, Body) */
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
-            {currentStep.options.map(opt => {
-              const isSelected = answers[currentStep.id] === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => handleSingleSelect(opt.id)}
-                  className={`text-left rounded-2xl border-2 overflow-hidden transition-all cursor-pointer ${
-                    isSelected
-                      ? "border-blue-600 shadow-md ring-2 ring-blue-100"
-                      : "border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50/50"
-                  }`}
-                >
-                  <div className={`px-4 py-3 flex items-center justify-between border-b ${
-                    isSelected ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-100 text-slate-800"
-                  }`}>
-                    <span className="font-extrabold text-sm sm:text-base">{opt.label}</span>
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                      isSelected ? "bg-white text-blue-600" : "border-2 border-slate-300"
-                    }`}>
-                      {isSelected && <Check size={12} className="stroke-[3]" />}
-                    </div>
-                  </div>
-
-                  {opt.bullets && (
-                    <ul className="p-4 space-y-2 bg-white">
-                      {opt.bullets.map((b, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-slate-600">
-                          {opt.isPositive ? (
-                            <CheckCircle2 size={14} className="text-emerald-500 shrink-0 mt-0.5" />
-                          ) : (
-                            <XCircle size={14} className="text-red-400 shrink-0 mt-0.5" />
-                          )}
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Power On Rejection Notice */}
-        {currentStep.id === "powerOn" && answers.powerOn === "power_no" && (
-          <div className="mt-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-center max-w-md mx-auto text-xs text-red-700 font-bold flex items-center justify-center gap-2">
-            <AlertTriangle size={16} />
-            <span>Sorry, we cannot accept smartwatches that do not turn on.</span>
-          </div>
-        )}
-
-        {/* Continue Button */}
-        <div className="mt-8 max-w-xs mx-auto text-center">
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <button
             type="button"
-            onClick={handleNext}
-            disabled={!isCurrentStepValid()}
-            className={`w-full py-3.5 rounded-2xl font-bold text-sm sm:text-base transition-all flex items-center justify-center gap-2 ${
-              isCurrentStepValid()
-                ? "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shadow-md shadow-blue-500/20"
-                : "bg-[#A5C9FF] text-white/90 cursor-not-allowed"
-            }`}
+            onClick={handlePrev}
+            className="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors cursor-pointer"
           >
-            <span>{stepIndex === STEPS.length - 1 ? "Calculate Instant Quote" : "Continue"}</span>
-            <ArrowRight size={18} />
+            <ArrowLeft size={16} />
+            <span>Back</span>
           </button>
 
-          {stepIndex > 0 && (
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="mt-3 text-xs sm:text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none"
-            >
-              Back
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            {device.imageUrl && (
+              <img src={device.imageUrl} alt={device.modelName} className="w-8 h-8 object-contain" />
+            )}
+            <div className="text-left hidden sm:block">
+              <span className="text-xs font-black text-slate-900 line-clamp-1">{device.modelName}</span>
+              {variant && <span className="text-[10px] text-slate-400 font-bold block">{variant}</span>}
+            </div>
+          </div>
+
+          <div className="text-right">
+            <span className="text-xs font-bold text-slate-400">
+              Step {stepIndex + 1} of {STEPS.length}
+            </span>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full bg-slate-100 h-1">
+          <div
+            className="bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] h-full transition-all duration-300"
+            style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
+          />
         </div>
       </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Main Question Panel */}
+          <div className="lg:col-span-8">
+            <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 shadow-xs">
+              <div className="mb-6">
+                <span className="inline-block text-[11px] font-black uppercase tracking-wider text-[#087F8C] bg-[#E8F6F7] px-3 py-1 rounded-full mb-2">
+                  Step {currentStep.stepNum} of {STEPS.length}
+                </span>
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 mb-1">
+                  {currentStep.title}
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500">{currentStep.subtitle}</p>
+              </div>
+
+              {/* Step 1: Does the watch Switch On ? */}
+              {currentStep.type === "power" && (
+                <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {currentStep.options.map(opt => {
+                      const isSelected = answers.powerOn === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setAnswers(prev => ({ ...prev, powerOn: opt.id }))}
+                          className={`text-left p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+                            isSelected
+                              ? "border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20"
+                              : "border-slate-200 bg-white hover:border-slate-300"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-base font-black ${isSelected ? "text-[#087F8C]" : "text-slate-900"}`}>
+                              {opt.label}
+                            </span>
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 ${
+                              isSelected ? "border-[#087F8C] bg-[#087F8C] text-white" : "border-slate-300"
+                            }`}>
+                              {isSelected && <Check size={12} className="stroke-[3]" />}
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-500 leading-relaxed">
+                            {opt.id === "yes" ? "Watch boots up to home face, displays properly." : "Watch is dead, black screen or stuck in boot loop."}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {answers.powerOn === "no" && (
+                    <div className="mt-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2.5">
+                      <AlertTriangle size={18} className="text-red-500 shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-bold">Device Cannot Be Evaluated</div>
+                        <div>We currently only accept devices that switch on. Please select &ldquo;Yes&rdquo; if your watch powers on.</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 2 & 3: Screen Condition & Physical Condition Cards */}
+              {currentStep.type === "cards" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {currentStep.options.map(opt => {
+                    const IconComp = opt.icon;
+                    const isSelected = answers[currentStep.id] === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setAnswers(prev => ({ ...prev, [currentStep.id]: opt.id }))}
+                        className={`text-left p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between min-h-[170px] ${
+                          isSelected
+                            ? "border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20"
+                            : "border-slate-200 bg-white hover:border-slate-300"
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                                isSelected ? "bg-[#087F8C] text-white" : "bg-slate-100 text-slate-600"
+                              }`}>
+                                <IconComp className="w-5 h-5" />
+                              </div>
+                              <span className={`text-base font-black ${isSelected ? "text-[#087F8C]" : "text-slate-900"}`}>
+                                {opt.title}
+                              </span>
+                            </div>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${opt.badgeColor}`}>
+                              {opt.badge}
+                            </span>
+                          </div>
+
+                          <ul className="space-y-1.5 text-xs text-slate-500">
+                            {opt.bullets.map((bullet, bIdx) => (
+                              <li key={bIdx} className="flex items-start gap-1.5">
+                                <span className="text-slate-400 mt-1">•</span>
+                                <span>{bullet}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="mt-3 flex justify-end">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 ${
+                            isSelected ? "border-[#087F8C] bg-[#087F8C] text-white" : "border-slate-300"
+                          }`}>
+                            {isSelected && <Check size={12} className="stroke-[3]" />}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Step 4: Accessories (Multi-select) */}
+              {currentStep.type === "accessories" && (
+                <div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    {currentStep.options.map(opt => {
+                      const IconComp = opt.icon;
+                      const isSelected = Array.isArray(answers.accessories) && answers.accessories.includes(opt.id);
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => handleToggleAccessory(opt.id)}
+                          className={`rounded-2xl border-2 p-4 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[130px] ${
+                            isSelected
+                              ? "border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20"
+                              : "border-slate-200 bg-white hover:border-slate-300"
+                          }`}
+                        >
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-2 ${
+                            isSelected ? "bg-[#087F8C] text-white" : "bg-slate-100 text-slate-500"
+                          }`}>
+                            <IconComp className="w-7 h-7" />
+                          </div>
+                          <span className={`text-xs font-bold leading-tight ${
+                            isSelected ? "text-[#087F8C] font-black" : "text-slate-700"
+                          }`}>
+                            {opt.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2.5">
+                    <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+                    <span>Original charger and strap will help you get the maximum value for your smartwatch.</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 5: Age of your device */}
+              {currentStep.type === "age" && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {currentStep.options.map(opt => {
+                    const isSelected = answers.age === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setAnswers(prev => ({ ...prev, age: opt.id }))}
+                        className={`text-left p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between min-h-[140px] ${
+                          isSelected
+                            ? "border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20"
+                            : "border-slate-200 bg-white hover:border-slate-300"
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`text-base font-black ${isSelected ? "text-[#087F8C]" : "text-slate-900"}`}>
+                              {opt.label}
+                            </span>
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 ${
+                              isSelected ? "border-[#087F8C] bg-[#087F8C] text-white" : "border-slate-300"
+                            }`}>
+                              {isSelected && <Check size={12} className="stroke-[3]" />}
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-500 leading-relaxed mb-3">
+                            {opt.desc}
+                          </p>
+                        </div>
+                        <div>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${opt.badgeColor}`}>
+                            {opt.badge}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Bottom Buttons */}
+              <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+                {stepIndex > 0 ? (
+                  <button
+                    type="button"
+                    onClick={handlePrev}
+                    className="px-6 py-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+                  >
+                    Back
+                  </button>
+                ) : <div />}
+
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={currentStep.id === "powerOn" && answers.powerOn === "no"}
+                  className={`px-8 py-3.5 rounded-xl text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+                    currentStep.id === "powerOn" && answers.powerOn === "no"
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                      : "btn-gradient text-white shadow-md shadow-[#087F8C]/20"
+                  }`}
+                >
+                  <span>Continue</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Right Panel: Cashify Sidebar */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-xs sticky top-24">
+              
+              {/* Device Header */}
+              <div className="flex items-center gap-4 pb-4 border-b border-slate-100">
+                <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center p-2 shrink-0">
+                  {device.imageUrl ? (
+                    <img src={device.imageUrl} alt={device.modelName} className="w-full h-full object-contain" />
+                  ) : (
+                    <WatchBodyGoodIcon className="w-8 h-8 text-slate-400" />
+                  )}
+                </div>
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-[#087F8C] bg-[#E8F6F7] px-2 py-0.5 rounded-md">
+                    {device.brand}
+                  </span>
+                  <h3 className="text-sm font-black text-slate-900 mt-1 line-clamp-2">
+                    {device.modelName}
+                  </h3>
+                  {variant && <span className="text-xs text-slate-400 font-semibold">{variant}</span>}
+                </div>
+              </div>
+
+              {/* Cashify Up To Value banner */}
+              <div className="my-5 p-4 rounded-2xl bg-[#E8F6F7] border border-[#087F8C]/20">
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#087F8C] block mb-1">
+                  Evaluation In Progress
+                </span>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xs font-bold text-slate-600">Get Upto:</span>
+                  <span className="text-2xl font-black text-slate-900">
+                    ₹{valuation.basePrice.toLocaleString("en-IN")}
+                  </span>
+                </div>
+                <div className="mt-3">
+                  <div className="flex justify-between text-[11px] font-bold text-slate-500 mb-1">
+                    <span>Step {stepIndex + 1} of {STEPS.length}</span>
+                    <span>{Math.round(((stepIndex + 1) / STEPS.length) * 100)}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] transition-all duration-300"
+                      style={{ width: `${((stepIndex + 1) / STEPS.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Cashify Device Evaluation Checklist */}
+              <div className="space-y-3 pt-2">
+                <div className="text-xs font-black uppercase tracking-wider text-slate-900">
+                  Device Evaluation
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  {/* Step 1 */}
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-50">
+                    <span className="text-slate-600 truncate max-w-[200px]">Does the watch Switch On ?</span>
+                    <span className={`font-bold flex items-center gap-1 ${
+                      answers.powerOn === "yes" ? "text-emerald-600" : "text-red-500"
+                    }`}>
+                      {answers.powerOn === "yes" ? (
+                        <>Yes <CheckCircle2 size={13} /></>
+                      ) : (
+                        <>No <XCircle size={13} /></>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-50">
+                    <span className="text-slate-600 truncate max-w-[200px]">Screen Condition</span>
+                    <span className="font-bold text-slate-900 capitalize">{answers.screenCondition}</span>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-50">
+                    <span className="text-slate-600 truncate max-w-[200px]">Physical Condition</span>
+                    <span className="font-bold text-slate-900 capitalize">{answers.bodyCondition.replace("_", " ")}</span>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-50">
+                    <span className="text-slate-600 truncate max-w-[200px]">Accessories</span>
+                    <span className="font-bold text-emerald-600">
+                      {answers.accessories.length} Included
+                    </span>
+                  </div>
+
+                  {/* Step 5 */}
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-50">
+                    <span className="text-slate-600 truncate max-w-[200px]">Device Age</span>
+                    <span className="font-bold text-[#087F8C]">{answers.age}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 text-center mb-2">
+                  <span className="text-[11px] font-bold text-slate-500 flex items-center justify-center gap-1.5">
+                    <Lock size={12} className="text-[#087F8C]" />
+                    Exact Valuation Locked until mobile OTP verification
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+                  <ShieldCheck size={14} className="text-emerald-600" />
+                  <span>Instant Payment Guarantee</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
+                  <CheckCircle2 size={14} className="text-[#087F8C]" />
+                  <span>Free Doorstep Pickup</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Unified Evaluation OTP Modal */}
+      <EvaluationOtpModal
+        isOpen={showOtpModal}
+        onClose={() => setShowOtpModal(false)}
+        onSuccess={() => {
+          setShowOtpModal(false);
+          finalizeAndShowResult();
+        }}
+        deviceName={device?.modelName || 'Smartwatch'}
+      />
     </div>
   );
 }

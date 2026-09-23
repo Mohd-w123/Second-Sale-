@@ -39,8 +39,8 @@ export default function SmartwatchModelDetailsPage() {
         <h2 className="text-xl font-bold text-slate-800 mb-2">Device Not Found</h2>
         <p className="text-sm text-slate-500 mb-6">We couldn&apos;t find this smartwatch model in our catalog.</p>
         <Link
-          to="/sell-smartwatch/brand"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl text-sm"
+          to="/sell-old-smartwatches"
+          className="inline-flex items-center gap-2 px-6 py-3 btn-gradient text-white font-bold rounded-2xl text-sm"
         >
           Browse All Brands
         </Link>
@@ -91,13 +91,13 @@ export default function SmartwatchModelDetailsPage() {
           </div>
 
           <p className="text-base sm:text-lg font-black text-slate-900 leading-snug max-w-sm">
-            Convert your old <span className="text-blue-600">{device.modelName}</span> into instant cash with SecondSale.
+            Convert your old <span className="text-[#087F8C]">{device.modelName}</span> into instant cash with SecondSale.
           </p>
         </div>
 
         {/* Right: Valuation Box & Action */}
         <div className="flex-1 w-full flex flex-col">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full w-fit mb-3 border border-blue-100">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#087F8C] bg-[#E8F6F7] px-3 py-1 rounded-full w-fit mb-3 border border-[#087F8C]/20">
             <Watch size={13} />
             {brandName}
           </div>
@@ -126,7 +126,7 @@ export default function SmartwatchModelDetailsPage() {
                       onClick={() => setSelectedVariant(v)}
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                         isSelected
-                          ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                          ? "bg-[#087F8C] text-white border-[#087F8C] shadow-xs"
                           : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                       }`}
                     >
@@ -168,7 +168,7 @@ export default function SmartwatchModelDetailsPage() {
             onClick={handleStartQuiz}
             className={`w-full py-4 sm:py-5 font-black rounded-2xl text-base sm:text-lg transition-all flex items-center justify-center gap-2 group ${
               isPincodeVerified
-                ? "bg-[#2563EB] text-white shadow-xl shadow-blue-100 hover:bg-[#1D4ED8] hover:-translate-y-1 cursor-pointer"
+                ? "btn-gradient text-white shadow-xl shadow-[#087F8C]/25 hover:-translate-y-1 cursor-pointer"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
             }`}
           >
@@ -179,7 +179,7 @@ export default function SmartwatchModelDetailsPage() {
           {/* Trust Highlights */}
           <div className="mt-6 pt-5 border-t border-slate-100 grid grid-cols-3 gap-2 text-center">
             <div className="flex flex-col items-center">
-              <Zap size={18} className="text-blue-500 mb-1" />
+              <Zap size={18} className="text-[#087F8C] mb-1" />
               <span className="text-[11px] font-bold text-slate-700">Instant Cash</span>
             </div>
             <div className="flex flex-col items-center">

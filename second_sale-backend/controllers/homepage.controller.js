@@ -159,7 +159,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
           category: "mobile",
           title: "Sell Smartphones",
           badge: "MOST POPULAR",
-          badgeColor: "bg-blue-50 text-blue-700 border-blue-200/80",
+          badgeColor: "bg-[#E8F6F7] text-[#087F8C] border-[#087F8C]/30",
           desc: "Get the highest cash value for your old iPhone, Samsung, OnePlus or Android phone in 60 seconds.",
           points: [
             "Instant online price quote in 60s",
@@ -169,10 +169,10 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
           ],
           cta: "Sell Mobile Phone",
           ctaTo: "/sell-old-mobile-phones/brand",
-          gradient: "from-[#2563EB] to-[#1D4ED8]",
-          shadowColor: "shadow-blue-500/20",
-          glowColor: "rgba(37, 99, 235, 0.08)",
-          iconBg: "bg-blue-600 text-white shadow-blue-500/30"
+          gradient: "from-[#116466] via-[#087F8C] to-[#0EA5E9]",
+          shadowColor: "shadow-teal-700/20",
+          glowColor: "rgba(8, 127, 140, 0.08)",
+          iconBg: "bg-gradient-to-r from-[#116466] to-[#087F8C] text-white shadow-teal-700/30"
         },
         {
           category: "tablet",

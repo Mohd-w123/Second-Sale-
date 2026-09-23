@@ -58,7 +58,7 @@ export default function TabletBrandSelectionPage() {
 
   const getBrandColor = (name) => {
     const b = TABLET_BRANDS.find(br => br.name.toLowerCase() === name.toLowerCase());
-    return b?.color || '#2563EB';
+    return b?.color || '#087F8C';
   };
 
   const getBrandLogo = (name) => {
@@ -102,7 +102,7 @@ export default function TabletBrandSelectionPage() {
           <Link
             key={b.brand}
             to={`/sell-tablet/${b.brand.toLowerCase()}`}
-            className="group flex flex-col items-center gap-3 bg-white rounded-2xl border border-border p-5 sm:p-6 transition-all duration-200 hover:border-primary hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(5,101,230,0.12)] no-underline"
+            className="group flex flex-col items-center gap-3 bg-white rounded-2xl border border-border p-5 sm:p-6 transition-all duration-200 hover:border-primary hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(8,127,140,0.15)] no-underline"
           >
             <div
               className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold transition-transform duration-200 group-hover:scale-110 overflow-hidden"

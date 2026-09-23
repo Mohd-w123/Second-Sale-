@@ -710,7 +710,7 @@ export default function AdminHomepage() {
                               type="button"
                               onClick={() => {
                                 const defaultCats = [
-                                  { label: "Mobile Phones", desc: "Sell old smartphones", to: "/sell-old-mobile-phones/brand", icon: "mobile", color: "#E6F4FF" },
+                                  { label: "Mobile Phones", desc: "Sell old smartphones", to: "/sell-old-mobile-phones/brand", icon: "mobile", color: "#E8F6F7" },
                                   { label: "Tablets", desc: "Sell old tablets", to: "/sell-tablet/brand", icon: "tablet", color: "#E0F0FF" },
                                   { label: "Laptops", desc: "Sell old laptops", to: "/sell-old-laptops/brand", icon: "laptop", color: "#FFF3E0" },
                                   { label: "iMac", desc: "Sell old iMac / Mac", to: "/sell-imac/brand", icon: "imac", color: "#F3E8FF" },
@@ -733,7 +733,7 @@ export default function AdminHomepage() {
                                   desc: "Sell your device",
                                   to: "/sell-old-mobile-phones/brand",
                                   icon: "mobile",
-                                  color: "#E6F4FF"
+                                  color: "#E8F6F7"
                                 });
                                 updateContentField(index, 'categories', curr);
                               }}
@@ -747,7 +747,7 @@ export default function AdminHomepage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                           {(Array.isArray(sec.content?.categories) ? sec.content.categories : [
-                            { label: "Mobile Phones", desc: "Sell old smartphones", to: "/sell-old-mobile-phones/brand", icon: "mobile", color: "#E6F4FF" },
+                            { label: "Mobile Phones", desc: "Sell old smartphones", to: "/sell-old-mobile-phones/brand", icon: "mobile", color: "#E8F6F7" },
                             { label: "Tablets", desc: "Sell old tablets", to: "/sell-tablet/brand", icon: "tablet", color: "#E0F0FF" },
                             { label: "Laptops", desc: "Sell old laptops", to: "/sell-old-laptops/brand", icon: "laptop", color: "#FFF3E0" },
                             { label: "iMac", desc: "Sell old iMac / Mac", to: "/sell-imac/brand", icon: "imac", color: "#F3E8FF" },
@@ -758,7 +758,7 @@ export default function AdminHomepage() {
                             <div
                               key={catIdx}
                               className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs space-y-2.5 relative"
-                              style={{ borderLeftColor: cat.color || '#2563EB', borderLeftWidth: '4px' }}
+                              style={{ borderLeftColor: cat.color || '#087F8C', borderLeftWidth: '4px' }}
                             >
                               <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 truncate">
@@ -855,7 +855,7 @@ export default function AdminHomepage() {
                                   <div className="flex items-center gap-1.5">
                                     <input
                                       type="color"
-                                      value={cat.color?.startsWith('#') && cat.color.length === 7 ? cat.color : '#E6F4FF'}
+                                      value={cat.color?.startsWith('#') && cat.color.length === 7 ? cat.color : '#E8F6F7'}
                                       onChange={(e) => {
                                         const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
                                         if (!curr[catIdx]) curr[catIdx] = { ...cat };
@@ -866,7 +866,7 @@ export default function AdminHomepage() {
                                     />
                                     <input
                                       type="text"
-                                      value={cat.color || '#E6F4FF'}
+                                      value={cat.color || '#E8F6F7'}
                                       onChange={(e) => {
                                         const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
                                         if (!curr[catIdx]) curr[catIdx] = { ...cat };
@@ -874,7 +874,7 @@ export default function AdminHomepage() {
                                         updateContentField(index, 'categories', curr);
                                       }}
                                       className="w-full px-2 py-1 text-xs font-mono border border-slate-200 rounded-lg"
-                                      placeholder="#E6F4FF"
+                                      placeholder="#E8F6F7"
                                     />
                                   </div>
                                 </div>
@@ -1127,7 +1127,7 @@ export default function AdminHomepage() {
                               <div key={cardIdx} className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3">
                                 <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                                   <div className="flex items-center gap-2">
-                                    <span className="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 text-xs font-black flex items-center justify-center">
+                                    <span className="w-6 h-6 rounded-lg bg-[#E8F6F7] text-[#087F8C] text-xs font-black flex items-center justify-center">
                                       {cardIdx + 1}
                                     </span>
                                     <span className="text-xs font-black text-slate-800 uppercase tracking-wide">

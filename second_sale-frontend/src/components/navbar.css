@@ -39,7 +39,7 @@
   gap: 2px;
 }
 .logo-chevrons {
-  color: #2563EB;
+  color: #087F8C;
   font-size: 22px;
   font-weight: 900;
   letter-spacing: -4px;
@@ -71,7 +71,7 @@
   transition: border-color 0.2s, background 0.2s;
 }
 .navbar-search input:focus {
-  border-color: #2563EB;
+  border-color: #087F8C;
   background: #fff;
 }
 .navbar-search input::placeholder { color: #aaa; }
@@ -89,7 +89,7 @@
   padding: 0;
   transition: color 0.2s;
 }
-.search-btn:hover { color: #2563EB; }
+.search-btn:hover { color: #087F8C; }
 
 /* Right Actions */
 .navbar-actions {
@@ -113,9 +113,9 @@
   border-radius: 8px;
   transition: background 0.15s, color 0.15s;
 }
-.btn-login:hover { background: #f4f4f4; color: #2563EB; }
+.btn-login:hover { background: #f4f4f4; color: #087F8C; }
 .btn-download {
-  background: #2563EB;
+  background: #087F8C;
   color: #fff;
   border: none;
   cursor: pointer;
@@ -165,7 +165,7 @@
   white-space: nowrap;
   transition: color 0.15s, background 0.15s;
 }
-.nav-item-btn:hover { color: #2563EB; background: #EFF2FF; }
+.nav-item-btn:hover { color: #087F8C; background: #E8F6F7; }
 .nav-item-btn.active {
   color: #111;
   font-weight: 700;
@@ -208,7 +208,7 @@
   width: 100%;
   text-align: left;
 }
-.dropdown-item:hover { background: #EFF2FF; color: #2563EB; font-weight: 500; }
+.dropdown-item:hover { background: #E8F6F7; color: #087F8C; font-weight: 500; }
 
 /* Mobile Hamburger */
 .hamburger-btn {
@@ -280,7 +280,7 @@
   border-bottom: 1px solid #f7f7f7;
 }
 .mobile-nav-btn:hover { background: #f9f9f9; }
-.mobile-nav-btn.active { color: #2563EB; font-weight: 700; }
+.mobile-nav-btn.active { color: #087F8C; font-weight: 700; }
 .mobile-dropdown {
   background: #f9fdfb;
   border-bottom: 1px solid #f0f0f0;
@@ -298,7 +298,7 @@
   width: 100%;
   text-align: left;
 }
-.mobile-dropdown-item:hover { color: #2563EB; }
+.mobile-dropdown-item:hover { color: #087F8C; }
 .mobile-actions {
   display: flex;
   flex-direction: column;
@@ -322,9 +322,9 @@
   transition: border-color 0.2s, color 0.2s;
   text-decoration: none;
 }
-.mobile-btn-login:hover { border-color: #2563EB; color: #2563EB; }
+.mobile-btn-login:hover { border-color: #087F8C; color: #087F8C; }
 .mobile-btn-download {
-  background: #2563EB;
+  background: #087F8C;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -445,7 +445,7 @@
 .search-result-price {
   font-size: 13px;
   font-weight: 700;
-  color: #2563EB;
+  color: #087F8C;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -465,7 +465,7 @@
   width: 18px;
   height: 18px;
   border: 2.5px solid #e0e0e0;
-  border-top-color: #2563EB;
+  border-top-color: #087F8C;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -474,7 +474,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid #e0e0e0;
-  border-top-color: #2563EB;
+  border-top-color: #087F8C;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }

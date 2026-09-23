@@ -214,12 +214,12 @@ const PincodeBox = forwardRef(function PincodeBox({
           <button
             type="button"
             onClick={handleDetectLocation}
-            className="text-xs font-bold text-[#2563EB] hover:text-blue-700 hover:underline flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
+            className="text-xs font-bold text-[#087F8C] hover:text-[#066772] hover:underline flex items-center gap-1.5 bg-transparent border-none cursor-pointer"
             disabled={detecting || checking}
           >
             {detecting ? (
               <span className="flex items-center gap-1.5">
-                <svg className="animate-spin h-3.5 w-3.5 text-[#2563EB]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-3.5 w-3.5 text-[#087F8C]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -269,12 +269,12 @@ const PincodeBox = forwardRef(function PincodeBox({
             }
           }}
           placeholder={placeholder}
-          className="flex-1 px-4 py-2.5 border border-slate-300 rounded-xl text-sm font-sans outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 bg-white transition-all tracking-wider font-bold"
+          className="flex-1 px-4 py-2.5 border border-slate-300 rounded-xl text-sm font-sans outline-none focus:border-[#087F8C] focus:ring-2 focus:ring-[#087F8C]/15 bg-white transition-all tracking-wider font-bold"
           disabled={detecting || checking}
         />
         <button
           type="submit"
-          className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center min-w-[85px] shadow-xs active:scale-95"
+          className="px-6 py-2.5 btn-gradient text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center min-w-[85px] shadow-xs active:scale-95"
           disabled={pincode.length !== 6 || checking || detecting}
         >
           {checking ? 'Checking...' : 'Check'}

@@ -35,22 +35,22 @@ const INDUSTRY_VERTICALS = [
 
 const SOLUTION_FEATURES = [
   {
-    icon: <Zap size={24} className="text-[#2563EB]" />,
+    icon: <Zap size={24} className="text-[#087F8C]" />,
     title: "Quick Turnaround",
     desc: "Process large volumes of devices in days, not months. Our streamlined operations ensure rapid asset liquidation."
   },
   {
-    icon: <ShieldCheck size={24} className="text-[#2563EB]" />,
+    icon: <ShieldCheck size={24} className="text-[#087F8C]" />,
     title: "Data Security",
     desc: "Military-grade data wiping and certification. Complete compliance with data protection regulations."
   },
   {
-    icon: <BarChart3 size={24} className="text-[#2563EB]" />,
+    icon: <BarChart3 size={24} className="text-[#087F8C]" />,
     title: "Transparent Reporting",
     desc: "Detailed asset reports, pricing breakdowns, and real-time tracking of all devices."
   },
   {
-    icon: <Users size={24} className="text-[#2563EB]" />,
+    icon: <Users size={24} className="text-[#087F8C]" />,
     title: "Dedicated Support",
     desc: "Personal account manager ensures smooth handling of your enterprise requirements."
   }
@@ -62,7 +62,7 @@ function SectionHeading({ tag, title, subtitle, center = true }) {
   return (
     <div className={`mb-12 max-w-3xl ${center ? "text-center mx-auto" : "text-left"}`}>
       {tag && (
-        <span className="inline-block bg-[#E6F4FF] text-[#2563EB] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#2563EB]/10">
+        <span className="inline-block bg-[#E8F6F7] text-[#087F8C] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#087F8C]/10">
           {tag}
         </span>
       )}
@@ -131,7 +131,7 @@ export default function CorporatePage() {
                 <input
                   type="text"
                   required
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                   placeholder="Enter company name"
                   onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                 />
@@ -142,7 +142,7 @@ export default function CorporatePage() {
                   <input
                     type="text"
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                     placeholder="Full name"
                     onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
                   />
@@ -151,7 +151,7 @@ export default function CorporatePage() {
                   <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Industry</label>
                   <select
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#087F8C]"
                     onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
                   >
                     <option value="">Select Industry</option>
@@ -169,7 +169,7 @@ export default function CorporatePage() {
                   <input
                     type="email"
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                     placeholder="corporate@company.com"
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
@@ -179,7 +179,7 @@ export default function CorporatePage() {
                   <input
                     type="tel"
                     required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                     placeholder="+91 7045180009"
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
@@ -189,7 +189,7 @@ export default function CorporatePage() {
                 <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Estimated Device Count</label>
                 <select
                   required
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#087F8C]"
                   onChange={(e) => setFormData({ ...formData, deviceCount: e.target.value })}
                 >
                   <option value="">Select Count Range</option>
@@ -201,7 +201,7 @@ export default function CorporatePage() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-md shadow-blue-500/20 mt-2 border-none cursor-pointer"
+                className="w-full btn-gradient text-white font-bold text-sm py-3.5 rounded-xl transition-all shadow-md shadow-[#087F8C]/20 mt-2 border-none cursor-pointer"
               >
                 Submit Corporate Inquiry
               </button>
@@ -211,21 +211,21 @@ export default function CorporatePage() {
       ) : (
         <>
           {/* ─── 1. HERO & CORPORATE INQUIRY FORM ─── */}
-          <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF] via-white to-white pt-12 pb-20 px-4">
-            <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
+          <section className="relative overflow-hidden bg-gradient-to-br from-[#E8F6F7] via-white to-white pt-12 pb-20 px-4">
+            <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#087F8C]/5 blur-3xl" />
 
             <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-start">
 
               {/* Left Column Content */}
               <div className="lg:sticky lg:top-8 mt-4">
-                <div className="inline-flex items-center gap-2 bg-white border border-[#2563EB]/20 rounded-full pl-2 pr-4 py-1.5 text-xs font-bold text-[#2563EB] mb-6 shadow-sm">
-                  <span className="bg-[#2563EB] text-white text-[10px] uppercase px-2 py-0.5 rounded-md font-black">🏢</span>
+                <div className="inline-flex items-center gap-2 bg-white border border-[#087F8C]/20 rounded-full pl-2 pr-4 py-1.5 text-xs font-bold text-[#087F8C] mb-6 shadow-sm">
+                  <span className="bg-[#087F8C] text-white text-[10px] uppercase px-2 py-0.5 rounded-md font-black">🏢</span>
                   Enterprise Device Liquidation Solutions
                 </div>
 
                 <h1 className="text-[2.25rem] sm:text-[3rem] font-black text-gray-900 leading-[1.1] tracking-tight mb-6">
                   Streamline Your <br />
-                  <span className="text-[#2563EB]">Device Disposal</span>
+                  <span className="text-[#087F8C]">Device Disposal</span>
                 </h1>
 
                 <p className="text-base text-gray-500 leading-relaxed mb-8 max-w-[540px]">
@@ -236,8 +236,8 @@ export default function CorporatePage() {
                 <div className="space-y-3.5 mb-8 max-w-[500px]">
                   {CORPORATE_BENEFITS.map((benefit, i) => (
                     <div key={i} className="flex items-center gap-3 bg-white border border-gray-100 p-3.5 rounded-xl shadow-sm">
-                      <div className="w-6 h-6 bg-[#E6F4FF] rounded-full flex items-center justify-center shrink-0">
-                        <CheckCircle2 size={15} className="text-[#2563EB]" />
+                      <div className="w-6 h-6 bg-[#E8F6F7] rounded-full flex items-center justify-center shrink-0">
+                        <CheckCircle2 size={15} className="text-[#087F8C]" />
                       </div>
                       <span className="text-sm font-bold text-gray-700">{benefit}</span>
                     </div>
@@ -248,7 +248,7 @@ export default function CorporatePage() {
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   {CORPORATE_METRICS.map((m, i) => (
                     <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
-                      <div className="text-xl font-black text-[#2563EB]">{m.value}</div>
+                      <div className="text-xl font-black text-[#087F8C]">{m.value}</div>
                       <div className="text-xs font-bold text-gray-500 mt-1">{m.label}</div>
                     </div>
                   ))}
@@ -268,7 +268,7 @@ export default function CorporatePage() {
                     <input
                       type="text"
                       required
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                       placeholder="Enter company name"
                       onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                     />
@@ -280,7 +280,7 @@ export default function CorporatePage() {
                       <input
                         type="text"
                         required
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                         placeholder="Full name"
                         onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
                       />
@@ -289,7 +289,7 @@ export default function CorporatePage() {
                       <label className="block text-[11px] font-bold text-gray-500 uppercase mb-1">Industry</label>
                       <select
                         required
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#2563EB]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-500 focus:outline-none focus:border-[#087F8C]"
                         onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
                       >
                         <option value="">Select Industry</option>
@@ -308,7 +308,7 @@ export default function CorporatePage() {
                     <input
                       type="email"
                       required
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                       placeholder="corporate@company.com"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
@@ -323,7 +323,7 @@ export default function CorporatePage() {
                           type="tel"
                           required
                           pattern="[0-9]{10}"
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-16 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-16 pr-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                           placeholder="10-digit number"
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         />
@@ -334,7 +334,7 @@ export default function CorporatePage() {
                       <input
                         type="text"
                         required
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#2563EB]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-[#087F8C]"
                         placeholder="e.g. 500+"
                         onChange={(e) => setFormData({ ...formData, deviceCount: e.target.value })}
                       />
@@ -343,7 +343,7 @@ export default function CorporatePage() {
 
                   <button
                     type="submit"
-                    className="w-full bg-[#2563EB] text-white rounded-xl py-3 font-black text-sm shadow-lg shadow-[#2563EB]/20 hover:bg-blue-700 transition duration-200 mt-2"
+                    className="w-full btn-gradient text-white rounded-xl py-3 font-black text-sm shadow-lg shadow-[#087F8C]/20 transition duration-200 mt-2"
                   >
                     Get Corporate Quote
                   </button>
@@ -396,7 +396,7 @@ export default function CorporatePage() {
           </section>
 
           {/* ─── 4. CTA SECTION ─── */}
-          <section className="py-16 sm:py-24 bg-gradient-to-r from-[#2563EB] to-[#0452B8] text-white relative overflow-hidden">
+          <section className="py-16 sm:py-24 bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] text-white relative overflow-hidden">
             <div className="pointer-events-none absolute -top-20 -right-20 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
 
             <div className="max-w-[1200px] mx-auto px-4 text-center relative z-10">
@@ -407,7 +407,7 @@ export default function CorporatePage() {
                 Contact our enterprise solutions team today for a personalized proposal and dedicated support.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button className="bg-white text-[#2563EB] font-black px-8 py-3.5 rounded-xl hover:bg-gray-100 transition shadow-lg flex items-center gap-2">
+                <button className="bg-white text-[#087F8C] font-black px-8 py-3.5 rounded-xl hover:bg-gray-100 transition shadow-lg flex items-center gap-2">
                   Contact Sales
                   <ArrowRight size={18} />
                 </button>

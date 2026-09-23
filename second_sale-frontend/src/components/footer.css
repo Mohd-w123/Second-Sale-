@@ -62,11 +62,11 @@
   text-decoration: none;
   color: inherit;
 }
-.app-btn:hover { background: #374151; border-color: #2563EB; }
+.app-btn:hover { background: #374151; border-color: #087F8C; }
 .app-btn-text {}
 .app-btn-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
 .app-btn-name { font-size: 14px; font-weight: 600; color: #fff; }
-.app-btn-icon { color: #2563EB; display: flex; }
+.app-btn-icon { color: #087F8C; display: flex; }
 
 /* Links Column */
 .footer-col {}
@@ -75,7 +75,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #2563EB;
+  color: #087F8C;
   margin-bottom: 18px;
 }
 .footer-col-links {
@@ -149,7 +149,7 @@
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.social-btn:hover { background: #2563EB; color: #fff; border-color: #2563EB; }
+.social-btn:hover { background: #087F8C; color: #fff; border-color: #087F8C; }
 
 .footer-badges {
   display: flex;

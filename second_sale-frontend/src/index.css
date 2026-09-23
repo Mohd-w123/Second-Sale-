@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #2563EB;
-  --color-primary-dark: #1D4ED8;
-  --color-primary-light: #E6F4FF;
+  --color-primary: #087F8C;
+  --color-primary-deep: #116466;
+  --color-primary-dark: #0D4E50;
+  --color-primary-light: #E8F6F7;
   --color-secondary: #0EA5E9;
-  --color-accent: #00D4FF;
-  --color-navy: #0F2D5B;
-  --color-navy-light: #1e4080;
+  --color-secondary-dark: #0284C7;
+  --color-accent: #0EA5E9;
+  --color-navy: #0B252C;
+  --color-navy-light: #164048;
   --color-border-light: #E2E8F0;
   --color-text-primary: #0F172A;
   --color-text-muted: #64748B;
   --color-border: #E2E8F0;
-  --color-bg-alt: #F7FAFF;
+  --color-bg-alt: #F4F9FA;
   --font-sans: 'Plus Jakarta Sans', sans-serif;
 }
 
@@ -32,26 +34,55 @@
   body { margin: 0; }
 }
 
-/* Gradient button utility */
-.btn-gradient {
-  background: linear-gradient(135deg, #2563EB 0%, #0EA5E9 100%);
-  color: #fff;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+/* Premium Teal -> Cyan Gradient button utility */
+.btn-gradient, .btn-primary-gradient {
+  background: linear-gradient(90deg, #116466 0%, #087F8C 50%, #0EA5E9 100%) !important;
+  color: #FFFFFF !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(8, 127, 140, 0.28);
+  border: none;
 }
-.btn-gradient:hover {
-  background: linear-gradient(135deg, #1D4ED8 0%, #0284C7 100%);
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+.btn-gradient:hover, .btn-primary-gradient:hover {
+  background: linear-gradient(90deg, #0D4E50 0%, #066772 50%, #0284C7 100%) !important;
+  box-shadow: 0 6px 20px rgba(8, 127, 140, 0.4);
   transform: translateY(-1px);
+  color: #FFFFFF !important;
 }
-.btn-gradient:active {
+.btn-gradient:active, .btn-primary-gradient:active {
   transform: translateY(0);
+}
+
+/* Secondary outline button */
+.btn-outline-primary {
+  background: #FFFFFF;
+  color: #087F8C;
+  border: 2px solid #087F8C;
+  transition: all 0.2s ease;
+}
+.btn-outline-primary:hover {
+  background: #E8F6F7;
+  color: #116466;
+  border-color: #116466;
+}
+
+/* Text gradient utility */
+.text-gradient-teal {
+  background: linear-gradient(90deg, #116466 0%, #087F8C 50%, #0EA5E9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Soft Teal Badge */
+.badge-teal {
+  background-color: #E8F6F7;
+  color: #087F8C;
+  border: 1px solid rgba(8, 127, 140, 0.25);
 }
 
 /* Animated price counter */
 @keyframes priceFlash {
   0% { transform: scale(1); }
-  50% { transform: scale(1.05); color: #2563EB; }
+  50% { transform: scale(1.05); color: #087F8C; }
   100% { transform: scale(1); }
 }
 .price-animate {
@@ -118,7 +149,7 @@
   text-align: left;
   transition: background 0.12s;
 }
-.search-result-item:hover { background: #E6F4FF; }
+.search-result-item:hover { background: #E8F6F7; }
 .search-result-item:first-child { border-radius: 14px 14px 0 0; }
 .search-result-item:last-child { border-radius: 0 0 14px 14px; }
 .search-result-item:only-child { border-radius: 14px; }
@@ -136,13 +167,13 @@
 .search-result-name { font-size: 14px; font-weight: 600; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .search-result-meta { font-size: 12px; color: #64748B; font-weight: 400; }
 
-.search-result-price { font-size: 13px; font-weight: 700; color: #2563EB; white-space: nowrap; flex-shrink: 0; }
+.search-result-price { font-size: 13px; font-weight: 700; color: #087F8C; white-space: nowrap; flex-shrink: 0; }
 
 .search-loading, .search-empty { justify-content: center; padding: 20px 16px; color: #64748B; font-size: 14px; cursor: default; }
 .search-loading:hover, .search-empty:hover { background: none; }
 
-.search-spinner { width: 18px; height: 18px; border: 2.5px solid #e0e0e0; border-top-color: #2563EB; border-radius: 50%; animation: spin 0.6s linear infinite; }
-.search-spinner-sm { width: 16px; height: 16px; border: 2px solid #e0e0e0; border-top-color: #2563EB; border-radius: 50%; animation: spin 0.6s linear infinite; }
+.search-spinner { width: 18px; height: 18px; border: 2.5px solid #e0e0e0; border-top-color: #087F8C; border-radius: 50%; animation: spin 0.6s linear infinite; }
+.search-spinner-sm { width: 16px; height: 16px; border: 2px solid #e0e0e0; border-top-color: #087F8C; border-radius: 50%; animation: spin 0.6s linear infinite; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 

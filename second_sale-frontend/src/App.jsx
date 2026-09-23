@@ -9,7 +9,6 @@ import './index.css';
 // Pages
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
-import SignUp from './pages/SignUp.jsx';
 import BrandSelectionPage from './pages/BrandSelectionPage.jsx';
 import ModelSelectionPage from './pages/ModelSelectionPage.jsx';
 import VariantSelectionPage from './pages/VariantSelectionPage.jsx';
@@ -57,7 +56,11 @@ import TabletBrandSelectionPage from './pages/TabletBrandSelectionPage.jsx';
 import TabletModelSelectionPage from './pages/TabletModelSelectionPage.jsx';
 import TabletVariantSelectionPage from './pages/TabletVariantSelectionPage.jsx';
 import TabletConditionQuizPage from './pages/TabletConditionQuizPage.jsx';
-import SellTvPage from './pages/SellTvPage.jsx';
+// TV Pages (Cashify-style Flow)
+import TvBrandSelectionPage from './pages/TvBrandSelectionPage.jsx';
+import TvModelSelectionPage from './pages/TvModelSelectionPage.jsx';
+import TvModelDetailsPage from './pages/TvModelDetailsPage.jsx';
+import TvConditionQuizPage from './pages/TvConditionQuizPage.jsx';
 
 // Earbuds Pages
 import EarbudsBrandSelectionPage from './pages/EarbudsBrandSelectionPage.jsx';
@@ -92,6 +95,7 @@ import AdminRefurbished from './pages/admin/AdminRefurbished.jsx';
 import AdminHomepage from './pages/admin/AdminHomepage.jsx';
 import AdminPages from './pages/admin/AdminPages.jsx';
 import AdminSalesUsers from './pages/admin/AdminSalesUsers.jsx';
+import AdminQuizConfig from './pages/admin/AdminQuizConfig.jsx';
 import CustomPageView from './pages/CustomPageView.jsx';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -145,6 +149,10 @@ function App() {
           <Route path="/sell-old-mobile-phones/:brand" element={<ModelSelectionPage />} />
           <Route path="/sell-old-mobile-phones/:brand/:slug" element={<VariantSelectionPage />} />
           <Route path="/sell-old-mobile-phones/:brand/:slug/quiz" element={<ConditionQuizPage />} />
+          <Route path="/sell-old-mobile-phone/brand" element={<BrandSelectionPage />} />
+          <Route path="/sell-old-mobile-phone/:brand" element={<ModelSelectionPage />} />
+          <Route path="/sell-old-mobile-phone/:brand/:slug" element={<VariantSelectionPage />} />
+          <Route path="/sell-old-mobile-phone/:brand/:slug/quiz" element={<ConditionQuizPage />} />
           {/* Laptop flow */}
           <Route path="/sell-old-laptops/brand" element={<LaptopBrandSelectionPage />} />
           <Route path="/sell-old-laptops/:brand" element={<LaptopModelSelectionPage />} />
@@ -160,8 +168,17 @@ function App() {
           <Route path="/sell-tablet/:brand" element={<TabletModelSelectionPage />} />
           <Route path="/sell-tablet/:brand/:slug" element={<TabletVariantSelectionPage />} />
           <Route path="/sell-tablet/:brand/:slug/quiz" element={<TabletConditionQuizPage />} />
-          {/* TV Trade-in Flow */}
-          <Route path="/sell-tv" element={<SellTvPage />} />
+          {/* TV Trade-in Flow (Cashify-accurate flow with safe doorstep unmounting) */}
+          <Route path="/sell-tv" element={<TvBrandSelectionPage />} />
+          <Route path="/sell-tv/brand" element={<TvBrandSelectionPage />} />
+          <Route path="/sell-tv/:brand" element={<TvModelSelectionPage />} />
+          <Route path="/sell-tv/:brand/:slug" element={<TvModelDetailsPage />} />
+          <Route path="/sell-tv/:brand/:slug/quiz" element={<TvConditionQuizPage />} />
+          {/* Legacy / Alias paths */}
+          <Route path="/sell/tv/brand" element={<TvBrandSelectionPage />} />
+          <Route path="/sell/tv/:brand" element={<TvModelSelectionPage />} />
+          <Route path="/sell/tv/:brand/:slug" element={<TvModelDetailsPage />} />
+          <Route path="/sell/tv/:brand/:slug/quiz" element={<TvConditionQuizPage />} />
           {/* Earbuds Flow */}
           <Route path="/sell-earbuds/brand" element={<EarbudsBrandSelectionPage />} />
           <Route path="/sell-earbuds/:brand" element={<EarbudsModelSelectionPage />} />
@@ -235,6 +252,7 @@ function App() {
             <Route path="pages" element={<AdminProtectedRoute requiredPermission="pages"><AdminPages /></AdminProtectedRoute>} />
             <Route path="users" element={<AdminProtectedRoute requiredPermission="users"><AdminUsers /></AdminProtectedRoute>} />
             <Route path="devices" element={<AdminProtectedRoute requiredPermission="devices"><AdminDevices /></AdminProtectedRoute>} />
+            <Route path="quiz" element={<AdminProtectedRoute requiredPermission="quiz"><AdminQuizConfig /></AdminProtectedRoute>} />
             <Route path="refurbished" element={<AdminProtectedRoute requiredPermission="refurbished"><AdminRefurbished /></AdminProtectedRoute>} />
             <Route path="categories" element={<AdminProtectedRoute requiredPermission="categories"><AdminCategories /></AdminProtectedRoute>} />
             <Route path="partners" element={<AdminProtectedRoute requiredPermission="partners"><AdminPartners /></AdminProtectedRoute>} />

@@ -137,35 +137,24 @@ export const logout = async (req, res, next) => {
 
 export const sendOtp = async (req, res, next) => {
   try {
-    const { phone } = req.body;
+    let phone = req.body?.phone;
+    if (typeof phone === 'object' && phone !== null) {
+      phone = phone.phone || phone.mobile;
+    }
     if (!phone) {
       return res.status(400).json({ message: 'Phone number is required' });
     }
-
-    /* ── COMMENTED OUT: 2Factor SMS Gateway Integration ──
-    const apiKey = process.env.TWO_FACTOR_API_KEY || 'a7aa1e56-670c-11f1-8f15-0200cd936042';
-    const template = process.env.TWO_FACTOR_TEMPLATE || 'OTPTEMPLATE';
-
-    // Format phone to digits only and add 91 if it's a 10-digit number
-    const cleanPhone = phone.replace(/\D/g, '');
-    const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-
-    const url = `https://2factor.in/API/V1/${apiKey}/SMS/${formattedPhone}/AUTOGEN/${template}`;
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data.Status !== 'Success') {
-      return res.status(400).json({ message: 'Failed to send OTP', error: data.Details });
+    const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
+    if (!cleanPhone || cleanPhone.length !== 10) {
+      return res.status(400).json({ message: 'Please provide a valid 10-digit mobile number' });
     }
-    ── END COMMENTED OUT: 2Factor SMS Gateway Integration ── */
 
-    // In testing/dev mode: generate mock sessionId and bypass external SMS gateway
-    const sessionId = `mock-session-${Date.now()}`;
+    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
     res.json({
-      message: 'OTP sent successfully (Testing mode: enter any 6-digit OTP e.g. 123456)',
+      message: 'OTP sent successfully (Dummy OTP enabled: enter 123456)',
       sessionId,
+      phone: cleanPhone,
     });
   } catch (error) {
     next(error);
@@ -174,35 +163,35 @@ export const sendOtp = async (req, res, next) => {
 
 export const verifyOtp = async (req, res, next) => {
   try {
-    const { phone, otp, sessionId } = req.body;
-    if (!phone || !otp || !sessionId) {
-      return res.status(400).json({ message: 'Phone, OTP, and Session ID are required' });
+    let { phone, otp, code, sessionId } = req.body;
+    if (typeof phone === 'object' && phone !== null) {
+      code = code || phone.code || phone.otp;
+      sessionId = sessionId || phone.sessionId;
+      phone = phone.phone || phone.mobile;
     }
 
-    /* ── COMMENTED OUT: 2Factor SMS Gateway Verification ──
-    const apiKey = process.env.TWO_FACTOR_API_KEY || 'a7aa1e56-670c-11f1-8f15-0200cd936042';
-    const url = `https://2factor.in/API/V1/${apiKey}/SMS/VERIFY/${sessionId}/${otp}`;
+    const cleanPhone = String(phone || '').replace(/\D/g, '').slice(-10);
+    const finalOtp = String(otp || code || '').trim();
 
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data.Status !== 'Success') {
-      return res.status(401).json({ message: 'Invalid or expired OTP' });
+    if (!cleanPhone) {
+      return res.status(400).json({ message: 'Phone number is required' });
     }
-    ── END COMMENTED OUT: 2Factor SMS Gateway Verification ── */
+    if (!finalOtp) {
+      return res.status(400).json({ message: 'OTP verification code is required' });
+    }
 
-    // In testing/dev mode: accept any valid 6-digit OTP (e.g. 123456)
-    if (!/^\d{6}$/.test(otp)) {
-      return res.status(400).json({ message: 'Invalid OTP format. Please enter a 6-digit OTP' });
+    // Dummy OTP support: accept 123456, 1234, 000000, or any 4-to-6 digit code in development/testing
+    if (!/^\d{4,6}$/.test(finalOtp)) {
+      return res.status(400).json({ message: 'Invalid OTP format. Please enter a 4 or 6-digit OTP (e.g. 123456)' });
     }
 
     // Find or create user by original phone number
-    let user = await User.findOne({ phone });
+    let user = await User.findOne({ phone: cleanPhone });
     let isNewUser = false;
 
     if (!user) {
       user = await User.create({
-        phone,
+        phone: cleanPhone,
         name: 'User',
       });
       isNewUser = true;

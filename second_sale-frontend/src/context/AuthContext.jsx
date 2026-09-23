@@ -43,8 +43,18 @@ export function AuthProvider({ children }) {
     return data;
   }, []);
 
-  const verifyOtp = useCallback(async (phone, otp, sessionId) => {
-    const { data } = await authService.verifyOtp(phone, otp, sessionId);
+  const verifyOtp = useCallback(async (phoneOrPayload, otp, sessionId) => {
+    let payload;
+    if (typeof phoneOrPayload === 'object' && phoneOrPayload !== null) {
+      payload = {
+        phone: phoneOrPayload.phone,
+        otp: phoneOrPayload.otp || phoneOrPayload.code,
+        sessionId: phoneOrPayload.sessionId,
+      };
+    } else {
+      payload = { phone: phoneOrPayload, otp, sessionId };
+    }
+    const { data } = await authService.verifyOtp(payload.phone, payload.otp, payload.sessionId);
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     localStorage.setItem('user', JSON.stringify(data.user));

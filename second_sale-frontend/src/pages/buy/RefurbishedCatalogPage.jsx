@@ -37,7 +37,7 @@ const PRICE_BRACKETS = [
 
 const GRADE_STYLES = {
   superb: { badge: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", label: "Superb" },
-  veryGood: { badge: "bg-blue-50 text-blue-700 border-blue-200", dot: "bg-blue-500", label: "Very Good" },
+  veryGood: { badge: "bg-[#E8F6F7] text-[#087F8C] border-blue-200", dot: "bg-[#E8F6F7]0", label: "Very Good" },
   good: { badge: "bg-amber-50 text-amber-700 border-amber-200", dot: "bg-amber-500", label: "Good" },
 };
 
@@ -69,7 +69,7 @@ function DeviceCard({ device }) {
       </div>
       <div className="p-4 flex flex-col gap-1 flex-1">
         <p className="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">{device.brand}</p>
-        <h3 className="text-sm font-extrabold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors">{device.modelName}</h3>
+        <h3 className="text-sm font-extrabold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#087F8C] transition-colors">{device.modelName}</h3>
         <div className="flex items-center gap-1.5 mt-1">
           <div className="flex items-center gap-0.5 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
             <Star size={11} fill="#10b981" stroke="none" />
@@ -83,10 +83,10 @@ function DeviceCard({ device }) {
         </div>
         <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-3 text-[10px] font-bold text-slate-500">
           <span className="flex items-center gap-1"><Shield size={11} className="text-emerald-500" />{device.warrantyMonths}M Warranty</span>
-          <span className="flex items-center gap-1"><RotateCcw size={11} className="text-blue-500" />7D Replace</span>
+          <span className="flex items-center gap-1"><RotateCcw size={11} className="text-[#087F8C]" />7D Replace</span>
           <span className="flex items-center gap-1"><Truck size={11} className="text-purple-500" />Free Ship</span>
         </div>
-        <div className="mt-3 w-full py-2.5 rounded-xl text-sm font-extrabold bg-blue-50 text-blue-700 border border-blue-200 group-hover:bg-[#2563EB] group-hover:text-white group-hover:border-transparent transition-all duration-300 text-center">
+        <div className="mt-3 w-full py-2.5 rounded-xl text-sm font-extrabold bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/20 group-hover:btn-gradient group-hover:text-white group-hover:border-transparent transition-all duration-300 text-center">
           View Details
         </div>
       </div>
@@ -99,7 +99,7 @@ function FilterSection({ title, children }) {
   return (
     <div className="border-b border-slate-100 pb-4 mb-4">
       <button type="button" onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full text-sm font-bold text-slate-800 mb-3 hover:text-blue-600 cursor-pointer border-none bg-transparent p-0">
+        className="flex items-center justify-between w-full text-sm font-bold text-slate-800 mb-3 hover:text-[#087F8C] cursor-pointer border-none bg-transparent p-0">
         {title}{open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
       {open && children}
@@ -115,8 +115,8 @@ function Filters({ selectedGrade, setSelectedGrade, selectedPriceBracket, setSel
           {GRADES.map(g => (
             <button key={g.id} type="button"
               onClick={() => { setSelectedGrade(selectedGrade === g.id ? "" : g.id); setPage(1); }}
-              className={`w-full flex items-start gap-3 p-3 rounded-xl border text-left cursor-pointer ${selectedGrade === g.id ? "bg-blue-50 border-blue-300" : "bg-white border-slate-200 hover:border-slate-300"}`}>
-              <div className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center text-xs font-black shrink-0 ${selectedGrade === g.id ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-500"}`}>{g.icon}</div>
+              className={`w-full flex items-start gap-3 p-3 rounded-xl border text-left cursor-pointer ${selectedGrade === g.id ? "bg-[#E8F6F7] border-[#087F8C]/30" : "bg-white border-slate-200 hover:border-slate-300"}`}>
+              <div className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center text-xs font-black shrink-0 ${selectedGrade === g.id ? "bg-[#087F8C] text-white" : "bg-slate-100 text-slate-500"}`}>{g.icon}</div>
               <div>
                 <p className="text-sm font-bold text-slate-800">{g.label}</p>
                 <p className="text-[11px] text-slate-400 leading-snug mt-0.5">{g.desc}</p>
@@ -130,9 +130,9 @@ function Filters({ selectedGrade, setSelectedGrade, selectedPriceBracket, setSel
           {PRICE_BRACKETS.map((b, i) => (
             <button key={i} type="button"
               onClick={() => { setSelectedPriceBracket(selectedPriceBracket?.label === b.label ? null : b); setPage(1); }}
-              className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold text-left cursor-pointer ${selectedPriceBracket?.label === b.label ? "bg-blue-50 border-blue-300 text-blue-700" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}>
-              <span className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedPriceBracket?.label === b.label ? "border-blue-600" : "border-slate-300"}`}>
-                {selectedPriceBracket?.label === b.label && <span className="w-2 h-2 rounded-full bg-blue-600" />}
+              className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-semibold text-left cursor-pointer ${selectedPriceBracket?.label === b.label ? "bg-[#E8F6F7] border-[#087F8C]/30 text-[#087F8C]" : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"}`}>
+              <span className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedPriceBracket?.label === b.label ? "border-[#087F8C]" : "border-slate-300"}`}>
+                {selectedPriceBracket?.label === b.label && <span className="w-2 h-2 rounded-full bg-[#087F8C]" />}
               </span>
               {b.label}
             </button>
@@ -143,11 +143,11 @@ function Filters({ selectedGrade, setSelectedGrade, selectedPriceBracket, setSel
         <div className="space-y-2">
           {BRANDS.map(b => (
             <button key={b} type="button" onClick={() => toggleBrand(b)}
-              className="flex items-center gap-2.5 w-full text-sm cursor-pointer border-none bg-transparent p-0 hover:text-blue-600 py-0.5">
-              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${selectedBrands.includes(b) ? "bg-[#2563EB] border-[#2563EB]" : "border-slate-300"}`}>
+              className="flex items-center gap-2.5 w-full text-sm cursor-pointer border-none bg-transparent p-0 hover:text-[#087F8C] py-0.5">
+              <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${selectedBrands.includes(b) ? "bg-[#087F8C] border-[#087F8C]" : "border-slate-300"}`}>
                 {selectedBrands.includes(b) && <span className="text-white text-[10px] font-black">v</span>}
               </div>
-              <span className={selectedBrands.includes(b) ? "font-bold text-blue-600" : "text-slate-600"}>{b}</span>
+              <span className={selectedBrands.includes(b) ? "font-bold text-[#087F8C]" : "text-slate-600"}>{b}</span>
             </button>
           ))}
         </div>
@@ -223,7 +223,7 @@ export default function RefurbishedCatalogPage() {
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-3">
             {CATEGORIES.map(cat => (
               <button key={cat.id} type="button" onClick={() => { setSelectedCat(cat.id); setPage(1); }}
-                className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap cursor-pointer border ${selectedCat === cat.id ? "bg-[#2563EB] text-white border-[#2563EB] shadow" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300 hover:text-blue-600"}`}>
+                className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap cursor-pointer border ${selectedCat === cat.id ? "bg-[#087F8C] text-white border-[#087F8C] shadow" : "bg-white text-slate-600 border-slate-200 hover:border-[#087F8C]/30 hover:text-[#087F8C]"}`}>
                 {cat.label}
               </button>
             ))}
@@ -236,8 +236,8 @@ export default function RefurbishedCatalogPage() {
             <div className="bg-white rounded-2xl p-5 border border-slate-200 sticky top-[120px]">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-extrabold text-slate-800 flex items-center gap-2">
-                  <SlidersHorizontal size={16} className="text-blue-600" />
-                  Filters {activeFilterCount > 0 && <span className="w-5 h-5 bg-blue-600 text-white text-[10px] font-black rounded-full flex items-center justify-center">{activeFilterCount}</span>}
+                  <SlidersHorizontal size={16} className="text-[#087F8C]" />
+                  Filters {activeFilterCount > 0 && <span className="w-5 h-5 bg-[#087F8C] text-white text-[10px] font-black rounded-full flex items-center justify-center">{activeFilterCount}</span>}
                 </h3>
                 {activeFilterCount > 0 && <button type="button" onClick={clearFilters} className="text-xs text-rose-500 font-bold cursor-pointer border-none bg-transparent">Clear All</button>}
               </div>
@@ -250,16 +250,16 @@ export default function RefurbishedCatalogPage() {
                 <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input type="text" value={searchText} onChange={e => { setSearchText(e.target.value); setPage(1); }}
                   placeholder="Search devices (e.g. iPhone 14, MacBook Air)"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20" />
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none focus:border-[#087F8C] focus:ring-2 focus:ring-[#087F8C]/20" />
               </div>
               <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }}
-                className="px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 outline-none focus:border-[#2563EB] cursor-pointer">
+                className="px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 outline-none focus:border-[#087F8C] cursor-pointer">
                 {SORT_OPTIONS.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
               </select>
               <button type="button" onClick={() => setFiltersOpen(true)}
                 className="lg:hidden flex items-center gap-2 px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm font-bold cursor-pointer">
-                <SlidersHorizontal size={16} className="text-blue-600" />
-                Filters {activeFilterCount > 0 && <span className="w-5 h-5 bg-blue-600 text-white text-[10px] rounded-full flex items-center justify-center font-black">{activeFilterCount}</span>}
+                <SlidersHorizontal size={16} className="text-[#087F8C]" />
+                Filters {activeFilterCount > 0 && <span className="w-5 h-5 bg-[#087F8C] text-white text-[10px] rounded-full flex items-center justify-center font-black">{activeFilterCount}</span>}
               </button>
             </div>
             <p className="text-sm text-slate-500 mb-4 font-medium">{loading ? "Loading devices..." : `${pagination.total} refurbished devices found`}</p>
@@ -279,7 +279,7 @@ export default function RefurbishedCatalogPage() {
                 <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4"><Search size={28} className="text-slate-300" /></div>
                 <h3 className="text-lg font-bold text-slate-700 mb-1">No Devices Found</h3>
                 <p className="text-sm text-slate-400 mb-4">Try adjusting your filters or search term.</p>
-                <button type="button" onClick={clearFilters} className="px-5 py-2.5 rounded-xl bg-[#2563EB] text-white text-sm font-bold cursor-pointer border-none hover:bg-[#1D4ED8]">Clear Filters</button>
+                <button type="button" onClick={clearFilters} className="px-5 py-2.5 rounded-xl btn-gradient text-white text-sm font-bold cursor-pointer border-none">Clear Filters</button>
               </div>
             ) : (
               <>
@@ -290,7 +290,7 @@ export default function RefurbishedCatalogPage() {
                   <div className="flex items-center justify-center gap-2 mt-10">
                     {[...Array(Math.min(pagination.pages, 10))].map((_, i) => (
                       <button key={i} type="button" onClick={() => { setPage(i + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                        className={`w-10 h-10 rounded-xl text-sm font-bold cursor-pointer border ${page === i + 1 ? "bg-[#2563EB] text-white border-[#2563EB] shadow" : "bg-white text-slate-600 border-slate-200 hover:border-blue-300"}`}>
+                        className={`w-10 h-10 rounded-xl text-sm font-bold cursor-pointer border ${page === i + 1 ? "bg-[#087F8C] text-white border-[#087F8C] shadow" : "bg-white text-slate-600 border-slate-200 hover:border-[#087F8C]/30"}`}>
                         {i + 1}
                       </button>
                     ))}
@@ -306,7 +306,7 @@ export default function RefurbishedCatalogPage() {
           <div className="flex-1 bg-black/50 backdrop-blur-sm" onClick={() => setFiltersOpen(false)} />
           <div className="w-80 bg-white h-full overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-5 border-b border-slate-100">
-              <h3 className="font-extrabold text-slate-800 flex items-center gap-2"><SlidersHorizontal size={16} className="text-blue-600" />Filters</h3>
+              <h3 className="font-extrabold text-slate-800 flex items-center gap-2"><SlidersHorizontal size={16} className="text-[#087F8C]" />Filters</h3>
               <button type="button" onClick={() => setFiltersOpen(false)} className="p-2 rounded-lg hover:bg-slate-100 cursor-pointer border-none bg-transparent"><X size={20} className="text-slate-500" /></button>
             </div>
             <div className="p-5">
@@ -314,7 +314,7 @@ export default function RefurbishedCatalogPage() {
               <Filters selectedGrade={selectedGrade} setSelectedGrade={setSelectedGrade} selectedPriceBracket={selectedPriceBracket} setSelectedPriceBracket={setSelectedPriceBracket} selectedBrands={selectedBrands} toggleBrand={toggleBrand} setPage={setPage} />
             </div>
             <div className="p-5 border-t border-slate-100">
-              <button type="button" onClick={() => setFiltersOpen(false)} className="w-full py-3 rounded-xl bg-[#2563EB] text-white font-bold text-sm cursor-pointer border-none hover:bg-[#1D4ED8]">Show {devices.length} Results</button>
+              <button type="button" onClick={() => setFiltersOpen(false)} className="w-full py-3 rounded-xl btn-gradient text-white font-bold text-sm cursor-pointer border-none">Show {devices.length} Results</button>
             </div>
           </div>
         </div>

@@ -118,7 +118,7 @@ const CloseIcon = () => (
 );
 
 const ShieldCheck = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#087F8C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     <polyline points="9 12 11 14 15 10" />
   </svg>
@@ -449,7 +449,7 @@ export default function Navbar() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Matching Devices ({searchResults.length})
             </span>
-            <span className="text-[11px] text-blue-600 font-semibold">
+            <span className="text-[11px] text-[#087F8C] font-semibold">
               Instant Valuation
             </span>
           </div>
@@ -458,7 +458,7 @@ export default function Navbar() {
         <div className="overflow-y-auto divide-y divide-slate-100 flex-1">
           {isSearching ? (
             <div className="px-6 py-8 text-center text-slate-500">
-              <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <div className="w-6 h-6 border-2 border-[#087F8C] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
               <p className="text-xs font-semibold">Searching catalog for &quot;{searchQuery}&quot;...</p>
             </div>
           ) : searchResults.length === 0 ? (
@@ -476,10 +476,10 @@ export default function Navbar() {
               <button
                 key={result.slug}
                 onClick={() => handleResultClick(result)}
-                className="w-full px-4 py-3 text-left hover:bg-blue-50/70 transition-all flex items-center gap-3.5 group cursor-pointer border-none bg-transparent"
+                className="w-full px-4 py-3 text-left hover:bg-[#E8F6F7]/70 transition-all flex items-center gap-3.5 group cursor-pointer border-none bg-transparent"
               >
                 {/* Image Container */}
-                <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-blue-300 group-hover:bg-white transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-[#087F8C]/40 group-hover:bg-white transition-colors">
                   {result.imageUrl ? (
                     <img 
                       src={result.imageUrl} 
@@ -496,7 +496,7 @@ export default function Navbar() {
 
                 {/* Device Info */}
                 <div className="flex-1 min-w-0 pr-2">
-                  <p className="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                  <p className="font-bold text-sm text-slate-900 group-hover:text-[#087F8C] transition-colors truncate">
                     {result.modelName}
                   </p>
                   <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
@@ -510,14 +510,14 @@ export default function Navbar() {
                 {result.maxPrice > 0 && (
                   <div className="text-right shrink-0 pl-1">
                     <p className="text-[10px] uppercase font-bold text-slate-400 leading-tight">Get Upto</p>
-                    <p className="text-sm font-extrabold text-blue-600 leading-tight">
+                    <p className="text-sm font-extrabold text-[#087F8C] leading-tight">
                       ₹{result.maxPrice.toLocaleString("en-IN")}
                     </p>
                   </div>
                 )}
 
                 {/* Arrow */}
-                <div className="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0">
+                <div className="text-slate-300 group-hover:text-[#087F8C] group-hover:translate-x-0.5 transition-all shrink-0">
                   <ChevronRight />
                 </div>
               </button>
@@ -540,7 +540,7 @@ export default function Navbar() {
       {topBar?.isEnabled && topBar?.text && (
         <div
           className="py-1.5 px-4 text-center text-xs font-bold transition-all flex items-center justify-center gap-2"
-          style={{ backgroundColor: topBar.bgColor || '#2563EB', color: topBar.textColor || '#FFFFFF' }}
+          style={{ backgroundColor: topBar.bgColor || '#087F8C', color: topBar.textColor || '#FFFFFF' }}
         >
           <span>{topBar.text}</span>
           {topBar.linkTo && (
@@ -586,7 +586,7 @@ export default function Navbar() {
                 {item.hasDropdown ? (
                   <button
                     className={`flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent
-                      ${isOpen ? "text-[#2563EB] bg-[#E6F4FF]" : "text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50"}`}
+                      ${isOpen ? "text-[#087F8C] bg-[#E8F6F7]" : "text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50"}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (isSell) {
@@ -617,13 +617,13 @@ export default function Navbar() {
                     href={item.to}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50 transition-colors whitespace-nowrap no-underline"
+                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50 transition-colors whitespace-nowrap no-underline"
                   >
                     {item.label}
                   </a>
                 ) : (
                   <button
-                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]/50 transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent"
+                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50 transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent"
                     onClick={() => {
                       if (item.to?.startsWith("/#")) {
                         const el = document.getElementById(item.to.replace("/#", ""));
@@ -651,10 +651,10 @@ export default function Navbar() {
                           if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
                           setBuyDropdownOpen(false);
                         }}
-                        className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#2563EB] no-underline"
+                        className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] no-underline"
                       >
                         <span className="font-bold text-[15px] tracking-tight">{cat.label}</span>
-                        <ChevronRight size={14} className="text-slate-300 group-hover:text-[#2563EB] group-hover:translate-x-0.5 transition-all" />
+                        <ChevronRight size={14} className="text-slate-300 group-hover:text-[#087F8C] group-hover:translate-x-0.5 transition-all" />
                       </Link>
                     ))}
                     <div className="pt-1.5 mt-1 border-t border-slate-100">
@@ -664,7 +664,7 @@ export default function Navbar() {
                           if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
                           setBuyDropdownOpen(false);
                         }}
-                        className="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-[#2563EB] hover:bg-blue-50/60 transition-colors no-underline"
+                        className="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-bold text-[#087F8C] hover:bg-[#E8F6F7]/60 transition-colors no-underline"
                       >
                         <span>All Refurbished Devices</span>
                         <ArrowRight size={13} />
@@ -698,12 +698,12 @@ export default function Navbar() {
                           }}
                           className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-left border-none cursor-pointer ${
                             isSelected 
-                              ? "bg-white text-[#2563EB] shadow-xs font-bold border border-slate-100" 
+                              ? "bg-white text-[#087F8C] shadow-xs font-bold border border-slate-100" 
                               : "text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 bg-transparent"
                           }`}
                         >
                           <span className="truncate">{cat.label}</span>
-                          <ChevronRight size={13} className={isSelected ? "text-[#2563EB]" : "text-slate-300"} />
+                          <ChevronRight size={13} className={isSelected ? "text-[#087F8C]" : "text-slate-300"} />
                         </button>
                       );
                     })}
@@ -717,13 +717,13 @@ export default function Navbar() {
                       <div className="flex-1 p-5 flex flex-col justify-between bg-white min-w-0">
                         {currentCategoryObj?.comingSoon ? (
                           <div className="flex flex-col items-center justify-center h-full text-center py-6 px-2">
-                            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center mb-3">
+                            <div className="w-12 h-12 rounded-2xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center mb-3">
                               <Sparkles size={22} />
                             </div>
                             <p className="text-sm font-bold text-slate-900">
                               {currentCategoryObj.label} Valuation
                             </p>
-                            <span className="inline-block mt-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2563EB] border border-blue-100">
+                            <span className="inline-block mt-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/20">
                               Coming Soon
                             </span>
                             <p className="text-xs text-slate-400 mt-2 max-w-[190px] leading-relaxed">
@@ -754,12 +754,12 @@ export default function Navbar() {
                                         if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
                                         setSellDropdownOpen(false);
                                       }}
-                                      className="group flex items-center justify-between py-1.5 px-2 rounded-lg text-sm text-slate-600 hover:text-[#2563EB] hover:bg-blue-50/60 font-medium transition-all no-underline"
+                                      className="group flex items-center justify-between py-1.5 px-2 rounded-lg text-sm text-slate-600 hover:text-[#087F8C] hover:bg-[#E8F6F7]/60 font-medium transition-all no-underline"
                                     >
                                       <span className="group-hover:translate-x-1 transition-transform truncate">
                                         {brandName}
                                       </span>
-                                      <span className="text-slate-300 group-hover:text-[#2563EB] text-xs transition-colors shrink-0">
+                                      <span className="text-slate-300 group-hover:text-[#087F8C] text-xs transition-colors shrink-0">
                                         →
                                       </span>
                                     </Link>
@@ -776,7 +776,7 @@ export default function Navbar() {
                                   if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
                                   setSellDropdownOpen(false);
                                 }}
-                                className="flex items-center gap-1.5 text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] transition-colors no-underline"
+                                className="flex items-center gap-1.5 text-xs font-bold text-[#087F8C] hover:text-[#066772] transition-colors no-underline"
                               >
                                 <span>More {currentCategoryObj?.label} Brands</span>
                                 <ArrowRight size={13} />
@@ -799,14 +799,14 @@ export default function Navbar() {
           <input
             type="text"
             placeholder="Search device (e.g. iPhone 15)"
-            className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-sans text-[#0F2D5B] outline-none bg-[#F7FAFF] focus:border-[#2563EB] focus:bg-white focus:ring-2 focus:ring-[#2563EB]/20 transition-all"
+            className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-sans text-[#0F2D5B] outline-none bg-[#F7FAFF] focus:border-[#087F8C] focus:bg-white focus:ring-2 focus:ring-[#087F8C]/20 transition-all"
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => {
               if (searchResults.length > 0 || searchQuery.length >= 2) setShowResults(true);
             }}
           />
-          <button className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#2563EB] rounded-lg flex items-center justify-center text-white hover:bg-[#1D4ED8] transition-colors">
+          <button className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#087F8C] rounded-lg flex items-center justify-center text-white hover:bg-[#066772] transition-colors">
             <SearchIcon />
           </button>
           {renderSearchResults(false)}
@@ -815,19 +815,19 @@ export default function Navbar() {
         {/* Right Actions */}
         <div className="flex items-center gap-3 shrink-0">
           {/* Secure & Trusted badge */}
-          <div className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-[#2563EB]">
+          <div className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-[#087F8C]">
             <ShieldCheck />
             Secure & Trusted
           </div>
 
           {isLoggedIn ? (
-            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E6F4FF] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
-              <div className="w-8 h-8 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-xs font-bold">
+            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
+              <div className="w-8 h-8 rounded-full bg-[#087F8C] text-white flex items-center justify-center text-xs font-bold">
                 {userName?.[0]?.toUpperCase() || "U"}
               </div>
             </Link>
           ) : (
-            <Link to="/login" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E6F4FF] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
+            <Link to="/login" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
               <UserIcon />
             </Link>
           )}
@@ -841,7 +841,7 @@ export default function Navbar() {
 
           {/* Hamburger */}
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-[#E6F4FF] text-[#0F2D5B] transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -856,7 +856,7 @@ export default function Navbar() {
             <input
               type="text"
               placeholder="Search devices by name or brand..."
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-sans bg-[#F7FAFF] outline-none focus:border-[#2563EB] focus:bg-white"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-sans bg-[#F7FAFF] outline-none focus:border-[#087F8C] focus:bg-white"
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={() => {
@@ -871,7 +871,7 @@ export default function Navbar() {
               <div key={item._id || item.label}>
                 <button
                   className={`flex items-center justify-between w-full px-5 py-4 text-left font-semibold rounded-xl transition-colors
-                    ${mobileExpanded === item.label ? "text-[#2563EB] bg-[#E6F4FF]" : "text-[#0F2D5B] hover:bg-[#F7FAFF]"}`}
+                    ${mobileExpanded === item.label ? "text-[#087F8C] bg-[#E8F6F7]" : "text-[#0F2D5B] hover:bg-[#F7FAFF]"}`}
                   onClick={() => {
                     if (!item.hasDropdown) {
                       setMobileMenuOpen(false);
@@ -912,7 +912,7 @@ export default function Navbar() {
                         className={`flex items-center justify-between px-6 py-3 text-sm no-underline font-medium transition-colors ${
                           sub.comingSoon 
                             ? "text-slate-400 cursor-not-allowed opacity-75" 
-                            : "text-[#0F2D5B] hover:text-[#2563EB] hover:bg-[#E6F4FF]"
+                            : "text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]"
                         }`}
                       >
                         <span className="font-semibold">{sub.label}</span>
@@ -933,11 +933,11 @@ export default function Navbar() {
 
           <div className="mt-8 flex flex-col gap-3">
             {isLoggedIn ? (
-              <Link to="/dashboard" className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl font-semibold text-[#0F2D5B] no-underline hover:border-[#2563EB] hover:text-[#2563EB] transition-colors">
+              <Link to="/dashboard" className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl font-semibold text-[#0F2D5B] no-underline hover:border-[#087F8C] hover:text-[#087F8C] transition-colors">
                 <UserIcon /> Dashboard
               </Link>
             ) : (
-              <Link to="/login" className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl font-semibold text-[#0F2D5B] no-underline hover:border-[#2563EB] hover:text-[#2563EB] transition-colors">
+              <Link to="/login" className="flex items-center justify-center gap-2 p-4 border border-gray-200 rounded-xl font-semibold text-[#0F2D5B] no-underline hover:border-[#087F8C] hover:text-[#087F8C] transition-colors">
                 <UserIcon /> Login
               </Link>
             )}

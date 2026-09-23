@@ -150,7 +150,7 @@ export default function SmartwatchBrandSelectionPage() {
               </div>
 
               {b.maxPrice > 0 && (
-                <div className="mt-3 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                <div className="mt-3 text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full">
                   Up to ₹{b.maxPrice.toLocaleString("en-IN")}
                 </div>
               )}

@@ -41,7 +41,7 @@ const GRADE_INFO = {
     label: "Very Good",
     subtitle: "Minimal Signs of Use",
     badge: "bg-blue-100 text-blue-800 border-blue-300",
-    dot: "bg-blue-500",
+    dot: "bg-[#E8F6F7]0",
     scratches: "1-2 microscopic marks not visible from 12 inches away.",
     hardware: "100% factory tested, certified parts, battery >82%",
     recommendation: "Our most popular choice — incredible value with near-pristine aesthetics.",
@@ -155,7 +155,7 @@ export default function RefurbishedProductDetailPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-[#087F8C] border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-600 font-medium">Loading certified refurbished device...</p>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function RefurbishedProductDetailPage() {
           <p className="text-slate-600 text-sm mb-6">{error || "This refurbished device is currently out of stock."}</p>
           <Link
             to="/buy-refurbished"
-            className="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition"
+            className="inline-flex items-center justify-center px-6 py-2.5 btn-gradient text-white font-semibold rounded-xl transition"
           >
             Browse All Refurbished Devices
           </Link>
@@ -221,11 +221,11 @@ export default function RefurbishedProductDetailPage() {
       {/* Breadcrumbs */}
       <div className="bg-white border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-2 text-xs sm:text-sm text-slate-500 overflow-x-auto whitespace-nowrap">
-          <Link to="/" className="hover:text-blue-600 transition">Home</Link>
+          <Link to="/" className="hover:text-[#087F8C] transition">Home</Link>
           <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
-          <Link to="/buy-refurbished" className="hover:text-blue-600 transition">Buy Refurbished</Link>
+          <Link to="/buy-refurbished" className="hover:text-[#087F8C] transition">Buy Refurbished</Link>
           <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
-          <Link to={`/buy-refurbished?category=${device.category}`} className="capitalize hover:text-blue-600 transition">
+          <Link to={`/buy-refurbished?category=${device.category}`} className="capitalize hover:text-[#087F8C] transition">
             {device.category}
           </Link>
           <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
@@ -269,7 +269,7 @@ export default function RefurbishedProductDetailPage() {
                       key={i}
                       onClick={() => setActiveImgIndex(i)}
                       className={`w-18 h-18 rounded-2xl border-2 p-1.5 bg-white flex items-center justify-center transition overflow-hidden flex-shrink-0 ${
-                        activeImgIndex === i ? "border-blue-600 shadow-md" : "border-slate-200 opacity-70 hover:opacity-100"
+                        activeImgIndex === i ? "border-[#087F8C] shadow-md" : "border-slate-200 opacity-70 hover:opacity-100"
                       }`}
                     >
                       <img src={img} alt={`Thumbnail ${i}`} className="w-full h-full object-contain" />
@@ -281,7 +281,7 @@ export default function RefurbishedProductDetailPage() {
               {/* Trust Badges Bar */}
               <div className="grid grid-cols-3 gap-3 p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
                 <div className="flex flex-col items-center text-center p-2">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center mb-2">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                   <span className="text-xs font-bold text-slate-800">6 Months</span>
@@ -350,7 +350,7 @@ export default function RefurbishedProductDetailPage() {
                   <h3 className="text-base font-bold text-slate-900">Choose Cosmetic Condition</h3>
                   <p className="text-xs text-slate-500">Each condition grade is 100% functional and tested.</p>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-blue-600 font-semibold cursor-pointer">
+                <div className="flex items-center gap-1 text-xs text-[#087F8C] font-semibold cursor-pointer">
                   <HelpCircle className="w-3.5 h-3.5" />
                   <span>Grading Guide</span>
                 </div>
@@ -373,14 +373,14 @@ export default function RefurbishedProductDetailPage() {
                         !isAvailable
                           ? "border-slate-100 bg-slate-50 opacity-40 cursor-not-allowed"
                           : isSelected
-                          ? "border-blue-600 bg-blue-50/40 shadow-sm"
+                          ? "border-[#087F8C] bg-[#E8F6F7] shadow-sm"
                           : "border-slate-200 hover:border-slate-300 bg-white"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="font-extrabold text-sm text-slate-900">{info.label}</span>
                         {isSelected && (
-                          <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
+                          <span className="w-5 h-5 rounded-full bg-[#087F8C] text-white flex items-center justify-center text-xs">
                             <Check className="w-3 h-3 stroke-[3]" />
                           </span>
                         )}
@@ -429,7 +429,7 @@ export default function RefurbishedProductDetailPage() {
                           onClick={() => setSelectedStorage(storage)}
                           className={`px-4 py-2 rounded-xl text-xs font-bold border transition ${
                             selectedStorage === storage
-                              ? "border-blue-600 bg-blue-50 text-blue-700 shadow-xs"
+                              ? "border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs"
                               : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
                           }`}
                         >
@@ -455,7 +455,7 @@ export default function RefurbishedProductDetailPage() {
                             onClick={() => setSelectedColor(color)}
                             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition ${
                               selectedColor === color
-                                ? "border-blue-600 bg-blue-50 text-blue-700 shadow-xs"
+                                ? "border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs"
                                 : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
                             }`}
                           >
@@ -481,7 +481,7 @@ export default function RefurbishedProductDetailPage() {
               placeholder="Enter 6-digit Pincode (e.g. 400001)"
               isMandatory={true}
               showMandatoryBadge={true}
-              icon={<MapPin className="w-4 h-4 text-blue-600 flex-shrink-0" />}
+              icon={<MapPin className="w-4 h-4 text-[#087F8C] flex-shrink-0" />}
               serviceText="Express delivery in 2-4 business days. Cash / Pay on Delivery eligible!"
               onVerified={handlePincodeVerified}
             />
@@ -495,7 +495,7 @@ export default function RefurbishedProductDetailPage() {
                   onClick={handleBuyNow}
                   className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-extrabold text-base transition-all duration-300 ${
                     isBuyEnabled
-                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 active:scale-98 cursor-pointer"
+                      ? "btn-gradient text-white shadow-lg shadow-[#087F8C]/25 active:scale-98 cursor-pointer"
                       : "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed"
                   }`}
                 >
@@ -547,7 +547,7 @@ export default function RefurbishedProductDetailPage() {
                   const Icon = pt.icon;
                   return (
                     <div key={i} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-[#087F8C] flex items-center justify-center flex-shrink-0">
                         <Icon className="w-4 h-4" />
                       </div>
                       <div>
@@ -564,7 +564,7 @@ export default function RefurbishedProductDetailPage() {
             {device.inTheBox && device.inTheBox.length > 0 && (
               <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-3">
                 <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-blue-600" />
+                  <Package className="w-4 h-4 text-[#087F8C]" />
                   <h3 className="text-sm font-bold text-slate-900">What's In The Box?</h3>
                 </div>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">

@@ -60,9 +60,16 @@ export const DEVICEKART_EARBUDS_QUIZ = {
   ]
 };
 
-export function calculateEarbudsPrice({ basePrice = 0, answers = {} }) {
+export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {} }) {
   let a = Number(basePrice) || 0;
   const breakdown = {};
+
+  const resolveDeduction = (category, key, defaultVal) => {
+    if (!key) return 0;
+    if (device?.[category]?.[key] !== undefined) return Number(device[category][key]);
+    if (device?.deductions?.[key] !== undefined) return Number(device.deductions[key]);
+    return defaultVal !== undefined ? defaultVal : 0;
+  };
 
   const applyDeduction = (key, label, pct) => {
     const n = Number(pct) || 0;
@@ -72,53 +79,60 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {} }) {
     a = n > 0 ? Math.max(a - r, 0) : a + r;
   };
 
-  // 1. Power on
-  if (answers.power === "power_no") {
-    applyDeduction("power_no", "Does Not Power On (-90%)", 90);
+  // 1. Does the Earbuds switch on?
+  const isPowerNo = answers.switchOn === "no" || answers.power === "power_no" || answers.powerOn === "no";
+  if (isPowerNo) {
+    const powerPct = resolveDeduction("functionalDeductions", "power_no", 90);
+    applyDeduction("power_no", `Does Not Power On (-${powerPct}%)`, powerPct);
     return {
       basePrice,
       finalPrice: Math.max(Math.round(a), 0),
-      totalDeductionPct: 90,
+      totalDeductionPct: powerPct,
       breakdown,
       isRejected: true,
-      rejectedReason: "We currently only accept earbuds that switch on without issue."
+      rejectedReason: "We currently only accept devices that switch on."
     };
   }
 
-  // 2. Voice / Mic
-  if (answers.voice_mic === "voice_faulty") {
-    applyDeduction("voice_mic", "Faulty Voice/Mic (-20%)", 20);
+  // 2. Are there any speaker/mic issues in your device?
+  const hasAudioIssues = answers.speakerMicIssues === "yes" || answers.voice_mic === "voice_faulty" || answers.micIssue;
+  if (hasAudioIssues) {
+    const micPct = resolveDeduction("functionalDeductions", "voice_mic", 20);
+    applyDeduction("voice_mic", `Speaker / Mic Issues (-${micPct}%)`, micPct);
   }
 
-  // 3. Connectivity
-  if (answers.connectivity === "conn_faulty") {
-    applyDeduction("connectivity", "Faulty Connectivity (-35%)", 35);
+  // 3. Are there any connectivity issues in your device?
+  const hasConnIssues = answers.connectivityIssues === "yes" || answers.connectivity === "conn_faulty" || answers.connectivityIssue;
+  if (hasConnIssues) {
+    const connPct = resolveDeduction("functionalDeductions", "connectivity", 30);
+    applyDeduction("connectivity", `Bluetooth Connectivity Issues (-${connPct}%)`, connPct);
   }
 
-  // 4. Physical Damage
-  if (answers.physical === "physical_damaged") {
-    applyDeduction("physical", "Physical Damage (-40%)", 40);
+  // 4. Are there any physical issues on your device?
+  const hasPhysicalIssues = answers.physicalIssues === "yes" || answers.physical === "physical_damaged" || answers.bodyCondition === "damaged";
+  if (hasPhysicalIssues) {
+    const physPct = resolveDeduction("bodyDeductions", "damaged", 25);
+    applyDeduction("physical", `Physical Issues / Case Wear (-${physPct}%)`, physPct);
   }
 
-  // 5. Accessories (missing items incur deduction)
-  const accs = Array.isArray(answers.accessories) ? answers.accessories : [];
-  if (!accs.includes("acc_box")) {
-    applyDeduction("missing_box", "Missing Original Box (-5%)", 5);
-  }
-  if (!accs.includes("acc_case")) {
-    applyDeduction("missing_case", "Missing Charging Case (-25%)", 25);
-  }
-  if (!accs.includes("acc_cable")) {
-    applyDeduction("missing_cable", "Missing Charging Cable (-3%)", 3);
+  // 5. Is original charging case, charging cable, invoice and box available?
+  if (answers.accessoriesAvailable === "no") {
+    const accPct = 15;
+    applyDeduction("missing_accessories", `Missing Original Accessories/Box (-${accPct}%)`, accPct);
+  } else if (Array.isArray(answers.accessories)) {
+    if (!answers.accessories.includes("acc_case") && !answers.accessories.includes("case")) {
+      applyDeduction("missing_case", "Missing Charging Case (-20%)", 20);
+    }
+    if (!answers.accessories.includes("acc_box") && !answers.accessories.includes("box")) {
+      applyDeduction("missing_box", "Missing Box (-5%)", 5);
+    }
   }
 
-  // 6. Device Age
-  if (answers.age === "age_3_6") {
-    applyDeduction("age", "Age 3–6 Months (-7%)", 7);
-  } else if (answers.age === "age_6_11") {
-    applyDeduction("age", "Age 6–11 Months (-10%)", 10);
-  } else if (answers.age === "age_11_plus") {
-    applyDeduction("age", "Age Above 11 Months (-15%)", 15);
+  // 6. Age of your device
+  if (answers.age === "age_6_11" || answers.age === "6 to 11 Months") {
+    applyDeduction("age", "Age 6–11 Months (-7%)", 7);
+  } else if (answers.age === "age_above_11" || answers.age === "Above 11 Months" || answers.age === "age_11_plus") {
+    applyDeduction("age", "Age Above 11 Months (-12%)", 12);
   }
 
   const finalPrice = Math.max(Math.round(a), 0);

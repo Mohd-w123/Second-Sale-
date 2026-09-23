@@ -28,7 +28,7 @@ const DEVICE_CATEGORIES = [
     desc: "Sell old smartphones",
     to: "/sell-old-mobile-phones/brand",
     img: mobileDeviceImg,
-    color: "#E6F4FF",
+    color: "#E8F6F7",
   },
   {
     label: "Tablets",
@@ -97,7 +97,7 @@ const SERVICE_FEATURES = [
     title: "Sell Smartphones",
     highlight: "Smartphones",
     badge: "MOST POPULAR",
-    badgeColor: "bg-blue-50 text-blue-700 border-blue-200/80",
+    badgeColor: "bg-[#E8F6F7] text-[#087F8C] border-[#087F8C]/30",
     desc: "Get the highest cash value for your old iPhone, Samsung, OnePlus or Android phone in 60 seconds.",
     points: [
       "Instant online price quote in 60s",
@@ -107,10 +107,10 @@ const SERVICE_FEATURES = [
     ],
     cta: "Sell Mobile Phone",
     ctaTo: "/sell-old-mobile-phones/brand",
-    gradient: "from-[#2563EB] to-[#1D4ED8]",
-    shadowColor: "shadow-blue-500/20",
-    glowColor: "rgba(37, 99, 235, 0.08)",
-    iconBg: "bg-blue-600 text-white shadow-blue-500/30",
+    gradient: "from-[#116466] via-[#087F8C] to-[#0EA5E9]",
+    shadowColor: "shadow-teal-700/20",
+    glowColor: "rgba(8, 127, 140, 0.08)",
+    iconBg: "bg-gradient-to-r from-[#116466] to-[#087F8C] text-white shadow-teal-700/30",
   },
   {
     category: "tablet",
@@ -344,9 +344,9 @@ function ReviewColumn({ reviews, reverse = false }) {
       <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none" />
       <div ref={trackRef} className="will-change-transform">
         {doubled.map((r, i) => (
-          <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 mb-3 shadow-sm hover:border-[#2563EB]/30 hover:shadow-md transition-all duration-300 cursor-default">
+          <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 mb-3 shadow-sm hover:border-[#087F8C]/30 hover:shadow-md transition-all duration-300 cursor-default">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center text-sm font-bold shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[#087F8C] text-white flex items-center justify-center text-sm font-bold shrink-0">
                 {r.name[0]}
               </div>
               <div>
@@ -370,7 +370,7 @@ function ReviewColumn({ reviews, reverse = false }) {
 
 function SectionTag({ children }) {
   return (
-    <span className="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#1D4ED8] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#2563EB]/20">
+    <span className="inline-flex items-center gap-2 bg-[#E8F6F7] text-[#087F8C] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-4 border border-[#087F8C]/20">
       {children}
     </span>
   );
@@ -384,7 +384,7 @@ function SectionTitle({ tag, title, titleHighlight, subtitle }) {
         {titleHighlight ? (
           <>
             {title.split(titleHighlight)[0]}
-            <span className="text-[#2563EB]">{titleHighlight}</span>
+            <span className="text-[#087F8C]">{titleHighlight}</span>
             {title.split(titleHighlight)[1] || ""}
           </>
         ) : title}
@@ -406,8 +406,8 @@ function FAQItem({ q, a }) {
         onClick={() => setOpen(!open)}
         className="w-full flex justify-between items-center px-6 py-5 text-left bg-transparent border-none cursor-pointer gap-4 group"
       >
-        <span className="text-base sm:text-lg font-bold text-[#0F2D5B] group-hover:text-[#2563EB] transition-colors">{q}</span>
-        <span className="text-[#2563EB] shrink-0">
+        <span className="text-base sm:text-lg font-bold text-[#0F2D5B] group-hover:text-[#087F8C] transition-colors">{q}</span>
+        <span className="text-[#087F8C] shrink-0">
           <ChevronDown size={18} strokeWidth={2.5} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
         </span>
       </button>
@@ -597,15 +597,15 @@ export default function HomePage() {
 
     return (
       <div key="hero" className="w-full">
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#E6F4FF]/40 via-white to-white pt-6 pb-12 sm:pb-16 px-4">
-          <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#2563EB]/5 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#2563EB]/5 blur-3xl" />
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#E8F6F7]/40 via-white to-white pt-6 pb-12 sm:pb-16 px-4">
+          <div className="pointer-events-none absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-[#087F8C]/5 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-[#087F8C]/5 blur-3xl" />
 
           <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-14 items-center">
             {/* Left Column */}
             <div className="relative z-10 pt-4 sm:pt-8">
-              <div className="inline-flex items-center gap-2 bg-[#E6F4FF] border border-[#2563EB]/20 rounded-full pl-2.5 pr-4 py-1.5 text-[11px] sm:text-xs font-bold text-[#1D4ED8] mb-6">
-                <div className="w-5 h-5 rounded-full bg-[#2563EB] flex items-center justify-center">
+              <div className="inline-flex items-center gap-2 bg-[#E8F6F7] border border-[#087F8C]/20 rounded-full pl-2.5 pr-4 py-1.5 text-[11px] sm:text-xs font-bold text-[#087F8C] mb-6">
+                <div className="w-5 h-5 rounded-full bg-[#087F8C] flex items-center justify-center">
                   <Shield size={11} className="text-white" />
                 </div>
                 {badge}
@@ -615,9 +615,9 @@ export default function HomePage() {
                 {headline}
               </h1>
               <h1 className="text-[2rem] sm:text-[2.8rem] lg:text-[3.2rem] font-black leading-[1.08] tracking-tight mb-5">
-                <span className="text-[#2563EB] relative inline-block">
+                <span className="text-[#087F8C] relative inline-block">
                   {subheadline}
-                  <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#2563EB] rounded-full" style={{ bottom: "-4px" }} />
+                  <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#087F8C] rounded-full" style={{ bottom: "-4px" }} />
                 </span>
               </h1>
 
@@ -635,7 +635,7 @@ export default function HomePage() {
                       setShowResults(true);
                     }
                   }}
-                  className="flex items-center bg-white border-2 border-slate-200 rounded-2xl overflow-hidden focus-within:border-[#2563EB] focus-within:shadow-md transition-all shadow-sm"
+                  className="flex items-center bg-white border-2 border-slate-200 rounded-2xl overflow-hidden focus-within:border-[#087F8C] focus-within:shadow-md transition-all shadow-sm"
                 >
                   <div className="pl-4 text-slate-400">
                     <Search size={20} />
@@ -676,7 +676,7 @@ export default function HomePage() {
                         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                           Matching Devices ({searchResults.length})
                         </span>
-                        <span className="text-[11px] text-blue-600 font-semibold">
+                        <span className="text-[11px] text-[#087F8C] font-semibold">
                           Instant Valuation
                         </span>
                       </div>
@@ -685,7 +685,7 @@ export default function HomePage() {
                     <div className="overflow-y-auto divide-y divide-slate-100 max-h-[360px]">
                       {isSearching ? (
                         <div className="px-6 py-8 text-center text-slate-500">
-                          <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                          <div className="w-6 h-6 border-2 border-[#087F8C] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                           <p className="text-xs font-semibold">Searching devices for &quot;{searchQuery}&quot;...</p>
                         </div>
                       ) : searchResults.length === 0 ? (
@@ -704,9 +704,9 @@ export default function HomePage() {
                             key={result.slug}
                             type="button"
                             onClick={() => handleResultClick(result)}
-                            className="w-full px-4 py-3 text-left hover:bg-blue-50/70 transition-all flex items-center gap-3.5 group cursor-pointer border-none bg-transparent"
+                            className="w-full px-4 py-3 text-left hover:bg-[#E8F6F7]/70 transition-all flex items-center gap-3.5 group cursor-pointer border-none bg-transparent"
                           >
-                            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-blue-300 group-hover:bg-white transition-colors">
+                            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 p-1 flex items-center justify-center shrink-0 overflow-hidden group-hover:border-[#087F8C]/40 group-hover:bg-white transition-colors">
                               {result.imageUrl ? (
                                 <img
                                   src={result.imageUrl}
@@ -722,7 +722,7 @@ export default function HomePage() {
                             </div>
 
                             <div className="flex-1 min-w-0 pr-2">
-                              <p className="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                              <p className="font-bold text-sm text-slate-900 group-hover:text-[#087F8C] transition-colors truncate">
                                 {result.modelName}
                               </p>
                               <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
@@ -735,13 +735,13 @@ export default function HomePage() {
                             {result.maxPrice > 0 && (
                               <div className="text-right shrink-0 pl-1">
                                 <p className="text-[10px] uppercase font-bold text-slate-400 leading-tight">Get Upto</p>
-                                <p className="text-sm font-extrabold text-blue-600 leading-tight">
+                                <p className="text-sm font-extrabold text-[#087F8C] leading-tight">
                                   ₹{result.maxPrice.toLocaleString("en-IN")}
                                 </p>
                               </div>
                             )}
 
-                            <div className="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0">
+                            <div className="text-slate-300 group-hover:text-[#087F8C] group-hover:translate-x-0.5 transition-all shrink-0">
                               <ArrowRight size={16} />
                             </div>
                           </button>
@@ -766,7 +766,7 @@ export default function HomePage() {
                     key={tag}
                     type="button"
                     onClick={() => handleTagClick(tag)}
-                    className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-semibold text-[#0F2D5B] hover:border-[#2563EB] hover:text-[#2563EB] hover:bg-[#E6F4FF]/40 transition-all cursor-pointer shadow-xs"
+                    className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-semibold text-[#0F2D5B] hover:border-[#087F8C] hover:text-[#087F8C] hover:bg-[#E8F6F7]/40 transition-all cursor-pointer shadow-xs"
                   >
                     {tag}
                   </button>
@@ -777,7 +777,7 @@ export default function HomePage() {
               <div className="flex flex-wrap gap-3 mb-6">
                 <Link
                   to={primaryCtaLink}
-                  className="inline-flex items-center gap-2 btn-gradient text-white font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all no-underline shadow-lg shadow-[#2563EB]/25 hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 btn-gradient text-white font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all no-underline shadow-lg shadow-[#087F8C]/25 hover:-translate-y-0.5"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
@@ -787,7 +787,7 @@ export default function HomePage() {
                 </Link>
                 <a
                   href={secondaryCtaLink}
-                  className="inline-flex items-center gap-2 bg-white border-2 border-gray-200 hover:border-[#2563EB] text-[#0F2D5B] hover:text-[#2563EB] font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all no-underline"
+                  className="inline-flex items-center gap-2 bg-white border-2 border-gray-200 hover:border-[#087F8C] text-[#0F2D5B] hover:text-[#087F8C] font-bold text-sm sm:text-base px-6 py-3.5 rounded-xl transition-all no-underline"
                 >
                   <Clock size={18} />
                   {secondaryCtaText}
@@ -799,7 +799,7 @@ export default function HomePage() {
               <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-gray-500 font-medium">
                 {trustPills.map((pill) => (
                   <span key={pill} className="flex items-center gap-1.5">
-                    <span className="w-4 h-4 rounded-full bg-[#2563EB] flex items-center justify-center text-white text-[9px]">✓</span>
+                    <span className="w-4 h-4 rounded-full bg-[#087F8C] flex items-center justify-center text-white text-[9px]">✓</span>
                     {pill}
                   </span>
                 ))}
@@ -844,13 +844,13 @@ export default function HomePage() {
             {categories.map((cat, idx) => {
               const defaultCat = DEVICE_CATEGORIES[idx % DEVICE_CATEGORIES.length] || DEVICE_CATEGORIES[0];
               const img = cat.img || (cat.icon === "mobile" ? mobileDeviceImg : cat.icon === "tablet" ? tabletDeviceImg : cat.icon === "laptop" ? laptopDeviceImg : cat.icon === "imac" ? macDeviceImg : defaultCat.img);
-              const color = cat.color || defaultCat.color || "#E6F4FF";
+              const color = cat.color || defaultCat.color || "#E8F6F7";
 
               return (
                 <Link
                   to={cat.to || "/sell-old-mobile-phones/brand"}
                   key={cat.label || idx}
-                  className="group flex flex-col items-center text-center rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#2563EB]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 no-underline relative overflow-hidden"
+                  className="group flex flex-col items-center text-center rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#087F8C]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 no-underline relative overflow-hidden"
                   style={{ backgroundColor: color + "35" }}
                 >
                   <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
@@ -875,14 +875,14 @@ export default function HomePage() {
                     )}
                   </div>
 
-                  <h3 className="text-sm sm:text-base font-extrabold text-[#0F2D5B] group-hover:text-[#2563EB] transition-colors leading-snug mb-1">
+                  <h3 className="text-sm sm:text-base font-extrabold text-[#0F2D5B] group-hover:text-[#087F8C] transition-colors leading-snug mb-1">
                     {cat.label}
                   </h3>
                   <p className="text-[11px] text-gray-400 font-medium leading-tight">
                     {cat.desc}
                   </p>
 
-                  <div className="mt-2 text-[11px] font-bold text-[#2563EB] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
+                  <div className="mt-2 text-[11px] font-bold text-[#087F8C] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0">
                     <span>Sell Now</span>
                     <ArrowRight size={12} />
                   </div>
@@ -910,7 +910,7 @@ export default function HomePage() {
               const icon = defaultStat?.icon || <Star size={22} strokeWidth={1.8} />;
               return (
                 <div key={stat.label || idx} className="flex items-center gap-3 min-w-fit">
-                  <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[#E8F6F7] flex items-center justify-center text-[#087F8C] shrink-0">
                     {icon}
                   </div>
                   <div>
@@ -939,7 +939,7 @@ export default function HomePage() {
             {items.map((item, i) => (
               <span key={item + i} className="flex items-center gap-1.5 whitespace-nowrap">
                 {i > 0 && <span className="text-gray-300 mx-1">|</span>}
-                <span className="text-[#2563EB]">✓</span>
+                <span className="text-[#087F8C]">✓</span>
                 {item}
               </span>
             ))}
@@ -956,8 +956,8 @@ export default function HomePage() {
       : SERVICE_FEATURES;
 
     return (
-      <section key="services" className="py-16 sm:py-24 bg-gradient-to-b from-[#F7FAFF] via-white to-[#F7FAFF] relative overflow-hidden">
-        <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-blue-400/5 blur-[120px] rounded-full" />
+      <section key="services" className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F9FA] via-white to-[#F4F9FA] relative overflow-hidden">
+        <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-[#087F8C]/5 blur-[120px] rounded-full" />
         <div className="max-w-[1200px] mx-auto px-4 relative z-10">
           <SectionTitle
             tag={badge}
@@ -968,13 +968,51 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mt-12">
             {cards.map((s, idx) => {
               const defaultStyle = SERVICE_FEATURES[idx % SERVICE_FEATURES.length] || SERVICE_FEATURES[0];
-              const gradient = s.gradient || defaultStyle.gradient;
-              const shadowColor = s.shadowColor || defaultStyle.shadowColor;
-              const glowColor = s.glowColor || defaultStyle.glowColor;
-              const iconBg = s.iconBg || defaultStyle.iconBg;
-              const badgeColor = s.badgeColor || defaultStyle.badgeColor;
               const category = s.category || defaultStyle.category;
               const points = Array.isArray(s.points) ? s.points : defaultStyle.points;
+
+              const isMobileOrPrimary = category === "mobile" || idx === 0 || (s.iconBg && s.iconBg.includes("blue"));
+              const isTablet = category === "tablet";
+              const isLaptop = category === "laptop";
+
+              const iconBg = isMobileOrPrimary
+                ? "bg-gradient-to-r from-[#116466] to-[#087F8C] text-white shadow-teal-700/30"
+                : isTablet
+                ? "bg-indigo-600 text-white shadow-indigo-500/30"
+                : isLaptop
+                ? "bg-amber-600 text-white shadow-amber-500/30"
+                : (s.iconBg || defaultStyle.iconBg);
+
+              const badgeColor = isMobileOrPrimary
+                ? "bg-[#E8F6F7] text-[#087F8C] border-[#087F8C]/30"
+                : isTablet
+                ? "bg-indigo-50 text-indigo-700 border-indigo-200/80"
+                : isLaptop
+                ? "bg-amber-50 text-amber-800 border-amber-200/80"
+                : (s.badgeColor || defaultStyle.badgeColor);
+
+              const glowColor = isMobileOrPrimary
+                ? "rgba(8, 127, 140, 0.08)"
+                : (s.glowColor || defaultStyle.glowColor);
+
+              const btnStyle = isMobileOrPrimary
+                ? { background: "linear-gradient(90deg, #116466 0%, #087F8C 50%, #0EA5E9 100%)", color: "#FFFFFF" }
+                : isTablet
+                ? { background: "linear-gradient(90deg, #4F46E5 0%, #4338CA 100%)", color: "#FFFFFF" }
+                : isLaptop
+                ? { background: "linear-gradient(90deg, #D97706 0%, #B45309 100%)", color: "#FFFFFF" }
+                : { background: "linear-gradient(90deg, #116466 0%, #087F8C 50%, #0EA5E9 100%)", color: "#FFFFFF" };
+
+              const btnClass = isMobileOrPrimary
+                ? "btn-gradient shadow-teal-700/25"
+                : isTablet
+                ? "shadow-indigo-500/25"
+                : isLaptop
+                ? "shadow-amber-500/25"
+                : "btn-gradient shadow-teal-700/25";
+
+              const ctaText = s.cta || defaultStyle.cta || (category === "tablet" ? "Sell Tablet & iPad" : category === "laptop" ? "Sell Laptop & MacBook" : "Sell Mobile Phone");
+              const ctaLink = s.ctaTo || defaultStyle.ctaTo || (category === "tablet" ? "/sell-tablet/brand" : category === "laptop" ? "/sell-old-laptops/brand" : "/sell-old-mobile-phones/brand");
 
               return (
                 <div
@@ -1003,7 +1041,7 @@ export default function HomePage() {
                       </span>
                     </div>
 
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5 tracking-tight group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2.5 tracking-tight group-hover:text-[#087F8C] transition-colors">
                       {s.title}
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
@@ -1013,7 +1051,7 @@ export default function HomePage() {
                     <div className="space-y-3 mb-8">
                       {points.map((point, pIdx) => (
                         <div key={pIdx} className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 font-semibold">
-                          <div className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5 border border-blue-100">
+                          <div className="w-5 h-5 rounded-full bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center shrink-0 mt-0.5 border border-[#087F8C]/20">
                             <CheckCircle2 size={13} className="stroke-[2.5]" />
                           </div>
                           <span className="leading-snug">{point}</span>
@@ -1023,11 +1061,12 @@ export default function HomePage() {
                   </div>
 
                   <Link
-                    to={s.ctaTo || "/sell-old-mobile-phones/brand"}
-                    className={`w-full py-4 px-6 rounded-2xl font-black text-sm text-white flex items-center justify-between shadow-md transition-all duration-300 group-hover:shadow-xl bg-gradient-to-r ${gradient} ${shadowColor} hover:brightness-105 active:scale-[0.99] no-underline`}
+                    to={ctaLink}
+                    style={btnStyle}
+                    className={`w-full py-4 px-6 rounded-2xl font-black text-sm text-white flex items-center justify-between shadow-md transition-all duration-300 group-hover:shadow-xl hover:brightness-105 active:scale-[0.99] no-underline ${btnClass}`}
                   >
-                    <span>{s.cta || "Sell Device"}</span>
-                    <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1">
+                    <span className="text-white font-bold">{ctaText}</span>
+                    <div className="w-8 h-8 rounded-xl bg-white/20 text-white flex items-center justify-center transition-transform group-hover:translate-x-1 shrink-0">
                       <ArrowRight size={16} />
                     </div>
                   </Link>
@@ -1046,7 +1085,7 @@ export default function HomePage() {
                 const icon = f.icon || defaultF?.icon || <Shield size={22} strokeWidth={1.8} />;
                 return (
                   <div key={f.title || idx} className="flex items-center gap-3 min-w-fit">
-                    <div className="w-10 h-10 rounded-full bg-[#E6F4FF] flex items-center justify-center text-[#2563EB] shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#E8F6F7] flex items-center justify-center text-[#087F8C] shrink-0">
                       {icon}
                     </div>
                     <div>
@@ -1082,12 +1121,12 @@ export default function HomePage() {
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
-              <div className="inline-flex items-center gap-1.5 bg-blue-50 text-[#2563EB] text-xs font-black tracking-wider uppercase px-3.5 py-1.5 rounded-full mb-3 border border-blue-100">
+              <div className="inline-flex items-center gap-1.5 bg-[#E8F6F7] text-[#087F8C] text-xs font-black tracking-wider uppercase px-3.5 py-1.5 rounded-full mb-3 border border-[#087F8C]/20">
                 <Flame size={14} className="text-amber-500 fill-amber-500" />
                 {sec?.content?.tag || "TOP SELLER CHOICES"}
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-                {sec?.title || <>Most Quoted <span className="text-[#2563EB]">Devices</span></>}
+                {sec?.title || <>Most Quoted <span className="text-[#087F8C]">Devices</span></>}
               </h2>
               <p className="text-slate-500 text-sm sm:text-base mt-1 max-w-xl">
                 {sec?.subtitle || "These devices are in highest demand right now. Get the best value for your device with instant pickup."}
@@ -1097,7 +1136,7 @@ export default function HomePage() {
             <div className="flex items-center gap-3 self-start md:self-end">
               <Link
                 to="/sell-old-mobile-phones/brand"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#2563EB] hover:text-blue-700 transition-colors mr-2"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs sm:text-sm font-extrabold text-[#087F8C] hover:text-[#066772] transition-colors mr-2"
               >
                 <span>View All Devices</span>
                 <ArrowRight size={15} />
@@ -1106,7 +1145,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => scrollQuoted("left")}
-                  className="w-10 h-10 rounded-full bg-slate-50 hover:bg-white border border-slate-200 text-slate-700 hover:text-[#2563EB] hover:border-blue-400 hover:shadow-md flex items-center justify-center transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-slate-50 hover:bg-white border border-slate-200 text-slate-700 hover:text-[#087F8C] hover:border-[#087F8C] hover:shadow-md flex items-center justify-center transition-all cursor-pointer"
                   aria-label="Previous"
                 >
                   <ChevronLeft size={20} strokeWidth={2.5} />
@@ -1114,7 +1153,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => scrollQuoted("right")}
-                  className="w-10 h-10 rounded-full bg-slate-50 hover:bg-white border border-slate-200 text-slate-700 hover:text-[#2563EB] hover:border-blue-400 hover:shadow-md flex items-center justify-center transition-all cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-slate-50 hover:bg-white border border-slate-200 text-slate-700 hover:text-[#087F8C] hover:border-[#087F8C] hover:shadow-md flex items-center justify-center transition-all cursor-pointer"
                   aria-label="Next"
                 >
                   <ChevronRight size={20} strokeWidth={2.5} />
@@ -1133,8 +1172,8 @@ export default function HomePage() {
                   onClick={() => setQuotedCategory(tab.id)}
                   className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border ${
                     isActive
-                      ? "bg-[#2563EB] text-white border-[#2563EB] shadow-md shadow-blue-500/20"
-                      : "bg-slate-50 text-slate-600 border-slate-200/80 hover:border-blue-300 hover:bg-white hover:text-blue-600"
+                      ? "btn-gradient text-white border-transparent shadow-md shadow-teal-900/20"
+                      : "bg-slate-50 text-slate-600 border-slate-200/80 hover:border-[#087F8C]/40 hover:bg-white hover:text-[#087F8C]"
                   }`}
                 >
                   {tab.label}
@@ -1157,7 +1196,7 @@ export default function HomePage() {
                   ? "bg-purple-50 text-purple-700 border-purple-200"
                   : d.badgeType === "amber"
                   ? "bg-amber-50 text-amber-800 border-amber-200"
-                  : "bg-blue-50 text-blue-700 border-blue-200";
+                  : "bg-[#E8F6F7] text-[#087F8C] border-[#087F8C]/25";
 
               const dotColor =
                 d.badgeType === "emerald"
@@ -1168,13 +1207,13 @@ export default function HomePage() {
                   ? "bg-purple-500"
                   : d.badgeType === "amber"
                   ? "bg-amber-500"
-                  : "bg-blue-500";
+                  : "bg-[#087F8C]";
 
               return (
                 <Link
                   key={d.id}
                   to={d.to || "/sell-old-mobile-phones/brand"}
-                  className="min-w-[260px] sm:min-w-[280px] max-w-[280px] shrink-0 snap-start bg-white rounded-[28px] p-5 border border-slate-200/80 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group no-underline relative overflow-hidden"
+                  className="min-w-[260px] sm:min-w-[280px] max-w-[280px] shrink-0 snap-start bg-white rounded-[28px] p-5 border border-slate-200/80 hover:border-[#087F8C]/40 hover:shadow-xl hover:shadow-teal-900/10 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group no-underline relative overflow-hidden"
                 >
                 <div className="flex items-center justify-between mb-3">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide border ${badgeStyle}`}>
@@ -1193,7 +1232,7 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#2563EB] transition-colors leading-snug line-clamp-1 mb-1">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-[#087F8C] transition-colors leading-snug line-clamp-1 mb-1">
                     {d.name}
                   </h3>
                   <div className="flex items-baseline gap-1.5 mb-3">
@@ -1205,7 +1244,7 @@ export default function HomePage() {
 
                   <div className="grid grid-cols-3 gap-1 py-2 px-1 bg-slate-50 rounded-xl border border-slate-100 text-center mb-4">
                     <div className="flex flex-col items-center">
-                      <ShieldCheck size={13} className="text-blue-500 mb-0.5" />
+                      <ShieldCheck size={13} className="text-[#087F8C] mb-0.5" />
                       <span className="text-[9px] font-bold text-slate-500">Best Price</span>
                     </div>
                     <div className="flex flex-col items-center border-x border-slate-200/60">
@@ -1219,7 +1258,7 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <div className="w-full py-3 px-4 rounded-xl font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all duration-300 bg-blue-50 text-[#2563EB] border border-blue-100 group-hover:bg-[#2563EB] group-hover:text-white group-hover:border-transparent group-hover:shadow-md group-hover:shadow-blue-500/20">
+                <div className="w-full py-3 px-4 rounded-xl font-extrabold text-xs sm:text-sm text-center flex items-center justify-center gap-1.5 transition-all duration-300 bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/20 group-hover:btn-gradient group-hover:text-white group-hover:border-transparent group-hover:shadow-md group-hover:shadow-teal-900/20">
                   <span>Get Quote</span>
                   <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                 </div>
@@ -1231,7 +1270,7 @@ export default function HomePage() {
         <div className="text-center sm:hidden mt-4">
           <Link
             to="/sell-old-mobile-phones/brand"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2563EB]"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#087F8C]"
           >
             <span>View All Devices</span>
             <ArrowRight size={14} />
@@ -1251,16 +1290,16 @@ export default function HomePage() {
     return (
       <section key="howItWorks" id="how-it-works" className="py-16 sm:py-24 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="bg-[#E6F4FF]/40 rounded-[32px] p-8 sm:p-12 border border-[#2563EB]/10">
+          <div className="bg-[#E8F6F7]/40 rounded-[32px] p-8 sm:p-12 border border-[#087F8C]/10">
             <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
               <div className="lg:w-[280px] shrink-0">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="w-8 h-[3px] bg-[#2563EB] rounded-full" />
-                  <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider">EASY PROCESS</span>
+                  <span className="w-8 h-[3px] bg-[#087F8C] rounded-full" />
+                  <span className="text-xs font-bold text-[#087F8C] uppercase tracking-wider">EASY PROCESS</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-[#0F2D5B] mb-3 leading-tight">
                   How It Works <br />
-                  <span className="text-[#2563EB]">(4 Simple Steps)</span>
+                  <span className="text-[#087F8C]">(4 Simple Steps)</span>
                 </h2>
                 <p className="text-sm text-gray-500 leading-relaxed">
                   {sec?.subtitle || "Fast, secure and hassle-free experience from quote to payment."}
@@ -1274,13 +1313,13 @@ export default function HomePage() {
                   return (
                     <div key={step.num || i} className="text-center relative">
                       {i < stepsList.length - 1 && (
-                        <div className="hidden lg:block absolute top-7 left-[60%] w-[80%] border-t-2 border-dashed border-[#2563EB]/30 z-0" />
+                        <div className="hidden lg:block absolute top-7 left-[60%] w-[80%] border-t-2 border-dashed border-[#087F8C]/30 z-0" />
                       )}
-                      <div className="w-14 h-14 bg-[#2563EB] text-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#2563EB]/20 relative z-10">
+                      <div className="w-14 h-14 bg-[#087F8C] text-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#087F8C]/20 relative z-10">
                         {icon}
                       </div>
                       <h4 className="text-sm font-black text-[#0F2D5B] mb-1.5">
-                        <span className="block text-[#2563EB] text-base font-black mb-0.5">{step.num || (i + 1)}</span>
+                        <span className="block text-[#087F8C] text-base font-black mb-0.5">{step.num || (i + 1)}</span>
                         <span className="block leading-snug">{step.title}</span>
                       </h4>
                       <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
@@ -1290,7 +1329,7 @@ export default function HomePage() {
               </div>
             </div>
 
-          <div className="mt-8 pt-6 border-t border-[#2563EB]/10 flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
+          <div className="mt-8 pt-6 border-t border-[#087F8C]/10 flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
             {(Array.isArray(sec?.content?.trustPoints) && sec.content.trustPoints.length > 0
               ? sec.content.trustPoints
               : [
@@ -1303,7 +1342,7 @@ export default function HomePage() {
               const defaultIcons = [<Shield key="s" size={18} />, <Tag key="t" size={18} />, <Users key="u" size={18} />, <Headphones key="h" size={18} />];
               return (
                 <div key={t.text || i} className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#2563EB] shrink-0 shadow-sm">
+                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#087F8C] shrink-0 shadow-sm">
                     {defaultIcons[i % defaultIcons.length]}
                   </div>
                   <div>
@@ -1361,9 +1400,9 @@ export default function HomePage() {
     return (
       <section key="whyUs" className="py-16 sm:py-24 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="bg-gradient-to-br from-[#E6F4FF]/50 to-white rounded-[28px] p-8 sm:p-12 border border-[#2563EB]/15 shadow-xl max-w-4xl mx-auto">
+          <div className="bg-gradient-to-br from-[#E8F6F7]/50 to-white rounded-[28px] p-8 sm:p-12 border border-[#087F8C]/15 shadow-xl max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <span className="text-xs font-bold text-[#2563EB] uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+              <span className="text-xs font-bold text-[#087F8C] uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
                 TRUST & TRANSPARENCY
               </span>
               <h3 className="text-2xl sm:text-3xl font-black text-[#0F2D5B] mt-3 mb-2">
@@ -1375,8 +1414,8 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {guaranteesList.map((g, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-xs sm:text-sm font-semibold text-[#0F2D5B] bg-white rounded-xl p-4 border border-[#2563EB]/10 shadow-xs">
-                  <div className="w-5 h-5 bg-[#2563EB] text-white rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">✓</div>
+                <div key={idx} className="flex items-center gap-3 text-xs sm:text-sm font-semibold text-[#0F2D5B] bg-white rounded-xl p-4 border border-[#087F8C]/10 shadow-xs">
+                  <div className="w-5 h-5 bg-[#087F8C] text-white rounded-full flex items-center justify-center text-[10px] shrink-0 font-black">✓</div>
                   {g}
                 </div>
               ))}
@@ -1407,7 +1446,7 @@ export default function HomePage() {
             ))}
           </div>
           <p className="text-center mt-6">
-            <Link to="/faq" className="text-[#2563EB] font-bold text-sm hover:underline">
+            <Link to="/faq" className="text-[#087F8C] font-bold text-sm hover:underline">
               View all FAQs →
             </Link>
           </p>
@@ -1443,7 +1482,7 @@ export default function HomePage() {
                 <Link
                   key={city.slug || idx}
                   to={city.link || `/sell-old-phone-in/${city.slug}`}
-                  className="bg-[#F7FAFF] border border-gray-200 rounded-lg px-4 py-2 text-xs font-bold text-gray-600 hover:border-[#2563EB] hover:text-[#2563EB] hover:bg-[#E6F4FF] hover:shadow-sm transition-all no-underline"
+                  className="bg-[#F7FAFF] border border-gray-200 rounded-lg px-4 py-2 text-xs font-bold text-gray-600 hover:border-[#087F8C] hover:text-[#087F8C] hover:bg-[#E8F6F7] hover:shadow-sm transition-all no-underline"
                 >
                   {city.name}
                 </Link>

@@ -20,6 +20,7 @@ import tvLeadRoutes from './routes/tvLead.routes.js';
 import refurbishedRoutes from './routes/refurbished.routes.js';
 import homepageRoutes from './routes/homepage.routes.js';
 import customPageRoutes from './routes/customPage.routes.js';
+import quizRoutes from './routes/quiz.routes.js';
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.use('/api/tv-leads', tvLeadRoutes);
 app.use('/api/refurbished', refurbishedRoutes);
 app.use('/api/homepage', homepageRoutes);
 app.use('/api/pages', customPageRoutes);
+app.use('/api/quiz', quizRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

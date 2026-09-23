@@ -20,11 +20,11 @@ export default function ModelSeoContent({ device, brandName }) {
         ))}
       </div>
       <p className="mt-6 text-xs text-gray-400">
-        <Link to="/faq" className="text-[#2563EB] hover:underline">
+        <Link to="/faq" className="text-[#087F8C] hover:underline">
           View all FAQs
         </Link>
         {' · '}
-        <Link to="/compare/secondsale-vs-cashify" className="text-[#2563EB] hover:underline">
+        <Link to="/compare/secondsale-vs-cashify" className="text-[#087F8C] hover:underline">
           Compare with Cashify
         </Link>
       </p>

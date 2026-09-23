@@ -21,15 +21,23 @@ export const WINDOWS_PROCESSORS = [
 ];
 
 export const MAC_PROCESSORS = [
-  'Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core i9',
-  'Apple M1', 'Apple M1 Pro', 'Apple M1 Max', 'Apple M2', 'Apple M2 Pro',
-  'Apple M2 Max', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max', 'Apple M4',
-  'Apple M4 Pro', 'Apple M4 Max', 'Apple M5'
+  'Apple M4 Pro', 'Apple M4 Max', 'Apple M4',
+  'Apple M3 Pro', 'Apple M3 Max', 'Apple M3',
+  'Apple M2 Pro', 'Apple M2 Max', 'Apple M2',
+  'Apple M1 Pro', 'Apple M1 Max', 'Apple M1',
+  'Apple M5',
+  'Intel Core i7', 'Intel Core i5', 'Intel Core i9', 'Intel Core i3'
+];
+
+export const MAC_RAM = [
+  '8GB', '16GB', '18GB', '24GB', '32GB', '36GB', '48GB', '64GB', '96GB', '128GB'
+];
+
+export const MAC_STORAGE = [
+  '256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'
 ];
 
 export const MASTER_PROCESSORS = [...WINDOWS_PROCESSORS, ...MAC_PROCESSORS];
-
-
 
 export const MASTER_RAM = [
   '4GB', '6GB', '8GB', '10GB', '12GB', '16GB', '24GB', '32GB', '36GB', '48GB', '64GB', '128GB', '256GB'
