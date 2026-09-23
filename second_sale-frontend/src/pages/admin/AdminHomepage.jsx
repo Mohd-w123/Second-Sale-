@@ -5,9 +5,13 @@ import {
   RefreshCw, RotateCcw, ExternalLink, CheckCircle2, AlertCircle,
   Layout, Smartphone, BarChart3, Zap, ShoppingBag, HelpCircle,
   Star, ShieldCheck, MapPin, Sparkles, Check, Plus, Trash2, Sliders,
-  Upload, Image as ImageIcon
+  Upload, Image as ImageIcon, Tablet, Laptop, Monitor, Tv, Headphones, Watch, Gamepad2, Camera, Speaker
 } from 'lucide-react';
 import heroBannerDefaultImg from '../../assets/hero-banner.jpg';
+import mobileDeviceImg from '../../assets/devices/mobile.png';
+import tabletDeviceImg from '../../assets/devices/tablet.png';
+import laptopDeviceImg from '../../assets/devices/laptop.png';
+import macDeviceImg from '../../assets/devices/mac.png';
 import './admin.css';
 
 const SECTION_ICONS = {
@@ -30,6 +34,7 @@ export default function AdminHomepage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
+  const [uploadingCatImg, setUploadingCatImg] = useState(null);
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [feedback, setFeedback] = useState(null);
   const heroFileInputRef = useRef(null);
@@ -129,6 +134,33 @@ export default function AdminHomepage() {
     }
   };
 
+  // Upload custom category image
+  const handleUploadCategoryImg = async (secIndex, catIdx, file) => {
+    if (!file) return;
+    const key = `${secIndex}-${catIdx}`;
+    setUploadingCatImg(key);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await adminService.uploadHomepageImage(fd);
+      if (res.data?.imageUrl) {
+        const curr = Array.isArray(sections[secIndex]?.content?.categories)
+          ? [...sections[secIndex].content.categories]
+          : [];
+        if (!curr[catIdx]) curr[catIdx] = { ...sections[secIndex].content.categories[catIdx] };
+        curr[catIdx].img = res.data.imageUrl;
+        curr[catIdx].icon = 'custom';
+        updateContentField(secIndex, 'categories', curr);
+        showFeedback('success', `Image uploaded for "${curr[catIdx].label || 'Category'}"!`);
+      }
+    } catch (err) {
+      console.error('Failed to upload category image:', err);
+      showFeedback('error', err.response?.data?.message || 'Failed to upload category image');
+    } finally {
+      setUploadingCatImg(null);
+    }
+  };
+
   // Save changes to backend
   const handleSave = async () => {
     setSaving(true);
@@ -181,7 +213,7 @@ export default function AdminHomepage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Layout className="text-blue-600" size={26} />
+            <Layout className="text-[#087F8C]" size={26} />
             Homepage Section Manager
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -212,7 +244,7 @@ export default function AdminHomepage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 cursor-pointer border-none transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl shadow-md shadow-[#087F8C]/20 cursor-pointer border-none transition-all disabled:opacity-50"
           >
             {saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
             <span>{saving ? 'Publishing...' : 'Publish Layout'}</span>
@@ -237,7 +269,7 @@ export default function AdminHomepage() {
                 key={sec._id || sec.type + index}
                 className={`bg-white rounded-2xl border transition-all ${
                   isExpanded
-                    ? 'border-blue-500 shadow-md ring-2 ring-blue-500/10'
+                    ? 'border-[#087F8C] shadow-md ring-2 ring-[#087F8C]/10'
                     : sec.isEnabled
                     ? 'border-slate-200 shadow-xs hover:border-slate-300'
                     : 'border-slate-200 bg-slate-50/60 opacity-60'
@@ -251,7 +283,7 @@ export default function AdminHomepage() {
                       #{index + 1}
                     </span>
 
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center shrink-0">
                       <IconComponent size={20} />
                     </div>
 
@@ -279,7 +311,7 @@ export default function AdminHomepage() {
                       type="button"
                       disabled={index === 0}
                       onClick={() => moveSection(index, 'up')}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent border-none bg-transparent cursor-pointer transition-colors"
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-[#087F8C] hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent border-none bg-transparent cursor-pointer transition-colors"
                       title="Move Up"
                     >
                       <ChevronUp size={18} />
@@ -290,7 +322,7 @@ export default function AdminHomepage() {
                       type="button"
                       disabled={index === sections.length - 1}
                       onClick={() => moveSection(index, 'down')}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent border-none bg-transparent cursor-pointer transition-colors"
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-[#087F8C] hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent border-none bg-transparent cursor-pointer transition-colors"
                       title="Move Down"
                     >
                       <ChevronDown size={18} />
@@ -316,7 +348,7 @@ export default function AdminHomepage() {
                       onClick={() => setExpandedIndex(isExpanded ? null : index)}
                       className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                         isExpanded
-                          ? 'bg-blue-600 text-white border-blue-600'
+                          ? 'bg-[#087F8C] text-white border-[#087F8C]'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -357,7 +389,7 @@ export default function AdminHomepage() {
                     {/* ─── SLIDER EDITOR ────────────────────────────────────────── */}
                     {sec.type === 'slider' && (
                       <div className="space-y-3 pt-2">
-                        <div className="p-3.5 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-blue-900 leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="p-3.5 bg-[#E8F6F7]/70 border border-[#087F8C]/25/80 rounded-xl text-xs text-[#0B252C] leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div>
                             <p className="font-bold">Slider Banners & Images</p>
                             <p className="text-slate-600 mt-0.5">
@@ -366,7 +398,7 @@ export default function AdminHomepage() {
                           </div>
                           <a
                             href="/admin/site-settings"
-                            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-xs whitespace-nowrap hover:bg-blue-700 transition-colors no-underline shrink-0 text-center"
+                            className="px-3 py-1.5 bg-[#087F8C] text-white rounded-lg font-bold text-xs whitespace-nowrap hover:bg-[#066772] transition-colors no-underline shrink-0 text-center"
                           >
                             Manage Banners →
                           </a>
@@ -420,7 +452,7 @@ export default function AdminHomepage() {
                                   type="button"
                                   onClick={() => heroFileInputRef.current?.click()}
                                   disabled={uploadingHeroImage}
-                                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 rounded-xl text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
+                                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/25 hover:bg-[#E8F6F7] rounded-xl text-xs font-bold cursor-pointer transition-colors disabled:opacity-50"
                                 >
                                   {uploadingHeroImage ? <RefreshCw size={14} className="animate-spin" /> : <Upload size={14} />}
                                   <span>{uploadingHeroImage ? 'Uploading Image...' : 'Upload New Hero Graphic'}</span>
@@ -484,7 +516,7 @@ export default function AdminHomepage() {
 
                           <div>
                             <label className="block text-xs font-bold text-slate-700 mb-1">
-                              Hero Highlighted Subheadline (Blue Text)
+                              Hero Highlighted Subheadline (Teal Text)
                             </label>
                             <input
                               type="text"
@@ -539,7 +571,7 @@ export default function AdminHomepage() {
                                 curr.push("New Tag");
                                 updateContentField(index, 'popularSearches', curr);
                               }}
-                              className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer border-none bg-transparent"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[#087F8C] hover:text-[#066772] cursor-pointer border-none bg-transparent"
                             >
                               <Plus size={13} />
                               <span>Add Tag</span>
@@ -584,7 +616,7 @@ export default function AdminHomepage() {
                         {/* CTA Buttons */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                            <span className="text-xs font-extrabold text-blue-600 block">Primary Action Button</span>
+                            <span className="text-xs font-extrabold text-[#087F8C] block">Primary Action Button</span>
                             <div>
                               <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Label</label>
                               <input
@@ -647,7 +679,7 @@ export default function AdminHomepage() {
                                 curr.push("New Feature Badge");
                                 updateContentField(index, 'trustPills', curr);
                               }}
-                              className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer border-none bg-transparent"
+                              className="inline-flex items-center gap-1 text-xs font-bold text-[#087F8C] hover:text-[#066772] cursor-pointer border-none bg-transparent"
                             >
                               <Plus size={13} />
                               <span>Add Badge</span>
@@ -660,7 +692,7 @@ export default function AdminHomepage() {
                               "Secure & Hassle-free"
                             ]).map((pill, pIdx) => (
                               <div key={pIdx} className="flex items-center gap-2">
-                                <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-[10px] font-black flex items-center justify-center shrink-0">
+                                <span className="w-5 h-5 rounded-full bg-[#E8F6F7] text-[#087F8C] text-[10px] font-black flex items-center justify-center shrink-0">
                                   ✓
                                 </span>
                                 <input
@@ -671,7 +703,7 @@ export default function AdminHomepage() {
                                     curr[pIdx] = e.target.value;
                                     updateContentField(index, 'trustPills', curr);
                                   }}
-                                  className="flex-1 px-3 py-1.5 text-xs font-medium text-slate-800 border border-slate-200 rounded-lg bg-white focus:border-blue-500 focus:outline-none"
+                                  className="flex-1 px-3 py-1.5 text-xs font-medium text-slate-800 border border-slate-200 rounded-lg bg-white focus:border-[#087F8C] focus:outline-none"
                                   placeholder="e.g. Free Pickup"
                                 />
                                 <button
@@ -737,7 +769,7 @@ export default function AdminHomepage() {
                                 });
                                 updateContentField(index, 'categories', curr);
                               }}
-                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
                             >
                               <Plus size={13} />
                               <span>Add Category</span>
@@ -757,7 +789,7 @@ export default function AdminHomepage() {
                           ]).map((cat, catIdx) => (
                             <div
                               key={catIdx}
-                              className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs space-y-2.5 relative"
+                              className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs space-y-3 relative transition-all"
                               style={{ borderLeftColor: cat.color || '#087F8C', borderLeftWidth: '4px' }}
                             >
                               <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
@@ -776,6 +808,97 @@ export default function AdminHomepage() {
                                 >
                                   <Trash2 size={13} />
                                 </button>
+                              </div>
+
+                              {/* Live Card Mini-Preview & Direct Upload */}
+                              <div
+                                className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200/80 transition-all select-none"
+                                style={{ backgroundColor: (cat.color || '#E8F6F7') + '45' }}
+                              >
+                                <div className="relative group w-12 h-12 rounded-xl bg-white/95 border border-slate-200/80 shadow-2xs flex items-center justify-center shrink-0 overflow-hidden p-1">
+                                  {cat.img ? (
+                                    <img src={cat.img} alt={cat.label} className="w-full h-full object-contain filter drop-shadow-2xs" />
+                                  ) : cat.icon === 'mobile' ? (
+                                    <img src={mobileDeviceImg} alt="Phone" className="w-full h-full object-contain filter drop-shadow-2xs" />
+                                  ) : cat.icon === 'tablet' ? (
+                                    <img src={tabletDeviceImg} alt="Tablet" className="w-full h-full object-contain filter drop-shadow-2xs" />
+                                  ) : cat.icon === 'laptop' ? (
+                                    <img src={laptopDeviceImg} alt="Laptop" className="w-full h-full object-contain filter drop-shadow-2xs" />
+                                  ) : cat.icon === 'imac' ? (
+                                    <img src={macDeviceImg} alt="iMac" className="w-full h-full object-contain filter drop-shadow-2xs" />
+                                  ) : cat.icon === 'smartwatch' ? (
+                                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                                      <Watch size={18} />
+                                    </div>
+                                  ) : cat.icon === 'console' ? (
+                                    <div className="w-9 h-9 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                                      <Gamepad2 size={18} />
+                                    </div>
+                                  ) : cat.icon === 'tv' ? (
+                                    <div className="w-9 h-9 rounded-xl bg-teal-100 text-[#087F8C] flex items-center justify-center">
+                                      <Tv size={18} />
+                                    </div>
+                                  ) : cat.icon === 'camera' ? (
+                                    <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                                      <Camera size={18} />
+                                    </div>
+                                  ) : cat.icon === 'speaker' ? (
+                                    <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                      <Speaker size={18} />
+                                    </div>
+                                  ) : cat.icon === 'monitor' ? (
+                                    <div className="w-9 h-9 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center">
+                                      <Monitor size={18} />
+                                    </div>
+                                  ) : (
+                                    <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                      <Headphones size={18} />
+                                    </div>
+                                  )}
+
+                                  {/* Quick Upload Hover Overlay */}
+                                  <label
+                                    className="absolute inset-0 bg-slate-900/75 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-opacity text-[8px] font-bold text-center leading-tight p-0.5 z-10"
+                                    title="Click to upload custom icon"
+                                  >
+                                    <Upload size={13} className="mb-0.5 text-white" />
+                                    <span>Upload</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => handleUploadCategoryImg(index, catIdx, e.target.files?.[0])}
+                                    />
+                                  </label>
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="text-xs font-black text-slate-800 truncate">{cat.label || 'Category Name'}</p>
+                                    {cat.img ? (
+                                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 text-emerald-700 bg-emerald-100 rounded-md whitespace-nowrap">
+                                        Custom
+                                      </span>
+                                    ) : (
+                                      <span className="text-[9px] font-medium px-1.5 py-0.5 text-slate-500 bg-slate-100 rounded-md whitespace-nowrap">
+                                        Preset
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[11px] text-slate-500 font-medium truncate">{cat.desc || 'Sell your device'}</p>
+                                </div>
+
+                                {/* Direct Upload / Replace Button */}
+                                <label className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold text-[#087F8C] bg-white hover:bg-[#E8F6F7] border border-[#087F8C]/40 rounded-lg cursor-pointer transition-colors shadow-2xs shrink-0">
+                                  <Upload size={11} />
+                                  <span>{cat.img ? 'Replace' : 'Upload'}</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => handleUploadCategoryImg(index, catIdx, e.target.files?.[0])}
+                                  />
+                                </label>
                               </div>
 
                               <div>
@@ -826,77 +949,169 @@ export default function AdminHomepage() {
                                 />
                               </div>
 
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Preset Icon</label>
-                                  <select
-                                    value={cat.icon || 'mobile'}
-                                    onChange={(e) => {
-                                      const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
-                                      if (!curr[catIdx]) curr[catIdx] = { ...cat };
-                                      curr[catIdx].icon = e.target.value;
-                                      updateContentField(index, 'categories', curr);
-                                    }}
-                                    className="w-full px-2 py-1.5 text-xs font-medium text-slate-800 border border-slate-200 rounded-lg bg-white"
-                                  >
-                                    <option value="mobile">📱 Phone</option>
-                                    <option value="tablet">📲 Tablet</option>
-                                    <option value="laptop">💻 Laptop</option>
-                                    <option value="imac">🖥️ iMac</option>
-                                    <option value="earbuds">🎧 Earbuds</option>
-                                    <option value="smartwatch">⌚ Watch</option>
-                                    <option value="console">🎮 Console</option>
-                                    <option value="custom">🖼️ Custom Image</option>
-                                  </select>
+                              {/* Graphic & Icon Controls */}
+                              <div className="space-y-2 pt-1 border-t border-slate-100">
+                                <div className="flex items-center justify-between">
+                                  <label className="block text-[10px] font-bold text-slate-700">Icon / Graphic Image</label>
+                                  {uploadingCatImg === `${index}-${catIdx}` && (
+                                    <span className="text-[10px] font-bold text-[#087F8C] flex items-center gap-1">
+                                      <RefreshCw size={10} className="animate-spin" /> Uploading…
+                                    </span>
+                                  )}
                                 </div>
 
-                                <div>
-                                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Card Color Tint</label>
-                                  <div className="flex items-center gap-1.5">
-                                    <input
-                                      type="color"
-                                      value={cat.color?.startsWith('#') && cat.color.length === 7 ? cat.color : '#E8F6F7'}
-                                      onChange={(e) => {
-                                        const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
-                                        if (!curr[catIdx]) curr[catIdx] = { ...cat };
-                                        curr[catIdx].color = e.target.value;
-                                        updateContentField(index, 'categories', curr);
-                                      }}
-                                      className="w-8 h-7 p-0 border border-slate-200 rounded cursor-pointer shrink-0"
-                                    />
-                                    <input
-                                      type="text"
-                                      value={cat.color || '#E8F6F7'}
-                                      onChange={(e) => {
-                                        const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
-                                        if (!curr[catIdx]) curr[catIdx] = { ...cat };
-                                        curr[catIdx].color = e.target.value;
-                                        updateContentField(index, 'categories', curr);
-                                      }}
-                                      className="w-full px-2 py-1 text-xs font-mono border border-slate-200 rounded-lg"
-                                      placeholder="#E8F6F7"
-                                    />
+                                {/* Custom Uploaded Icon Box */}
+                                {cat.img ? (
+                                  <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[10px] font-bold text-emerald-800 flex items-center gap-1">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                                        Custom Image Icon Active
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
+                                          if (!curr[catIdx]) curr[catIdx] = { ...cat };
+                                          delete curr[catIdx].img;
+                                          curr[catIdx].icon = 'mobile';
+                                          updateContentField(index, 'categories', curr);
+                                        }}
+                                        className="text-[10px] font-bold text-rose-600 hover:text-rose-800 bg-white hover:bg-rose-50 px-2 py-0.5 rounded border border-rose-200 cursor-pointer transition-colors"
+                                      >
+                                        Revert to 3D Preset
+                                      </button>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <label className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300 cursor-pointer transition-colors shadow-2xs">
+                                        <Upload size={12} />
+                                        <span>Change / Upload New Icon</span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={(e) => handleUploadCategoryImg(index, catIdx, e.target.files?.[0])}
+                                        />
+                                      </label>
+                                    </div>
+
+                                    <div>
+                                      <label className="block text-[9px] font-semibold text-slate-500 mb-0.5">Image URL:</label>
+                                      <input
+                                        type="text"
+                                        value={cat.img || ''}
+                                        onChange={(e) => {
+                                          const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
+                                          if (!curr[catIdx]) curr[catIdx] = { ...cat };
+                                          curr[catIdx].img = e.target.value;
+                                          curr[catIdx].icon = 'custom';
+                                          updateContentField(index, 'categories', curr);
+                                        }}
+                                        placeholder="https://..."
+                                        className="w-full px-2 py-1 text-[11px] font-mono border border-emerald-200 rounded-lg bg-white"
+                                      />
+                                    </div>
                                   </div>
-                                </div>
+                                ) : (
+                                  /* Preset Icon Selection with Fast Upload Button */
+                                  <div className="space-y-1.5">
+                                    <div className="flex items-center gap-1.5">
+                                      <select
+                                        value={cat.icon || 'mobile'}
+                                        onChange={(e) => {
+                                          const val = e.target.value;
+                                          const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
+                                          if (!curr[catIdx]) curr[catIdx] = { ...cat };
+                                          curr[catIdx].icon = val;
+                                          if (val !== 'custom') {
+                                            delete curr[catIdx].img;
+                                          }
+                                          updateContentField(index, 'categories', curr);
+                                        }}
+                                        className="flex-1 px-2.5 py-1.5 text-xs font-semibold text-slate-800 border border-slate-200 rounded-lg bg-white"
+                                      >
+                                        <optgroup label="3D Device Graphics">
+                                          <option value="mobile">📱 3D Mobile Phone</option>
+                                          <option value="tablet">📲 3D Tablet / iPad</option>
+                                          <option value="laptop">💻 3D Laptop / MacBook</option>
+                                          <option value="imac">🖥️ 3D iMac / All-in-One</option>
+                                        </optgroup>
+                                        <optgroup label="Modern Lucide Icons">
+                                          <option value="earbuds">🎧 Earbuds & AirPods</option>
+                                          <option value="smartwatch">⌚ Smartwatch & Apple Watch</option>
+                                          <option value="console">🎮 Gaming Console (PS5, Xbox)</option>
+                                          <option value="tv">📺 Smart TV</option>
+                                          <option value="camera">📷 Camera & DSLR</option>
+                                          <option value="speaker">🔊 Audio & Speakers</option>
+                                          <option value="monitor">🖥️ Monitors & Displays</option>
+                                        </optgroup>
+                                        <optgroup label="Custom Upload">
+                                          <option value="custom">🖼️ Upload Custom Icon File</option>
+                                        </optgroup>
+                                      </select>
+
+                                      <label className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-[#087F8C] bg-[#E8F6F7] hover:bg-[#d0eff2] border border-[#087F8C]/30 rounded-lg cursor-pointer transition-colors shadow-2xs whitespace-nowrap">
+                                        <Upload size={12} />
+                                        <span>Upload File</span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={(e) => handleUploadCategoryImg(index, catIdx, e.target.files?.[0])}
+                                        />
+                                      </label>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
 
-                              {cat.icon === 'custom' && (
-                                <div>
-                                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Custom Image URL</label>
+                              {/* Card Color Tint & Quick Palette Chips */}
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-500 mb-1">Card Background Color</label>
+                                <div className="flex items-center gap-1.5 mb-1.5">
                                   <input
-                                    type="text"
-                                    value={cat.img || ''}
+                                    type="color"
+                                    value={cat.color?.startsWith('#') && cat.color.length === 7 ? cat.color : '#E8F6F7'}
                                     onChange={(e) => {
                                       const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
                                       if (!curr[catIdx]) curr[catIdx] = { ...cat };
-                                      curr[catIdx].img = e.target.value;
+                                      curr[catIdx].color = e.target.value;
                                       updateContentField(index, 'categories', curr);
                                     }}
-                                    className="w-full px-2.5 py-1.5 text-xs font-medium text-slate-800 border border-slate-200 rounded-lg"
-                                    placeholder="https://example.com/icon.png"
+                                    className="w-8 h-7 p-0 border border-slate-200 rounded cursor-pointer shrink-0"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={cat.color || '#E8F6F7'}
+                                    onChange={(e) => {
+                                      const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
+                                      if (!curr[catIdx]) curr[catIdx] = { ...cat };
+                                      curr[catIdx].color = e.target.value;
+                                      updateContentField(index, 'categories', curr);
+                                    }}
+                                    className="w-full px-2 py-1 text-xs font-mono border border-slate-200 rounded-lg"
+                                    placeholder="#E8F6F7"
                                   />
                                 </div>
-                              )}
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  {['#E8F6F7', '#E0F0FF', '#FFF3E0', '#F3E8FF', '#ECFDF5', '#FEF3C7', '#EDE9FE', '#FFE4E6'].map((c) => (
+                                    <button
+                                      key={c}
+                                      type="button"
+                                      onClick={() => {
+                                        const curr = Array.isArray(sec.content?.categories) ? [...sec.content.categories] : [];
+                                        if (!curr[catIdx]) curr[catIdx] = { ...cat };
+                                        curr[catIdx].color = c;
+                                        updateContentField(index, 'categories', curr);
+                                      }}
+                                      className="w-4 h-4 rounded-full border border-slate-300 hover:scale-125 transition-transform"
+                                      style={{ backgroundColor: c }}
+                                      title={`Set ${c}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -917,7 +1132,7 @@ export default function AdminHomepage() {
                               currStats.push({ value: '10K+', label: 'New Metric' });
                               updateContentField(index, 'stats', currStats);
                             }}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer border-none bg-transparent"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[#087F8C] hover:text-[#066772] cursor-pointer border-none bg-transparent"
                           >
                             <Plus size={14} />
                             <span>Add Stat</span>
@@ -1010,7 +1225,7 @@ export default function AdminHomepage() {
                               curr.push("New Feature Highlight");
                               updateContentField(index, "items", curr);
                             }}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer border-none bg-transparent"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[#087F8C] hover:text-[#066772] cursor-pointer border-none bg-transparent"
                           >
                             <Plus size={14} />
                             <span>Add Highlight</span>
@@ -1026,7 +1241,7 @@ export default function AdminHomepage() {
                             "Doorstep Pickup",
                           ]).map((item, itIdx) => (
                             <div key={itIdx} className="flex items-center gap-2">
-                              <span className="w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-xs font-black flex items-center justify-center shrink-0 border border-blue-100">
+                              <span className="w-6 h-6 rounded-full bg-[#E8F6F7] text-[#087F8C] text-xs font-black flex items-center justify-center shrink-0 border border-[#087F8C]/20">
                                 {itIdx + 1}
                               </span>
                               <input
@@ -1037,7 +1252,7 @@ export default function AdminHomepage() {
                                   curr[itIdx] = e.target.value;
                                   updateContentField(index, "items", curr);
                                 }}
-                                className="flex-1 px-3 py-2 text-xs font-medium text-slate-800 border border-slate-200 rounded-lg bg-white focus:border-blue-500 focus:outline-none"
+                                className="flex-1 px-3 py-2 text-xs font-medium text-slate-800 border border-slate-200 rounded-lg bg-white focus:border-[#087F8C] focus:outline-none"
                                 placeholder="e.g. 100% Secure Transactions"
                               />
                               <button
@@ -1239,7 +1454,7 @@ export default function AdminHomepage() {
                                         curr[cardIdx].points = pts;
                                         updateContentField(index, 'cards', curr);
                                       }}
-                                      className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 cursor-pointer border-none bg-transparent"
+                                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#087F8C] hover:text-[#066772] cursor-pointer border-none bg-transparent"
                                     >
                                       <Plus size={12} />
                                       <span>Add Point</span>
@@ -1249,7 +1464,7 @@ export default function AdminHomepage() {
                                   <div className="space-y-1.5">
                                     {(Array.isArray(card.points) ? card.points : []).map((pt, ptIdx) => (
                                       <div key={ptIdx} className="flex items-center gap-2">
-                                        <span className="w-4 h-4 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold flex items-center justify-center shrink-0">✓</span>
+                                        <span className="w-4 h-4 rounded-full bg-[#E8F6F7] text-[#087F8C] text-[10px] font-bold flex items-center justify-center shrink-0">✓</span>
                                         <input
                                           type="text"
                                           value={pt}
@@ -1348,7 +1563,7 @@ export default function AdminHomepage() {
                             { num: "4", title: "Get Paid Instantly", desc: "Receive instant payment in your bank account." },
                           ]).map((step, stepIdx) => (
                             <div key={stepIdx} className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                              <span className="text-xs font-extrabold text-blue-600 block">Step {step.num || (stepIdx + 1)}</span>
+                              <span className="text-xs font-extrabold text-[#087F8C] block">Step {step.num || (stepIdx + 1)}</span>
                               <div>
                                 <label className="block text-[10px] font-bold text-slate-400 mb-0.5">Title</label>
                                 <input
@@ -1439,7 +1654,7 @@ export default function AdminHomepage() {
                               curr.push('New Guarantee Point');
                               updateContentField(index, 'guarantees', curr);
                             }}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer border-none bg-transparent"
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[#087F8C] hover:text-[#066772] cursor-pointer border-none bg-transparent"
                           >
                             <Plus size={14} />
                             <span>Add Point</span>
@@ -1517,7 +1732,7 @@ export default function AdminHomepage() {
                                 curr.push({ id: `cat-${Date.now()}`, label: 'New Category' });
                                 updateContentField(index, 'categories', curr);
                               }}
-                              className="px-2.5 py-1 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border-none cursor-pointer flex items-center gap-1"
+                              className="px-2.5 py-1 text-[11px] font-bold text-[#087F8C] bg-[#E8F6F7] hover:bg-[#E8F6F7] rounded-lg border-none cursor-pointer flex items-center gap-1"
                             >
                               <Plus size={12} /> Add Tab
                             </button>
@@ -1710,7 +1925,7 @@ export default function AdminHomepage() {
                                   });
                                   updateContentField(index, 'devices', curr);
                                 }}
-                                className="px-2.5 py-1 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border-none cursor-pointer flex items-center gap-1"
+                                className="px-2.5 py-1 text-[11px] font-bold text-[#087F8C] bg-[#E8F6F7] hover:bg-[#E8F6F7] rounded-lg border-none cursor-pointer flex items-center gap-1"
                               >
                                 <Plus size={12} /> Add Device
                               </button>
@@ -1919,7 +2134,7 @@ export default function AdminHomepage() {
                                 });
                                 updateContentField(index, 'reviews', curr);
                               }}
-                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
                             >
                               <Plus size={13} />
                               <span>Add Review</span>
@@ -2078,7 +2293,7 @@ export default function AdminHomepage() {
                                 });
                                 updateContentField(index, 'faqs', curr);
                               }}
-                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
                             >
                               <Plus size={13} />
                               <span>Add FAQ</span>
@@ -2215,7 +2430,7 @@ export default function AdminHomepage() {
                                   });
                                   updateContentField(index, 'cities', curr);
                                 }}
-                                className="inline-flex items-center gap-1 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
+                                className="inline-flex items-center gap-1 px-3 py-1 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-lg cursor-pointer border-none shadow-xs transition-colors"
                               >
                                 <Plus size={13} />
                                 <span>Add City</span>
@@ -2299,7 +2514,7 @@ export default function AdminHomepage() {
                                 type="checkbox"
                                 checked={sec.content?.showAboutBox !== false}
                                 onChange={(e) => updateContentField(index, 'showAboutBox', e.target.checked)}
-                                className="rounded text-blue-600"
+                                className="rounded text-[#087F8C]"
                               />
                               <span>Display Box</span>
                             </label>
@@ -2335,7 +2550,7 @@ export default function AdminHomepage() {
                       <button
                         type="button"
                         onClick={() => setExpandedIndex(null)}
-                        className="px-4 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-xs font-bold border border-blue-200 cursor-pointer"
+                        className="px-4 py-1.5 bg-[#E8F6F7] text-[#087F8C] hover:bg-[#E8F6F7] rounded-xl text-xs font-bold border border-[#087F8C]/25 cursor-pointer"
                       >
                         ✓ Done Editing Section
                       </button>

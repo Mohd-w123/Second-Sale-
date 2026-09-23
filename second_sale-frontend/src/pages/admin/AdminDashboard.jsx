@@ -59,7 +59,7 @@ export default function AdminDashboard() {
     {
       label: 'Total Users',
       value: stats.totalUsers,
-      icon: <Users size={20} className="text-blue-400" />,
+      icon: <Users size={20} className="text-[#087F8C]" />,
       bg: 'rgba(59, 130, 246, 0.1)',
       accent: '#60a5fa',
     },
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
               <tbody>
                 {recentOrders.map((order) => (
                   <tr key={order._id}>
-                    <td className="font-mono text-xs text-blue-600 font-semibold">{order.orderId}</td>
+                    <td className="font-mono text-xs text-[#087F8C] font-semibold">{order.orderId}</td>
                     <td>
                       <div>
                         <div className="font-bold text-slate-800">{order.device.brand} {order.device.modelName}</div>

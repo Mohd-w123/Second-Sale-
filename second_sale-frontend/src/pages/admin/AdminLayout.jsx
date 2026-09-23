@@ -146,7 +146,7 @@ export default function AdminLayout() {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-white truncate">{userName}</p>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-400 block">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#087F8C] block">
               {userRoleBadge}
             </span>
           </div>

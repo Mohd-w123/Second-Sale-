@@ -116,19 +116,29 @@ export const addBanner = async (req, res) => {
   }
 };
 
-// ── UPDATE banner (link/alt/order/active) ───────────────────────
+// ── UPDATE banner (link/alt/order/active/image) ───────────────────
 export const updateBanner = async (req, res) => {
   try {
     const { bannerId } = req.params;
-    const { linkTo, altText, order, isActive } = req.body;
+    const { linkTo, altText, order, isActive, imageUrl } = req.body;
     const settings = await SiteSettings.findOne({ singleton: 'main' });
     if (!settings) return res.status(404).json({ message: 'Settings not found' });
     const banner = settings.banners.id(bannerId);
     if (!banner) return res.status(404).json({ message: 'Banner not found' });
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer, 'secondsale/banners');
+      banner.imageUrl = result.secure_url;
+    } else if (imageUrl) {
+      banner.imageUrl = imageUrl;
+    }
+
     if (linkTo !== undefined) banner.linkTo = linkTo;
     if (altText !== undefined) banner.altText = altText;
     if (order !== undefined) banner.order = Number(order);
-    if (isActive !== undefined) banner.isActive = isActive;
+    if (isActive !== undefined) {
+      banner.isActive = typeof isActive === 'string' ? isActive === 'true' : Boolean(isActive);
+    }
     settings.banners.sort((a, b) => a.order - b.order);
     await settings.save();
     res.json(settings);

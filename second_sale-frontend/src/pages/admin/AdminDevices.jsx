@@ -1082,7 +1082,7 @@ export default function AdminDevices() {
                           className="text-slate-400 hover:text-slate-100 flex items-center gap-2"
                         >
                           {formData.isGamingLaptop ? (
-                            <ToggleRight size={28} className="text-blue-500" />
+                            <ToggleRight size={28} className="text-[#087F8C]" />
                           ) : (
                             <ToggleLeft size={28} className="text-slate-600" />
                           )}
@@ -1589,8 +1589,8 @@ export default function AdminDevices() {
               {modalTab === 'multipliers' && (
                 <div className="space-y-6 max-h-[450px] overflow-y-auto pr-2">
                   {['smartwatch', 'earbuds', 'console', 'gaming'].includes(formData.category) && (
-                    <div className="p-4 bg-blue-950/40 border border-blue-800/60 rounded-xl text-xs text-blue-200 flex items-start gap-2.5">
-                      <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                    <div className="p-4 bg-[#0B252C]/40 border border-[#116466]/60 rounded-xl text-xs text-[#E8F6F7] flex items-start gap-2.5">
+                      <Info className="w-5 h-5 text-[#087F8C] shrink-0 mt-0.5" />
                       <div>
                         <strong className="block text-white font-bold mb-1">Standard Dynamic Valuation Active</strong>
                         This category uses DeviceKart's standardized percentage valuation model. All condition, screen, body, and functional deductions are computed dynamically starting from each variant's <strong>Base Price</strong> configured in the Variants tab.

@@ -30,7 +30,9 @@ import {
   Star,
   ShieldCheck,
   Zap,
-  Sparkles
+  Sparkles,
+  Edit2,
+  Camera
 } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -98,6 +100,17 @@ export default function AdminSiteSettings() {
   const [bannerAlt, setBannerAlt] = useState('Promotional Banner');
   const [bannerOrder, setBannerOrder] = useState(0);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+
+  // Banner editing state
+  const [editingBanner, setEditingBanner] = useState(null);
+  const [editBannerFile, setEditBannerFile] = useState(null);
+  const [editBannerPreview, setEditBannerPreview] = useState('');
+  const [editBannerLink, setEditBannerLink] = useState('');
+  const [editBannerAlt, setEditBannerAlt] = useState('');
+  const [editBannerOrder, setEditBannerOrder] = useState(0);
+  const [editBannerActive, setEditBannerActive] = useState(true);
+  const [savingBannerEdit, setSavingBannerEdit] = useState(false);
+  const editBannerInputRef = useRef(null);
 
   // Logo upload state
   const [logoFile, setLogoFile] = useState(null);
@@ -196,11 +209,11 @@ export default function AdminSiteSettings() {
     fetchSettings();
   }, []);
 
-  async function fetchSettings() {
+  async function fetchSettings(retryCount = 0) {
     try {
       setLoading(true);
-      const res = await fetch(`${API}/site-settings`);
-      const data = await res.json();
+      const res = await adminService.getSiteSettings();
+      const data = res.data;
       setSettings(data);
       setBannerOrder(data.banners?.length || 0);
 
@@ -255,8 +268,14 @@ export default function AdminSiteSettings() {
       if (data.whatsappMessage) {
         setWhatsappMessage(data.whatsappMessage);
       }
-    } catch {
-      flash('error', 'Could not load site settings. Please check server connection.');
+    } catch (err) {
+      console.error('Failed to load site settings:', err);
+      // Auto-retry once after 800ms if server was momentarily restarting
+      if (retryCount < 1) {
+        setTimeout(() => fetchSettings(retryCount + 1), 800);
+        return;
+      }
+      flash('error', err.response?.data?.message || 'Could not load site settings. Please check server connection.');
     } finally {
       setLoading(false);
     }
@@ -450,6 +469,57 @@ export default function AdminSiteSettings() {
       flash('error', err.message);
     } finally {
       setUploadingBanner(false);
+    }
+  };
+
+  const handleStartEditBanner = (banner) => {
+    setEditingBanner(banner);
+    setEditBannerFile(null);
+    setEditBannerPreview(banner.imageUrl || '');
+    setEditBannerLink(banner.linkTo || '/sell-old-mobile-phones/brand');
+    setEditBannerAlt(banner.altText || 'Promotional Banner');
+    setEditBannerOrder(banner.order ?? 0);
+    setEditBannerActive(banner.isActive !== false);
+  };
+
+  const handleEditBannerFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setEditBannerFile(file);
+    setEditBannerPreview(URL.createObjectURL(file));
+  };
+
+  const handleSaveBannerEdit = async (e) => {
+    if (e) e.preventDefault();
+    if (!editingBanner) return;
+    setSavingBannerEdit(true);
+    try {
+      const fd = new FormData();
+      if (editBannerFile) {
+        fd.append('banner', editBannerFile);
+      }
+      fd.append('linkTo', editBannerLink);
+      fd.append('altText', editBannerAlt);
+      fd.append('order', editBannerOrder);
+      fd.append('isActive', editBannerActive);
+
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch(`${API}/site-settings/banners/${editingBanner._id}`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to update banner');
+      broadcastSettingsUpdate(data);
+      setEditingBanner(null);
+      setEditBannerFile(null);
+      setEditBannerPreview('');
+      flash('success', 'Banner updated successfully!');
+    } catch (err) {
+      flash('error', err.message || 'Failed to update banner');
+    } finally {
+      setSavingBannerEdit(false);
     }
   };
 
@@ -649,7 +719,7 @@ export default function AdminSiteSettings() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-slate-500">
-        <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+        <RefreshCw className="w-8 h-8 animate-spin text-[#087F8C] mb-3" />
         <p className="text-sm font-semibold">Loading Site Settings...</p>
       </div>
     );
@@ -670,7 +740,7 @@ export default function AdminSiteSettings() {
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
               Site Settings
             </h1>
-            <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-blue-100">
+            <span className="bg-[#E8F6F7] text-[#087F8C] text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#087F8C]/20">
               Live Customizer
             </span>
           </div>
@@ -692,7 +762,7 @@ export default function AdminSiteSettings() {
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold transition-all border border-blue-200"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#E8F6F7] hover:bg-[#E8F6F7] text-[#087F8C] rounded-xl text-xs font-bold transition-all border border-[#087F8C]/25"
           >
             <ExternalLink size={14} />
             <span>Preview Site</span>
@@ -754,7 +824,7 @@ export default function AdminSiteSettings() {
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] border border-[#087F8C]/20 text-[#087F8C] flex items-center justify-center shrink-0">
               <ImageIcon size={20} />
             </div>
             <div>
@@ -826,24 +896,24 @@ export default function AdminSiteSettings() {
                 <button
                   type="button"
                   onClick={() => logoInputRef.current?.click()}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-dashed border-slate-300 hover:border-blue-500 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 bg-slate-50/50 hover:bg-blue-50/40 transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2.5 border border-dashed border-slate-300 hover:border-[#087F8C] rounded-xl text-xs font-bold text-slate-700 hover:text-[#087F8C] bg-slate-50/50 hover:bg-[#E8F6F7]/40 transition-all cursor-pointer"
                 >
                   <Upload size={15} />
                   <span>Choose New Image</span>
                 </button>
 
                 {logoPreview && (
-                  <div className="flex items-center gap-3 bg-blue-50/60 p-2 pr-3 rounded-xl border border-blue-200 animate-in fade-in">
+                  <div className="flex items-center gap-3 bg-[#E8F6F7]/60 p-2 pr-3 rounded-xl border border-[#087F8C]/25 animate-in fade-in">
                     <img
                       src={logoPreview}
                       alt="Selected preview"
-                      className="h-9 w-auto max-w-[120px] object-contain rounded-lg border border-blue-200 bg-white px-2"
+                      className="h-9 w-auto max-w-[120px] object-contain rounded-lg border border-[#087F8C]/25 bg-white px-2"
                     />
                     <button
                       type="button"
                       onClick={uploadLogo}
                       disabled={uploadingLogo}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-4 py-2 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-lg transition-all shadow-sm disabled:opacity-50"
                     >
                       {uploadingLogo ? (
                         <>
@@ -907,24 +977,24 @@ export default function AdminSiteSettings() {
                   <button
                     type="button"
                     onClick={() => faviconInputRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2 border border-dashed border-slate-300 hover:border-blue-500 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-600 bg-slate-50/50 hover:bg-blue-50/40 transition-all cursor-pointer"
+                    className="flex items-center gap-2 px-4 py-2 border border-dashed border-slate-300 hover:border-[#087F8C] rounded-xl text-xs font-bold text-slate-700 hover:text-[#087F8C] bg-slate-50/50 hover:bg-[#E8F6F7]/40 transition-all cursor-pointer"
                   >
                     <Upload size={14} />
                     <span>Choose Favicon File</span>
                   </button>
 
                   {faviconPreview && (
-                    <div className="flex items-center gap-3 bg-blue-50/60 p-2 pr-3 rounded-xl border border-blue-200 animate-in fade-in">
+                    <div className="flex items-center gap-3 bg-[#E8F6F7]/60 p-2 pr-3 rounded-xl border border-[#087F8C]/25 animate-in fade-in">
                       <img
                         src={faviconPreview}
                         alt="Favicon preview"
-                        className="w-7 h-7 object-contain rounded border border-blue-200 bg-white p-0.5"
+                        className="w-7 h-7 object-contain rounded border border-[#087F8C]/25 bg-white p-0.5"
                       />
                       <button
                         type="button"
                         onClick={uploadFavicon}
                         disabled={uploadingFavicon}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-lg transition-all shadow-sm disabled:opacity-50"
                       >
                         {uploadingFavicon ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
                         <span>Save Favicon</span>
@@ -952,7 +1022,7 @@ export default function AdminSiteSettings() {
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] border border-[#087F8C]/20 text-[#087F8C] flex items-center justify-center shrink-0">
               <Sliders size={20} />
             </div>
             <div>
@@ -960,7 +1030,7 @@ export default function AdminSiteSettings() {
                 <h3 className="text-base sm:text-lg font-bold text-slate-900">
                   Homepage Banner Slider
                 </h3>
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-[#E8F6F7] text-[#087F8C] border-[#087F8C]/25">
                   {activeBannersCount} of {totalBannersCount} Active
                 </span>
               </div>
@@ -987,13 +1057,13 @@ export default function AdminSiteSettings() {
         {isBannersOpen && (
           <div className="p-5 sm:p-6 bg-white space-y-6 animate-in fade-in duration-200">
             {/* Add Banner Inner Subsection */}
-            <div className="rounded-2xl border border-blue-200 bg-blue-50/50 overflow-hidden transition-all">
+            <div className="rounded-2xl border border-[#087F8C]/25 bg-[#E8F6F7]/50 overflow-hidden transition-all">
               <div
                 onClick={() => setIsAddFormOpen(!isAddFormOpen)}
-                className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-blue-100/40 select-none transition-colors border-b border-blue-100"
+                className="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-[#E8F6F7]/40 select-none transition-colors border-b border-[#087F8C]/20"
               >
-                <div className="flex items-center gap-2.5 text-blue-900 font-bold text-sm">
-                  <div className="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                <div className="flex items-center gap-2.5 text-[#0B252C] font-bold text-sm">
+                  <div className="w-6 h-6 rounded-md bg-[#087F8C] text-white flex items-center justify-center font-bold text-xs shadow-xs">
                     <Plus size={14} />
                   </div>
                   <span>Add New Slider Banner</span>
@@ -1004,7 +1074,7 @@ export default function AdminSiteSettings() {
                     e.stopPropagation();
                     setIsAddFormOpen(!isAddFormOpen);
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-blue-200 text-blue-700 text-xs font-bold hover:bg-blue-50 transition-all"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-[#087F8C]/25 text-[#087F8C] text-xs font-bold hover:bg-[#E8F6F7] transition-all"
                 >
                   <span>{isAddFormOpen ? 'Hide Form' : 'Show Form'}</span>
                   {isAddFormOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -1040,9 +1110,9 @@ export default function AdminSiteSettings() {
                   ) : (
                     <div
                       onClick={() => bannerInputRef.current?.click()}
-                      className="border-2 border-dashed border-blue-200 hover:border-blue-500 rounded-xl p-6 flex flex-col items-center justify-center gap-2 text-blue-600 hover:bg-blue-50/50 transition-all cursor-pointer select-none"
+                      className="border-2 border-dashed border-[#087F8C]/25 hover:border-[#087F8C] rounded-xl p-6 flex flex-col items-center justify-center gap-2 text-[#087F8C] hover:bg-[#E8F6F7]/50 transition-all cursor-pointer select-none"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                      <div className="w-12 h-12 rounded-xl bg-[#E8F6F7] flex items-center justify-center text-[#087F8C]">
                         <Upload size={22} />
                       </div>
                       <p className="text-sm font-bold text-slate-800">
@@ -1066,7 +1136,7 @@ export default function AdminSiteSettings() {
                           value={bannerLink}
                           onChange={(e) => setBannerLink(e.target.value)}
                           placeholder="/sell-old-mobile-phones/brand"
-                          className="w-full pl-9 pr-3 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                          className="w-full pl-9 pr-3 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none transition-all"
                         />
                       </div>
                     </div>
@@ -1079,7 +1149,7 @@ export default function AdminSiteSettings() {
                         value={bannerAlt}
                         onChange={(e) => setBannerAlt(e.target.value)}
                         placeholder="Promotional Summer Sale"
-                        className="w-full px-3 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                        className="w-full px-3 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -1096,7 +1166,7 @@ export default function AdminSiteSettings() {
                       type="button"
                       onClick={uploadBanner}
                       disabled={!bannerFile || uploadingBanner}
-                      className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-5 py-2 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-[#087F8C]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {uploadingBanner ? (
                         <>
@@ -1157,18 +1227,25 @@ export default function AdminSiteSettings() {
                       <div
                         key={banner._id}
                         className={`flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl border transition-all ${banner.isActive
-                          ? 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-xs'
+                          ? 'border-slate-200 bg-white hover:border-[#087F8C]/40 hover:shadow-xs'
                           : 'border-slate-200 bg-slate-50 opacity-60'
                           }`}
                       >
                         <div className="flex items-center gap-3 shrink-0">
                           <GripVertical size={18} className="text-slate-300 cursor-grab shrink-0" />
-                          <div className="w-28 h-16 rounded-lg overflow-hidden border border-slate-200 bg-slate-900 shrink-0">
+                          <div
+                            onClick={() => handleStartEditBanner(banner)}
+                            className="w-28 h-16 rounded-lg overflow-hidden border border-slate-200 bg-slate-900 shrink-0 relative group cursor-pointer"
+                            title="Click to edit banner & change image"
+                          >
                             <img
                               src={banner.imageUrl}
                               alt={banner.altText}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                             />
+                            <div className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                              <Edit2 size={16} />
+                            </div>
                           </div>
                         </div>
 
@@ -1190,13 +1267,13 @@ export default function AdminSiteSettings() {
                                 type="text"
                                 value={editLink}
                                 onChange={(e) => setEditLink(e.target.value)}
-                                className="flex-1 text-xs px-3 py-1.5 border border-blue-400 rounded-lg outline-none focus:ring-2 focus:ring-blue-100"
+                                className="flex-1 text-xs px-3 py-1.5 border border-[#087F8C]/50 rounded-lg outline-none focus:ring-2 focus:ring-[#E8F6F7]"
                                 autoFocus
                               />
                               <button
                                 type="button"
                                 onClick={() => saveBannerLink(banner._id)}
-                                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors"
+                                className="px-3 py-1.5 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-lg transition-colors"
                               >
                                 Save
                               </button>
@@ -1215,7 +1292,7 @@ export default function AdminSiteSettings() {
                                 setEditingBannerId(banner._id);
                                 setEditLink(banner.linkTo);
                               }}
-                              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-semibold truncate hover:underline text-left mt-0.5"
+                              className="flex items-center gap-1 text-xs text-[#087F8C] hover:text-[#116466] font-semibold truncate hover:underline text-left mt-0.5"
                               title="Click to edit link"
                             >
                               <LinkIcon size={12} className="shrink-0" />
@@ -1225,6 +1302,14 @@ export default function AdminSiteSettings() {
                         </div>
 
                         <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditBanner(banner)}
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-[#E8F6F7] text-slate-700 hover:text-[#087F8C] border border-slate-200 hover:border-[#087F8C]/30 transition-all"
+                            title="Edit banner image & details"
+                          >
+                            <Edit2 size={16} />
+                          </button>
                           <button
                             type="button"
                             onClick={() => toggleBanner(banner._id, banner.isActive)}
@@ -1262,7 +1347,7 @@ export default function AdminSiteSettings() {
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] border border-[#087F8C]/20 text-[#087F8C] flex items-center justify-center shrink-0">
               <Compass size={20} />
             </div>
             <div>
@@ -1270,7 +1355,7 @@ export default function AdminSiteSettings() {
                 <h3 className="text-base sm:text-lg font-bold text-slate-900">
                   Header Navigation Links
                 </h3>
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-[#E8F6F7] text-[#087F8C] border-[#087F8C]/25">
                   {activeNavCount} of {totalNavCount} Active
                 </span>
               </div>
@@ -1297,15 +1382,15 @@ export default function AdminSiteSettings() {
         {isNavOpen && (
           <div className="p-5 sm:p-6 bg-white space-y-6 animate-in fade-in duration-200">
             {/* Add New Nav Link Form */}
-            <form onSubmit={addNavLink} className="p-4 sm:p-5 rounded-2xl border border-blue-200 bg-blue-50/40 space-y-3">
+            <form onSubmit={addNavLink} className="p-4 sm:p-5 rounded-2xl border border-[#087F8C]/25 bg-[#E8F6F7]/40 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold text-blue-900 uppercase tracking-wider">
+                <p className="text-xs font-bold text-[#0B252C] uppercase tracking-wider">
                   + Add New Navigation Item
                 </p>
                 <button
                   type="button"
                   onClick={resetNavLinks}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-blue-600 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-[#087F8C] transition-colors cursor-pointer"
                   title="Reset to default menu"
                 >
                   <RotateCcw size={12} />
@@ -1323,7 +1408,7 @@ export default function AdminSiteSettings() {
                     value={newNavLabel}
                     onChange={(e) => setNewNavLabel(e.target.value)}
                     placeholder="e.g. Festive Deals, Corporate"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white transition-all"
+                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none bg-white transition-all"
                   />
                 </div>
                 <div>
@@ -1335,7 +1420,7 @@ export default function AdminSiteSettings() {
                     value={newNavTo}
                     onChange={(e) => setNewNavTo(e.target.value)}
                     placeholder="/deals or /#how-it-works"
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white transition-all"
+                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none bg-white transition-all"
                   />
                 </div>
               </div>
@@ -1347,7 +1432,7 @@ export default function AdminSiteSettings() {
                       type="checkbox"
                       checked={newNavDropdown}
                       onChange={(e) => setNewNavDropdown(e.target.checked)}
-                      className="rounded text-blue-600 focus:ring-blue-400"
+                      className="rounded text-[#087F8C] focus:ring-[#087F8C]"
                     />
                     <span>Attach &apos;Sell Device&apos; Mega Menu</span>
                   </label>
@@ -1356,7 +1441,7 @@ export default function AdminSiteSettings() {
                       type="checkbox"
                       checked={newNavExternal}
                       onChange={(e) => setNewNavExternal(e.target.checked)}
-                      className="rounded text-blue-600 focus:ring-blue-400"
+                      className="rounded text-[#087F8C] focus:ring-[#087F8C]"
                     />
                     <span>Open in new tab</span>
                   </label>
@@ -1365,7 +1450,7 @@ export default function AdminSiteSettings() {
                 <button
                   type="submit"
                   disabled={savingNav || !newNavLabel.trim()}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-blue-600/20 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-[#087F8C]/20 disabled:opacity-50 cursor-pointer"
                 >
                   <Plus size={14} />
                   <span>{savingNav ? 'Saving…' : 'Add Item'}</span>
@@ -1388,7 +1473,7 @@ export default function AdminSiteSettings() {
                   <div
                     key={item._id}
                     className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${item.isActive
-                      ? 'border-slate-200 bg-white hover:border-blue-300'
+                      ? 'border-slate-200 bg-white hover:border-[#087F8C]/40'
                       : 'border-slate-200 bg-slate-50 opacity-60'
                       }`}
                   >
@@ -1398,31 +1483,31 @@ export default function AdminSiteSettings() {
                       </span>
 
                       {editingNavId === item._id ? (
-                        <div className="flex-1 flex flex-col gap-2 p-2.5 bg-blue-50/60 rounded-xl border border-blue-200">
+                        <div className="flex-1 flex flex-col gap-2 p-2.5 bg-[#E8F6F7]/60 rounded-xl border border-[#087F8C]/25">
                           <div className="flex flex-wrap items-center gap-2">
                             <input
                               type="text"
                               value={editNavLabel}
                               onChange={(e) => setEditNavLabel(e.target.value)}
-                              className="text-xs px-2.5 py-1.5 border border-blue-300 bg-white rounded-lg outline-none flex-1 min-w-[120px] font-semibold text-slate-900"
+                              className="text-xs px-2.5 py-1.5 border border-[#087F8C]/40 bg-white rounded-lg outline-none flex-1 min-w-[120px] font-semibold text-slate-900"
                               placeholder="Label"
                             />
                             <input
                               type="text"
                               value={editNavTo}
                               onChange={(e) => setEditNavTo(e.target.value)}
-                              className="text-xs px-2.5 py-1.5 border border-blue-300 bg-white rounded-lg outline-none flex-1 min-w-[140px] text-slate-700"
+                              className="text-xs px-2.5 py-1.5 border border-[#087F8C]/40 bg-white rounded-lg outline-none flex-1 min-w-[140px] text-slate-700"
                               placeholder="Path (/page or https://)"
                             />
                           </div>
-                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-blue-100">
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#087F8C]/20">
                             <div className="flex items-center gap-3">
                               <label className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer font-medium">
                                 <input
                                   type="checkbox"
                                   checked={editNavDropdown}
                                   onChange={(e) => setEditNavDropdown(e.target.checked)}
-                                  className="rounded text-blue-600 focus:ring-0"
+                                  className="rounded text-[#087F8C] focus:ring-0"
                                 />
                                 Mega Menu
                               </label>
@@ -1431,7 +1516,7 @@ export default function AdminSiteSettings() {
                                   type="checkbox"
                                   checked={editNavExternal}
                                   onChange={(e) => setEditNavExternal(e.target.checked)}
-                                  className="rounded text-blue-600 focus:ring-0"
+                                  className="rounded text-[#087F8C] focus:ring-0"
                                 />
                                 Open in New Tab
                               </label>
@@ -1441,7 +1526,7 @@ export default function AdminSiteSettings() {
                                 type="button"
                                 disabled={savingNavId === item._id}
                                 onClick={() => saveEditedNavLink(item._id)}
-                                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#087F8C] hover:bg-[#066772] disabled:bg-[#087F8C]/40 text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
                               >
                                 {savingNavId === item._id ? (
                                   <>
@@ -1491,7 +1576,7 @@ export default function AdminSiteSettings() {
                               setEditNavDropdown(Boolean(item.hasDropdown));
                               setEditNavExternal(Boolean(item.isExternal));
                             }}
-                            className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-0.5"
+                            className="text-xs text-[#087F8C] hover:underline flex items-center gap-1 mt-0.5"
                           >
                             <LinkIcon size={11} />
                             <span className="truncate">{item.to}</span>
@@ -1509,7 +1594,7 @@ export default function AdminSiteSettings() {
                           disabled={index === 0}
                           onClick={() => moveNavLink(index, -1)}
                           title="Move up"
-                          className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                          className="p-1.5 text-slate-500 hover:text-[#087F8C] hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                         >
                           <ChevronUp size={14} />
                         </button>
@@ -1518,7 +1603,7 @@ export default function AdminSiteSettings() {
                           disabled={index === (settings?.navLinks?.length || 0) - 1}
                           onClick={() => moveNavLink(index, 1)}
                           title="Move down"
-                          className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none border-l border-slate-200 transition-colors"
+                          className="p-1.5 text-slate-500 hover:text-[#087F8C] hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none border-l border-slate-200 transition-colors"
                         >
                           <ChevronDown size={14} />
                         </button>
@@ -1533,7 +1618,7 @@ export default function AdminSiteSettings() {
                           }`}
                         title={item.isActive ? 'Active — click to disable' : 'Disabled — click to enable'}
                       >
-                        {togglingNavId === item._id ? <RefreshCw size={15} className="animate-spin text-blue-600" /> : item.isActive ? <Eye size={15} /> : <EyeOff size={15} />}
+                        {togglingNavId === item._id ? <RefreshCw size={15} className="animate-spin text-[#087F8C]" /> : item.isActive ? <Eye size={15} /> : <EyeOff size={15} />}
                       </button>
                       <button
                         type="button"
@@ -1559,7 +1644,7 @@ export default function AdminSiteSettings() {
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] border border-[#087F8C]/20 text-[#087F8C] flex items-center justify-center shrink-0">
               <Megaphone size={20} />
             </div>
             <div>
@@ -1596,7 +1681,7 @@ export default function AdminSiteSettings() {
                 type="checkbox"
                 checked={topBarEnabled}
                 onChange={(e) => setTopBarEnabled(e.target.checked)}
-                className="w-4 h-4 rounded text-blue-600"
+                className="w-4 h-4 rounded text-[#087F8C]"
               />
               <span>Enable announcement strip at top of website</span>
             </label>
@@ -1666,7 +1751,7 @@ export default function AdminSiteSettings() {
                 type="button"
                 onClick={saveTopBar}
                 disabled={savingTopBar}
-                className="ml-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
+                className="ml-auto px-5 py-2 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
               >
                 {savingTopBar ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
                 <span>Save Top Bar</span>
@@ -1811,7 +1896,7 @@ export default function AdminSiteSettings() {
           className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
         >
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] border border-[#087F8C]/20 text-[#087F8C] flex items-center justify-center shrink-0">
               <Globe size={20} />
             </div>
             <div>
@@ -1819,7 +1904,7 @@ export default function AdminSiteSettings() {
                 <h3 className="text-base sm:text-lg font-bold text-slate-900">
                   Footer Information & Social Links
                 </h3>
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-blue-50 text-blue-700 border-blue-200">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-[#E8F6F7] text-[#087F8C] border-[#087F8C]/25">
                   Global Footer
                 </span>
               </div>
@@ -1957,7 +2042,7 @@ export default function AdminSiteSettings() {
             {/* Top 4 Trust Feature Cards */}
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
               <div className="flex items-center gap-2">
-                <ShieldCheck size={16} className="text-blue-600" />
+                <ShieldCheck size={16} className="text-[#087F8C]" />
                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
                   Top Trust Feature Cards (4 Cards Banner)
                 </span>
@@ -1968,7 +2053,7 @@ export default function AdminSiteSettings() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                 {footerTrustFeatures.map((card, idx) => (
                   <div key={idx} className="bg-white p-3 rounded-xl border border-slate-200 space-y-2 shadow-xs">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md inline-block">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#087F8C] bg-[#E8F6F7] px-2 py-0.5 rounded-md inline-block">
                       Card #{idx + 1}
                     </span>
                     <div>
@@ -2006,7 +2091,7 @@ export default function AdminSiteSettings() {
             <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Compass size={18} className="text-blue-600" />
+                  <Compass size={18} className="text-[#087F8C]" />
                   <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
                     Footer Navigation Columns (Sell Devices, Company, Support &amp; Legal)
                   </h4>
@@ -2028,12 +2113,12 @@ export default function AdminSiteSettings() {
                     type="button"
                     onClick={() => setActiveFooterTab(tab.id)}
                     className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeFooterTab === tab.id
-                      ? 'bg-blue-600 text-white shadow-sm'
+                      ? 'bg-[#087F8C] text-white shadow-sm'
                       : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                       }`}
                   >
                     <span>{tab.label}</span>
-                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeFooterTab === tab.id ? 'bg-blue-700 text-blue-100' : 'bg-slate-100 text-slate-500'
+                    <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeFooterTab === tab.id ? 'bg-[#066772] text-[#E8F6F7]' : 'bg-slate-100 text-slate-500'
                       }`}>
                       {tab.count}
                     </span>
@@ -2153,7 +2238,7 @@ export default function AdminSiteSettings() {
                       setNewFooterTo('/');
                       flash('success', `Added link to ${activeFooterTab === 'sellDevices' ? 'Sell Devices' : activeFooterTab === 'company' ? 'Company' : 'Support & Legal'} column!`);
                     }}
-                    className="w-full sm:w-auto px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                    className="w-full sm:w-auto px-4 py-1.5 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
                   >
                     <Plus size={14} />
                     <span>Add Link</span>
@@ -2246,7 +2331,7 @@ export default function AdminSiteSettings() {
                 type="button"
                 onClick={saveFooter}
                 disabled={savingFooter}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
+                className="px-5 py-2 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
               >
                 {savingFooter ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
                 <span>Save Footer Information</span>
@@ -2255,6 +2340,230 @@ export default function AdminSiteSettings() {
           </div>
         )}
       </div>
+
+      {/* ── EDIT BANNER MODAL ─────────────────────────────────────── */}
+      {editingBanner && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => {
+            if (!savingBannerEdit) {
+              setEditingBanner(null);
+              setEditBannerFile(null);
+              setEditBannerPreview('');
+            }
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center">
+                  <Edit2 size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Edit Slider Banner</h3>
+                  <p className="text-xs text-slate-500">Update banner graphic image, target link, and settings</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!savingBannerEdit) {
+                    setEditingBanner(null);
+                    setEditBannerFile(null);
+                    setEditBannerPreview('');
+                  }
+                }}
+                disabled={savingBannerEdit}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors disabled:opacity-50"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-5">
+              {/* Banner Graphic Image Preview & Replace */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-slate-700">Banner Graphic Image</label>
+                  {editBannerFile ? (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                      New Image Selected (Pending Save)
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-semibold text-slate-500">
+                      Recommended: ~1200 x 380px (PNG, JPG, WEBP up to 5MB)
+                    </span>
+                  )}
+                </div>
+
+                <input
+                  ref={editBannerInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleEditBannerFileSelect}
+                />
+
+                <div className="relative rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-950 aspect-[1200/380] min-h-[140px] flex items-center justify-center group shadow-inner">
+                  {editBannerPreview ? (
+                    <img
+                      src={editBannerPreview}
+                      alt="Banner preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-slate-400">
+                      <ImageIcon size={32} />
+                      <span className="text-xs font-semibold mt-1">No image available</span>
+                    </div>
+                  )}
+
+                  {/* Hover overlay to change image */}
+                  <div
+                    onClick={() => editBannerInputRef.current?.click()}
+                    className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 cursor-pointer text-white"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-xs flex items-center justify-center text-white">
+                      <Camera size={20} />
+                    </div>
+                    <span className="text-xs font-bold">Click to choose replacement image</span>
+                  </div>
+                </div>
+
+                {/* Quick Change / Revert Buttons */}
+                <div className="flex items-center justify-between mt-2.5">
+                  <button
+                    type="button"
+                    onClick={() => editBannerInputRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#E8F6F7] hover:bg-[#d4eef0] text-[#087F8C] text-xs font-bold transition-all border border-[#087F8C]/20"
+                  >
+                    <Upload size={13} />
+                    <span>{editBannerFile ? 'Select Different Image' : 'Upload & Change Image'}</span>
+                  </button>
+
+                  {editBannerFile && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditBannerFile(null);
+                        setEditBannerPreview(editingBanner.imageUrl || '');
+                      }}
+                      className="text-xs text-rose-600 hover:text-rose-700 font-semibold hover:underline"
+                    >
+                      Revert to original graphic
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Alt Description & Redirect Link */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                    Banner Title / Alt Description
+                  </label>
+                  <input
+                    type="text"
+                    value={editBannerAlt}
+                    onChange={(e) => setEditBannerAlt(e.target.value)}
+                    placeholder="e.g. Promotional Summer Sale"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                    Redirect Target Link
+                  </label>
+                  <div className="relative">
+                    <LinkIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={editBannerLink}
+                      onChange={(e) => setEditBannerLink(e.target.value)}
+                      placeholder="/sell-old-mobile-phones/brand"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Display Order & Visibility Toggle */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                    Slider Display Order (Position)
+                  </label>
+                  <input
+                    type="number"
+                    value={editBannerOrder}
+                    onChange={(e) => setEditBannerOrder(Number(e.target.value))}
+                    min={0}
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none transition-all"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">Lower numbers appear first in the slider (e.g. 0, 1, 2)</p>
+                </div>
+
+                <div className="flex flex-col justify-center">
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                    Live Visibility Status
+                  </label>
+                  <label className="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors select-none">
+                    <input
+                      type="checkbox"
+                      checked={editBannerActive}
+                      onChange={(e) => setEditBannerActive(e.target.checked)}
+                      className="w-4 h-4 accent-[#087F8C] rounded"
+                    />
+                    <span className="text-xs font-bold text-slate-800">
+                      {editBannerActive ? 'Active on Homepage' : 'Hidden from Homepage'}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-end gap-2.5 bg-slate-50/50">
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingBanner(null);
+                  setEditBannerFile(null);
+                  setEditBannerPreview('');
+                }}
+                disabled={savingBannerEdit}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold transition-all disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveBannerEdit}
+                disabled={savingBannerEdit}
+                className="flex items-center gap-2 px-5 py-2 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-[#087F8C]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savingBannerEdit ? (
+                  <>
+                    <RefreshCw size={13} className="animate-spin" />
+                    <span>Saving Banner…</span>
+                  </>
+                ) : (
+                  <>
+                    <Save size={14} />
+                    <span>Save Changes</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

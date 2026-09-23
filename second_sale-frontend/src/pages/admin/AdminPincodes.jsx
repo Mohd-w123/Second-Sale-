@@ -121,7 +121,7 @@ export default function AdminPincodes() {
                   </td>
                   <td>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleOpenModal(pin)} className="p-2 hover:bg-white/5 rounded-lg text-blue-400 transition-colors">
+                      <button onClick={() => handleOpenModal(pin)} className="p-2 hover:bg-white/5 rounded-lg text-[#087F8C] transition-colors">
                         <Edit size={16} />
                       </button>
                       <button onClick={() => handleDelete(pin._id)} className="p-2 hover:bg-white/5 rounded-lg text-red-400 transition-colors">
@@ -183,7 +183,7 @@ export default function AdminPincodes() {
                       type="checkbox" 
                       checked={form.isActive} 
                       onChange={e => setForm({...form, isActive: e.target.checked})}
-                      className="w-4 h-4 accent-blue-500"
+                      className="w-4 h-4 accent-[#087F8C]"
                     />
                     <span className="text-sm text-gray-300">Is Active</span>
                   </label>

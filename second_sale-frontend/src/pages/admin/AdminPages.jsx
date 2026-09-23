@@ -154,7 +154,7 @@ export default function AdminPages() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <FileText className="text-blue-600" size={26} />
+            <FileText className="text-[#087F8C]" size={26} />
             Custom Pages (CMS)
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -164,7 +164,7 @@ export default function AdminPages() {
 
         <button
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all border-none cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl shadow-md shadow-[#087F8C]/20 transition-all border-none cursor-pointer self-start sm:self-auto"
         >
           <Plus size={16} />
           <span>Create New Page</span>
@@ -186,7 +186,7 @@ export default function AdminPages() {
 
         <button
           onClick={fetchPages}
-          className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-slate-200 bg-white cursor-pointer self-end sm:self-auto"
+          className="p-2 text-slate-500 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-xl transition-colors border border-slate-200 bg-white cursor-pointer self-end sm:self-auto"
           title="Refresh"
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -209,7 +209,7 @@ export default function AdminPages() {
             </p>
             <button
               onClick={handleOpenCreate}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl border-none cursor-pointer hover:bg-blue-700 transition-colors"
+              className="mt-4 px-4 py-2 bg-[#087F8C] text-white text-xs font-bold rounded-xl border-none cursor-pointer hover:bg-[#066772] transition-colors"
             >
               + Create First Page
             </button>
@@ -233,7 +233,7 @@ export default function AdminPages() {
                       <div className="font-bold text-slate-900 text-sm">{p.title}</div>
                       <div className="flex items-center gap-1.5 text-[11px] font-mono mt-0.5">
                         <Globe size={11} className="text-slate-400" />
-                        <span className="font-bold text-blue-600">{getPageUrl(p.slug)}</span>
+                        <span className="font-bold text-[#087F8C]">{getPageUrl(p.slug)}</span>
                       </div>
                     </td>
 
@@ -252,7 +252,7 @@ export default function AdminPages() {
 
                     <td className="py-3.5 px-4 text-slate-600">
                       {p.showInFooter ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#087F8C] bg-[#E8F6F7] px-2 py-0.5 rounded-md">
                           Column: {p.footerColumn || 'Company'}
                         </span>
                       ) : (
@@ -272,14 +272,14 @@ export default function AdminPages() {
                           href={getPageUrl(p.slug)}
                           target="_blank"
                           rel="noreferrer"
-                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg transition-colors"
                           title={`View Live Page (${getPageUrl(p.slug)})`}
                         >
                           <ExternalLink size={15} />
                         </a>
                         <button
                           onClick={() => handleOpenEdit(p)}
-                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border-none bg-transparent cursor-pointer"
+                          className="p-1.5 text-slate-400 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg transition-colors border-none bg-transparent cursor-pointer"
                           title="Edit Content"
                         >
                           <Edit2 size={15} />
@@ -336,13 +336,13 @@ export default function AdminPages() {
                     placeholder="e.g. Certified Refurbished Warranty Policy"
                     value={formData.title}
                     onChange={handleTitleChange}
-                    className="w-full px-3.5 py-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none"
+                    className="w-full px-3.5 py-2 text-xs font-semibold border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-[#087F8C] focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    URL Slug * (Live at <span className="text-blue-600 font-mono">{getPageUrl(formData.slug || 'your-slug')}</span>)
+                    URL Slug * (Live at <span className="text-[#087F8C] font-mono">{getPageUrl(formData.slug || 'your-slug')}</span>)
                   </label>
                   <input
                     type="text"
@@ -402,7 +402,7 @@ export default function AdminPages() {
                       type="checkbox"
                       checked={formData.isPublished}
                       onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                      className="w-4 h-4 rounded text-blue-600"
+                      className="w-4 h-4 rounded text-[#087F8C]"
                     />
                     <span>Publish live on website</span>
                   </label>
@@ -412,7 +412,7 @@ export default function AdminPages() {
                       type="checkbox"
                       checked={formData.showInFooter}
                       onChange={(e) => setFormData({ ...formData, showInFooter: e.target.checked })}
-                      className="w-4 h-4 rounded text-blue-600"
+                      className="w-4 h-4 rounded text-[#087F8C]"
                     />
                     <span>Show link in website Footer</span>
                   </label>
@@ -447,7 +447,7 @@ export default function AdminPages() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 border-none cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2 bg-[#087F8C] hover:bg-[#066772] text-white rounded-xl text-xs font-bold shadow-md shadow-[#087F8C]/20 border-none cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'Saving...' : editingId ? 'Update Page' : 'Publish Page'}
                 </button>

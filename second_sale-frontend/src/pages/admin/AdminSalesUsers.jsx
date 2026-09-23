@@ -222,7 +222,7 @@ export default function AdminSalesUsers() {
 
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 btn-gradient text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/10 transition-all cursor-pointer"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 btn-gradient text-white font-bold text-sm rounded-xl shadow-md shadow-[#087F8C]/10 transition-all cursor-pointer"
         >
           <UserPlus size={18} />
           <span>Add Sales User</span>
@@ -257,7 +257,7 @@ export default function AdminSalesUsers() {
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#087F8C] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center">
             <Users2 size={24} />
           </div>
           <div>
@@ -335,7 +335,7 @@ export default function AdminSalesUsers() {
                     <tr key={user._id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#116466] to-[#087F8C] text-white font-bold flex items-center justify-center text-sm shadow-sm">
                             {initial}
                           </div>
                           <div>
@@ -346,7 +346,7 @@ export default function AdminSalesUsers() {
                       </td>
 
                       <td className="py-4 px-6">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-[#087F8C] border border-blue-100 uppercase tracking-wide">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/20 uppercase tracking-wide">
                           <Shield size={12} />
                           {user.role === 'admin' ? 'Administrator' : 'Sales Team'}
                         </span>
@@ -410,7 +410,7 @@ export default function AdminSalesUsers() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openEditModal(user)}
-                            className="p-2 text-gray-400 hover:text-[#087F8C] hover:bg-blue-50 rounded-xl transition-all cursor-pointer"
+                            className="p-2 text-gray-400 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-xl transition-all cursor-pointer"
                             title="Edit Permissions & Details"
                           >
                             <Edit2 size={16} />
@@ -579,7 +579,7 @@ export default function AdminSalesUsers() {
                         onClick={() => handleTogglePermission(mod.id)}
                         className={`p-3.5 rounded-2xl border transition-all flex items-start gap-3 cursor-pointer ${
                           isChecked
-                            ? 'bg-blue-50/50 border-[#087F8C] text-[#087F8C]'
+                            ? 'bg-[#E8F6F7]/50 border-[#087F8C] text-[#087F8C]'
                             : 'bg-gray-50/50 border-gray-100 hover:border-gray-200 text-gray-700'
                         }`}
                       >
@@ -618,7 +618,7 @@ export default function AdminSalesUsers() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 btn-gradient text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                  className="px-6 py-2.5 btn-gradient text-white font-bold text-sm rounded-xl shadow-md shadow-[#087F8C]/20 transition-all cursor-pointer"
                 >
                   {showCreateModal ? 'Create User' : 'Save Changes'}
                 </button>

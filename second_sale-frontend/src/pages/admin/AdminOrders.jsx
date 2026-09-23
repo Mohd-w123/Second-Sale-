@@ -45,8 +45,8 @@ function OrderDetailModal({ order, onClose }) {
   const Section = ({ icon: Icon, title, children }) => (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center">
-          <Icon size={14} className="text-blue-600" />
+        <div className="w-7 h-7 rounded-lg bg-[#E8F6F7] flex items-center justify-center">
+          <Icon size={14} className="text-[#087F8C]" />
         </div>
         <span className="text-[12px] font-800 text-slate-500 uppercase tracking-wider">{title}</span>
       </div>
@@ -137,9 +137,9 @@ function OrderDetailModal({ order, onClose }) {
             {pb.functionalDeduction !== 0 && <InfoRow label="Functional Deduction" value={`-₹${Math.abs(pb.functionalDeduction)}`} />}
             {pb.batteryDeduction !== 0 && <InfoRow label="Battery Deduction" value={`-₹${Math.abs(pb.batteryDeduction)}`} />}
             {pb.accessoriesBonus !== 0 && <InfoRow label="Accessories Bonus" value={`+₹${pb.accessoriesBonus}`} />}
-            <div className="flex justify-between items-center py-3 mt-1 border-t-2 border-blue-100">
-              <span className="text-[12px] font-800 text-blue-700 uppercase tracking-wider">Final Price Offered</span>
-              <span className="text-[18px] font-900 text-blue-700">₹{pb.finalPrice || 0}</span>
+            <div className="flex justify-between items-center py-3 mt-1 border-t-2 border-[#087F8C]/20">
+              <span className="text-[12px] font-800 text-[#087F8C] uppercase tracking-wider">Final Price Offered</span>
+              <span className="text-[18px] font-900 text-[#087F8C]">₹{pb.finalPrice || 0}</span>
             </div>
           </Section>
 
@@ -184,12 +184,12 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
         {/* Header */}
         <div className="admin-modal-header">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center">
               <Tv size={20} />
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900">TV Callback & Quote Request</h3>
-              <p className="text-xs font-mono font-bold text-blue-600 mt-0.5">{lead.leadId}</p>
+              <p className="text-xs font-mono font-bold text-[#087F8C] mt-0.5">{lead.leadId}</p>
             </div>
           </div>
           <button className="admin-modal-close" onClick={onClose}><X size={16} /></button>
@@ -205,7 +205,7 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
             <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-800 text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <User size={13} className="text-blue-600" /> Customer Information
+                  <User size={13} className="text-[#087F8C]" /> Customer Information
                 </span>
                 <a
                   href={`tel:${c.phone}`}
@@ -235,7 +235,7 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
             {/* TV Specs Box */}
             <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
               <span className="text-[11px] font-800 text-slate-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
-                <Tv size={13} className="text-blue-600" /> TV Specifications
+                <Tv size={13} className="text-[#087F8C]" /> TV Specifications
               </span>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between items-center">
@@ -244,7 +244,7 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-500">Screen Size:</span>
-                  <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md text-xs">{lead.screenSize}</span>
+                  <span className="font-bold text-[#087F8C] bg-[#E8F6F7] px-2 py-0.5 rounded-md text-xs">{lead.screenSize}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs text-slate-500">Display Type:</span>
@@ -271,7 +271,7 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
           <div>
             <div className="flex items-center justify-between mb-2.5">
               <span className="text-[11px] font-800 text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <ImageIcon size={13} className="text-blue-600" /> Uploaded TV Photos (4 Angles)
+                <ImageIcon size={13} className="text-[#087F8C]" /> Uploaded TV Photos (4 Angles)
               </span>
               <span className="text-[11px] text-slate-400">Click any photo to view full image</span>
             </div>
@@ -290,7 +290,7 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
                     onClick={() => url && setActivePhoto({ url, label: pos.label })}
                     className={`border rounded-xl p-2 text-center transition-all ${
                       url
-                        ? "cursor-pointer hover:border-blue-500 hover:shadow-md bg-white border-slate-200"
+                        ? "cursor-pointer hover:border-[#087F8C] hover:shadow-md bg-white border-slate-200"
                         : "bg-slate-50 border-dashed border-slate-200 text-slate-400"
                     }`}
                   >
@@ -334,9 +334,9 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
           )}
 
           {/* Admin Actions: Status, Quote Offer & Notes */}
-          <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-5 space-y-4">
-            <h4 className="text-xs font-800 text-blue-900 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles size={14} className="text-blue-600" /> Admin Quote Actions & Follow-up
+          <div className="bg-[#E8F6F7]/60 border border-[#087F8C]/20 rounded-2xl p-5 space-y-4">
+            <h4 className="text-xs font-800 text-[#0B252C] uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles size={14} className="text-[#087F8C]" /> Admin Quote Actions & Follow-up
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -375,11 +375,11 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
                 onChange={(e) => setAdminNotes(e.target.value)}
                 placeholder="Add customer communication notes, pickup instructions, inspection findings..."
                 rows={3}
-                className="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:border-[#087F8C] transition-colors"
               />
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-blue-100/80">
+            <div className="flex items-center justify-between pt-2 border-t border-[#087F8C]/20/80">
               <button
                 type="button"
                 onClick={() => {
@@ -579,14 +579,14 @@ export default function AdminOrders() {
           onClick={() => setActiveTab("devices")}
           className={`flex items-center gap-2.5 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
             activeTab === "devices"
-              ? "bg-blue-600 text-white shadow-sm shadow-blue-500/20"
+              ? "bg-[#087F8C] text-white shadow-sm shadow-[#087F8C]/20"
               : "bg-slate-100 text-slate-600 hover:bg-slate-200"
           }`}
         >
           <Smartphone size={16} />
           <span>Device Orders (Phones, Laptops, Tablets)</span>
           <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${
-            activeTab === "devices" ? "bg-blue-800 text-blue-100" : "bg-slate-200 text-slate-700"
+            activeTab === "devices" ? "bg-[#116466] text-[#E8F6F7]" : "bg-slate-200 text-slate-700"
           }`}>
             {total}
           </span>
@@ -596,7 +596,7 @@ export default function AdminOrders() {
           onClick={() => setActiveTab("tv")}
           className={`flex items-center gap-2.5 px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all ${
             activeTab === "tv"
-              ? "bg-blue-600 text-white shadow-sm shadow-blue-500/20"
+              ? "bg-[#087F8C] text-white shadow-sm shadow-[#087F8C]/20"
               : "bg-slate-100 text-slate-600 hover:bg-slate-200"
           }`}
         >
@@ -608,7 +608,7 @@ export default function AdminOrders() {
             </span>
           ) : (
             <span className={`text-[11px] px-2 py-0.5 rounded-full font-extrabold ${
-              activeTab === "tv" ? "bg-blue-800 text-blue-100" : "bg-slate-200 text-slate-700"
+              activeTab === "tv" ? "bg-[#116466] text-[#E8F6F7]" : "bg-slate-200 text-slate-700"
             }`}>
               {tvCounts.total || 0}
             </span>
@@ -681,7 +681,7 @@ export default function AdminOrders() {
                     {orders.map((order) => (
                       <tr key={order._id}>
                         <td>
-                          <span className="font-mono text-xs text-blue-600 font-bold">{order.orderId}</span>
+                          <span className="font-mono text-xs text-[#087F8C] font-bold">{order.orderId}</span>
                         </td>
                         <td>
                           {order.userId ? (
@@ -728,9 +728,9 @@ export default function AdminOrders() {
                               borderRadius: 8,
                               fontSize: 11,
                               fontWeight: 700,
-                              background: "#EFF6FF",
+                              background: "#E8F6F7",
                               color: "#087F8C",
-                              border: "1px solid #BFDBFE",
+                              border: "1px solid rgba(8, 127, 140, 0.25)",
                               cursor: "pointer",
                               transition: "all 0.15s ease",
                               whiteSpace: "nowrap",
@@ -856,14 +856,14 @@ export default function AdminOrders() {
                       return (
                         <tr key={lead._id}>
                           <td>
-                            <span className="font-mono text-xs text-blue-600 font-bold">{lead.leadId}</span>
+                            <span className="font-mono text-xs text-[#087F8C] font-bold">{lead.leadId}</span>
                           </td>
                           <td>
                             <div>
                               <div className="font-bold text-slate-900">{lead.customer?.name || "Customer"}</div>
                               <a
                                 href={`tel:${lead.customer?.phone}`}
-                                className="text-[11px] text-blue-600 font-mono font-semibold hover:underline flex items-center gap-1"
+                                className="text-[11px] text-[#087F8C] font-mono font-semibold hover:underline flex items-center gap-1"
                               >
                                 <Phone size={10} /> {lead.customer?.phone}
                               </a>
@@ -896,10 +896,10 @@ export default function AdminOrders() {
                                     <img
                                       src={lead.photos.front}
                                       alt="Front"
-                                      className="w-8 h-8 rounded-lg object-cover border border-slate-200 group-hover:border-blue-500"
+                                      className="w-8 h-8 rounded-lg object-cover border border-slate-200 group-hover:border-[#087F8C]"
                                     />
                                   )}
-                                  <span className="text-[11px] font-bold text-blue-600 group-hover:underline">
+                                  <span className="text-[11px] font-bold text-[#087F8C] group-hover:underline">
                                     {photoCount} photo{photoCount > 1 ? "s" : ""}
                                   </span>
                                 </div>
@@ -930,7 +930,7 @@ export default function AdminOrders() {
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => setSelectedTvLead(lead)}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors border border-blue-200"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E8F6F7] text-[#087F8C] hover:bg-[#087F8C] hover:text-white transition-colors border border-[#087F8C]/25"
                               >
                                 <Eye size={12} /> Review Quote
                               </button>
