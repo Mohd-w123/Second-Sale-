@@ -4,7 +4,7 @@ import { deviceService } from '../services/device.service';
 import { quizService } from '../services/quiz.service';
 import { useQuote } from '../hooks/useQuote';
 import { useAuth } from '../hooks/useAuth';
-import { calculatePrice } from '../utils/priceCalculator';
+import { calculatePrice, isDeviceWarrantyEligible } from '../utils/priceCalculator';
 import { formatCurrency } from '../utils/formatCurrency';
 import Loader from '../components/ui/Loader';
 import NoIndexSEO from '../components/seo/NoIndexSEO';
@@ -176,6 +176,10 @@ export default function ConditionQuizPage() {
       if (!supportsESIM(dev.modelName)) {
         seteSIMSupport('single_esim');
       }
+      if (!isDeviceWarrantyEligible(dev)) {
+        setUnderWarranty(false);
+        setHasGSTBill(false);
+      }
     }).catch(() => {
       if (isMounted) setLoading(false);
     });
@@ -192,21 +196,28 @@ export default function ConditionQuizPage() {
   }, [slug]);
 
   // Derived: calculate price & breakdown in render (uses model custom quiz if active, otherwise category master)
+  const isWarrantyEligible = device ? isDeviceWarrantyEligible(device) : false;
   const selectedVariant = device?.variants?.find(v => v.storage === storage) || device?.variants?.[0];
   const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
     ? device.customQuiz
     : quizConfig;
+
+  const computedDeviceAge = isWarrantyEligible
+    ? (underWarranty ? '0 - 3 Months' : 'Above 11 Months')
+    : 'Above 11 Months';
 
   const breakdown = device ? calculatePrice({
     brand: device.brand,
     modelName: device.modelName,
     device,
     basePrice: selectedVariant?.basePrice || 0,
+    deviceAge: computedDeviceAge,
+    isWarrantyEligible,
     ableToMakeCalls: ableToMakeCalls ?? true,
     isTouchScreenWorking: isTouchScreenWorking ?? true,
     isScreenOriginal: isScreenOriginal ?? true,
-    underWarranty: underWarranty ?? true,
-    hasGSTBill: hasGSTBill ?? true,
+    underWarranty: isWarrantyEligible ? (underWarranty ?? true) : false,
+    hasGSTBill: isWarrantyEligible ? (hasGSTBill ?? true) : false,
     eSIMSupport: eSIMSupport === 'dual_esim' ? 'dual_esim' : 'single_esim',
     screenCondition: screenBodyDefects.includes('defect_screen_broken_scratch') ? 'cracked' : 'none',
     bodyCondition: screenBodyDefects.includes('defect_body_scratch_dent') ? 'average' : 'good',
@@ -232,8 +243,9 @@ export default function ConditionQuizPage() {
         ableToMakeCalls,
         isTouchScreenWorking,
         isScreenOriginal,
-        underWarranty,
-        hasGSTBill,
+        underWarranty: isWarrantyEligible ? underWarranty : false,
+        hasGSTBill: isWarrantyEligible ? hasGSTBill : false,
+        isWarrantyEligible,
         eSIMSupport,
         screenBodyDefects,
         functionalProblems,
@@ -264,8 +276,7 @@ export default function ConditionQuizPage() {
     ableToMakeCalls !== null &&
     isTouchScreenWorking !== null &&
     isScreenOriginal !== null &&
-    underWarranty !== null &&
-    hasGSTBill !== null &&
+    (!isWarrantyEligible || (underWarranty !== null && hasGSTBill !== null)) &&
     (!isEsimDevice || eSIMSupport !== null);
 
   // Result / Final Quote View
@@ -353,25 +364,39 @@ export default function ConditionQuizPage() {
                     </p>
                   </div>
 
-                  <div>
-                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
-                      MANUFACTURER WARRANTY
-                    </span>
-                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${underWarranty ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
-                      {underWarranty ? 'Yes (Under Warranty)' : 'No (Out of Warranty)'}
-                    </p>
-                  </div>
+                  {isWarrantyEligible ? (
+                    <>
+                      <div>
+                        <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                          MANUFACTURER WARRANTY
+                        </span>
+                        <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${underWarranty ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
+                          {underWarranty ? 'Yes (Under Warranty)' : 'No (Out of Warranty)'}
+                        </p>
+                      </div>
 
-                  <div>
-                    <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
-                      VALID GST BILL
-                    </span>
-                    <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${hasGSTBill ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
-                      {hasGSTBill ? 'Yes (Bill with matching IMEI)' : 'No Bill'}
-                    </p>
-                  </div>
+                      <div>
+                        <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                          VALID GST BILL
+                        </span>
+                        <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                          <span className={`w-2 h-2 rounded-full ${hasGSTBill ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
+                          {hasGSTBill ? 'Yes (Bill with matching IMEI)' : 'No Bill'}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div>
+                      <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                        WARRANTY STATUS
+                      </span>
+                      <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                        Out of Warranty (&gt;11 Months)
+                      </p>
+                    </div>
+                  )}
 
                   {isEsimDevice && (
                     <div>
@@ -616,70 +641,74 @@ export default function ConditionQuizPage() {
                     </div>
 
                     {/* Q4: Warranty */}
-                    <div className="space-y-3">
-                      <div>
-                        <h3 className="text-base font-bold text-gray-900">Is your device under manufacturer warranty?</h3>
-                        <p className="text-xs text-gray-400">
-                          You can get a better price for your device if it's under manufacturer warranty with a GST valid bill.
-                        </p>
+                    {isWarrantyEligible && (
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-base font-bold text-gray-900">Is your device under manufacturer warranty?</h3>
+                          <p className="text-xs text-gray-400">
+                            You can get a better price for your device if it's under manufacturer warranty with a GST valid bill.
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <button
+                            type="button"
+                            onClick={() => setUnderWarranty(true)}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
+                              underWarranty === true
+                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
+                          >
+                            Yes
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setUnderWarranty(false)}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
+                              underWarranty === false
+                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
+                          >
+                            No
+                          </button>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <button
-                          type="button"
-                          onClick={() => setUnderWarranty(true)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            underWarranty === true
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
-                        >
-                          Yes
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setUnderWarranty(false)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            underWarranty === false
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
-                        >
-                          No
-                        </button>
-                      </div>
-                    </div>
+                    )}
 
                     {/* Q5: GST Bill */}
-                    <div className="space-y-3">
-                      <div>
-                        <h3 className="text-base font-bold text-gray-900">Do you have GST valid bill with the same IMEI?</h3>
-                        <p className="text-xs text-gray-400">Make sure your bill has device IMEI mentioned on it.</p>
+                    {isWarrantyEligible && (
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-base font-bold text-gray-900">Do you have GST valid bill with the same IMEI?</h3>
+                          <p className="text-xs text-gray-400">Make sure your bill has device IMEI mentioned on it.</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <button
+                            type="button"
+                            onClick={() => setHasGSTBill(true)}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
+                              hasGSTBill === true
+                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
+                          >
+                            Yes
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setHasGSTBill(false)}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
+                              hasGSTBill === false
+                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
+                          >
+                            No
+                          </button>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <button
-                          type="button"
-                          onClick={() => setHasGSTBill(true)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            hasGSTBill === true
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
-                        >
-                          Yes
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setHasGSTBill(false)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            hasGSTBill === false
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
-                        >
-                          No
-                        </button>
-                      </div>
-                    </div>
+                    )}
 
                     {/* Q6: eSIM Support (Conditional for iPhone) */}
                     {isEsimDevice && (
@@ -977,14 +1006,23 @@ export default function ConditionQuizPage() {
                     <span>Screen Original:</span>
                     <span className="font-bold text-gray-900">{isScreenOriginal === null ? '—' : isScreenOriginal ? 'Yes' : 'No'}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Mobile Under Warranty:</span>
-                    <span className="font-bold text-gray-900">{underWarranty === null ? '—' : underWarranty ? 'Yes' : 'No'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>GST Valid Bill:</span>
-                    <span className="font-bold text-gray-900">{hasGSTBill === null ? '—' : hasGSTBill ? 'Yes' : 'No'}</span>
-                  </div>
+                  {isWarrantyEligible ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Mobile Under Warranty:</span>
+                        <span className="font-bold text-gray-900">{underWarranty === null ? '—' : underWarranty ? 'Yes' : 'No'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>GST Valid Bill:</span>
+                        <span className="font-bold text-gray-900">{hasGSTBill === null ? '—' : hasGSTBill ? 'Yes' : 'No'}</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between">
+                      <span>Warranty Status:</span>
+                      <span className="font-bold text-gray-900">Out of Warranty (&gt;11m)</span>
+                    </div>
+                  )}
                   {isEsimDevice && (
                     <div className="flex justify-between">
                       <span>eSIM Support:</span>
