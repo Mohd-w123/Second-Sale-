@@ -115,7 +115,7 @@ export default function AdminUsers() {
                   <tr key={user._id}>
                     <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center font-bold text-blue-600">
+                        <div className="w-8 h-8 rounded-full bg-[#E8F6F7] border border-[#087F8C]/25 flex items-center justify-center font-bold text-[#087F8C]">
                           {user.name ? user.name[0].toUpperCase() : 'U'}
                         </div>
                         <div>
@@ -129,7 +129,7 @@ export default function AdminUsers() {
                       <div className="text-xs text-slate-400 font-mono">{user.phone}</div>
                     </td>
                     <td>
-                      <span className="font-mono text-xs bg-blue-50 border border-blue-200 text-blue-600 py-0.5 px-1.5 rounded">
+                      <span className="font-mono text-xs bg-[#E8F6F7] border border-[#087F8C]/25 text-[#087F8C] py-0.5 px-1.5 rounded">
                         {user.referralCode || 'N/A'}
                       </span>
                     </td>
@@ -204,21 +204,21 @@ export default function AdminUsers() {
                 {/* Details card */}
                 <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3.5">
                   <div className="flex items-center gap-3">
-                    <User className="text-blue-500 w-5 h-5" />
+                    <User className="text-[#087F8C] w-5 h-5" />
                     <div>
                       <div className="text-[10px] uppercase font-bold text-slate-400">Full Name</div>
                       <div className="text-sm font-semibold text-slate-900">{selectedUser.name}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Mail className="text-blue-500 w-5 h-5" />
+                    <Mail className="text-[#087F8C] w-5 h-5" />
                     <div>
                       <div className="text-[10px] uppercase font-bold text-slate-400">Email Address</div>
                       <div className="text-sm font-semibold text-slate-900">{selectedUser.email}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Phone className="text-blue-500 w-5 h-5" />
+                    <Phone className="text-[#087F8C] w-5 h-5" />
                     <div>
                       <div className="text-[10px] uppercase font-bold text-slate-400">Phone Number</div>
                       <div className="text-sm font-mono text-slate-900">{selectedUser.phone}</div>
@@ -242,7 +242,7 @@ export default function AdminUsers() {
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <div className="text-[10px] uppercase font-bold text-slate-400">Referral Code</div>
-                      <div className="text-sm font-bold text-blue-600 font-mono mt-1">
+                      <div className="text-sm font-bold text-[#087F8C] font-mono mt-1">
                         {selectedUser.referralCode || 'N/A'}
                       </div>
                     </div>
@@ -283,7 +283,7 @@ export default function AdminUsers() {
                       <tbody>
                         {userOrders.map((order) => (
                           <tr key={order._id}>
-                            <td className="font-mono text-xs text-blue-600 font-semibold">{order.orderId}</td>
+                            <td className="font-mono text-xs text-[#087F8C] font-semibold">{order.orderId}</td>
                             <td>
                               <div className="font-semibold text-slate-800">{order.device.brand} {order.device.modelName}</div>
                               <div className="text-[10px] text-slate-400">{order.device.storage}</div>

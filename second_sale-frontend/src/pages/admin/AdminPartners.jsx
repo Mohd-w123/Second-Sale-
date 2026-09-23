@@ -193,7 +193,7 @@ export default function AdminPartners() {
                   <tr key={partner._id}>
                     <td>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-500">
+                        <div className="w-8 h-8 rounded-lg bg-[#E8F6F7] border border-[#087F8C]/25 flex items-center justify-center text-[#087F8C]">
                           <Store size={16} />
                         </div>
                         <div>
@@ -289,7 +289,7 @@ export default function AdminPartners() {
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-2">
-                <Store className="w-5 h-5 text-blue-600" />
+                <Store className="w-5 h-5 text-[#087F8C]" />
                 <h3 className="font-bold text-slate-900 text-base">Partner Application Details</h3>
               </div>
               <button
@@ -306,7 +306,7 @@ export default function AdminPartners() {
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="font-bold text-slate-900 text-sm">{selectedPartner.businessName}</h4>
-                  <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                  <span className="text-[11px] font-bold text-[#087F8C] bg-[#E8F6F7] px-2 py-0.5 rounded border border-[#087F8C]/20">
                     {getShopTypeLabel(selectedPartner.shopType)}
                   </span>
                 </div>
@@ -321,13 +321,13 @@ export default function AdminPartners() {
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Phone</span>
-                    <a href={`tel:${selectedPartner.mobile}`} className="font-mono text-blue-600 hover:underline">
+                    <a href={`tel:${selectedPartner.mobile}`} className="font-mono text-[#087F8C] hover:underline">
                       {selectedPartner.mobile}
                     </a>
                   </div>
                   <div>
                     <span className="text-slate-400 block text-[10px] uppercase font-bold">Email</span>
-                    <a href={`mailto:${selectedPartner.email}`} className="font-mono text-blue-600 hover:underline truncate block">
+                    <a href={`mailto:${selectedPartner.email}`} className="font-mono text-[#087F8C] hover:underline truncate block">
                       {selectedPartner.email}
                     </a>
                   </div>
@@ -392,7 +392,7 @@ export default function AdminPartners() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   placeholder="e.g. Telephonic verification done. Shop address & GST documents verified. Credentials issued."
-                  className="w-full px-3.5 py-2.5 text-xs text-slate-800 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none"
+                  className="w-full px-3.5 py-2.5 text-xs text-slate-800 border border-slate-200 rounded-xl focus:border-[#087F8C] focus:ring-1 focus:ring-[#087F8C] outline-none resize-none"
                 />
               </div>
 

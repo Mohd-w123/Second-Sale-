@@ -32,7 +32,7 @@ router.put('/top-bar', updateTopBar);
 router.put('/footer', updateFooter);
 router.put('/whatsapp', updateWhatsApp);
 router.post('/banners', upload.single('banner'), addBanner);
-router.patch('/banners/:bannerId', updateBanner);
+router.patch('/banners/:bannerId', upload.single('banner'), updateBanner);
 router.delete('/banners/:bannerId', deleteBanner);
 router.post('/banners/reorder', reorderBanners);
 

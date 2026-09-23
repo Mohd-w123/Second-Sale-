@@ -6,7 +6,8 @@ import {
   Smartphone, Tablet, Laptop, Monitor,
   Shield, Tag, Zap, Truck, ArrowRight,
   ChevronDown, Star, CheckCircle2, Sparkles, BadgeCheck, Users,
-  Search, Clock, CreditCard, MapPin, Headphones, Watch, Gamepad2, ChevronLeft, ChevronRight, ShieldCheck, Flame
+  Search, Clock, CreditCard, MapPin, Headphones, Watch, Gamepad2, ChevronLeft, ChevronRight, ShieldCheck, Flame,
+  Tv, Camera, Speaker
 } from "lucide-react";
 import heroBannerImage from "../assets/hero-banner.jpg";
 import mobileDeviceImg from "../assets/devices/mobile.png";
@@ -843,8 +844,19 @@ export default function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
             {categories.map((cat, idx) => {
               const defaultCat = DEVICE_CATEGORIES[idx % DEVICE_CATEGORIES.length] || DEVICE_CATEGORIES[0];
-              const img = cat.img || (cat.icon === "mobile" ? mobileDeviceImg : cat.icon === "tablet" ? tabletDeviceImg : cat.icon === "laptop" ? laptopDeviceImg : cat.icon === "imac" ? macDeviceImg : defaultCat.img);
               const color = cat.color || defaultCat.color || "#E8F6F7";
+
+              // Determine image / icon dynamically
+              let img = cat.img || null;
+              if (!img) {
+                if (cat.icon === "mobile") img = mobileDeviceImg;
+                else if (cat.icon === "tablet") img = tabletDeviceImg;
+                else if (cat.icon === "laptop") img = laptopDeviceImg;
+                else if (cat.icon === "imac") img = macDeviceImg;
+                else if (!cat.icon && defaultCat.img) img = defaultCat.img;
+              }
+
+              const iconType = cat.icon || (!img ? defaultCat.icon : null);
 
               return (
                 <Link
@@ -860,13 +872,29 @@ export default function HomePage() {
                         alt={cat.label}
                         className="max-h-full max-w-full object-contain filter drop-shadow-xs"
                       />
-                    ) : cat.icon === "smartwatch" ? (
+                    ) : iconType === "smartwatch" ? (
                       <div className="w-14 h-14 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shadow-xs border border-amber-200/50">
                         <Watch size={28} />
                       </div>
-                    ) : cat.icon === "console" ? (
+                    ) : iconType === "console" ? (
                       <div className="w-14 h-14 rounded-2xl bg-purple-100/90 text-purple-600 flex items-center justify-center shadow-xs border border-purple-200/50">
                         <Gamepad2 size={28} />
+                      </div>
+                    ) : iconType === "tv" ? (
+                      <div className="w-14 h-14 rounded-2xl bg-teal-100/90 text-[#087F8C] flex items-center justify-center shadow-xs border border-teal-200/50">
+                        <Tv size={28} />
+                      </div>
+                    ) : iconType === "camera" ? (
+                      <div className="w-14 h-14 rounded-2xl bg-rose-100/90 text-rose-600 flex items-center justify-center shadow-xs border border-rose-200/50">
+                        <Camera size={28} />
+                      </div>
+                    ) : iconType === "speaker" ? (
+                      <div className="w-14 h-14 rounded-2xl bg-indigo-100/90 text-indigo-600 flex items-center justify-center shadow-xs border border-indigo-200/50">
+                        <Speaker size={28} />
+                      </div>
+                    ) : iconType === "monitor" ? (
+                      <div className="w-14 h-14 rounded-2xl bg-cyan-100/90 text-cyan-600 flex items-center justify-center shadow-xs border border-cyan-200/50">
+                        <Monitor size={28} />
                       </div>
                     ) : (
                       <div className="w-14 h-14 rounded-2xl bg-emerald-100/90 text-emerald-600 flex items-center justify-center shadow-xs border border-emerald-200/50">

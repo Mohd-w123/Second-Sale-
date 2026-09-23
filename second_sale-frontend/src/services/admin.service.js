@@ -88,6 +88,7 @@ export const adminService = {
   deletePage: (id) => adminApi.delete(`/pages/admin/${id}`),
 
   // Site Settings (Favicon, Top Bar, Footer, WhatsApp)
+  getSiteSettings: () => adminApi.get('/site-settings'),
   uploadFavicon: (formData) => adminApi.post('/site-settings/favicon', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   updateTopBar: (data) => adminApi.put('/site-settings/top-bar', data),
   updateFooter: (data) => adminApi.put('/site-settings/footer', data),

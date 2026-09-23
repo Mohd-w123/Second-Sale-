@@ -4,7 +4,7 @@ import {
   Search, Plus, Edit2, Trash2, CheckCircle2, XCircle, Eye,
   Package, ShoppingBag, Truck, Check, AlertCircle, RefreshCw,
   Sparkles, ExternalLink, ShieldCheck, ChevronRight, X, Layers,
-  DollarSign, Smartphone, Laptop, Tablet, Watch, Gamepad2
+  DollarSign, Smartphone, Laptop, Tablet, Watch, Gamepad2, Copy
 } from 'lucide-react';
 import './admin.css';
 
@@ -63,6 +63,7 @@ export default function AdminRefurbished() {
   const [modalTab, setModalTab] = useState('general'); // general | pricing | variants | specs
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [duplicatingId, setDuplicatingId] = useState(null);
 
   // Orders state
   const [orders, setOrders] = useState([]);
@@ -270,6 +271,42 @@ export default function AdminRefurbished() {
     }
   };
 
+  // Duplicate Refurbished Product
+  const handleDuplicateProduct = async (device) => {
+    if (!window.confirm(`Create a duplicate copy of "${device.title}"?`)) return;
+
+    try {
+      setDuplicatingId(device._id);
+      const cloned = JSON.parse(JSON.stringify(device));
+      delete cloned._id;
+      delete cloned.createdAt;
+      delete cloned.updatedAt;
+      delete cloned.__v;
+
+      const timestamp = Date.now().toString().slice(-4);
+      const newTitle = `${device.title} (Copy)`;
+      const newModelName = `${device.modelName || device.title} (Copy)`;
+      const baseSlug = (device.slug || '').replace(/-copy(-\d+)?$/, '');
+      const newSlug = `${baseSlug}-copy-${timestamp}`;
+
+      const payload = {
+        ...cloned,
+        title: newTitle,
+        modelName: newModelName,
+        slug: newSlug,
+      };
+
+      await adminService.createRefurbishedDevice(payload);
+      showFeedbackMsg('success', 'Refurbished product duplicated successfully!');
+      fetchProducts();
+    } catch (err) {
+      console.error('Failed to duplicate product:', err);
+      alert(err.response?.data?.message || 'Failed to duplicate product');
+    } finally {
+      setDuplicatingId(null);
+    }
+  };
+
   // Hard Delete
   const handleDeleteProduct = async (device) => {
     if (!window.confirm(`Are you sure you want to permanently delete "${device.title}"?`)) return;
@@ -372,7 +409,7 @@ export default function AdminRefurbished() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Package className="text-blue-600" size={26} />
+            <Package className="text-[#087F8C]" size={26} />
             Refurbished Marketplace
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -386,7 +423,7 @@ export default function AdminRefurbished() {
             onClick={() => setActiveTab('products')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all border-none cursor-pointer ${
               activeTab === 'products'
-                ? 'bg-white text-blue-600 shadow-sm'
+                ? 'bg-white text-[#087F8C] shadow-sm'
                 : 'bg-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -397,7 +434,7 @@ export default function AdminRefurbished() {
             onClick={() => setActiveTab('orders')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all border-none cursor-pointer ${
               activeTab === 'orders'
-                ? 'bg-white text-blue-600 shadow-sm'
+                ? 'bg-white text-[#087F8C] shadow-sm'
                 : 'bg-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -421,7 +458,7 @@ export default function AdminRefurbished() {
                   placeholder="Search products by model or brand..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-2 text-xs font-medium border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-[#087F8C] focus:outline-none transition-all"
                 />
               </div>
 
@@ -442,14 +479,14 @@ export default function AdminRefurbished() {
             <div className="flex items-center gap-2 w-full md:w-auto justify-end">
               <button
                 onClick={fetchProducts}
-                className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-slate-200 bg-white cursor-pointer"
+                className="p-2 text-slate-500 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-xl transition-colors border border-slate-200 bg-white cursor-pointer"
                 title="Refresh"
               >
                 <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
               </button>
               <button
                 onClick={handleOpenCreate}
-                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all border-none cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#087F8C] hover:bg-[#066772] text-white text-xs font-bold rounded-xl shadow-md shadow-[#087F8C]/20 transition-all border-none cursor-pointer"
               >
                 <Plus size={16} />
                 <span>Add Refurbished Product</span>
@@ -473,7 +510,7 @@ export default function AdminRefurbished() {
                 </p>
                 <button
                   onClick={handleOpenCreate}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl border-none cursor-pointer hover:bg-blue-700 transition-colors"
+                  className="mt-4 px-4 py-2 bg-[#087F8C] text-white text-xs font-bold rounded-xl border-none cursor-pointer hover:bg-[#066772] transition-colors"
                 >
                   + Add Product Now
                 </button>
@@ -532,7 +569,7 @@ export default function AdminRefurbished() {
 
                           {/* Category & Brand */}
                           <td className="py-3.5 px-4">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold text-[11px] capitalize">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E8F6F7] text-[#087F8C] font-bold text-[11px] capitalize">
                               {device.category}
                             </span>
                             <div className="text-[11px] text-slate-500 font-semibold mt-1">
@@ -548,7 +585,7 @@ export default function AdminRefurbished() {
                                 <span className="font-extrabold text-slate-900">₹{device.conditionGrades?.superb?.price?.toLocaleString('en-IN') || '—'}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">Very Good:</span>
+                                <span className="text-[10px] font-bold text-[#087F8C] bg-[#E8F6F7] px-1.5 py-0.5 rounded">Very Good:</span>
                                 <span className="font-semibold text-slate-700">₹{device.conditionGrades?.veryGood?.price?.toLocaleString('en-IN') || '—'}</span>
                               </div>
                               <div className="flex items-center gap-2">
@@ -597,17 +634,25 @@ export default function AdminRefurbished() {
                                 href={`/buy-refurbished/product/${device.slug}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="p-1.5 text-slate-400 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg transition-colors"
                                 title="View on Storefront"
                               >
                                 <ExternalLink size={15} />
                               </a>
                               <button
                                 onClick={() => handleOpenEdit(device)}
-                                className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border-none bg-transparent cursor-pointer"
+                                className="p-1.5 text-slate-400 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg transition-colors border-none bg-transparent cursor-pointer"
                                 title="Edit Product"
                               >
                                 <Edit2 size={15} />
+                              </button>
+                              <button
+                                onClick={() => handleDuplicateProduct(device)}
+                                disabled={duplicatingId === device._id}
+                                className="p-1.5 text-slate-400 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg transition-colors border-none bg-transparent cursor-pointer disabled:opacity-50"
+                                title="Duplicate Product (Create Copy)"
+                              >
+                                <Copy size={15} className={duplicatingId === device._id ? 'animate-spin' : ''} />
                               </button>
                               <button
                                 onClick={() => handleDeleteProduct(device)}
@@ -653,7 +698,7 @@ export default function AdminRefurbished() {
             </div>
             <button
               onClick={fetchOrders}
-              className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-slate-200 bg-white cursor-pointer"
+              className="p-2 text-slate-500 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-xl transition-colors border border-slate-200 bg-white cursor-pointer"
             >
               <RefreshCw size={16} className={ordersLoading ? 'animate-spin' : ''} />
             </button>
@@ -691,7 +736,7 @@ export default function AdminRefurbished() {
                     {orders.map((o) => (
                       <tr key={o._id || o.orderId} className="hover:bg-slate-50/60 transition-colors">
                         <td className="py-3.5 px-4">
-                          <span className="font-mono font-bold text-blue-600 block">#{o.orderId}</span>
+                          <span className="font-mono font-bold text-[#087F8C] block">#{o.orderId}</span>
                           <span className="text-[10px] text-slate-400 block mt-0.5">
                             {new Date(o.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
                           </span>
@@ -712,7 +757,7 @@ export default function AdminRefurbished() {
                             <span>•</span>
                             <span>{o.item?.color}</span>
                             <span>•</span>
-                            <span className="capitalize font-bold text-blue-600">{o.item?.conditionGrade}</span>
+                            <span className="capitalize font-bold text-[#087F8C]">{o.item?.conditionGrade}</span>
                           </div>
                           <div className="font-extrabold text-emerald-600 text-sm mt-1">
                             ₹{o.item?.price?.toLocaleString('en-IN')}
@@ -743,7 +788,7 @@ export default function AdminRefurbished() {
                         <td className="py-3.5 px-4">
                           <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-extrabold capitalize ${
                             o.orderStatus === 'delivered' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                            o.orderStatus === 'shipped' || o.orderStatus === 'out_for_delivery' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                            o.orderStatus === 'shipped' || o.orderStatus === 'out_for_delivery' ? 'bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/25' :
                             o.orderStatus === 'confirmed' || o.orderStatus === 'packed' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
                             o.orderStatus === 'cancelled' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
                             'bg-amber-50 text-amber-700 border border-amber-200'
@@ -765,7 +810,7 @@ export default function AdminRefurbished() {
                         <td className="py-3.5 px-4 text-right">
                           <button
                             onClick={() => handleOpenStatusModal(o)}
-                            className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-bold transition-all border border-blue-200 cursor-pointer"
+                            className="px-3 py-1.5 bg-[#E8F6F7] text-[#087F8C] hover:bg-[#087F8C] hover:text-white rounded-lg text-xs font-bold transition-all border border-[#087F8C]/25 cursor-pointer"
                           >
                             Update Status
                           </button>
@@ -815,7 +860,7 @@ export default function AdminRefurbished() {
                   onClick={() => setModalTab(tab.id)}
                   className={`py-3 px-3.5 text-xs font-bold border-b-2 whitespace-nowrap cursor-pointer transition-all ${
                     modalTab === tab.id
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-[#087F8C] text-[#087F8C]'
                       : 'border-transparent text-slate-400 hover:text-slate-700'
                   }`}
                 >
@@ -839,7 +884,7 @@ export default function AdminRefurbished() {
                       placeholder="e.g. Apple iPhone 13 (Refurbished)"
                       value={formData.title}
                       onChange={handleTitleChange}
-                      className="w-full px-3.5 py-2.5 text-xs font-medium border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 focus:outline-none"
+                      className="w-full px-3.5 py-2.5 text-xs font-medium border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-[#087F8C] focus:outline-none"
                     />
                   </div>
 
@@ -937,7 +982,7 @@ export default function AdminRefurbished() {
                         type="checkbox"
                         checked={formData.isActive}
                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                        className="w-4 h-4 rounded text-blue-600"
+                        className="w-4 h-4 rounded text-[#087F8C]"
                       />
                       <span>Active on Website</span>
                     </label>
@@ -947,7 +992,7 @@ export default function AdminRefurbished() {
                         type="checkbox"
                         checked={formData.isFeatured}
                         onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                        className="w-4 h-4 rounded text-blue-600"
+                        className="w-4 h-4 rounded text-[#087F8C]"
                       />
                       <span>Featured on Homepage</span>
                     </label>
@@ -1020,10 +1065,10 @@ export default function AdminRefurbished() {
                     </div>
 
                     {/* Very Good */}
-                    <div className="bg-blue-50/50 border-2 border-blue-200 rounded-2xl p-4 space-y-3">
+                    <div className="bg-[#E8F6F7]/50 border-2 border-[#087F8C]/25 rounded-2xl p-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-blue-800 text-sm">Very Good</span>
-                        <span className="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Great Value</span>
+                        <span className="font-extrabold text-[#116466] text-sm">Very Good</span>
+                        <span className="text-[10px] font-bold bg-[#E8F6F7] text-[#116466] px-2 py-0.5 rounded-full">Great Value</span>
                       </div>
                       <div>
                         <label className="block text-[11px] font-bold text-slate-600 mb-1">Selling Price (₹)</label>
@@ -1038,7 +1083,7 @@ export default function AdminRefurbished() {
                               veryGood: { ...formData.conditionGrades.veryGood, price: e.target.value }
                             }
                           })}
-                          className="w-full px-3 py-2 text-xs font-bold border border-blue-200 rounded-xl bg-white"
+                          className="w-full px-3 py-2 text-xs font-bold border border-[#087F8C]/25 rounded-xl bg-white"
                         />
                       </div>
                       <div>
@@ -1054,7 +1099,7 @@ export default function AdminRefurbished() {
                               veryGood: { ...formData.conditionGrades.veryGood, originalPrice: e.target.value }
                             }
                           })}
-                          className="w-full px-3 py-2 text-xs font-medium border border-blue-200 rounded-xl bg-white"
+                          className="w-full px-3 py-2 text-xs font-medium border border-[#087F8C]/25 rounded-xl bg-white"
                         />
                       </div>
                       <div>
@@ -1069,7 +1114,7 @@ export default function AdminRefurbished() {
                               veryGood: { ...formData.conditionGrades.veryGood, stock: e.target.value }
                             }
                           })}
-                          className="w-full px-3 py-2 text-xs font-medium border border-blue-200 rounded-xl bg-white"
+                          className="w-full px-3 py-2 text-xs font-medium border border-[#087F8C]/25 rounded-xl bg-white"
                         />
                       </div>
                     </div>
@@ -1141,7 +1186,7 @@ export default function AdminRefurbished() {
                     <button
                       type="button"
                       onClick={handleAddVariant}
-                      className="px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold border border-blue-200 cursor-pointer"
+                      className="px-3 py-1 bg-[#E8F6F7] text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg text-xs font-bold border border-[#087F8C]/25 cursor-pointer"
                     >
                       + Add Variant
                     </button>
@@ -1210,7 +1255,7 @@ export default function AdminRefurbished() {
                       <button
                         type="button"
                         onClick={handleAddSpec}
-                        className="px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-bold border border-blue-200 cursor-pointer"
+                        className="px-3 py-1 bg-[#E8F6F7] text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg text-xs font-bold border border-[#087F8C]/25 cursor-pointer"
                       >
                         + Add Spec
                       </button>
@@ -1299,7 +1344,7 @@ export default function AdminRefurbished() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 border-none cursor-pointer disabled:opacity-50"
+                    className="px-6 py-2.5 bg-[#087F8C] hover:bg-[#066772] text-white rounded-xl text-xs font-bold shadow-md shadow-[#087F8C]/20 border-none cursor-pointer disabled:opacity-50"
                   >
                     {submitting ? 'Saving...' : editingId ? 'Update Product' : 'Save Product'}
                   </button>
@@ -1431,7 +1476,7 @@ export default function AdminRefurbished() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 border-none cursor-pointer"
+                  className="px-5 py-2 bg-[#087F8C] hover:bg-[#066772] text-white rounded-xl text-xs font-bold shadow-md shadow-[#087F8C]/20 border-none cursor-pointer"
                 >
                   Save Status
                 </button>

@@ -272,7 +272,7 @@ export default function AdminCategories() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
-            <Layers className="text-blue-600" size={26} />
+            <Layers className="text-[#087F8C]" size={26} />
             <span>Category Management</span>
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm mt-1">
@@ -292,7 +292,7 @@ export default function AdminCategories() {
 
           <button
             onClick={() => setIsAddOpen(!isAddOpen)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#087F8C] hover:bg-[#066772] text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
           >
             <Plus size={15} />
             <span>{isAddOpen ? 'Close Form' : 'Add Category'}</span>
@@ -316,16 +316,16 @@ export default function AdminCategories() {
         </div>
         <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs">
           <span className="text-slate-400 text-xs font-bold uppercase tracking-wider block mb-1">Devices Linked</span>
-          <span className="text-2xl sm:text-3xl font-black text-blue-600">{totalDevicesLinked}</span>
+          <span className="text-2xl sm:text-3xl font-black text-[#087F8C]">{totalDevicesLinked}</span>
         </div>
       </div>
 
       {/* ── Quick Add Drawer / Card ──────────────────────────── */}
       {isAddOpen && (
-        <form onSubmit={handleCreate} className="p-5 sm:p-6 rounded-2xl border border-blue-200 bg-blue-50/50 shadow-sm space-y-4 animate-in fade-in duration-200">
+        <form onSubmit={handleCreate} className="p-5 sm:p-6 rounded-2xl border border-[#087F8C]/25 bg-[#E8F6F7]/50 shadow-sm space-y-4 animate-in fade-in duration-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-blue-950 uppercase tracking-wider flex items-center gap-2">
-              <Plus size={16} className="text-blue-600" />
+            <h3 className="text-sm font-bold text-[#0B252C] uppercase tracking-wider flex items-center gap-2">
+              <Plus size={16} className="text-[#087F8C]" />
               <span>Create New Category</span>
             </h3>
             <button
@@ -347,7 +347,7 @@ export default function AdminCategories() {
                 value={newName}
                 onChange={(e) => handleNameChange(e.target.value)}
                 placeholder="e.g. Smartwatch, Drone"
-                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white font-medium"
+                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none bg-white font-medium"
                 required
               />
             </div>
@@ -361,7 +361,7 @@ export default function AdminCategories() {
                 value={newSlug}
                 onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                 placeholder="e.g. smartwatch"
-                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white font-mono"
+                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none bg-white font-mono"
                 required
               />
             </div>
@@ -375,7 +375,7 @@ export default function AdminCategories() {
                 value={newRoute}
                 onChange={(e) => setNewRoute(e.target.value)}
                 placeholder="e.g. /sell-smartwatch/brand"
-                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white font-mono text-xs"
+                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none bg-white font-mono text-xs"
               />
             </div>
 
@@ -386,7 +386,7 @@ export default function AdminCategories() {
               <select
                 value={newIcon}
                 onChange={(e) => setNewIcon(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none bg-white font-medium"
+                className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-[#087F8C] focus:ring-2 focus:ring-[#E8F6F7] outline-none bg-white font-medium"
               >
                 <option value="Smartphone">Smartphone (Phone)</option>
                 <option value="Tablet">Tablet</option>
@@ -405,7 +405,7 @@ export default function AdminCategories() {
                   type="checkbox"
                   checked={newComingSoon}
                   onChange={(e) => setNewComingSoon(e.target.checked)}
-                  className="rounded text-blue-600 focus:ring-0 w-4 h-4"
+                  className="rounded text-[#087F8C] focus:ring-0 w-4 h-4"
                 />
                 <span>Coming Soon (Shows badge in Mega Menu, disables click)</span>
               </label>
@@ -416,7 +416,7 @@ export default function AdminCategories() {
             <button
               type="submit"
               disabled={savingCategory}
-              className="flex items-center gap-1.5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+              className="flex items-center gap-1.5 px-5 py-2.5 bg-[#087F8C] hover:bg-[#066772] disabled:bg-[#087F8C]/40 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
             >
               {savingCategory ? (
                 <>
@@ -445,7 +445,7 @@ export default function AdminCategories() {
 
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-3">
-            <RefreshCw size={24} className="animate-spin text-blue-600" />
+            <RefreshCw size={24} className="animate-spin text-[#087F8C]" />
             <span className="text-xs font-semibold">Loading Categories…</span>
           </div>
         ) : categories.length === 0 ? (
@@ -472,45 +472,45 @@ export default function AdminCategories() {
                     </span>
 
                     {/* Icon Badge */}
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100 shadow-2xs">
+                    <div className="w-10 h-10 rounded-xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center shrink-0 border border-[#087F8C]/20 shadow-2xs">
                       <IconComp size={18} />
                     </div>
 
                     {/* Main Information or In-Place Edit */}
                     {isEditing ? (
-                      <div className="flex-1 flex flex-col gap-2.5 p-3 rounded-xl bg-blue-50/50 border border-blue-200">
+                      <div className="flex-1 flex flex-col gap-2.5 p-3 rounded-xl bg-[#E8F6F7]/50 border border-[#087F8C]/25">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           <input
                             type="text"
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
                             placeholder="Name"
-                            className="px-3 py-1.5 text-xs bg-white rounded-lg border border-blue-300 outline-none font-bold text-slate-900"
+                            className="px-3 py-1.5 text-xs bg-white rounded-lg border border-[#087F8C]/40 outline-none font-bold text-slate-900"
                           />
                           <input
                             type="text"
                             value={editSlug}
                             onChange={(e) => setEditSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                             placeholder="slug"
-                            className="px-3 py-1.5 text-xs bg-white rounded-lg border border-blue-300 outline-none font-mono text-slate-700"
+                            className="px-3 py-1.5 text-xs bg-white rounded-lg border border-[#087F8C]/40 outline-none font-mono text-slate-700"
                           />
                           <input
                             type="text"
                             value={editRoute}
                             onChange={(e) => setEditRoute(e.target.value)}
                             placeholder="Route (/sell-...)"
-                            className="px-3 py-1.5 text-xs bg-white rounded-lg border border-blue-300 outline-none font-mono text-slate-700"
+                            className="px-3 py-1.5 text-xs bg-white rounded-lg border border-[#087F8C]/40 outline-none font-mono text-slate-700"
                           />
                         </div>
 
-                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-blue-100 text-xs">
+                        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#087F8C]/20 text-xs">
                           <div className="flex items-center gap-4">
                             <label className="flex items-center gap-1.5 font-semibold text-slate-700 cursor-pointer">
                               <input
                                 type="checkbox"
                                 checked={editComingSoon}
                                 onChange={(e) => setEditComingSoon(e.target.checked)}
-                                className="rounded text-blue-600 focus:ring-0"
+                                className="rounded text-[#087F8C] focus:ring-0"
                               />
                               <span>Coming Soon</span>
                             </label>
@@ -536,7 +536,7 @@ export default function AdminCategories() {
                               type="button"
                               disabled={savingEditId === cat._id}
                               onClick={() => handleSaveEdit(cat._id)}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold rounded-lg cursor-pointer"
+                              className="flex items-center gap-1 px-3 py-1.5 bg-[#087F8C] hover:bg-[#066772] disabled:bg-[#087F8C]/40 text-white font-bold rounded-lg cursor-pointer"
                             >
                               {savingEditId === cat._id ? (
                                 <RefreshCw size={12} className="animate-spin" />
@@ -573,7 +573,7 @@ export default function AdminCategories() {
                             </span>
                           )}
                           {cat.deviceCount > 0 && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/25">
                               {cat.deviceCount} models
                             </span>
                           )}
@@ -589,7 +589,7 @@ export default function AdminCategories() {
                             setEditIcon(cat.icon || 'Smartphone');
                             setEditComingSoon(Boolean(cat.isComingSoon));
                           }}
-                          className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1 cursor-pointer"
+                          className="text-xs text-[#087F8C] hover:underline flex items-center gap-1 mt-1 cursor-pointer"
                         >
                           <LinkIcon size={11} />
                           <span className="truncate">{cat.route || 'No route set'}</span>
@@ -609,7 +609,7 @@ export default function AdminCategories() {
                           disabled={index === 0 || movingId === cat._id}
                           onClick={() => handleMove(index, -1)}
                           title="Move up"
-                          className="p-2 text-slate-500 hover:text-blue-600 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                          className="p-2 text-slate-500 hover:text-[#087F8C] hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none transition-colors"
                         >
                           <ChevronUp size={14} />
                         </button>
@@ -618,7 +618,7 @@ export default function AdminCategories() {
                           disabled={index === categories.length - 1 || movingId === cat._id}
                           onClick={() => handleMove(index, 1)}
                           title="Move down"
-                          className="p-2 text-slate-500 hover:text-blue-600 hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none border-l border-slate-200 transition-colors"
+                          className="p-2 text-slate-500 hover:text-[#087F8C] hover:bg-slate-50 disabled:opacity-30 disabled:pointer-events-none border-l border-slate-200 transition-colors"
                         >
                           <ChevronDown size={14} />
                         </button>
@@ -637,7 +637,7 @@ export default function AdminCategories() {
                         title={cat.isActive ? 'Category is active (click to hide)' : 'Category is hidden (click to enable)'}
                       >
                         {togglingId === cat._id ? (
-                          <RefreshCw size={15} className="animate-spin text-blue-600" />
+                          <RefreshCw size={15} className="animate-spin text-[#087F8C]" />
                         ) : cat.isActive ? (
                           <Eye size={15} />
                         ) : (

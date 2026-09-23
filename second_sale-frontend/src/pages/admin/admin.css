@@ -79,7 +79,7 @@
 .admin-sidebar-logo span {
   font-size: 10px;
   font-weight: 700;
-  color: #38BDF8;
+  color: #2DD4BF;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   display: block;
@@ -135,7 +135,7 @@
 .admin-nav-item.active {
   background: #087F8C;
   color: #FFFFFF;
-  border-color: #3B82F6;
+  border-color: rgba(255, 255, 255, 0.2);
   font-weight: 700;
   box-shadow: 0 4px 16px rgba(8, 127, 140, 0.4);
 }
@@ -243,14 +243,14 @@
   font-size: 12.5px;
   font-weight: 600;
   color: #087F8C;
-  background: #EFF6FF;
-  border: 1px solid #DBEAFE;
+  background: #E8F6F7;
+  border: 1px solid rgba(8, 127, 140, 0.25);
   text-decoration: none;
   transition: all 0.2s;
 }
 
 .admin-store-link:hover {
-  background: #DBEAFE;
+  background: rgba(8, 127, 140, 0.25);
   color: #066772;
 }
 
@@ -451,10 +451,10 @@
   letter-spacing: 0.3px;
 }
 
-.admin-badge-blue {
-  background: #EFF6FF;
+.admin-badge-blue, .admin-badge-teal {
+  background: #E8F6F7;
   color: #087F8C;
-  border: 1px solid #BFDBFE;
+  border: 1px solid rgba(8, 127, 140, 0.25);
 }
 
 .admin-badge-green {
@@ -506,7 +506,7 @@
 }
 
 .admin-search:focus {
-  border-color: #93C5FD;
+  border-color: #087F8C;
   background: #FFFFFF;
   box-shadow: 0 0 0 3px rgba(8, 127, 140, 0.06);
 }
@@ -529,7 +529,7 @@
 }
 
 .admin-select:focus {
-  border-color: #93C5FD;
+  border-color: #087F8C;
 }
 
 /* ─── Buttons ──────────────────────────────────────────────────────────────── */
@@ -693,7 +693,7 @@
 .admin-field input:focus,
 .admin-field select:focus,
 .admin-field textarea:focus {
-  border-color: #93C5FD;
+  border-color: #087F8C;
   background: #FFFFFF;
   box-shadow: 0 0 0 3px rgba(8, 127, 140, 0.06);
 }
@@ -776,9 +776,9 @@
 }
 
 .admin-pagination-btn:hover:not(:disabled) {
-  background: #EFF6FF;
+  background: #E8F6F7;
   color: #087F8C;
-  border-color: #BFDBFE;
+  border-color: rgba(8, 127, 140, 0.25);
 }
 
 .admin-pagination-btn:disabled {
@@ -837,7 +837,7 @@
 }
 
 .admin-multiplier-item input:focus {
-  border-color: #93C5FD;
+  border-color: #087F8C;
 }
 
 /* ─── Scrollbar ────────────────────────────────────────────────────────────── */
@@ -890,7 +890,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #F0F9FF 0%, #EFF6FF 50%, #F5F3FF 100%);
+  background: linear-gradient(135deg, #F0F9FF 0%, #E8F6F7 50%, #F5F3FF 100%);
   position: relative;
   overflow: hidden;
 }
