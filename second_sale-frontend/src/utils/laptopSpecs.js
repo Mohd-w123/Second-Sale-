@@ -37,6 +37,145 @@ export const MAC_STORAGE = [
   '256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'
 ];
 
+/**
+ * Returns valid processor options for a Mac device based on its model, slug, and processorFamily.
+ */
+export function getValidMacProcessors(device) {
+  if (!device) return MAC_PROCESSORS;
+
+  const pf = (device.processorFamily || '').toLowerCase();
+  const gen = (device.generation || '').toLowerCase();
+  const name = (device.modelName || '').toLowerCase();
+  const slug = (device.slug || '').toLowerCase();
+
+  // If the device has variants with distinct processors configured in DB, use those
+  if (Array.isArray(device.variants) && device.variants.length > 1) {
+    const dbProcessors = [...new Set(device.variants.map(v => v.processor).filter(Boolean))];
+    if (dbProcessors.length > 1) {
+      return dbProcessors;
+    }
+  }
+
+  // 1. M4 Generation (2025 / 2026 / M4 in name or processorFamily)
+  if (pf.includes('m4') || name.includes('m4') || slug.includes('m4') || name.includes('2025') || name.includes('2026')) {
+    if (name.includes('air')) {
+      return ['Apple M4'];
+    }
+    return ['Apple M4 Pro', 'Apple M4 Max', 'Apple M4'];
+  }
+
+  // 2. M3 Generation (2024 / M3 in name or processorFamily)
+  if (pf.includes('m3') || name.includes('m3') || slug.includes('m3') || name.includes('2024')) {
+    if (name.includes('air')) {
+      return ['Apple M3'];
+    }
+    return ['Apple M3 Pro', 'Apple M3 Max', 'Apple M3'];
+  }
+
+  // 3. M2 Generation (2022 / 2023 / M2 in name or processorFamily)
+  if (pf.includes('m2') || name.includes('m2') || slug.includes('m2') || name.includes('2023') || name.includes('2022')) {
+    if (name.includes('air') || name.includes('neo') || name.includes('13')) {
+      return ['Apple M2'];
+    }
+    return ['Apple M2 Pro', 'Apple M2 Max', 'Apple M2'];
+  }
+
+  // 4. M1 Generation (2020 M1 / 2021 M1 Pro/Max)
+  if (pf.includes('m1') || name.includes('m1') || slug.includes('m1') || name.includes('2021')) {
+    if (name.includes('air') || name.includes('13')) {
+      return ['Apple M1'];
+    }
+    return ['Apple M1 Pro', 'Apple M1 Max', 'Apple M1'];
+  }
+
+  // 5. Intel Macs (2015-2020 Intel models)
+  if (gen.includes('intel') || pf.includes('intel') || name.includes('intel')) {
+    return ['Intel Core i5', 'Intel Core i7', 'Intel Core i9'];
+  }
+
+  // 6. Generic M-Series fallback (never show Intel)
+  if (gen.includes('m-series') || pf.startsWith('apple') || slug.includes('apple-macbook')) {
+    return [
+      'Apple M4 Pro', 'Apple M4 Max', 'Apple M4',
+      'Apple M3 Pro', 'Apple M3 Max', 'Apple M3',
+      'Apple M2 Pro', 'Apple M2 Max', 'Apple M2',
+      'Apple M1 Pro', 'Apple M1 Max', 'Apple M1'
+    ];
+  }
+
+  // Default fallback
+  return ['Intel Core i5', 'Intel Core i7', 'Intel Core i9'];
+}
+
+/**
+ * Returns valid RAM capacities for a chosen Mac processor based on Apple Unified Memory architecture.
+ */
+export function getValidMacRam(selectedProcessor) {
+  if (!selectedProcessor) {
+    return ['8GB', '16GB', '24GB', '32GB', '36GB', '48GB', '64GB'];
+  }
+  const proc = selectedProcessor.toLowerCase();
+
+  // Max chips: 32GB, 36GB, 48GB, 64GB, 96GB, 128GB
+  if (proc.includes('max')) {
+    return ['32GB', '36GB', '48GB', '64GB', '96GB', '128GB'];
+  }
+
+  // Pro chips: 16GB, 18GB, 24GB, 32GB, 36GB, 48GB
+  if (proc.includes('pro') && proc.includes('apple')) {
+    if (proc.includes('m4')) {
+      return ['16GB', '24GB', '48GB'];
+    }
+    if (proc.includes('m3')) {
+      return ['18GB', '36GB'];
+    }
+    return ['16GB', '32GB'];
+  }
+
+  // Base M-chips (M1, M2, M3, M4): 8GB, 16GB, 24GB
+  if (proc.includes('apple m')) {
+    if (proc.includes('m1')) {
+      return ['8GB', '16GB'];
+    }
+    return ['8GB', '16GB', '24GB'];
+  }
+
+  // Intel chips: 8GB, 16GB, 32GB, 64GB
+  if (proc.includes('intel')) {
+    return ['8GB', '16GB', '32GB', '64GB'];
+  }
+
+  return ['8GB', '16GB', '24GB', '32GB', '64GB'];
+}
+
+/**
+ * Returns valid Storage tiers for a chosen Mac processor.
+ */
+export function getValidMacStorage(selectedProcessor) {
+  if (!selectedProcessor) {
+    return ['256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD'];
+  }
+  const proc = selectedProcessor.toLowerCase();
+
+  // Max chips: 512GB to 8TB
+  if (proc.includes('max')) {
+    return ['512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'];
+  }
+
+  // Pro chips: 512GB to 8TB
+  if (proc.includes('pro') && proc.includes('apple')) {
+    return ['512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'];
+  }
+
+  // Base M-chips: 256GB to 2TB
+  if (proc.includes('apple m')) {
+    return ['256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD'];
+  }
+
+  // Intel chips: 128GB to 2TB
+  return ['128 GB SSD', '256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD'];
+}
+
 export const MASTER_PROCESSORS = [...WINDOWS_PROCESSORS, ...MAC_PROCESSORS];
 
 export const MASTER_RAM = [

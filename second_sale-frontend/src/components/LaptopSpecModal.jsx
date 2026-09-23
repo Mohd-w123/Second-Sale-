@@ -6,7 +6,10 @@ import {
   MAC_RAM,
   MAC_STORAGE,
   MASTER_RAM, 
-  MASTER_STORAGE 
+  MASTER_STORAGE,
+  getValidMacProcessors,
+  getValidMacRam,
+  getValidMacStorage
 } from '../utils/laptopSpecs';
 
 export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, initialValues }) {
@@ -108,6 +111,8 @@ export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, i
             <OverlayList 
               type={openDropdown}
               isMac={isMac}
+              device={device}
+              selectedProcessor={selectedProcessor}
               onSelect={(val) => handleSelect(openDropdown, val)}
               onClose={() => setOpenDropdown(null)}
             />
@@ -147,14 +152,17 @@ function SpecSelect({ label, value, disabled, setOpen }) {
   );
 }
 
-function OverlayList({ type, isMac, onSelect }) {
+function OverlayList({ type, isMac, device, selectedProcessor, onSelect }) {
   const [search, setSearch] = useState('');
   
-  const options = {
-    processor: isMac ? MAC_PROCESSORS : WINDOWS_PROCESSORS,
-    ram: isMac ? MAC_RAM : MASTER_RAM,
-    storage: isMac ? MAC_STORAGE : MASTER_STORAGE
-  }[type] || [];
+  let options = [];
+  if (type === 'processor') {
+    options = isMac ? getValidMacProcessors(device) : WINDOWS_PROCESSORS;
+  } else if (type === 'ram') {
+    options = isMac ? getValidMacRam(selectedProcessor) : MASTER_RAM;
+  } else if (type === 'storage') {
+    options = isMac ? getValidMacStorage(selectedProcessor) : MASTER_STORAGE;
+  }
 
   const filteredOptions = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
 

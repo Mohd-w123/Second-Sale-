@@ -550,13 +550,40 @@ export function calculateLaptopPrice(device, selections) {
       const baseline = device.variants[0];
       basePrice = baseline.basePrice;
 
-      const ramVal = (r) => parseInt(r) || 8;
-      basePrice += (ramVal(ram) - ramVal(baseline.ram)) * 200;
+      // ── 1. Processor Tier Delta ──
+      const selProc = selections.processor || '';
+      const baseProc = baseline.processor || device.processorFamily || '';
+      if (selProc && baseProc) {
+        const s = selProc.toLowerCase();
+        const b = baseProc.toLowerCase();
+        if (s !== b) {
+          const getMacTier = (proc) => {
+            if (proc.includes('max')) return 3;
+            if (proc.includes('pro')) return 2;
+            if (proc.includes('i9')) return 3;
+            if (proc.includes('i7')) return 2;
+            if (proc.includes('i5')) return 1;
+            if (proc.includes('i3')) return 0;
+            return 1; // base M-chip (M1, M2, M3, M4)
+          };
+          const sTier = getMacTier(s);
+          const bTier = getMacTier(b);
+          const isMSeries = s.includes('apple') || b.includes('apple');
+          const step = isMSeries ? 15000 : 3500;
+          basePrice += (sTier - bTier) * step;
+        }
+      }
 
-      const parseStorage = (s) => {
-        if (!s) return 0;
+      // ── 2. RAM Delta ──
+      const ramVal = (r) => parseInt(r) || 8;
+      const baseRam = baseline.ram ? ramVal(baseline.ram) : 16;
+      basePrice += (ramVal(ram) - baseRam) * 200;
+
+      // ── 3. Storage Delta ──
+      const parseStorage = (st) => {
+        if (!st) return 0;
         let totalGB = 0;
-        const parts = s.split('+');
+        const parts = st.split('+');
         parts.forEach(p => {
           const val = parseInt(p.trim()) || 0;
           const isTB = p.toUpperCase().includes('TB');
@@ -565,7 +592,7 @@ export function calculateLaptopPrice(device, selections) {
         return totalGB;
       };
 
-      const baselineGB = parseStorage(baseline.storage);
+      const baselineGB = parseStorage(baseline.storage) || 512;
       const selectedGB = parseStorage(storage);
       basePrice += (selectedGB - baselineGB) * 5;
     }
