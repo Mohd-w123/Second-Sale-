@@ -70,25 +70,39 @@ const DEFAULT_MULTIPLIERS = {
     chargingIssue: 1000,
   },
   screenDeductions: {
-    // Mobile Screen Defects (%)
+    // Mobile Screen Defects & Cashify Sub-Defects (%)
     defect_screen_broken_scratch: 25,
-    defect_screen_spots_lines: 30,
-    // Laptop Screen Defects (%)
+    screen_cracked: 35,
+    screen_chipped: 15,
+    screen_scratches_major: 12,
     screen_scratches_minor: 5,
-    screen_scratches_major: 10,
-    screen_cracked: 25,
+    defect_screen_spots_lines: 30,
+    deadPixels: 35,
+    dead_spots_lines: 25,
+    screen_spots_minor: 15,
+    screen_lines: 35,
+    screen_faded: 18,
+    screen_discoloration_major: 20,
+    screen_discoloration_minor: 10,
+    // Laptop Screen Defects (%)
     screen_discolour_minor: 8,
     screen_discolour_major: 18,
-    screen_spots_minor: 8,
     screen_spots_major: 18,
     screen_lines_visible: 18,
     screen_lines_flickering: 20,
     screen_lines_black_dots: 15,
   },
   bodyDeductions: {
-    // Mobile Body Defects (%)
+    // Mobile Body Defects & Cashify Sub-Defects (%)
     defect_body_scratch_dent: 10,
+    scratches: 10,
+    body_scratches_minor: 4,
+    bent_curved: 20,
+    body_scratches_dents: 8,
     defect_panel_missing_broken: 15,
+    panel_cracked: 12,
+    panel_missing: 18,
+    loose_screen: 10,
     // Laptop Body Defects (%)
     minorDentTop: 8,
     minorDentBase: 8,
@@ -102,15 +116,83 @@ const DEFAULT_MULTIPLIERS = {
   accessoriesBonus: { bill: 300, box: 500, charger: 800, withBoxAndCharger: 800, originalCharger: 500, thirdPartyCharger: 200, none: 0 }
 };
 
+const MOBILE_DEFECT_GROUPS = [
+  {
+    id: 'defect_screen_broken_scratch',
+    target: 'screenDeductions',
+    title: 'Broken / Scratch on Device Screen',
+    subtitle: 'Screen glass cracks, chips & scratches',
+    parentKey: 'defect_screen_broken_scratch',
+    parentDefault: 25,
+    subDefects: [
+      { key: 'screen_cracked', label: 'Screen Cracked / Glass Broken', target: 'screenDeductions', default: 35 },
+      { key: 'screen_chipped', label: 'Chipped Outside Display Area', target: 'screenDeductions', default: 15 },
+      { key: 'screen_scratches_major', label: 'More than 2 Scratches on Screen', target: 'screenDeductions', default: 12 },
+      { key: 'screen_scratches_minor', label: '1-2 Minor Scratches on Screen', target: 'screenDeductions', default: 5 },
+    ]
+  },
+  {
+    id: 'defect_screen_spots_lines',
+    target: 'screenDeductions',
+    title: 'Dead Spot / Visible Line & Discoloration',
+    subtitle: 'Display spots, lines, fading & discoloration',
+    parentKey: 'defect_screen_spots_lines',
+    parentDefault: 30,
+    subDefects: [
+      { key: 'deadPixels', label: 'Large / Heavy Visible Spots', target: 'screenDeductions', default: 35 },
+      { key: 'dead_spots_lines', label: '3 or More Minor Spots', target: 'screenDeductions', default: 25 },
+      { key: 'screen_spots_minor', label: '1-2 Minor Spots on Screen', target: 'screenDeductions', default: 15 },
+      { key: 'screen_lines', label: 'Visible Line(s) on Display', target: 'screenDeductions', default: 35 },
+      { key: 'screen_faded', label: 'Display Faded Along Edges', target: 'screenDeductions', default: 18 },
+      { key: 'screen_discoloration_major', label: 'Major Screen Discoloration', target: 'screenDeductions', default: 20 },
+      { key: 'screen_discoloration_minor', label: 'Minor Screen Discoloration', target: 'screenDeductions', default: 10 },
+    ]
+  },
+  {
+    id: 'defect_body_scratch_dent',
+    target: 'bodyDeductions',
+    title: 'Scratch / Dent on Device Body',
+    subtitle: 'Body scratches, paint peel & frame dents',
+    parentKey: 'defect_body_scratch_dent',
+    parentDefault: 10,
+    subDefects: [
+      { key: 'scratches', label: 'More than 2 Body Scratches', target: 'bodyDeductions', default: 10 },
+      { key: 'body_scratches_minor', label: '1-2 Minor Body Scratches', target: 'bodyDeductions', default: 4 },
+      { key: 'bent_curved', label: 'Major Dent(s) / Bent Frame', target: 'bodyDeductions', default: 20 },
+      { key: 'body_scratches_dents', label: '1-2 Minor Body Dents', target: 'bodyDeductions', default: 8 },
+    ]
+  },
+  {
+    id: 'defect_panel_missing_broken',
+    target: 'bodyDeductions',
+    title: 'Device Panel Missing / Broken',
+    subtitle: 'Back panel condition & frame separation',
+    parentKey: 'defect_panel_missing_broken',
+    parentDefault: 15,
+    subDefects: [
+      { key: 'panel_cracked', label: 'Cracked Side / Back Panel', target: 'bodyDeductions', default: 12 },
+      { key: 'panel_missing', label: 'Missing Side / Back Panel', target: 'bodyDeductions', default: 18 },
+      { key: 'loose_screen', label: 'Loose Screen / Frame Gap', target: 'bodyDeductions', default: 10 },
+    ]
+  },
+];
+
 const SCREEN_DEDUCTION_LABELS = {
-  defect_screen_broken_scratch: 'Broken/scratch on device screen (%)',
-  defect_screen_spots_lines: 'Dead Spot/Visible line & Discoloration (%)',
-  screen_scratches_minor: '1-2 Scratches on Screen (%)',
-  screen_scratches_major: 'More than 2 Scratches (%)',
+  defect_screen_broken_scratch: 'Broken/scratch on device screen (Parent %)',
+  defect_screen_spots_lines: 'Dead Spot/Visible line & Discoloration (Parent %)',
+  screen_scratches_minor: '1-2 Minor Scratches on Screen (%)',
+  screen_scratches_major: 'More than 2 Scratches on Screen (%)',
   screen_cracked: 'Screen Cracked / Broken (%)',
+  screen_chipped: 'Chipped Outside Display Area (%)',
+  deadPixels: 'Large / Heavy Visible Spots (%)',
+  dead_spots_lines: '3 or More Minor Spots (%)',
+  screen_spots_minor: '1-2 Minor Spots on Screen (%)',
+  screen_lines: 'Visible Line(s) on Display (%)',
+  screen_faded: 'Display Faded Along Edges (%)',
+  screen_discoloration_major: 'Major Screen Discoloration (%)',
+  screen_discoloration_minor: 'Minor Screen Discoloration (%)',
   screen_discolour_minor: 'Minor Discolouration (%)',
   screen_discolour_major: 'Major Discolouration (%)',
-  screen_spots_minor: '1-2 Minor Spots on Screen (%)',
   screen_spots_major: 'Large / Heavy Visible Spots (%)',
   screen_lines_visible: 'Visible Lines on Screen (%)',
   screen_lines_flickering: 'Display Flickering (%)',
@@ -120,8 +202,15 @@ const SCREEN_DEDUCTION_LABELS = {
 };
 
 const BODY_DEDUCTION_LABELS = {
-  defect_body_scratch_dent: 'Scratch/Dent on device body (%)',
-  defect_panel_missing_broken: 'Device panel missing/broken (%)',
+  defect_body_scratch_dent: 'Scratch/Dent on device body (Parent %)',
+  defect_panel_missing_broken: 'Device panel missing/broken (Parent %)',
+  scratches: 'More than 2 Body Scratches (%)',
+  body_scratches_minor: '1-2 Minor Body Scratches (%)',
+  bent_curved: 'Major Dent(s) / Bent Frame (%)',
+  body_scratches_dents: '1-2 Minor Body Dents (%)',
+  panel_cracked: 'Cracked Side / Back Panel (%)',
+  panel_missing: 'Missing Side / Back Panel (%)',
+  loose_screen: 'Loose Screen / Frame Gap (%)',
   minorDentTop: 'Minor Dent Top Panel (%)',
   minorDentBase: 'Minor Dent Base Panel (%)',
   majorDentTop: 'Major Dent Top Panel (%)',
@@ -177,6 +266,25 @@ export default function AdminDevices() {
   const [cloningQuiz, setCloningQuiz] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null); // null if creating
   const [formData, setFormData] = useState({});
+  const [expandedDefects, setExpandedDefects] = useState({
+    defect_screen_broken_scratch: true,
+    defect_screen_spots_lines: true,
+    defect_body_scratch_dent: true,
+    defect_panel_missing_broken: true,
+  });
+
+  const toggleDefectExpand = (key) => {
+    setExpandedDefects(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const toggleAllDefects = () => {
+    const allOpen = MOBILE_DEFECT_GROUPS.every(g => expandedDefects[g.id]);
+    const next = {};
+    MOBILE_DEFECT_GROUPS.forEach(g => {
+      next[g.id] = !allOpen;
+    });
+    setExpandedDefects(next);
+  };
 
   // Debounce search input
   useEffect(() => {
@@ -1523,31 +1631,118 @@ export default function AdminDevices() {
                   {/* MOBILE & TABLET DEDUCTIONS */}
                   {(formData.category === 'mobile' || formData.category === 'tablet') && (
                     <>
-                      {/* 1. Cashify Screen & Body Defects */}
+                      {/* 1. Cashify Screen & Body Defects with Granular Sub-Defects */}
                       <div>
-                        <h4 className="admin-section-title">Screen & Body Defects (Percentage %)</h4>
-                        <p className="text-xs text-slate-500 mb-2">Step 2: Applied if user selects physical defects</p>
-                        <div className="admin-multiplier-grid">
-                          {['defect_screen_broken_scratch', 'defect_screen_spots_lines'].map((key) => (
-                            <div key={key} className="admin-multiplier-item">
-                              <label>{SCREEN_DEDUCTION_LABELS[key] || key}</label>
-                              <input
-                                type="number"
-                                value={formData.screenDeductions?.[key] ?? ''}
-                                onChange={(e) => handleNestedChange('screenDeductions', key, e.target.value)}
-                              />
-                            </div>
-                          ))}
-                          {['defect_body_scratch_dent', 'defect_panel_missing_broken'].map((key) => (
-                            <div key={key} className="admin-multiplier-item">
-                              <label>{BODY_DEDUCTION_LABELS[key] || key}</label>
-                              <input
-                                type="number"
-                                value={formData.bodyDeductions?.[key] ?? ''}
-                                onChange={(e) => handleNestedChange('bodyDeductions', key, e.target.value)}
-                              />
-                            </div>
-                          ))}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                          <div>
+                            <h4 className="admin-section-title mb-0">Screen & Body Defects (Percentage %)</h4>
+                            <p className="text-xs text-slate-500">
+                              Step 2: Applied if user selects physical defects (Parent fallback & granular sub-defects)
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={toggleAllDefects}
+                            className="self-start sm:self-auto text-xs font-semibold text-[#087F8C] hover:text-[#116466] flex items-center gap-1 px-3 py-1.5 bg-[#E8F6F7] hover:bg-[#E8F6F7]/80 rounded-lg transition"
+                          >
+                            <span>{MOBILE_DEFECT_GROUPS.every(g => expandedDefects[g.id]) ? 'Collapse All Sub-Defects' : 'Expand All Sub-Defects'}</span>
+                            {MOBILE_DEFECT_GROUPS.every(g => expandedDefects[g.id]) ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+
+                        <div className="space-y-4">
+                          {MOBILE_DEFECT_GROUPS.map((group) => {
+                            const isExpanded = !!expandedDefects[group.id];
+                            const parentVal = formData[group.target]?.[group.parentKey] ?? '';
+
+                            return (
+                              <div
+                                key={group.id}
+                                className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm transition hover:border-slate-300"
+                              >
+                                {/* Parent Category Header Card */}
+                                <div className="p-3.5 bg-slate-50/80 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-[#087F8C] flex-shrink-0" />
+                                    <div>
+                                      <div className="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                                        <span>{group.title}</span>
+                                        <span className="text-[10px] font-semibold text-slate-500 bg-slate-200/70 px-1.5 py-0.5 rounded">
+                                          {group.subDefects.length} options
+                                        </span>
+                                      </div>
+                                      <div className="text-[11px] text-slate-500 mt-0.5">
+                                        {group.subtitle}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-3 self-end sm:self-center">
+                                    {/* Parent Fallback Input */}
+                                    <div className="flex items-center gap-1.5 bg-white border border-slate-300 rounded-lg px-2.5 py-1 shadow-sm">
+                                      <span className="text-[11px] font-medium text-slate-500">Parent Fallback:</span>
+                                      <input
+                                        type="number"
+                                        placeholder={String(group.parentDefault)}
+                                        value={parentVal}
+                                        onChange={(e) => handleNestedChange(group.target, group.parentKey, e.target.value)}
+                                        className="w-14 text-xs font-bold text-[#087F8C] text-right focus:outline-none"
+                                        title="Deduction % if sub-defects are not individually specified"
+                                      />
+                                      <span className="text-xs font-bold text-slate-400">%</span>
+                                    </div>
+
+                                    {/* Sub-Defect Accordion Toggle */}
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleDefectExpand(group.id)}
+                                      className="flex items-center gap-1 text-xs font-semibold text-[#087F8C] hover:text-[#116466] px-2.5 py-1.5 bg-white border border-slate-200 hover:border-[#087F8C] rounded-lg transition shadow-sm"
+                                    >
+                                      <span>{isExpanded ? 'Hide Sub-Defects' : 'Sub-Defects'}</span>
+                                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Granular Cashify Sub-Defects Grid */}
+                                {isExpanded && (
+                                  <div className="p-3.5 bg-white animate-fadeIn">
+                                    <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                                      <Sparkles className="w-3.5 h-3.5 text-[#087F8C]" />
+                                      Granular Cashify Follow-Up Question Deductions:
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+                                      {group.subDefects.map((sub) => {
+                                        const subVal = formData[sub.target]?.[sub.key] ?? '';
+                                        return (
+                                          <div
+                                            key={sub.key}
+                                            className="bg-slate-50/70 border border-slate-200 hover:border-slate-300 rounded-lg p-2.5 transition flex flex-col justify-between"
+                                          >
+                                            <label className="block text-[11px] font-semibold text-slate-700 mb-1.5 leading-snug">
+                                              {sub.label}
+                                            </label>
+                                            <div className="relative flex items-center">
+                                              <input
+                                                type="number"
+                                                placeholder={String(sub.default)}
+                                                value={subVal}
+                                                onChange={(e) => handleNestedChange(sub.target, sub.key, e.target.value)}
+                                                className="w-full text-xs font-semibold px-2 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-[#087F8C] focus:border-[#087F8C] focus:outline-none pr-6"
+                                              />
+                                              <span className="absolute right-2 text-xs font-bold text-slate-400 pointer-events-none">
+                                                %
+                                              </span>
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
 
