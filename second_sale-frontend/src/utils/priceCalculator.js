@@ -58,6 +58,68 @@ export const ISSUE_DEDUCTIONS = {
   cellularNetworkFaulty: 20,
 };
 
+// ─── CASHIFY WARRANTY ELIGIBILITY RULE ─────────────────────────────────────
+/**
+ * Cashify Rule: Determines if a device model is eligible for manufacturer warranty (launched within the last ~14-18 months).
+ * Older legacy models (iPhone 11/12/13/14, Galaxy S21/S22/S23, older laptops, etc.) skip the Age & Warranty step completely.
+ */
+export function isDeviceWarrantyEligible(device) {
+  if (!device) return false;
+
+  // 1. Explicit admin/database override
+  if (typeof device.isWarrantyEligible === 'boolean') {
+    return device.isWarrantyEligible;
+  }
+  if (device.releaseYear) {
+    const currentYear = new Date().getFullYear();
+    return Number(device.releaseYear) >= (currentYear - 1);
+  }
+
+  const name = (device.modelName || '').toLowerCase();
+  const slug = (device.slug || '').toLowerCase();
+  const brand = (device.brand || '').toLowerCase();
+
+  // 2. Apple iPhones: Only iPhone 15, 16, 17 are within active warranty window (2024-2026)
+  if (brand.includes('apple') || slug.includes('iphone') || name.includes('iphone')) {
+    const activeIphones = ['iphone 15', 'iphone 16', 'iphone 17'];
+    return activeIphones.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+  }
+
+  // 3. Samsung Galaxy: Only recent S24, S25, Z Fold/Flip 5 & 6, A55, A35
+  if (brand.includes('samsung') || slug.includes('samsung')) {
+    const activeSamsung = ['s24', 's25', 'fold 5', 'flip 5', 'fold 6', 'flip 6', 'a55', 'a35', 's23 fe'];
+    return activeSamsung.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+  }
+
+  // 4. OnePlus: OnePlus 12, 12R, 13, Open, Nord 4, Nord CE 4
+  if (brand.includes('oneplus') || slug.includes('oneplus')) {
+    const activeOnePlus = ['oneplus 12', 'oneplus 13', 'oneplus open', 'nord 4', 'nord ce 4'];
+    return activeOnePlus.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+  }
+
+  // 5. Google Pixel: Pixel 8, Pixel 9
+  if (brand.includes('google') || slug.includes('pixel')) {
+    const activePixel = ['pixel 8', 'pixel 9'];
+    return activePixel.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+  }
+
+  // 6. Xiaomi / Redmi / Poco: 14, 15, Note 13, Note 14, F6, X6
+  if (brand.includes('xiaomi') || brand.includes('redmi') || brand.includes('poco')) {
+    const activeXiaomi = ['xiaomi 14', 'xiaomi 15', 'note 13', 'note 14', 'poco f6', 'poco x6'];
+    return activeXiaomi.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+  }
+
+  // 7. Check if model name has a recent year (>= 2024)
+  const currentYear = new Date().getFullYear();
+  const yearMatch = name.match(/20\d{2}/);
+  if (yearMatch) {
+    const year = parseInt(yearMatch[0], 10);
+    return year >= (currentYear - 1);
+  }
+
+  return false;
+}
+
 // ─── DYNAMIC MOBILE & TABLET PRICE CALCULATOR ──────────────────────────────
 // Evaluates deductions dynamically against device-configured rates or defaults.
 // Any newly added question, option, condition, or admin deduction resolves dynamically.
@@ -67,6 +129,7 @@ export function calculatePrice({
   device = {},
   basePrice = 0,
   deviceAge,
+  isWarrantyEligible: userSpecifiedWarrantyEligible,
   ableToMakeCalls,
   doesTabletSwitchOn,
   isCellularNetworkWorking,
@@ -168,9 +231,11 @@ export function calculatePrice({
     currentPrice = Math.max(currentPrice - deduction, 0);
   };
 
+  const isEligibleForWarranty = userSpecifiedWarrantyEligible ?? isDeviceWarrantyEligible(device);
+
   // 1. Age deduction (applied first to base price)
   const ageDeductions = { '0 - 3 Months': 0, '3 - 6 Months': 7, '6 - 11 Months': 10, 'Above 11 Months': 21 };
-  const agePct = isSpecial ? 0 : (ageDeductions[deviceAge] ?? 7);
+  const agePct = (isSpecial || !isEligibleForWarranty) ? 0 : (ageDeductions[deviceAge] ?? 0);
   if (agePct > 0) applyDeduction('age', agePct);
 
   // 2. Dead device (cannot make calls / does not switch on) — default 90% or device override
@@ -198,14 +263,14 @@ export function calculatePrice({
     applyDeduction('copyScreen', copyPct);
   }
 
-  // 5. Out of warranty — 20%
-  if (!isSpecial && underWarranty === false && deviceAge !== 'Above 11 Months') {
+  // 5. Out of warranty — 20% (only deducted if device was eligible for warranty but user has no warranty)
+  if (!isSpecial && isEligibleForWarranty && underWarranty === false && deviceAge !== 'Above 11 Months') {
     const warPct = getDeductionPct('outOfWarranty') || 20;
     applyDeduction('outOfWarranty', warPct);
   }
 
-  // 6. No GST bill — 21%
-  if (!isSpecial && hasGSTBill === false && deviceAge !== 'Above 11 Months') {
+  // 6. No GST bill — 21% (only deducted if device was eligible for warranty but user has no bill)
+  if (!isSpecial && isEligibleForWarranty && hasGSTBill === false && deviceAge !== 'Above 11 Months') {
     const billPct = getDeductionPct('noBill') || 21;
     applyDeduction('noBill', billPct);
   }
