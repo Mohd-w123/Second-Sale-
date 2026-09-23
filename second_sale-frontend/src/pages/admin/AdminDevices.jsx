@@ -5,7 +5,7 @@ import { quizService } from '../../services/quiz.service';
 import {
   Search, ChevronLeft, ChevronRight, X, Plus, Trash2,
   Smartphone, Monitor, Laptop, Headphones, Watch, Gamepad2, FileText, Percent, Info, ToggleLeft, ToggleRight,
-  HelpCircle, CheckCircle2, ChevronDown, ChevronUp, Sparkles
+  HelpCircle, CheckCircle2, ChevronDown, ChevronUp, Sparkles, Copy
 } from 'lucide-react';
 import './admin.css';
 
@@ -272,6 +272,7 @@ export default function AdminDevices() {
     defect_body_scratch_dent: true,
     defect_panel_missing_broken: true,
   });
+  const [duplicatingId, setDuplicatingId] = useState(null);
 
   const toggleDefectExpand = (key) => {
     setExpandedDefects(prev => ({ ...prev, [key]: !prev[key] }));
@@ -646,6 +647,48 @@ export default function AdminDevices() {
     }
   };
 
+  // Duplicate Device
+  const handleDuplicate = async (device) => {
+    if (!window.confirm(`Create a duplicate copy of "${device.brand} ${device.modelName}"?`)) {
+      return;
+    }
+
+    try {
+      setDuplicatingId(device._id);
+      const cloned = JSON.parse(JSON.stringify(device));
+      delete cloned._id;
+      delete cloned.createdAt;
+      delete cloned.updatedAt;
+      delete cloned.__v;
+      if (Array.isArray(cloned.variants)) {
+        cloned.variants = cloned.variants.map(v => {
+          const copyV = { ...v };
+          delete copyV._id;
+          return copyV;
+        });
+      }
+
+      const timestamp = Date.now().toString().slice(-4);
+      const newModelName = `${device.modelName} (Copy)`;
+      const baseSlug = (device.slug || '').replace(/-copy(-\d+)?$/, '');
+      const newSlug = `${baseSlug}-copy-${timestamp}`;
+
+      const payload = {
+        ...JSON.parse(JSON.stringify(DEFAULT_MULTIPLIERS)),
+        ...cloned,
+        modelName: newModelName,
+        slug: newSlug,
+      };
+
+      await adminService.createDevice(payload);
+      fetchDevices();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to duplicate device');
+    } finally {
+      setDuplicatingId(null);
+    }
+  };
+
   // Delete Device
   const handleDelete = async (id, name) => {
     if (window.confirm(`Are you sure you want to delete "${name}"? This action is permanent.`)) {
@@ -791,12 +834,22 @@ export default function AdminDevices() {
                         <button
                           onClick={() => handleEditOpen(device)}
                           className="admin-btn admin-btn-ghost text-xs py-1 px-2.5"
+                          title="Edit Device"
                         >
                           Edit
                         </button>
                         <button
+                          onClick={() => handleDuplicate(device)}
+                          disabled={duplicatingId === device._id}
+                          className="admin-btn admin-btn-ghost text-xs py-1 px-2 text-[#087F8C] hover:text-[#116466] hover:bg-[#E8F6F7] transition disabled:opacity-50"
+                          title="Duplicate Device (Create Copy)"
+                        >
+                          <Copy size={13} className={duplicatingId === device._id ? 'animate-spin' : ''} />
+                        </button>
+                        <button
                           onClick={() => handleDelete(device._id, `${device.brand} ${device.modelName}`)}
                           className="admin-btn admin-btn-danger text-xs py-1 px-2.5"
+                          title="Delete Device"
                         >
                           <Trash2 size={12} />
                         </button>

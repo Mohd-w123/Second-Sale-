@@ -4,7 +4,7 @@ import {
   Search, Plus, Edit2, Trash2, CheckCircle2, XCircle, Eye,
   Package, ShoppingBag, Truck, Check, AlertCircle, RefreshCw,
   Sparkles, ExternalLink, ShieldCheck, ChevronRight, X, Layers,
-  DollarSign, Smartphone, Laptop, Tablet, Watch, Gamepad2
+  DollarSign, Smartphone, Laptop, Tablet, Watch, Gamepad2, Copy
 } from 'lucide-react';
 import './admin.css';
 
@@ -63,6 +63,7 @@ export default function AdminRefurbished() {
   const [modalTab, setModalTab] = useState('general'); // general | pricing | variants | specs
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [duplicatingId, setDuplicatingId] = useState(null);
 
   // Orders state
   const [orders, setOrders] = useState([]);
@@ -267,6 +268,42 @@ export default function AdminRefurbished() {
       fetchProducts();
     } catch (err) {
       console.error('Failed to toggle product status:', err);
+    }
+  };
+
+  // Duplicate Refurbished Product
+  const handleDuplicateProduct = async (device) => {
+    if (!window.confirm(`Create a duplicate copy of "${device.title}"?`)) return;
+
+    try {
+      setDuplicatingId(device._id);
+      const cloned = JSON.parse(JSON.stringify(device));
+      delete cloned._id;
+      delete cloned.createdAt;
+      delete cloned.updatedAt;
+      delete cloned.__v;
+
+      const timestamp = Date.now().toString().slice(-4);
+      const newTitle = `${device.title} (Copy)`;
+      const newModelName = `${device.modelName || device.title} (Copy)`;
+      const baseSlug = (device.slug || '').replace(/-copy(-\d+)?$/, '');
+      const newSlug = `${baseSlug}-copy-${timestamp}`;
+
+      const payload = {
+        ...cloned,
+        title: newTitle,
+        modelName: newModelName,
+        slug: newSlug,
+      };
+
+      await adminService.createRefurbishedDevice(payload);
+      showFeedbackMsg('success', 'Refurbished product duplicated successfully!');
+      fetchProducts();
+    } catch (err) {
+      console.error('Failed to duplicate product:', err);
+      alert(err.response?.data?.message || 'Failed to duplicate product');
+    } finally {
+      setDuplicatingId(null);
     }
   };
 
@@ -608,6 +645,14 @@ export default function AdminRefurbished() {
                                 title="Edit Product"
                               >
                                 <Edit2 size={15} />
+                              </button>
+                              <button
+                                onClick={() => handleDuplicateProduct(device)}
+                                disabled={duplicatingId === device._id}
+                                className="p-1.5 text-slate-400 hover:text-[#087F8C] hover:bg-[#E8F6F7] rounded-lg transition-colors border-none bg-transparent cursor-pointer disabled:opacity-50"
+                                title="Duplicate Product (Create Copy)"
+                              >
+                                <Copy size={15} className={duplicatingId === device._id ? 'animate-spin' : ''} />
                               </button>
                               <button
                                 onClick={() => handleDeleteProduct(device)}
