@@ -228,7 +228,7 @@ export default function AdminQuizConfig() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <HelpCircle className="w-7 h-7 text-blue-600" />
+            <HelpCircle className="w-7 h-7 text-[#087F8C]" />
             <h1 className="text-2xl font-bold text-slate-900">Dynamic Quiz & Deductions Manager</h1>
           </div>
           <p className="text-sm text-slate-500 mt-1">
@@ -248,7 +248,7 @@ export default function AdminQuizConfig() {
           <button
             onClick={handleSave}
             disabled={saving || loading}
-            className="flex items-center gap-1.5 px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition disabled:opacity-50"
+            className="admin-btn admin-btn-primary flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-lg shadow-sm transition disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : 'Save Quiz Changes'}
@@ -257,8 +257,8 @@ export default function AdminQuizConfig() {
       </div>
 
       {saveSuccess && (
-        <div className="flex items-center gap-2 p-4 text-blue-800 bg-blue-50 border border-blue-200 rounded-lg animate-fadeIn">
-          <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+        <div className="flex items-center gap-2 p-4 text-[#087F8C] bg-[#E8F6F7] border border-[#087F8C]/30 rounded-lg animate-fadeIn">
+          <CheckCircle className="w-5 h-5 text-[#087F8C] flex-shrink-0" />
           <span className="text-sm font-medium">Quiz configuration saved successfully! Quotes will now evaluate dynamically.</span>
         </div>
       )}
@@ -281,7 +281,7 @@ export default function AdminQuizConfig() {
               onClick={() => setActiveCategory(cat.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ? 'bg-[#087F8C] text-white shadow-sm font-semibold'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -305,7 +305,7 @@ export default function AdminQuizConfig() {
           </p>
           <button
             onClick={handleReset}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+            className="admin-btn admin-btn-primary px-4 py-2 text-sm font-medium rounded-lg transition"
           >
             Seed Cashify Defaults
           </button>
@@ -325,7 +325,7 @@ export default function AdminQuizConfig() {
                   className="flex items-center justify-between p-4.5 bg-slate-50 hover:bg-slate-100 cursor-pointer border-b border-slate-200 select-none transition"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">
+                    <span className="w-7 h-7 rounded-full bg-[#E8F6F7] text-[#087F8C] font-bold text-xs flex items-center justify-center">
                       {sIdx + 1}
                     </span>
                     <div>
@@ -368,7 +368,7 @@ export default function AdminQuizConfig() {
                           type="text"
                           value={step.label || ''}
                           onChange={(e) => handleStepFieldChange(sIdx, 'label', e.target.value)}
-                          className="w-full text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#087F8C]/20 focus:border-[#087F8C] focus:outline-none"
                         />
                       </div>
                       <div>
@@ -377,7 +377,7 @@ export default function AdminQuizConfig() {
                           type="text"
                           value={step.subtitle || ''}
                           onChange={(e) => handleStepFieldChange(sIdx, 'subtitle', e.target.value)}
-                          className="w-full text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          className="w-full text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#087F8C]/20 focus:border-[#087F8C] focus:outline-none"
                         />
                       </div>
                     </div>
@@ -399,7 +399,7 @@ export default function AdminQuizConfig() {
                                   type="text"
                                   value={q.title || ''}
                                   onChange={(e) => handleQuestionFieldChange(sIdx, qIdx, 'title', e.target.value)}
-                                  className="w-full text-sm font-medium px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                  className="w-full text-sm font-medium px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#087F8C]/20 focus:border-[#087F8C] focus:outline-none"
                                 />
                               </div>
 
@@ -410,7 +410,7 @@ export default function AdminQuizConfig() {
                                 <select
                                   value={q.type || 'yes_no'}
                                   onChange={(e) => handleQuestionFieldChange(sIdx, qIdx, 'type', e.target.value)}
-                                  className="w-full text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                  className="w-full text-sm px-3 py-2 bg-white border border-slate-300 rounded-md focus:ring-2 focus:ring-[#087F8C]/20 focus:border-[#087F8C] focus:outline-none"
                                 >
                                   <option value="yes_no">Yes / No</option>
                                   <option value="single_choice">Single Choice (Radio)</option>
@@ -426,7 +426,7 @@ export default function AdminQuizConfig() {
                                   type="text"
                                   value={q.subtitle || ''}
                                   onChange={(e) => handleQuestionFieldChange(sIdx, qIdx, 'subtitle', e.target.value)}
-                                  className="w-full text-xs px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                  className="w-full text-xs px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-md focus:ring-2 focus:ring-[#087F8C]/20 focus:border-[#087F8C] focus:outline-none"
                                 />
                               </div>
                             </div>
@@ -453,7 +453,7 @@ export default function AdminQuizConfig() {
                               </span>
                               <button
                                 onClick={() => handleAddOption(sIdx, qIdx)}
-                                className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700"
+                                className="flex items-center gap-1 text-xs font-semibold text-[#087F8C] hover:text-[#116466]"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                                 Add Option
@@ -472,7 +472,7 @@ export default function AdminQuizConfig() {
                                       placeholder="Option Label"
                                       value={opt.label || ''}
                                       onChange={(e) => handleOptionFieldChange(sIdx, qIdx, oIdx, 'label', e.target.value)}
-                                      className="w-full text-xs font-medium px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                      className="w-full text-xs font-medium px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-[#087F8C] focus:border-[#087F8C] focus:outline-none"
                                     />
                                   </div>
 
@@ -482,7 +482,7 @@ export default function AdminQuizConfig() {
                                       placeholder="Helper description (optional)"
                                       value={opt.description || ''}
                                       onChange={(e) => handleOptionFieldChange(sIdx, qIdx, oIdx, 'description', e.target.value)}
-                                      className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                      className="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-[#087F8C] focus:border-[#087F8C] focus:outline-none"
                                     />
                                   </div>
 
@@ -490,7 +490,7 @@ export default function AdminQuizConfig() {
                                     <select
                                       value={opt.deductionType || 'percentage'}
                                       onChange={(e) => handleOptionFieldChange(sIdx, qIdx, oIdx, 'deductionType', e.target.value)}
-                                      className="w-full text-xs px-2 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                      className="w-full text-xs px-2 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-[#087F8C] focus:border-[#087F8C] focus:outline-none"
                                     >
                                       <option value="percentage">% Percentage</option>
                                       <option value="flat_inr">₹ Flat INR</option>
@@ -506,7 +506,7 @@ export default function AdminQuizConfig() {
                                       placeholder="0"
                                       value={opt.deductionValue ?? 0}
                                       onChange={(e) => handleOptionFieldChange(sIdx, qIdx, oIdx, 'deductionValue', parseFloat(e.target.value) || 0)}
-                                      className="w-full text-xs font-semibold px-2 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                      className="w-full text-xs font-semibold px-2 py-1.5 bg-white border border-slate-300 rounded focus:ring-1 focus:ring-[#087F8C] focus:border-[#087F8C] focus:outline-none"
                                     />
                                   </div>
 
@@ -530,7 +530,7 @@ export default function AdminQuizConfig() {
                       <button
                         type="button"
                         onClick={() => handleAddQuestion(sIdx)}
-                        className="w-full py-2.5 border-2 border-dashed border-slate-300 hover:border-blue-500 text-slate-600 hover:text-blue-600 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition"
+                        className="w-full py-2.5 border-2 border-dashed border-slate-300 hover:border-[#087F8C] text-slate-600 hover:text-[#087F8C] hover:bg-[#E8F6F7]/30 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition"
                       >
                         <Plus className="w-4 h-4" />
                         Add Question to {step.label}
@@ -546,9 +546,9 @@ export default function AdminQuizConfig() {
           <button
             type="button"
             onClick={handleAddStep}
-            className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-300 hover:border-blue-500 text-slate-600 hover:text-blue-700 bg-white hover:bg-blue-50/40 rounded-xl text-sm font-semibold transition shadow-sm"
+            className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-300 hover:border-[#087F8C] text-slate-600 hover:text-[#087F8C] bg-white hover:bg-[#E8F6F7]/40 rounded-xl text-sm font-semibold transition shadow-sm"
           >
-            <Plus className="w-4 h-4 text-blue-600" />
+            <Plus className="w-4 h-4 text-[#087F8C]" />
             Add New Step Section
           </button>
         </div>
