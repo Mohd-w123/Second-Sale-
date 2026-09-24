@@ -20,6 +20,7 @@ import {
   Users2,
   ShieldAlert,
   HelpCircle,
+  Sparkles,
 } from 'lucide-react';
 import './admin.css';
 
@@ -56,6 +57,7 @@ export default function AdminLayout() {
     if (path.includes('/devices')) return 'Device Catalog';
     if (path.includes('/refurbished')) return 'Refurbished Marketplace';
     if (path.includes('/categories')) return 'Category Management';
+    if (path.includes('/brands')) return 'Brand Directory & Logos';
     if (path.includes('/partners')) return 'Partner Applications';
     if (path.includes('/orders')) return 'System Orders';
     if (path.includes('/pincodes')) return 'Serviceable Pincodes';
@@ -70,6 +72,8 @@ export default function AdminLayout() {
     { key: 'homepage', to: '/admin/homepage', icon: Layout, label: 'Homepage' },
     { key: 'pages', to: '/admin/pages', icon: FileText, label: 'Pages (CMS)' },
     { key: 'users', to: '/admin/users', icon: Users, label: 'Users' },
+    { key: 'categories', to: '/admin/categories', icon: Layers, label: 'Categories' },
+    { key: 'brands', to: '/admin/brands', icon: Sparkles, label: 'Brands & Logos' },
     { key: 'devices', to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
     { key: 'quiz', to: '/admin/quiz', icon: HelpCircle, label: 'Quiz & Deductions' },
     { key: 'refurbished', to: '/admin/refurbished', icon: Package, label: 'Refurbished' },

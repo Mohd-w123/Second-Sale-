@@ -5,7 +5,7 @@ import { quizService } from '../../services/quiz.service';
 import {
   Search, ChevronLeft, ChevronRight, X, Plus, Trash2,
   Smartphone, Monitor, Laptop, Headphones, Watch, Gamepad2, FileText, Percent, Info, ToggleLeft, ToggleRight,
-  HelpCircle, CheckCircle2, ChevronDown, ChevronUp, Sparkles, Copy
+  HelpCircle, CheckCircle2, ChevronDown, ChevronUp, Sparkles, Copy, Upload, RefreshCw
 } from 'lucide-react';
 import './admin.css';
 
@@ -338,6 +338,38 @@ export default function AdminDevices() {
     };
     loadCategories();
   }, []);
+
+  // Brand Suggestions and Image Upload State
+  const [brandSuggestions, setBrandSuggestions] = useState([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  useEffect(() => {
+    adminService.getBrands()
+      .then((res) => {
+        if (res.data && Array.isArray(res.data)) {
+          setBrandSuggestions(res.data.map((b) => b.name));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleUploadDeviceImg = async (file) => {
+    if (!file) return;
+    try {
+      setUploadingImage(true);
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await adminService.uploadDeviceImage(fd);
+      if (res.data?.imageUrl) {
+        handleInputChange('imageUrl', res.data.imageUrl);
+      }
+    } catch (err) {
+      console.error('Failed to upload device image:', err);
+      alert(err.response?.data?.message || 'Failed to upload device image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   // Open modal for Create
   const handleCreateOpen = () => {
@@ -979,11 +1011,17 @@ export default function AdminDevices() {
                       <label>Brand</label>
                       <input
                         type="text"
+                        list="brand-suggestions"
                         required
                         placeholder="e.g. Apple, Samsung, MSI"
                         value={formData.brand}
                         onChange={(e) => handleInputChange('brand', e.target.value)}
                       />
+                      <datalist id="brand-suggestions">
+                        {brandSuggestions.map((bName) => (
+                          <option key={bName} value={bName} />
+                        ))}
+                      </datalist>
                     </div>
                   </div>
 
@@ -1020,14 +1058,69 @@ export default function AdminDevices() {
                     </div>
                   </div>
 
-                  <div className="admin-field">
-                    <label>Image URL</label>
-                    <input
-                      type="text"
-                      placeholder="https://..."
-                      value={formData.imageUrl}
-                      onChange={(e) => handleInputChange('imageUrl', e.target.value)}
-                    />
+                  <div className="admin-field-row">
+                    <div className="admin-field">
+                      <label>Image URL</label>
+                      <input
+                        type="text"
+                        placeholder="https://... (or upload file on the right)"
+                        value={formData.imageUrl || ''}
+                        onChange={(e) => handleInputChange('imageUrl', e.target.value)}
+                      />
+                    </div>
+
+                    <div className="admin-field">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="!mb-0">Upload Image</label>
+                        {formData.imageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => handleInputChange('imageUrl', '')}
+                            className="text-[11px] font-bold text-rose-500 hover:text-rose-600 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <label className={`flex-1 flex items-center justify-center gap-2 h-[42px] px-3.5 rounded-[10px] border border-[#E2E8F0] bg-[#F8FAFC] hover:bg-slate-100 hover:border-[#087F8C] cursor-pointer font-bold text-xs text-slate-700 transition-all ${
+                          uploadingImage ? 'opacity-60 cursor-not-allowed' : ''
+                        }`}>
+                          {uploadingImage ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#087F8C]" />
+                              <span className="text-[#087F8C]">Uploading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-3.5 h-3.5 text-[#087F8C]" />
+                              <span>{formData.imageUrl ? 'Change Image File' : 'Upload from Device'}</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingImage}
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleUploadDeviceImg(file);
+                            }}
+                          />
+                        </label>
+
+                        {formData.imageUrl && (
+                          <div className="w-[42px] h-[42px] rounded-[10px] border border-[#E2E8F0] bg-white p-1 shrink-0 flex items-center justify-center overflow-hidden shadow-2xs">
+                            <img
+                              src={formData.imageUrl}
+                              alt="Preview"
+                              className="w-full h-full object-contain"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Laptop-specific configurations */}

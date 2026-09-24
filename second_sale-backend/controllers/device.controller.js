@@ -1,4 +1,5 @@
 import Device from '../models/Device.js';
+import Brand from '../models/Brand.js';
 
 export const getBrands = async (req, res, next) => {
   try {
@@ -24,7 +25,22 @@ export const getBrands = async (req, res, next) => {
       },
     ]);
 
-    res.json(brands);
+    // Attach dynamic logo and styling from Brand collection
+    const brandDocs = await Brand.find({ isActive: true }).select('name slug logo color order');
+    const brandMap = new Map();
+    brandDocs.forEach((b) => brandMap.set(b.name.toLowerCase(), b));
+
+    const enrichedBrands = brands.map((b) => {
+      const bDoc = brandMap.get(b.brand.toLowerCase());
+      return {
+        ...b,
+        logo: bDoc?.logo || '',
+        color: bDoc?.color || '',
+        order: bDoc?.order ?? 999,
+      };
+    });
+
+    res.json(enrichedBrands);
   } catch (error) {
     next(error);
   }

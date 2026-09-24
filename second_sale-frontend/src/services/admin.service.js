@@ -99,6 +99,15 @@ export const adminService = {
   createSalesUser: (data) => adminApi.post('/admin/sales-users', data),
   updateSalesUser: (id, data) => adminApi.put(`/admin/sales-users/${id}`, data),
   deleteSalesUser: (id) => adminApi.delete(`/admin/sales-users/${id}`),
+
+  // Brands Management & Logos
+  getBrands: (params) => adminApi.get('/brands', { params }),
+  getBrandById: (id) => adminApi.get(`/brands/${id}`),
+  createBrand: (data) => adminApi.post('/brands', data),
+  updateBrand: (id, data) => adminApi.put(`/brands/${id}`, data),
+  deleteBrand: (id) => adminApi.delete(`/brands/${id}`),
+  uploadBrandLogo: (formData) => adminApi.post('/brands/upload-logo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  uploadDeviceImage: (formData) => adminApi.post('/brands/upload-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 export default adminApi;
