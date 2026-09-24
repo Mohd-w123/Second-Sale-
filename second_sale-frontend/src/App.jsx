@@ -87,6 +87,7 @@ import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
 import AdminDevices from './pages/admin/AdminDevices.jsx';
 import AdminCategories from './pages/admin/AdminCategories.jsx';
+import AdminBrands from './pages/admin/AdminBrands.jsx';
 import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminPincodes from './pages/admin/AdminPincodes.jsx';
@@ -255,6 +256,7 @@ function App() {
             <Route path="quiz" element={<AdminProtectedRoute requiredPermission="quiz"><AdminQuizConfig /></AdminProtectedRoute>} />
             <Route path="refurbished" element={<AdminProtectedRoute requiredPermission="refurbished"><AdminRefurbished /></AdminProtectedRoute>} />
             <Route path="categories" element={<AdminProtectedRoute requiredPermission="categories"><AdminCategories /></AdminProtectedRoute>} />
+            <Route path="brands" element={<AdminProtectedRoute requiredPermission="devices"><AdminBrands /></AdminProtectedRoute>} />
             <Route path="partners" element={<AdminProtectedRoute requiredPermission="partners"><AdminPartners /></AdminProtectedRoute>} />
             <Route path="orders" element={<AdminProtectedRoute requiredPermission="orders"><AdminOrders /></AdminProtectedRoute>} />
             <Route path="pincodes" element={<AdminProtectedRoute requiredPermission="pincodes"><AdminPincodes /></AdminProtectedRoute>} />

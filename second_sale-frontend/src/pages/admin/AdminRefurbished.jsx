@@ -4,7 +4,7 @@ import {
   Search, Plus, Edit2, Trash2, CheckCircle2, XCircle, Eye,
   Package, ShoppingBag, Truck, Check, AlertCircle, RefreshCw,
   Sparkles, ExternalLink, ShieldCheck, ChevronRight, X, Layers,
-  DollarSign, Smartphone, Laptop, Tablet, Watch, Gamepad2, Copy
+  DollarSign, Smartphone, Laptop, Tablet, Watch, Gamepad2, Copy, Upload
 } from 'lucide-react';
 import './admin.css';
 
@@ -64,6 +64,28 @@ export default function AdminRefurbished() {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [duplicatingId, setDuplicatingId] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleUploadImage = async (file) => {
+    if (!file) return;
+    try {
+      setUploadingImage(true);
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await adminService.uploadDeviceImage(fd);
+      if (res.data?.imageUrl) {
+        setFormData(prev => ({
+          ...prev,
+          imagesText: prev.imagesText ? `${prev.imagesText.trim()}\n${res.data.imageUrl}` : res.data.imageUrl
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to upload image:', err);
+      alert(err.response?.data?.message || 'Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   // Orders state
   const [orders, setOrders] = useState([]);
@@ -964,12 +986,70 @@ export default function AdminRefurbished() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Product Images (1 URL per line, first image is Primary)
-                    </label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold text-slate-700">
+                        Product Images (1 URL per line, first image is Primary)
+                      </label>
+                      <label className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium cursor-pointer transition-all shadow-sm ${
+                        uploadingImage 
+                          ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                          : 'bg-[#087F8C]/10 hover:bg-[#087F8C]/20 text-[#087F8C] border-[#087F8C]/20'
+                      }`}>
+                        {uploadingImage ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Uploading to Cloud...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Upload Image</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingImage}
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleUploadImage(file);
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Image thumbnails preview if imagesText has lines */}
+                    {formData.imagesText && formData.imagesText.split('\n').filter(s => s.trim()).length > 0 && (
+                      <div className="flex items-center gap-2 mb-2 overflow-x-auto py-1.5 px-2 bg-slate-50 border border-slate-200 rounded-xl">
+                        {formData.imagesText.split('\n').filter(s => s.trim()).map((url, idx) => (
+                          <div key={idx} className="relative group w-14 h-14 rounded-lg border border-slate-200 bg-white p-1 shrink-0 overflow-hidden shadow-xs">
+                            <img src={url} alt={`Preview ${idx + 1}`} className="w-full h-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const urls = formData.imagesText.split('\n').filter(s => s.trim());
+                                urls.splice(idx, 1);
+                                setFormData(prev => ({ ...prev, imagesText: urls.join('\n') }));
+                              }}
+                              className="absolute inset-0 bg-rose-600/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Remove"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                            {idx === 0 && (
+                              <span className="absolute bottom-0 left-0 right-0 bg-[#087F8C] text-[8px] text-white text-center font-bold uppercase py-0.5">
+                                Main
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <textarea
                       rows="3"
-                      placeholder="https://images.unsplash.com/photo-iphone..."
+                      placeholder="https://images.unsplash.com/photo-iphone... or upload image above"
                       value={formData.imagesText}
                       onChange={(e) => setFormData({ ...formData, imagesText: e.target.value })}
                       className="w-full px-3.5 py-2 text-xs font-mono border border-slate-200 rounded-xl bg-slate-50"
