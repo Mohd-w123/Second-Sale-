@@ -139,10 +139,10 @@ export default function Navbar() {
     tablet: ["Apple", "Samsung"],
     laptop: ["Acer", "Apple", "Asus", "Dell", "HP", "Lenovo", "Samsung", "MSI"],
     mac: ["Apple"],
-    earbuds: ["Apple", "Samsung", "OnePlus", "boAt", "Sony"],
-    smartwatch: ["Apple", "Samsung", "boAt", "Noise", "Fire-Boltt", "OnePlus"],
-    console: ["Sony", "Microsoft", "Nintendo"],
-    gaming: ["Sony", "Microsoft", "Nintendo"],
+    earbuds: ["Apple", "Bose", "Google", "Samsung", "OnePlus", "Nothing"],
+    smartwatch: ["Apple", "OnePlus", "Samsung", "Google"],
+    console: ["Sony", "Microsoft"],
+    gaming: ["Sony", "Microsoft"],
     tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
   });
 
@@ -159,6 +159,7 @@ export default function Navbar() {
           deviceService.getBrands("smartwatch"),
           deviceService.getBrands("console"),
         ]);
+        const earBrands = (ear.data || []).map((b) => b.brand);
         const swBrands = (sw.data || []).map((b) => b.brand);
         const gamBrands = (gam.data || []).map((b) => b.brand);
         setBrandsData({
@@ -166,10 +167,10 @@ export default function Navbar() {
           tablet: (tab.data || []).map((b) => b.brand),
           laptop: (lap.data || []).map((b) => b.brand),
           mac: (mac.data || []).map((b) => b.brand),
-          earbuds: (ear.data || []).map((b) => b.brand),
-          smartwatch: swBrands.length > 0 ? swBrands : ["Apple", "Samsung", "boAt", "Noise"],
-          console: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft", "Nintendo"],
-          gaming: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft", "Nintendo"],
+          earbuds: earBrands.length > 0 ? earBrands : ["Apple", "Bose", "Google", "Samsung", "OnePlus", "Nothing"],
+          smartwatch: swBrands.length > 0 ? swBrands : ["Apple", "OnePlus", "Samsung", "Google"],
+          console: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft"],
+          gaming: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft"],
           tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
         });
       } catch (err) {

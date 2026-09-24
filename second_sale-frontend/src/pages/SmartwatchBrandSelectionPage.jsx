@@ -7,7 +7,7 @@ import SEOHead from "../components/seo/SEOHead";
 import { SMARTWATCH_BRANDS } from "../constants/devices";
 import { Watch, Search, ShieldCheck, Zap, Truck } from "lucide-react";
 
-const SMARTWATCH_BRAND_ORDER = ["Apple", "Samsung", "boAt", "Noise", "Fire-Boltt", "OnePlus", "Amazfit", "Garmin"];
+const SMARTWATCH_BRAND_ORDER = ["Apple", "OnePlus", "Samsung", "Google"];
 
 const sortBrands = (brandsList) => {
   return [...brandsList].sort((a, b) => {
@@ -77,7 +77,7 @@ export default function SmartwatchBrandSelectionPage() {
     <div className="max-w-[1200px] mx-auto px-4 sm:px-8 pt-5 sm:pt-8 pb-12 sm:pb-20">
       <SEOHead
         title="Sell Old Smartwatch Online — Instant Cash | SecondSale"
-        description="Sell used Apple Watch, Samsung Galaxy Watch, and other smartwatches online for the highest price. Free doorstep pickup & instant payment."
+        description="Sell used Apple Watch, OnePlus Watch, Samsung Galaxy Watch, and Google Pixel Watch online for the highest price. Free doorstep pickup & instant payment."
         canonicalUrl="/sell-smartwatch/brand"
       />
 
@@ -96,7 +96,7 @@ export default function SmartwatchBrandSelectionPage() {
           Select Your Smartwatch <span className="text-blue-600">Brand</span>
         </h1>
         <p className="text-slate-500 text-sm sm:text-base max-w-xl mx-auto">
-          Get an instant cash offer for your used Apple Watch, Galaxy Watch, or fitness tracker with free doorstep pickup across India.
+          Get an instant cash offer for your used Apple Watch, OnePlus Watch, Galaxy Watch, or Pixel Watch with free doorstep pickup across India.
         </p>
 
         {/* Search Bar */}
@@ -104,7 +104,7 @@ export default function SmartwatchBrandSelectionPage() {
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search brand (e.g. Apple, Samsung, boAt)..."
+            placeholder="Search brand (e.g. Apple, OnePlus, Samsung, Google)..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all shadow-xs"
