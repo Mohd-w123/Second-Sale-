@@ -7,7 +7,7 @@ import SEOHead from "../components/seo/SEOHead";
 import { EARBUDS_BRANDS } from "../constants/devices";
 import { Headphones, Search, Sparkles, ShieldCheck, Zap, Truck } from "lucide-react";
 
-const EARBUDS_BRAND_ORDER = ["Apple", "Samsung", "OnePlus", "boAt", "Sony", "Noise", "Realme", "JBL"];
+const EARBUDS_BRAND_ORDER = ["Apple", "Bose", "Google", "Samsung", "OnePlus", "Nothing"];
 
 const sortEarbudsBrands = (brandsList) => {
   return [...brandsList].sort((a, b) => {
@@ -77,7 +77,7 @@ export default function EarbudsBrandSelectionPage() {
     <div className="max-w-[1200px] mx-auto px-4 sm:px-8 pt-5 sm:pt-8 pb-12 sm:pb-20">
       <SEOHead
         title="Sell Old Earbuds Online — Instant Cash | SecondSale"
-        description="Sell used Apple AirPods, Samsung Galaxy Buds, OnePlus, boAt, and Sony earbuds online for the highest price. Free doorstep pickup & instant payment."
+        description="Sell used Apple AirPods, Bose, Google Pixel Buds, Samsung Galaxy Buds, OnePlus, and Nothing earbuds online for the highest price. Free doorstep pickup & instant payment."
         canonicalUrl="/sell-earbuds/brand"
       />
 
@@ -104,7 +104,7 @@ export default function EarbudsBrandSelectionPage() {
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search brand (e.g. Apple, Samsung, boAt)..."
+            placeholder="Search brand (e.g. Apple, Bose, Google, Samsung, OnePlus, Nothing)..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all shadow-xs"

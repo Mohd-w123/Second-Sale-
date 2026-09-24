@@ -7,7 +7,7 @@ import SEOHead from "../components/seo/SEOHead";
 import { GAMING_BRANDS } from "../constants/devices";
 import { Gamepad2, Search, ShieldCheck, Zap, Truck } from "lucide-react";
 
-const GAMING_BRAND_ORDER = ["Sony", "Microsoft", "Nintendo"];
+const GAMING_BRAND_ORDER = ["Sony", "Microsoft"];
 
 const sortBrands = (brandsList) => {
   return [...brandsList].sort((a, b) => {
@@ -78,7 +78,7 @@ export default function GamingBrandSelectionPage() {
     <div className="max-w-[1200px] mx-auto px-4 sm:px-8 pt-5 sm:pt-8 pb-12 sm:pb-20">
       <SEOHead
         title="Sell Old Gaming Console Online — Instant Cash | SecondSale"
-        description="Sell used PlayStation PS5, PS4, Xbox Series X, Nintendo Switch online for highest price. Free doorstep pickup & instant payment."
+        description="Sell used PlayStation PS5, PS4, and Xbox Series X, Xbox One online for the highest price. Free doorstep pickup & instant payment."
         canonicalUrl="/sell-gaming/brand"
       />
 
@@ -97,7 +97,7 @@ export default function GamingBrandSelectionPage() {
           Select Your Console <span className="text-blue-600">Brand</span>
         </h1>
         <p className="text-slate-500 text-sm sm:text-base max-w-xl mx-auto">
-          Get an instant cash offer for your used Sony PlayStation, Microsoft Xbox, or Nintendo Switch with free doorstep pickup across India.
+          Get an instant cash offer for your used Sony PlayStation or Microsoft Xbox with free doorstep pickup across India.
         </p>
 
         {/* Search Bar */}
@@ -105,7 +105,7 @@ export default function GamingBrandSelectionPage() {
           <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search brand (e.g. Sony, Microsoft, Nintendo)..."
+            placeholder="Search brand (e.g. Sony, Microsoft)..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all shadow-xs"
