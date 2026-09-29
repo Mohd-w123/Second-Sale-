@@ -76,9 +76,10 @@ export default function TvConditionQuizPage() {
       });
 
     quizService.getQuizByCategory('tv')
-      .then(res => {
-        if (isMounted && res?.data?.quiz) {
-          setQuizConfig(res.data.quiz);
+      .then(data => {
+        const config = data?.quiz || data;
+        if (isMounted && config?.steps) {
+          setQuizConfig(config);
         }
       })
       .catch(err => console.error('Failed to load TV quiz config:', err));

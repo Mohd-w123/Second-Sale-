@@ -1,8 +1,11 @@
 // Default Quiz Configurations based on live Cashify ground truth
+// seedVersion: increment when deduction values change to auto-reset stale DB configs
+export const QUIZ_SEED_VERSION = 5;
 
 export const DEFAULT_QUIZZES = {
   mobile: {
     category: 'mobile',
+    seedVersion: 5,
     steps: [
       {
         id: 'device_details',
@@ -105,7 +108,7 @@ export const DEFAULT_QUIZZES = {
                 description: 'Visible lines, yellow/pink spots or discoloration',
                 icon: 'DefectScreenSpotsLinesIcon',
                 deductionType: 'percentage',
-                deductionValue: 30,
+                deductionValue: 25,
                 isNegative: true,
               },
               {
@@ -114,7 +117,7 @@ export const DEFAULT_QUIZZES = {
                 description: 'Minor/major scratches or dents on side frame or back',
                 icon: 'DefectBodyScratchDentIcon',
                 deductionType: 'percentage',
-                deductionValue: 10,
+                deductionValue: 6,
                 isNegative: true,
               },
               {
@@ -123,9 +126,73 @@ export const DEFAULT_QUIZZES = {
                 description: 'Back panel or side buttons loose/cracked/missing',
                 icon: 'DefectPanelMissingBrokenIcon',
                 deductionType: 'percentage',
-                deductionValue: 15,
+                deductionValue: 25,
                 isNegative: true,
               },
+            ],
+          },
+          // ── Sub-defect deductions: configurable per sub-option from admin panel ──
+          // These options MATCH the deductionKey values in SUB_DEFECT_CONFIGS on the frontend.
+          // getDeductionPct() searches all quiz config options, so setting these here
+          // makes each sub-option percentage admin-configurable without any code changes.
+          {
+            id: 'sub_screen_broken_scratch',
+            title: '↳ Broken/Scratch Sub-options',
+            subtitle: 'Deduction % for each screen damage severity (applies when user selects sub-condition)',
+            type: 'single_choice',
+            required: false,
+            options: [
+              { id: 'screen_cracked', label: 'Screen cracked / glass broken (in warranty)', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+              { id: 'screen_chipped', label: 'Chipped / cracked outside display area (in warranty)', deductionType: 'percentage', deductionValue: 15, isNegative: true },
+              { id: 'screen_scratches_major', label: 'More than 2 scratches on screen (in warranty)', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+              { id: 'screen_scratches_minor', label: '1–2 scratches on screen (in warranty)', deductionType: 'percentage', deductionValue: 5, isNegative: true },
+              // Out-of-warranty overrides — applied automatically when device is out of warranty
+              { id: 'screen_cracked_ow', label: 'Screen cracked / glass broken (out of warranty)', deductionType: 'percentage', deductionValue: 35, isNegative: true },
+              { id: 'screen_chipped_ow', label: 'Chipped / cracked outside display area (out of warranty)', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+              { id: 'screen_scratches_major_ow', label: 'More than 2 scratches on screen (out of warranty)', deductionType: 'percentage', deductionValue: 20, isNegative: true },
+              { id: 'screen_scratches_minor_ow', label: '1–2 scratches on screen (out of warranty)', deductionType: 'percentage', deductionValue: 8, isNegative: true },
+            ],
+          },
+          {
+            id: 'sub_screen_spots_lines',
+            title: '↳ Dead Spot/Lines Sub-options',
+            subtitle: 'Deduction % for each dead-spot/line/discoloration sub-condition',
+            type: 'single_choice',
+            required: false,
+            options: [
+              { id: 'deadPixels', label: 'Large / heavy visible spots on screen', deductionType: 'percentage', deductionValue: 30, isNegative: true },
+              { id: 'dead_spots_lines', label: '3 or more minor spots on screen', deductionType: 'percentage', deductionValue: 30, isNegative: true },
+              { id: 'screen_spots_minor', label: '1–2 minor spots on screen', deductionType: 'percentage', deductionValue: 5, isNegative: true },
+              { id: 'screen_lines', label: 'Visible line(s) on display', deductionType: 'percentage', deductionValue: 30, isNegative: true },
+              { id: 'screen_faded', label: 'Display faded along edges', deductionType: 'percentage', deductionValue: 16, isNegative: true },
+              { id: 'screen_discoloration_major', label: 'Major discoloration', deductionType: 'percentage', deductionValue: 18, isNegative: true },
+              { id: 'screen_discoloration_minor', label: 'Minor discoloration', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+            ],
+          },
+          {
+            id: 'sub_body_scratch_dent',
+            title: '↳ Body Scratch/Dent Sub-options',
+            subtitle: 'Deduction % for each body scratch/dent sub-condition',
+            type: 'single_choice',
+            required: false,
+            options: [
+              { id: 'scratches', label: 'More than 2 scratches on body', deductionType: 'percentage', deductionValue: 6, isNegative: true },
+              { id: 'body_scratches_minor', label: '1–2 scratches on body', deductionType: 'percentage', deductionValue: 3, isNegative: true },
+              { id: 'body_dents_major', label: 'Major dents or more than 2 dents on body', deductionType: 'percentage', deductionValue: 6, isNegative: true },
+              { id: 'body_scratches_dents', label: '1–2 minor dents on body', deductionType: 'percentage', deductionValue: 5, isNegative: true },
+            ],
+          },
+          {
+            id: 'sub_panel_missing_broken',
+            title: '↳ Panel Missing/Broken Sub-options',
+            subtitle: 'Deduction % for each panel damage sub-condition',
+            type: 'single_choice',
+            required: false,
+            options: [
+              { id: 'panel_cracked', label: 'Cracked / broken side or back panel', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+              { id: 'panel_missing', label: 'Missing side or back panel', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+              { id: 'bent_curved', label: 'Bent / curved panel', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+              { id: 'loose_screen', label: 'Loose screen (gap between screen and body)', deductionType: 'percentage', deductionValue: 10, isNegative: true },
             ],
           },
         ],
@@ -142,24 +209,24 @@ export const DEFAULT_QUIZZES = {
             type: 'multi_choice',
             required: false,
             options: [
-              { id: 'front_camera', label: 'Front Camera not working', icon: 'FrontCameraIcon', deductionType: 'percentage', deductionValue: 8, isNegative: true },
-              { id: 'back_camera', label: 'Back Camera not working', icon: 'BackCameraIcon', deductionType: 'percentage', deductionValue: 15, isNegative: true },
-              { id: 'volume_button', label: 'Volume Button not working', icon: 'VolumeButtonIcon', deductionType: 'percentage', deductionValue: 4, isNegative: true },
-              { id: 'finger_touch', label: 'Finger Touch / Face ID', icon: 'FingerTouchIcon', deductionType: 'percentage', deductionValue: 26, isNegative: true },
-              { id: 'wifi_issue', label: 'WiFi not working', icon: 'WifiSignalIcon', deductionType: 'percentage', deductionValue: 39, isNegative: true },
+              { id: 'front_camera', label: 'Front Camera not working', icon: 'FrontCameraIcon', deductionType: 'percentage', deductionValue: 6, isNegative: true },
+              { id: 'back_camera', label: 'Back Camera not working', icon: 'BackCameraIcon', deductionType: 'percentage', deductionValue: 12, isNegative: true },
+              { id: 'volume_button', label: 'Volume Button not working', icon: 'VolumeButtonIcon', deductionType: 'percentage', deductionValue: 3, isNegative: true },
+              { id: 'finger_touch', label: 'Finger Touch / Face ID', icon: 'FingerTouchIcon', deductionType: 'percentage', deductionValue: 14, isNegative: true },
+              { id: 'wifi_issue', label: 'WiFi not working', icon: 'WifiSignalIcon', deductionType: 'percentage', deductionValue: 14, isNegative: true },
               { id: 'speaker_faulty', label: 'Speaker Faulty', icon: 'SpeakerIcon', deductionType: 'percentage', deductionValue: 4, isNegative: true },
-              { id: 'silent_button', label: 'Silent Button not working', icon: 'SilentSwitchIcon', deductionType: 'percentage', deductionValue: 3, isNegative: true },
-              { id: 'face_sensor', label: 'Face Sensor not working', icon: 'FaceSensorIcon', deductionType: 'percentage', deductionValue: 26, isNegative: true },
-              { id: 'power_button', label: 'Power Button not working', icon: 'PowerButtonIcon', deductionType: 'percentage', deductionValue: 2, isNegative: true },
-              { id: 'charging_port', label: 'Charging Port not working', icon: 'ChargingPortIcon', deductionType: 'percentage', deductionValue: 10, isNegative: true },
-              { id: 'audio_receiver', label: 'Audio Receiver not working', icon: 'SpeakerIcon', deductionType: 'percentage', deductionValue: 7, isNegative: true },
-              { id: 'camera_glass_broken', label: 'Camera Glass Broken', icon: 'CameraGlassBrokenIcon', deductionType: 'percentage', deductionValue: 8, isNegative: true },
-              { id: 'microphone', label: 'Microphone not working', icon: 'MicrophoneIcon', deductionType: 'percentage', deductionValue: 2, isNegative: true },
-              { id: 'bluetooth', label: 'Bluetooth not working', icon: 'BluetoothIcon', deductionType: 'percentage', deductionValue: 39, isNegative: true },
+              { id: 'silent_button', label: 'Silent Button not working', icon: 'SilentSwitchIcon', deductionType: 'percentage', deductionValue: 2, isNegative: true },
+              { id: 'face_sensor', label: 'Face Sensor not working', icon: 'FaceSensorIcon', deductionType: 'percentage', deductionValue: 16, isNegative: true },
+              { id: 'power_button', label: 'Power Button not working', icon: 'PowerButtonIcon', deductionType: 'percentage', deductionValue: 3, isNegative: true },
+              { id: 'charging_port', label: 'Charging Port not working', icon: 'ChargingPortIcon', deductionType: 'percentage', deductionValue: 6, isNegative: true },
+              { id: 'audio_receiver', label: 'Audio Receiver not working', icon: 'SpeakerIcon', deductionType: 'percentage', deductionValue: 4, isNegative: true },
+              { id: 'camera_glass_broken', label: 'Camera Glass Broken', icon: 'CameraGlassBrokenIcon', deductionType: 'percentage', deductionValue: 5, isNegative: true },
+              { id: 'microphone', label: 'Microphone not working', icon: 'MicrophoneIcon', deductionType: 'percentage', deductionValue: 3, isNegative: true },
+              { id: 'bluetooth', label: 'Bluetooth not working', icon: 'BluetoothIcon', deductionType: 'percentage', deductionValue: 10, isNegative: true },
               { id: 'vibrator', label: 'Vibrator is not working', icon: 'VibratorIcon', deductionType: 'percentage', deductionValue: 2, isNegative: true },
               { id: 'proximity_sensor', label: 'Proximity Sensor not working', icon: 'ProximitySensorIcon', deductionType: 'percentage', deductionValue: 3, isNegative: true },
-              { id: 'battery_service', label: 'Battery in Service (<80% health)', icon: 'BatteryWarningIcon', deductionType: 'percentage', deductionValue: 13, isNegative: true },
-              { id: 'battery_80_85', label: 'Battery Health 80-85%', icon: 'BatteryWarningYellowIcon', deductionType: 'percentage', deductionValue: 6, isNegative: true },
+              { id: 'battery_service', label: 'Battery in Service (<80% health)', icon: 'BatteryWarningIcon', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+              { id: 'battery_80_85', label: 'Battery Health 80-85%', icon: 'BatteryWarningYellowIcon', deductionType: 'percentage', deductionValue: 5, isNegative: true },
             ],
           },
         ],
@@ -186,6 +253,7 @@ export const DEFAULT_QUIZZES = {
   },
   tablet: {
     category: 'tablet',
+    seedVersion: 2,
     steps: [
       {
         id: 'device_details',
@@ -269,11 +337,11 @@ export const DEFAULT_QUIZZES = {
             type: 'multi_choice',
             required: false,
             options: [
-              { id: 'battery_service', label: 'Battery Warning / Degraded', icon: 'BatteryWarningIcon', deductionType: 'percentage', deductionValue: 15, isNegative: true },
-              { id: 'wifi_issue', label: 'Wi-Fi / Bluetooth Faulty', icon: 'WifiSignalIcon', deductionType: 'percentage', deductionValue: 35, isNegative: true },
-              { id: 'front_camera', label: 'Front Camera Faulty', icon: 'FrontCameraIcon', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+              { id: 'battery_service', label: 'Battery Warning / Degraded', icon: 'BatteryWarningIcon', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+              { id: 'wifi_issue', label: 'Wi-Fi / Bluetooth Faulty', icon: 'WifiSignalIcon', deductionType: 'percentage', deductionValue: 14, isNegative: true },
+              { id: 'front_camera', label: 'Front Camera Faulty', icon: 'FrontCameraIcon', deductionType: 'percentage', deductionValue: 6, isNegative: true },
               { id: 'back_camera', label: 'Back Camera Faulty', icon: 'BackCameraIcon', deductionType: 'percentage', deductionValue: 12, isNegative: true },
-              { id: 'charging_port', label: 'Charging Port Faulty', icon: 'ChargingPortIcon', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+              { id: 'charging_port', label: 'Charging Port Faulty', icon: 'ChargingPortIcon', deductionType: 'percentage', deductionValue: 6, isNegative: true },
             ],
           },
           {
@@ -294,6 +362,7 @@ export const DEFAULT_QUIZZES = {
   },
   laptop: {
     category: 'laptop',
+    seedVersion: 2,
     steps: [
       {
         id: 'power_status',
@@ -515,6 +584,285 @@ export const DEFAULT_QUIZZES = {
               { id: 'less_than_1', label: 'Less than 1 year (in warranty)', deductionType: 'percentage', deductionValue: 0, isNegative: false },
               { id: '1_to_3_years', label: 'Between 1 - 3 years', deductionType: 'percentage', deductionValue: 12, isNegative: true },
               { id: 'more_than_3_years', label: 'More than 3 years', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  smartwatch: {
+    category: 'smartwatch',
+    steps: [
+      {
+        id: 'watch_details',
+        label: 'Device Details',
+        subtitle: 'Tell us more about your smartwatch',
+        questions: [
+          {
+            id: 'watch_turn_on',
+            title: 'Does your smartwatch turn on and boot properly?',
+            subtitle: 'Check if the device powers on and shows screen display.',
+            type: 'yes_no',
+            required: true,
+            options: [
+              { id: 'yes', label: 'Yes', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 70, isNegative: true },
+            ],
+          },
+          {
+            id: 'watch_touch_screen',
+            title: 'Is the touch screen responding smoothly?',
+            subtitle: 'Check if swipes, taps, and digital crown work properly.',
+            type: 'yes_no',
+            required: true,
+            options: [
+              { id: 'yes', label: 'Yes', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 40, isNegative: true },
+            ],
+          },
+          {
+            id: 'watch_screen_condition',
+            title: 'Screen & Glass Condition',
+            subtitle: 'Select the visual condition of the front display glass.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'no_scratch', label: 'Flawless (No scratches)', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'minor_scratch', label: '1-2 Minor hairline scratches', deductionType: 'percentage', deductionValue: 8, isNegative: true },
+              { id: 'major_scratches', label: 'Multiple visible scratches', deductionType: 'percentage', deductionValue: 18, isNegative: true },
+              { id: 'cracked_broken', label: 'Cracked or chipped glass', deductionType: 'percentage', deductionValue: 50, isNegative: true },
+            ],
+          },
+          {
+            id: 'watch_warranty',
+            title: 'Is your smartwatch under valid brand warranty?',
+            subtitle: 'Having a valid GST purchase invoice increases your value.',
+            type: 'yes_no',
+            required: true,
+            options: [
+              { id: 'yes', label: 'Yes (Under warranty)', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'no', label: 'No / Expired', deductionType: 'percentage', deductionValue: 15, isNegative: true },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'watch_functional_defects',
+        label: 'Functional & Health Sensors',
+        subtitle: 'Select applicable sensor or hardware defects',
+        questions: [
+          {
+            id: 'watch_defects',
+            title: 'Select functional issues if applicable',
+            subtitle: 'Select all that apply to your watch',
+            type: 'multi_choice',
+            required: false,
+            options: [
+              { id: 'battery_issue', label: 'Battery drains rapidly (<12 hours)', deductionType: 'percentage', deductionValue: 15, isNegative: true },
+              { id: 'sensor_faulty', label: 'Heart rate / SpO2 / ECG sensor faulty', deductionType: 'percentage', deductionValue: 20, isNegative: true },
+              { id: 'speaker_mic_faulty', label: 'Speaker or microphone not clear', deductionType: 'percentage', deductionValue: 12, isNegative: true },
+              { id: 'vibration_faulty', label: 'Vibration / haptic motor not working', deductionType: 'percentage', deductionValue: 8, isNegative: true },
+              { id: 'bluetooth_wifi_faulty', label: 'Bluetooth or Wi-Fi sync issues', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'watch_accessories',
+        label: 'Accessories & Strap',
+        subtitle: 'Which accessories do you have available?',
+        questions: [
+          {
+            id: 'watch_acc',
+            title: 'Included Accessories',
+            subtitle: 'Original accessories give you the highest trade-in value.',
+            type: 'multi_choice',
+            required: false,
+            options: [
+              { id: 'original_charger', label: 'Original magnetic charging cable/puck', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'original_strap', label: 'Original strap / band intact', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'original_box', label: 'Original brand retail box', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'missing_charger', label: 'Missing original charger', deductionType: 'flat_inr', deductionValue: 800, isNegative: true },
+              { id: 'missing_box', label: 'Missing retail box', deductionType: 'flat_inr', deductionValue: 300, isNegative: true },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  earbuds: {
+    category: 'earbuds',
+    steps: [
+      {
+        id: 'earbuds_details',
+        label: 'Audio & Connectivity',
+        subtitle: 'Tell us about playback and audio clarity',
+        questions: [
+          {
+            id: 'earbuds_working',
+            title: 'Are both earbuds functioning properly?',
+            subtitle: 'Check audio playback from both left and right sides.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'both_working', label: 'Both earbuds working properly', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'left_only', label: 'Only Left earbud works (Right is dead)', deductionType: 'percentage', deductionValue: 50, isNegative: true },
+              { id: 'right_only', label: 'Only Right earbud works (Left is dead)', deductionType: 'percentage', deductionValue: 50, isNegative: true },
+              { id: 'neither_working', label: 'Neither earbud works', deductionType: 'percentage', deductionValue: 85, isNegative: true },
+            ],
+          },
+          {
+            id: 'earbuds_audio_quality',
+            title: 'Sound Quality & Microphone',
+            subtitle: 'Check audio clarity, bass, and calling mic.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'flawless_sound', label: 'Flawless clear audio & mic', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'low_volume', label: 'Low volume in one or both earbuds', deductionType: 'percentage', deductionValue: 20, isNegative: true },
+              { id: 'distorted_sound', label: 'Distorted or buzzing sound', deductionType: 'percentage', deductionValue: 30, isNegative: true },
+              { id: 'mic_not_working', label: 'Microphone not picking up voice on calls', deductionType: 'percentage', deductionValue: 15, isNegative: true },
+            ],
+          },
+          {
+            id: 'earbuds_warranty',
+            title: 'Is your device under valid manufacturer warranty?',
+            subtitle: 'Valid GST bill required for in-warranty pricing.',
+            type: 'yes_no',
+            required: true,
+            options: [
+              { id: 'yes', label: 'Yes (Under warranty with invoice)', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'no', label: 'No / Expired', deductionType: 'percentage', deductionValue: 15, isNegative: true },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'earbuds_case_condition',
+        label: 'Charging Case & Battery',
+        subtitle: 'Select charging case functionality and battery backup',
+        questions: [
+          {
+            id: 'case_condition',
+            title: 'Charging Case Condition',
+            subtitle: 'Does the charging case hold charge and charge both earbuds?',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'case_flawless', label: 'Case charges normally & holds battery', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'case_battery_weak', label: 'Case battery drains quickly', deductionType: 'percentage', deductionValue: 20, isNegative: true },
+              { id: 'case_not_charging', label: 'Case not charging earbuds properly', deductionType: 'percentage', deductionValue: 45, isNegative: true },
+            ],
+          },
+          {
+            id: 'earbuds_body_condition',
+            title: 'Physical Cosmetic Condition',
+            subtitle: 'Scratches, scuffs, or dents on earbuds/case.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'like_new', label: 'Flawless (No scratches or dents)', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'minor_scratches', label: 'Minor surface scuffs on case', deductionType: 'percentage', deductionValue: 6, isNegative: true },
+              { id: 'heavy_scratches', label: 'Deep scratches, yellowing, or chipped plastic', deductionType: 'percentage', deductionValue: 20, isNegative: true },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  gaming: {
+    category: 'gaming',
+    steps: [
+      {
+        id: 'console_details',
+        label: 'System & Power',
+        subtitle: 'Console boot, display, and disk drive',
+        questions: [
+          {
+            id: 'console_powers_on',
+            title: 'Does the console power on and display home menu?',
+            subtitle: 'Check if system boots cleanly without error lights or beeps.',
+            type: 'yes_no',
+            required: true,
+            options: [
+              { id: 'yes', label: 'Yes (Boots to dashboard)', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'no', label: 'No / Power light of death / Shuts down immediately', deductionType: 'percentage', deductionValue: 80, isNegative: true },
+            ],
+          },
+          {
+            id: 'console_display_output',
+            title: 'HDMI / Video Output Quality',
+            subtitle: 'Check HDMI port for artifacts, flickering, or bent pins.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'flawless_hdmi', label: 'Flawless 1080p / 4K output without glitch', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'loose_hdmi', label: 'Loose HDMI port / intermittent signal', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+              { id: 'damaged_hdmi', label: 'Damaged HDMI port / no video output', deductionType: 'percentage', deductionValue: 60, isNegative: true },
+            ],
+          },
+          {
+            id: 'console_disc_drive',
+            title: 'Disc Drive Condition',
+            subtitle: 'Applies to Disc / Standard Edition consoles.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'drive_working', label: 'Disc drive reads & ejects game discs properly', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'drive_faulty', label: 'Disc drive makes grinding noise or cannot read discs', deductionType: 'percentage', deductionValue: 25, isNegative: true },
+              { id: 'digital_console', label: 'Digital Edition (No disc drive)', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'console_controllers_thermal',
+        label: 'Controller & Cooling',
+        subtitle: 'Thermal status and controller functionality',
+        questions: [
+          {
+            id: 'console_controller',
+            title: 'Controller Condition',
+            subtitle: 'Check thumbsticks, triggers, and wireless connectivity.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'controller_flawless', label: 'Original wireless controller in flawless working order', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'stick_drift', label: 'Controller has stick drift or worn thumbsticks', deductionType: 'percentage', deductionValue: 15, isNegative: true },
+              { id: 'no_controller', label: 'No controller included', deductionType: 'flat_inr', deductionValue: 2500, isNegative: true },
+            ],
+          },
+          {
+            id: 'console_thermals',
+            title: 'Fan Noise & Temperature',
+            subtitle: 'Check cooling fans under load while playing games.',
+            type: 'single_choice',
+            required: true,
+            options: [
+              { id: 'normal_quiet', label: 'Runs quietly without overheating warning', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'loud_fan', label: 'Very loud jet engine fan noise under load', deductionType: 'percentage', deductionValue: 12, isNegative: true },
+              { id: 'overheating_shutdown', label: 'Console overheats and shuts down during gameplay', deductionType: 'percentage', deductionValue: 40, isNegative: true },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'console_accessories',
+        label: 'Cables & Retail Box',
+        subtitle: 'Select included cables and packaging',
+        questions: [
+          {
+            id: 'console_acc',
+            title: 'Included Accessories',
+            subtitle: 'Standard accessories required for trade-in.',
+            type: 'multi_choice',
+            required: false,
+            options: [
+              { id: 'power_cable', label: 'Original AC Power Cable included', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'hdmi_cable', label: 'High Speed HDMI Cable included', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'original_box', label: 'Original packaging box with inserts', deductionType: 'percentage', deductionValue: 0, isNegative: false },
+              { id: 'missing_power_hdmi', label: 'Missing power or HDMI cable', deductionType: 'flat_inr', deductionValue: 600, isNegative: true },
+              { id: 'missing_box', label: 'Missing retail box', deductionType: 'flat_inr', deductionValue: 500, isNegative: true },
             ],
           },
         ],

@@ -77,7 +77,6 @@ export default function AdminLayout() {
     { key: 'devices', to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
     { key: 'quiz', to: '/admin/quiz', icon: HelpCircle, label: 'Quiz & Deductions' },
     { key: 'refurbished', to: '/admin/refurbished', icon: Package, label: 'Refurbished' },
-    { key: 'categories', to: '/admin/categories', icon: Layers, label: 'Categories' },
     { key: 'partners', to: '/admin/partners', icon: Handshake, label: 'Partners' },
     { key: 'orders', to: '/admin/orders', icon: ClipboardList, label: 'Orders' },
     { key: 'pincodes', to: '/admin/pincodes', icon: MapPin, label: 'Pincodes' },

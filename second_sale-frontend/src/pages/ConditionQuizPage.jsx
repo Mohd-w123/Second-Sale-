@@ -178,7 +178,7 @@ const SUB_DEFECT_CONFIGS = {
         title: '2. Dents on device Body',
         subtitle: 'Check for dents on device body',
         options: [
-          { id: 'dents_major', label: 'Major dent(s) or more than 2', icon: BodyDentMajorIcon, deductionKey: 'bent_curved' },
+          { id: 'dents_major', label: 'Major dent(s) or more than 2', icon: BodyDentMajorIcon, deductionKey: 'body_dents_major' },
           { id: 'dents_minor', label: '1-2 minor dents', icon: BodyDentMinorIcon, deductionKey: 'body_scratches_dents' },
           { id: 'dents_none', label: 'No dents', icon: CleanPhoneWithSparkleIcon, deductionKey: null },
         ],
@@ -251,10 +251,19 @@ const supportsESIM = (modelName) => {
 const bundlesCharger = (brand, modelName) => {
   if (!modelName) return true;
   const name = modelName.toLowerCase();
-  if (brand?.toLowerCase() === 'apple') {
+  const b = brand?.toLowerCase() || '';
+  if (b === 'apple' || name.includes('iphone')) {
     const noChargerPatterns = [
       'iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone se 2022'
     ];
+    return !noChargerPatterns.some(p => name.includes(p));
+  }
+  if (b === 'samsung') {
+    const noChargerPatterns = ['s21', 's22', 's23', 's24', 's25', 'fold', 'flip'];
+    return !noChargerPatterns.some(p => name.includes(p));
+  }
+  if (b === 'google') {
+    const noChargerPatterns = ['pixel 6', 'pixel 7', 'pixel 8', 'pixel 9'];
     return !noChargerPatterns.some(p => name.includes(p));
   }
   return true;
@@ -377,16 +386,9 @@ export default function ConditionQuizPage() {
     isScreenOriginal: isScreenOriginal ?? true,
     underWarranty: isWarrantyEligible ? (underWarranty ?? true) : false,
     hasGSTBill: isWarrantyEligible ? (hasGSTBill ?? true) : false,
-    eSIMSupport: eSIMSupport === 'dual_esim' ? 'dual_esim' : 'single_esim',
-    screenCondition: (
-      subDefectAnswers.screen_physical_condition === 'screen_cracked' ||
-      screenBodyDefects.includes('defect_screen_broken_scratch')
-    ) ? 'cracked' : 'none',
-    bodyCondition: (
-      subDefectAnswers.body_dents === 'dents_major' ||
-      subDefectAnswers.body_scratches === 'scratches_heavy' ||
-      screenBodyDefects.includes('defect_body_scratch_dent')
-    ) ? 'average' : 'good',
+    eSIMSupport: eSIMSupport,  // null | 'single_esim' | 'dual_esim' | 'esim_only_global'
+    screenCondition: 'none',
+    bodyCondition: 'good',
     physicalIssues: activeSubDefectDeductionKeys,
     technicalIssues: functionalProblems,
     hasBox,
@@ -644,8 +646,8 @@ export default function ConditionQuizPage() {
                         ESIM SUPPORT
                       </span>
                       <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                        {eSIMSupport === 'dual_esim' ? 'Dual eSIM' : 'Single eSIM'}
+                        <span className={`w-2 h-2 rounded-full ${eSIMSupport ? 'bg-blue-500' : 'bg-gray-300'}`}></span>
+                        {eSIMSupport === 'dual_esim' ? 'Dual eSIM' : eSIMSupport === 'single_esim' ? 'Single eSIM' : '—'}
                       </p>
                     </div>
                   )}
@@ -1421,7 +1423,9 @@ export default function ConditionQuizPage() {
                   {isEsimDevice && (
                     <div className="flex justify-between">
                       <span>eSIM Support:</span>
-                      <span className="font-bold text-gray-900">{eSIMSupport === 'dual_esim' ? 'Dual eSIM' : 'Single eSIM'}</span>
+                      <span className="font-bold text-gray-900">
+                        {eSIMSupport === 'dual_esim' ? 'Dual eSIM' : eSIMSupport === 'single_esim' ? 'Single eSIM' : '—'}
+                      </span>
                     </div>
                   )}
                 </div>

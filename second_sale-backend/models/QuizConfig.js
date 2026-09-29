@@ -48,6 +48,12 @@ const quizConfigSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  // Tracks which seed version calibrated these deduction values
+  // Auto-incremented in defaultQuizData.js when values change; triggers auto-reset in controller
+  seedVersion: {
+    type: Number,
+    default: 1,
+  },
 }, {
   timestamps: true,
 });

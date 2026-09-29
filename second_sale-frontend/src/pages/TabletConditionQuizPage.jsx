@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { deviceService } from '../services/device.service';
+import { quizService } from '../services/quiz.service';
 import { useQuote } from '../hooks/useQuote';
 import { useAuth } from '../hooks/useAuth';
 import { calculatePrice } from '../utils/priceCalculator';
@@ -163,6 +164,20 @@ export default function TabletConditionQuizPage() {
   const [priceAnimating, setPriceAnimating] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [breakdown, setBreakdown] = useState(null);
+  const [quizConfig, setQuizConfig] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    quizService.getQuizByCategory('tablet')
+      .then(data => {
+        const config = data?.quiz || data;
+        if (isMounted && config?.steps) {
+          setQuizConfig(config);
+        }
+      })
+      .catch(err => console.error('Failed to load tablet quiz config:', err));
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     deviceService.getDevice(slug).then(res => {
@@ -185,6 +200,10 @@ export default function TabletConditionQuizPage() {
     if (!device) return;
     const variant = device.variants.find(v => v.storage === storage) || device.variants[0];
 
+    const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
+      ? device.customQuiz
+      : quizConfig;
+
     // Calculate new price dynamically based on user inputs
     const result = calculatePrice({
       brand: device.brand,
@@ -204,7 +223,7 @@ export default function TabletConditionQuizPage() {
       technicalIssues,
       hasCharger: selectedAccessories.includes('Charger'),
       hasBox: selectedAccessories.includes('Box'),
-      quizConfig: (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0) ? device.customQuiz : null,
+      quizConfig: effectiveQuizConfig,
     });
 
     setPriceAnimating(true);
@@ -213,6 +232,7 @@ export default function TabletConditionQuizPage() {
     setBreakdown(result);
   }, [
     device,
+    quizConfig,
     deviceAge,
     ableToMakeCalls,
     isTouchScreenWorking,

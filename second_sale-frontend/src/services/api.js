@@ -5,20 +5,35 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Request interceptor — attach access token
+// Request interceptor — attach access token or admin token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (!config.headers.Authorization) {
+    const adminToken = localStorage.getItem('adminToken');
+    const userToken = localStorage.getItem('accessToken');
+    
+    // Prioritize adminToken for any /admin endpoint, or fallback to available token
+    if (config.url?.includes('/admin') && adminToken) {
+      config.headers.Authorization = `Bearer ${adminToken}`;
+    } else if (userToken) {
+      config.headers.Authorization = `Bearer ${userToken}`;
+    } else if (adminToken) {
+      config.headers.Authorization = `Bearer ${adminToken}`;
+    }
   }
   return config;
 });
 
-// Response interceptor — auto-refresh on 401
+// Response interceptor — auto-refresh on 401 (for customer routes only)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    
+    // Never run consumer refresh/redirect logic on admin endpoints
+    if (originalRequest?.url?.includes('/admin')) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {

@@ -1,69 +1,105 @@
-import { isSpecialModel } from './specialModels';
+import { isSpecialModel } from './specialModels.js';
 
-// ─── EXTENSIBLE ISSUE DEDUCTION PERCENTAGES ───────────────────────────────
+// ─── EXTENSIBLE ISSUE DEDUCTION PERCENTAGES (MATCHING LIVE CASHIFY GROUND TRUTH) ────
 export const ISSUE_DEDUCTIONS = {
   // Cashify Screen Condition Keys
   none: 0,
-  scratches: 5,
-  cracked: 35,
-  faulty: 35,
-  not_usable: 65,
-  
+  scratches: 6,              // > 2 scratches on body (also used as general scratch key)
+  cracked: 28,
+  faulty: 55,
+  not_usable: 85,
+
   // Cashify Body Condition Keys
   good: 0,
   flawless: 0,
-  average: 8,
-  below_average: 18,
-  broken: 25,
+  average: 6,
+  below_average: 12,
+  broken: 20,
 
-  // Physical Issues & Sub-Defects (Matching Live Cashify Evaluation)
-  glass_crack: 40,
-  back_panel: 17,
-  camera_glass_broken: 8,
-  screen_scratches_minor: 5,
-  screen_scratches_major: 12,
-  screen_cracked: 35,
-  screen_chipped: 15,
-  deadPixels: 35,
-  dead_spots_lines: 25,
-  screen_spots_minor: 15,
-  screen_lines: 35,
-  screen_faded: 18,
-  screen_discoloration_major: 20,
+  // ─── Screen broken/scratch sub-defects (Cashify calibrated, warranty-aware) ──────────
+  glass_crack: 28,
+  back_panel: 12,
+  camera_glass_broken: 5,
+  // In-warranty deductions (used when device underWarranty === true or warranty not applicable)
+  screen_scratches_minor: 5,       // 1-2 scratches (in warranty)
+  screen_scratches_major: 10,      // > 2 scratches (in warranty)
+  screen_cracked: 25,              // screen cracked / glass broken (in warranty)
+  screen_chipped: 15,              // chipped outside display area (in warranty)
+  // Out-of-warranty overrides — applied automatically when underWarranty === false
+  screen_cracked_ow: 35,           // screen cracked (out of warranty)
+  screen_chipped_ow: 25,           // chipped (out of warranty)
+  screen_scratches_major_ow: 20,   // > 2 scratches (out of warranty)
+  screen_scratches_minor_ow: 8,    // 1-2 scratches (out of warranty)
+
+  // ─── Dead pixels / spots on screen ─────────────────────────────────────────────────
+  deadPixels: 30,                  // large / heavy spot on screen
+  dead_spots_lines: 30,            // 3 or more minor spots
+  screen_spots_minor: 5,           // 1-2 minor spots
+
+  // ─── Visible lines & fading ─────────────────────────────────────────────────────────
+  screen_lines: 30,                // visible lines on display
+  screen_faded: 16,                // display faded along edges
+
+  // ─── Discoloration ───────────────────────────────────────────────────────────────────
+  screen_discoloration_major: 18,
   screen_discoloration_minor: 10,
-  body_scratches_minor: 4,
-  scratches: 10,
-  body_scratches_dents: 8,
-  bent_curved: 20,
-  panel_missing_broken: 15,
-  panel_cracked: 12,
-  panel_missing: 18,
-  loose_screen: 10,
-  defect_screen_broken_scratch: 25,
-  defect_screen_spots_lines: 30,
-  defect_body_scratch_dent: 10,
-  defect_panel_missing_broken: 15,
 
-  // Technical Issues (Matching Cashify / DeviceKart)
-  battery_service: 13,
-  battery_80_85: 6,
-  front_camera: 8,
-  back_camera: 15,
-  volume_button: 4,
-  wifi_issue: 39,
-  finger_touch: 26,
-  face_unlock: 26,
-  face_sensor: 26,
+  // ─── Body scratches ──────────────────────────────────────────────────────────────────
+  body_scratches_minor: 3,         // 1-2 scratches on body
+  body_scratches_dents: 5,         // 1-2 minor dents on body
+
+  // ─── Body dents (separate key from bent_curved to avoid conflict) ────────────────────
+  body_dents_major: 6,             // major dents or > 2 dents on body
+
+  // ─── Panel damage ────────────────────────────────────────────────────────────────────
+  bent_curved: 25,                 // bent / curved panel
+  panel_missing_broken: 25,
+  panel_cracked: 25,               // cracked / broken side or back panel
+  panel_missing: 25,               // missing side or back panel
+  panel_loose_screen: 8,
+  loose_screen: 10,                // loose screen (gap between screen and body)
+
+  // Top-level defect category fallbacks (when no sub-defect is selected)
+  defect_screen_broken_scratch: 25,
+  defect_screen_spots_lines: 25,
+  defect_body_scratch_dent: 6,
+  defect_panel_missing_broken: 25,
+
+
+  // Technical Issues (Matching Cashify Benchmark)
+  battery_service: 10,
+  battery_80_85: 5,
+  front_camera: 6,
+  back_camera: 12,
+  volume_button: 3,
+  wifi_issue: 14,
+  finger_touch: 14,
+  face_unlock: 16,
+  face_sensor: 16,
   speaker_faulty: 4,
-  power_button: 2,
-  charging_port: 10,
-  audio_receiver: 7,
-  bluetooth: 39,
+  power_button: 3,
+  charging_port: 6,
+  audio_receiver: 4,
+  bluetooth: 10,
   vibrator: 2,
-  microphone: 2,
+  microphone: 3,
   proximity_sensor: 3,
-  silent_button: 3,
-  cellularNetworkFaulty: 20,
+  silent_button: 2,
+  cellularNetworkFaulty: 18,
+  dead: 88,
+  screenFaulty: 55,
+  copyScreen: 35,
+  eSIM: 6,
+  esim_only_global: 6,  // fallback if not set in quiz config
+  noBox: 3,
+  noCharger: 3,
+
+  // ─── WARRANTY & BILL COMBINED DEDUCTIONS (Cashify matrix, NOT from quiz config) ───
+  // These keys are resolved ONLY via device-specific overrides or these ISSUE_DEDUCTIONS defaults
+  // They must NEVER be picked up from quiz config (manufacturer_warranty question "No" option = 20%)
+  noBillWarrantyLost: 12,      // Under warranty, but no GST bill → warranty claim invalid
+  outOfWarranty: 14,            // Out of warranty, valid GST bill present
+  outOfWarrantyAndNoBill: 16,  // Out of warranty AND no GST bill (most common for old phones)
 };
 
 // ─── CASHIFY WARRANTY ELIGIBILITY RULE ─────────────────────────────────────
@@ -99,10 +135,28 @@ export function isDeviceWarrantyEligible(device) {
     return activeSamsung.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
   }
 
-  // 4. OnePlus: OnePlus 12, 12R, 13, Open, Nord 4, Nord CE 4
+  // 4. OnePlus: ALL series launched from Jan 2023 onwards (user requirement)
+  // OnePlus offers 2-year warranty; 2023 launches may still be in extended/service warranty.
+  // Models: Flagship (11/12/13/15), R-series (11R/12R/13R), Nord (3/4/5/6),
+  //         Nord CE (3/3 Lite/4/4 Lite/5/5 Lite/6/6 Lite), Open, N-series
   if (brand.includes('oneplus') || slug.includes('oneplus')) {
-    const activeOnePlus = ['oneplus 12', 'oneplus 13', 'oneplus open', 'nord 4', 'nord ce 4'];
-    return activeOnePlus.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+    const activeOnePlus = [
+      // Flagship & R-series (2023+)
+      'oneplus 11', 'oneplus 12', 'oneplus 13', 'oneplus 15',
+      'oneplus 11r', 'oneplus 12r', 'oneplus 13r',
+      // Nord series (2023+)
+      'nord 3', 'nord 4', 'nord 5', 'nord 6',
+      // Nord CE series (2023+)
+      'nord ce 3', 'nord ce 4', 'nord ce 5', 'nord ce 6',
+      'nord ce3', 'nord ce4', 'nord ce5', 'nord ce6',
+      // Nord N-series (2023+)
+      'nord n30',
+      // Foldable (2023+)
+      'oneplus open',
+      // N-series (2026+)
+      'oneplus n6', 'nord 6',
+    ];
+    return activeOnePlus.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')));
   }
 
   // 5. Google Pixel: Pixel 8, Pixel 9
@@ -128,9 +182,29 @@ export function isDeviceWarrantyEligible(device) {
   return false;
 }
 
+// Helper to determine if phone bundles a power adapter in the retail box
+export function bundlesCharger(brand, modelName) {
+  if (!modelName) return true;
+  const name = modelName.toLowerCase();
+  const b = brand?.toLowerCase() || '';
+  if (b === 'apple' || name.includes('iphone')) {
+    const noChargerPatterns = ['iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone se 2022'];
+    return !noChargerPatterns.some(p => name.includes(p));
+  }
+  if (b === 'samsung') {
+    const noChargerPatterns = ['s21', 's22', 's23', 's24', 's25', 'fold', 'flip'];
+    return !noChargerPatterns.some(p => name.includes(p));
+  }
+  if (b === 'google') {
+    const noChargerPatterns = ['pixel 6', 'pixel 7', 'pixel 8', 'pixel 9'];
+    return !noChargerPatterns.some(p => name.includes(p));
+  }
+  return true;
+}
+
 // ─── DYNAMIC MOBILE & TABLET PRICE CALCULATOR ──────────────────────────────
-// Evaluates deductions dynamically against device-configured rates or defaults.
-// Any newly added question, option, condition, or admin deduction resolves dynamically.
+// Evaluates deductions according to exact Cashify market methodology.
+// Prevents duplicate deductions, double-warranty penalties, and clamps values safely.
 export function calculatePrice({
   brand,
   modelName,
@@ -156,182 +230,204 @@ export function calculatePrice({
   answers = {},
   quizConfig = null,
 }) {
+  const numericBase = Number(basePrice) || 0;
+  if (numericBase <= 0) {
+    return { basePrice: 0, totalDeductionPct: 0, breakdown: {}, finalPrice: 0 };
+  }
+
   const breakdown = {};
-  let currentPrice = Number(basePrice) || 0;
+  let totalDeductionPct = 0;
   const isSpecial = isSpecialModel(brand, modelName);
+
+  // Safe percentage extractor: only returns valid 1-100 percentage values
+  const sanitizePct = (val) => {
+    const num = Number(val);
+    if (Number.isFinite(num) && num > 0 && num <= 100) return num;
+    return null;
+  };
 
   // Dynamic helper: resolves deduction percentage from device DB overrides, quiz config, then defaults
   const getDeductionPct = (key, category = '') => {
     if (!key) return 0;
-    // 1. Device specific override (highest priority)
+    // 1. Device specific override (highest priority, only if valid percentage <= 100)
     if (device) {
       if (category === 'screen' && device.screenDeductions?.[key] !== undefined) {
-        return Number(device.screenDeductions[key]);
+        const val = sanitizePct(device.screenDeductions[key]);
+        if (val !== null) return val;
       }
       if (category === 'body' && device.bodyDeductions?.[key] !== undefined) {
-        return Number(device.bodyDeductions[key]);
+        const val = sanitizePct(device.bodyDeductions[key]);
+        if (val !== null) return val;
       }
       if (category === 'functional' && device.functionalDeductions?.[key] !== undefined) {
-        return Number(device.functionalDeductions[key]);
+        const val = sanitizePct(device.functionalDeductions[key]);
+        if (val !== null) return val;
       }
-      // General fallbacks across collections if category was omitted
       if (device.functionalDeductions?.[key] !== undefined) {
-        return Number(device.functionalDeductions[key]);
+        const val = sanitizePct(device.functionalDeductions[key]);
+        if (val !== null) return val;
       }
       if (device.screenDeductions?.[key] !== undefined) {
-        return Number(device.screenDeductions[key]);
+        const val = sanitizePct(device.screenDeductions[key]);
+        if (val !== null) return val;
       }
       if (device.bodyDeductions?.[key] !== undefined) {
-        return Number(device.bodyDeductions[key]);
+        const val = sanitizePct(device.bodyDeductions[key]);
+        if (val !== null) return val;
       }
       if (device.deductions?.[key] !== undefined) {
-        return Number(device.deductions[key]);
+        const val = sanitizePct(device.deductions[key]);
+        if (val !== null) return val;
       }
       if (device[key] !== undefined && typeof device[key] === 'number') {
-        return Number(device[key]);
+        const val = sanitizePct(device[key]);
+        if (val !== null) return val;
       }
     }
+
     // 2. Category Quiz Configuration override from Admin Quiz Manager
     if (quizConfig?.steps) {
       const keyAliases = {
-        dead: ['able_to_make_calls', 'dead'],
+        dead: ['able_to_make_calls', 'dead', 'does_tablet_switch_on'],
         cellularNetworkFaulty: ['cellular_network_working', 'cellularNetworkFaulty'],
-        screenFaulty: ['touch_screen_working', 'screenFaulty'],
-        nonOriginalScreen: ['screen_original', 'nonOriginalScreen'],
+        screenFaulty: ['touch_screen_working', 'screenFaulty', 'faulty'],
+        copyScreen: ['screen_original', 'nonOriginalScreen', 'copyScreen'],
         outOfWarranty: ['manufacturer_warranty', 'outOfWarranty'],
         noBill: ['gst_bill', 'noBill'],
         noCharger: ['charger', 'noCharger'],
         noBox: ['box', 'noBox'],
-        crackedScreen: ['defect_screen_broken_scratch', 'crackedScreen'],
+        screen_cracked: ['defect_screen_broken_scratch', 'screen_cracked', 'cracked'],
         deadPixels: ['defect_screen_spots_lines', 'deadPixels'],
         scratches: ['defect_body_scratch_dent', 'scratches'],
-        brokenPanel: ['defect_panel_missing_broken', 'brokenPanel'],
+        panel_cracked: ['defect_panel_missing_broken', 'panel_cracked'],
       };
       const targets = [key, ...(keyAliases[key] || [])];
 
       for (const step of quizConfig.steps) {
         for (const q of (step.questions || [])) {
-          // If the key matches a question ID (e.g. able_to_make_calls, touch_screen_working, etc.)
           if (targets.includes(q.id)) {
             const faultOpt = q.options?.find(o => o.isNegative || o.id === 'no' || targets.includes(o.id));
             if (faultOpt && faultOpt.deductionValue !== undefined && faultOpt.deductionType === 'percentage') {
-              return Number(faultOpt.deductionValue);
+              const val = sanitizePct(faultOpt.deductionValue);
+              if (val !== null) return val;
             }
           }
           for (const opt of (q.options || [])) {
             if (targets.includes(opt.id) && opt.deductionValue !== undefined && opt.deductionType === 'percentage') {
-              return Number(opt.deductionValue);
+              const val = sanitizePct(opt.deductionValue);
+              if (val !== null) return val;
             }
           }
         }
       }
     }
+
     // 3. Market benchmark defaults
     return ISSUE_DEDUCTIONS[key] ?? 0;
   };
 
-  // Helper: apply a percentage deduction to currentPrice and record it in breakdown
-  const applyDeduction = (key, pct) => {
-    const validPct = Math.max(0, Math.min(100, Number(pct) || 0));
-    if (validPct === 0) return;
-    const deduction = Math.round(currentPrice * (validPct / 100));
-    breakdown[key] = validPct;
-    currentPrice = Math.max(currentPrice - deduction, 0);
-  };
-
   const isEligibleForWarranty = userSpecifiedWarrantyEligible ?? isDeviceWarrantyEligible(device);
 
-  // 1. Age deduction (applied first to base price)
-  const ageDeductions = { '0 - 3 Months': 0, '3 - 6 Months': 7, '6 - 11 Months': 10, 'Above 11 Months': 21 };
-  const agePct = (isSpecial || !isEligibleForWarranty) ? 0 : (ageDeductions[deviceAge] ?? 0);
-  if (agePct > 0) applyDeduction('age', agePct);
-
-  // 2. Dead device (cannot make calls / does not switch on) — default 90% or device override
+  // 1. Dead device check (cannot make calls / does not switch on)
   const isDead = (doesTabletSwitchOn === false) || (ableToMakeCalls === false);
   if (isDead) {
-    const deadPct = getDeductionPct('dead') || 90;
-    applyDeduction('dead', deadPct);
+    const deadPct = getDeductionPct('dead') || 88;
+    breakdown.dead = deadPct;
+    totalDeductionPct = deadPct;
+    const finalPrice = Math.max(Math.round(numericBase * (1 - totalDeductionPct / 100) / 10) * 10, 1500);
+    return {
+      basePrice: numericBase,
+      totalDeductionPct,
+      breakdown,
+      finalPrice,
+    };
   }
 
-  // 2b. Cellular / Network issue — default 20% or device override
-  if (isCellularNetworkWorking === false) {
-    const cellPct = getDeductionPct('cellularNetworkFaulty') || 20;
-    applyDeduction('cellularNetworkFaulty', cellPct);
-  }
-
-  // 3. Touch screen faulty — default 65% or device override
+  // 2. Touch screen faulty (display or digitizer unresponsive)
   if (isTouchScreenWorking === false) {
-    const touchPct = getDeductionPct('screenFaulty') || 65;
-    applyDeduction('screenFaulty', touchPct);
+    const touchPct = getDeductionPct('screenFaulty') || 55;
+    totalDeductionPct += touchPct;
+    breakdown.screenFaulty = touchPct;
   }
 
-  // 4. Non-original screen — default 50% or device override
+  // 3. Non-original / Copy screen
   if (isScreenOriginal === false) {
-    const copyPct = getDeductionPct('copyScreen') || 50;
-    applyDeduction('copyScreen', copyPct);
+    const copyPct = getDeductionPct('copyScreen') || 30;
+    totalDeductionPct += copyPct;
+    breakdown.copyScreen = copyPct;
   }
 
-  // 5. Out of warranty — 20% (only deducted if device was eligible for warranty but user has no warranty)
-  if (!isSpecial && isEligibleForWarranty && underWarranty === false && deviceAge !== 'Above 11 Months') {
-    const warPct = getDeductionPct('outOfWarranty') || 20;
-    applyDeduction('outOfWarranty', warPct);
+  // 4. Cellular network issue
+  if (isCellularNetworkWorking === false) {
+    const cellPct = getDeductionPct('cellularNetworkFaulty') || 18;
+    totalDeductionPct += cellPct;
+    breakdown.cellularNetworkFaulty = cellPct;
   }
 
-  // 6. No GST bill — 21% (only deducted if device was eligible for warranty but user has no bill)
-  if (!isSpecial && isEligibleForWarranty && hasGSTBill === false && deviceAge !== 'Above 11 Months') {
-    const billPct = getDeductionPct('noBill') || 21;
-    applyDeduction('noBill', billPct);
-  }
+  // 5. Warranty & GST Invoice Evaluation (Exact Cashify Matrix — NO compounding, NO quiz config interference)
+  // NOTE: We deliberately bypass getDeductionPct() here because the quiz config's manufacturer_warranty
+  // question "No" option returns 20% (the old default), which wrongly overrides the combined-case values.
+  // Instead we use: device-specific override → ISSUE_DEDUCTIONS → hardcoded fallback.
+  if (!isSpecial && isEligibleForWarranty) {
+    const hasWarranty = Boolean(underWarranty);
+    const hasBill = Boolean(hasGSTBill);
 
-  // 7. eSIM only global variant — default 6% or device override
-  if (eSIMSupport === 'esim_only_global') {
-    const esimPct = getDeductionPct('eSIM') || 6;
-    applyDeduction('eSIM', esimPct);
-  }
+    // Helper: only check device-level overrides and ISSUE_DEDUCTIONS, skip quiz config entirely
+    const getWarrantyPct = (key, fallback) => {
+      // 1. Device-specific admin override (highest priority)
+      const devVal = device?.deductions?.[key];
+      if (devVal !== undefined) { const v = Number(devVal); if (Number.isFinite(v) && v > 0 && v <= 100) return v; }
+      // 2. Market benchmark
+      const issueVal = ISSUE_DEDUCTIONS[key];
+      if (issueVal !== undefined) { const v = Number(issueVal); if (Number.isFinite(v) && v > 0 && v <= 100) return v; }
+      return fallback;
+    };
 
-  // 8. Screen condition deduction (Cashify 4-card selection)
-  if (screenCondition && screenCondition !== 'none') {
-    const screenPct = getDeductionPct(screenCondition, 'screen');
-    if (screenPct > 0) {
-      applyDeduction(`screen_${screenCondition}`, screenPct);
+    if (hasWarranty && hasBill) {
+      // Full active warranty with valid GST bill: 0% deduction
+    } else if (hasWarranty && !hasBill) {
+      // In warranty window, but without bill → Apple/OEM rejects warranty claim
+      const noBillPct = getWarrantyPct('noBillWarrantyLost', 12);
+      totalDeductionPct += noBillPct;
+      breakdown.noBillWarrantyLost = noBillPct;
+    } else if (!hasWarranty && hasBill) {
+      // Warranty expired, valid bill present
+      const expPct = getWarrantyPct('outOfWarranty', 14);
+      totalDeductionPct += expPct;
+      breakdown.outOfWarranty = expPct;
+    } else {
+      // Out of warranty and no bill (most common for older used phones)
+      const outPct = getWarrantyPct('outOfWarrantyAndNoBill', 16);
+      totalDeductionPct += outPct;
+      breakdown.outOfWarrantyAndNoBill = outPct;
     }
   }
 
-  // 9. Body condition deduction (Cashify Good/Average/Below Average)
-  if (bodyCondition && bodyCondition !== 'good' && bodyCondition !== 'flawless') {
-    const bodyPct = getDeductionPct(bodyCondition, 'body');
-    if (bodyPct > 0) {
-      applyDeduction(`body_${bodyCondition}`, bodyPct);
+  // 6. eSIM variant deduction (fully admin-configurable via Quiz & Deductions panel)
+  // ‣ single_esim  → 0% (Indian dual-SIM phones: no deduction)
+  // ‣ dual_esim    → admin-set % (e.g. 20% if admin configured it)
+  // ‣ esim_only_global → 6% default (US locked / no physical SIM slot)
+  // Uses getDeductionPct so quiz config values always take precedence over ISSUE_DEDUCTIONS
+  if (eSIMSupport && eSIMSupport !== 'single_esim') {
+    const esimPct = getDeductionPct(eSIMSupport);
+    if (esimPct > 0) {
+      totalDeductionPct += esimPct;
+      breakdown[eSIMSupport] = esimPct;
     }
   }
 
-  // 10. No charger — default 3% or device override
-  if (hasCharger === false) {
-    const chargerPct = getDeductionPct('noCharger') || 3;
-    applyDeduction('noCharger', chargerPct);
-  }
-
-  // 11. No box — default 5% or device override
-  if (hasBox === false) {
-    const boxPct = getDeductionPct('noBox') || 5;
-    applyDeduction('noBox', boxPct);
-  }
-
-  // 12. Dynamic Physical + Technical + Custom Issues
-  // Any newly added question/condition passed in physicalIssues, technicalIssues, or customDeductions
+  // 7. Aggregate all selected physical & functional issue keys
   const combinedIssues = new Set([
     ...(Array.isArray(physicalIssues) ? physicalIssues : []),
     ...(Array.isArray(technicalIssues) ? technicalIssues : []),
     ...(Array.isArray(customDeductions) ? customDeductions : []),
   ]);
 
-  // Also include any dynamic answers dictionary keys that are truthy or arrays
   if (answers && typeof answers === 'object') {
     Object.entries(answers).forEach(([qKey, qVal]) => {
       if (Array.isArray(qVal)) {
         qVal.forEach(item => combinedIssues.add(item));
       } else if (typeof qVal === 'string' && qVal && qVal !== 'none' && qVal !== 'good' && qVal !== 'flawless') {
-        // If not already handled as screenCondition/bodyCondition
         if (qKey !== 'screenCondition' && qKey !== 'bodyCondition' && qKey !== 'deviceAge') {
           combinedIssues.add(qVal);
         }
@@ -339,22 +435,98 @@ export function calculatePrice({
     });
   }
 
-    for (const id of combinedIssues) {
+  // Identify if any specific screen or body sub-defect was chosen
+  const SCREEN_DEFECT_KEYS = new Set([
+    'screen_cracked', 'screen_chipped', 'screen_scratches_minor', 'screen_scratches_major',
+    'deadPixels', 'dead_spots_lines', 'screen_spots_minor', 'screen_lines', 'screen_faded',
+    'screen_discoloration_major', 'screen_discoloration_minor',
+    'defect_screen_broken_scratch', 'defect_screen_spots_lines'
+  ]);
+
+  const BODY_DEFECT_KEYS = new Set([
+    'body_scratches_minor', 'scratches', 'body_scratches_dents', 'body_dents_major',
+    'bent_curved', 'panel_cracked', 'panel_missing', 'panel_loose_screen', 'loose_screen',
+    'camera_glass_broken', 'defect_body_scratch_dent', 'defect_panel_missing_broken'
+  ]);
+
+  let screenDeductionSum = 0;
+  let bodyDeductionSum = 0;
+  let hasSpecificScreenDefect = false;
+  let hasSpecificBodyDefect = false;
+
+  // Screen-defect keys that have DIFFERENT deduction rates based on warranty status.
+  // Out-of-warranty: higher deduction (device older, repair cost higher).
+  // In-warranty or warranty not applicable: use the base (in-warranty) rate.
+  const WARRANTY_SENSITIVE_SCREEN_KEYS = new Set([
+    'screen_cracked', 'screen_chipped', 'screen_scratches_major', 'screen_scratches_minor',
+  ]);
+
+  for (const id of combinedIssues) {
     if (!id || id === 'none') continue;
-    const pct = getDeductionPct(id, 'functional');
-    if (pct > 0) {
-      applyDeduction(`issue_${id}`, pct);
+
+    if (SCREEN_DEFECT_KEYS.has(id)) {
+      hasSpecificScreenDefect = true;
+      // Warranty-sensitive keys: use higher _ow rate when device is confirmed out-of-warranty
+      let effectiveKey = id;
+      if (WARRANTY_SENSITIVE_SCREEN_KEYS.has(id) && underWarranty === false) {
+        const owKey = `${id}_ow`;
+        if (ISSUE_DEDUCTIONS[owKey] !== undefined) effectiveKey = owKey;
+      }
+      const pct = getDeductionPct(effectiveKey, 'screen');
+      if (pct > 0) {
+        screenDeductionSum += pct;
+        breakdown[id] = pct; // use original key for display, not _ow key
+      }
+    } else if (BODY_DEFECT_KEYS.has(id)) {
+      hasSpecificBodyDefect = true;
+      const pct = getDeductionPct(id, 'body');
+      if (pct > 0) {
+        bodyDeductionSum += pct;
+        breakdown[id] = pct;
+      }
+    } else {
+      // General technical issue (camera, battery, etc.)
+      const pct = getDeductionPct(id, 'functional');
+      if (pct > 0) {
+        totalDeductionPct += pct;
+        breakdown[id] = pct;
+      }
     }
   }
 
-  // 13. Dynamic Flat INR Deductions from QuizConfig
+  // Fallback for older flows where only screenCondition/bodyCondition strings are passed
+  if (!hasSpecificScreenDefect && screenCondition && screenCondition !== 'none') {
+    const screenPct = getDeductionPct(screenCondition, 'screen');
+    if (screenPct > 0) {
+      screenDeductionSum += screenPct;
+      breakdown[`screen_${screenCondition}`] = screenPct;
+    }
+  }
+
+  if (!hasSpecificBodyDefect && bodyCondition && bodyCondition !== 'good' && bodyCondition !== 'flawless') {
+    const bodyPct = getDeductionPct(bodyCondition, 'body');
+    if (bodyPct > 0) {
+      bodyDeductionSum += bodyPct;
+      breakdown[`body_${bodyCondition}`] = bodyPct;
+    }
+  }
+
+  // Cap screen defects to max 55% (screen assembly replacement cost)
+  const effectiveScreenDeduction = Math.min(screenDeductionSum, 55);
+  // Cap body defects to max 25% (housing replacement cost)
+  const effectiveBodyDeduction = Math.min(bodyDeductionSum, 25);
+
+  totalDeductionPct += effectiveScreenDeduction + effectiveBodyDeduction;
+
+  // 8. Dynamic Flat INR Deductions from QuizConfig or DB
+  let flatDeductionAmt = 0;
   if (quizConfig?.steps) {
     for (const step of quizConfig.steps) {
       for (const q of (step.questions || [])) {
         for (const opt of (q.options || [])) {
           if (combinedIssues.has(opt.id) && opt.deductionType === 'flat_inr' && opt.deductionValue > 0) {
             const flatAmt = Math.round(Number(opt.deductionValue));
-            currentPrice = Math.max(currentPrice - flatAmt, 0);
+            flatDeductionAmt += flatAmt;
             breakdown[`flat_${opt.id}`] = flatAmt;
           }
         }
@@ -362,14 +534,33 @@ export function calculatePrice({
     }
   }
 
-  const totalDeductionPct = basePrice > 0
-    ? Math.round(((basePrice - currentPrice) / basePrice) * 100)
-    : 0;
+  // 9. Accessories
+  if (hasBox === false) {
+    const boxPct = getDeductionPct('noBox') || 3;
+    totalDeductionPct += boxPct;
+    breakdown.noBox = boxPct;
+  }
 
-  const finalPrice = Math.max(currentPrice, 0);
+  // Charger: Only deduct if device bundles charger and user does not have it
+  const deviceBundlesCharger = bundlesCharger(brand || device.brand, modelName || device.modelName);
+  if (hasCharger === false && deviceBundlesCharger) {
+    const chargerPct = getDeductionPct('noCharger') || 3;
+    totalDeductionPct += chargerPct;
+    breakdown.noCharger = chargerPct;
+  }
+
+  // 10. Total deduction clamp: maximum 88% so a working device maintains a fair scrap/parts floor
+  totalDeductionPct = Math.min(totalDeductionPct, 88);
+
+  const percentageDeductionAmt = Math.round(numericBase * (totalDeductionPct / 100));
+  const floorPrice = Math.round(numericBase * 0.05); // At least 5% floor
+  const rawFinal = Math.max(numericBase - percentageDeductionAmt - flatDeductionAmt, floorPrice);
+
+  // Round final quote to nearest ₹10 for clean Indian pricing format
+  const finalPrice = Math.round(rawFinal / 10) * 10;
 
   return {
-    basePrice,
+    basePrice: numericBase,
     totalDeductionPct,
     breakdown,
     finalPrice,
@@ -600,9 +791,62 @@ function getAgeMultiplier(yearBracket) {
 export function calculateLaptopPrice(device, selections) {
   const { ram, storage, yearBracket,
     functionalIssues = [], screenIssues = [], bodyIssues = [],
-    accessories, powerStatus, screenSize } = selections;
+    accessories, powerStatus, screenSize, quizConfig } = selections;
 
   let basePrice;
+
+  const defaultScreenDeductions = {
+    screen_flawless: 0,
+    screen_scratches_minor: 5,
+    screen_scratches_major: 10,
+    screen_cracked: 25,
+    screenCracked: 25,
+    screen_discolour_none: 0,
+    screen_discolour_minor: 8,
+    screen_discolour_major: 18,
+    lineDiscolour: 18,
+    screen_spots_none: 0,
+    screen_spots_minor: 8,
+    screen_spots_major: 18,
+    screen_lines_none: 0,
+    screen_lines_visible: 18,
+    screen_lines_flickering: 20,
+    screen_lines_black_dots: 15,
+  };
+
+  const resolveLaptopDeduction = (group, key, defaultVal = 0) => {
+    if (!key) return 0;
+    // 1. Device specific override (highest priority)
+    if (device?.[group]?.[key] !== undefined) {
+      const val = Number(device[group][key]);
+      if (Number.isFinite(val) && val >= 0) return val;
+    }
+    if (device?.deductions?.[key] !== undefined) {
+      const val = Number(device.deductions[key]);
+      if (Number.isFinite(val) && val >= 0) return val;
+    }
+    // 2. Category Quiz Configuration override from Admin Quiz Manager
+    if (quizConfig?.steps) {
+      for (const step of quizConfig.steps) {
+        for (const q of (step.questions || [])) {
+          if (q.id === key) {
+            const opt = q.options?.find(o => o.isNegative || o.id === 'no' || o.id === key);
+            if (opt?.deductionValue !== undefined && opt.deductionType === 'percentage') {
+              const val = Number(opt.deductionValue);
+              if (Number.isFinite(val) && val >= 0) return val;
+            }
+          }
+          for (const opt of (q.options || [])) {
+            if (opt.id === key && opt.deductionValue !== undefined && opt.deductionType === 'percentage') {
+              const val = Number(opt.deductionValue);
+              if (Number.isFinite(val) && val >= 0) return val;
+            }
+          }
+        }
+      }
+    }
+    return defaultVal;
+  };
 
   if (device.brand === 'Apple') {
     // ── 1. Find base price from variant for Apple ──
@@ -677,14 +921,15 @@ export function calculateLaptopPrice(device, selections) {
 
     let powerDeduction = 0;
     if (powerStatus === 'off') {
-      powerDeduction = Math.round(basePrice * 0.95);
+      const powerPct = resolveLaptopDeduction('functionalDeductions', 'powers_on', 95);
+      powerDeduction = Math.round(basePrice * (powerPct / 100));
       currentPrice = Math.max(currentPrice - powerDeduction, 0);
     }
 
     let functionalDeduction = 0;
     const funcIssues = (functionalIssues || []).filter(i => i !== 'noIssues');
     for (const issue of funcIssues) {
-      const pct = device.functionalDeductions?.[issue] || 0;
+      const pct = resolveLaptopDeduction('functionalDeductions', issue, 0);
       if (pct > 0) {
         const deduction = Math.round(currentPrice * (pct / 100));
         functionalDeduction += deduction;
@@ -693,27 +938,9 @@ export function calculateLaptopPrice(device, selections) {
     }
 
     let screenDeduction = 0;
-    const defaultScreenDeductions = {
-      screen_flawless: 0,
-      screen_scratches_minor: 5,
-      screen_scratches_major: 10,
-      screen_cracked: 25,
-      screenCracked: 25,
-      screen_discolour_none: 0,
-      screen_discolour_minor: 8,
-      screen_discolour_major: 18,
-      lineDiscolour: 18,
-      screen_spots_none: 0,
-      screen_spots_minor: 8,
-      screen_spots_major: 18,
-      screen_lines_none: 0,
-      screen_lines_visible: 18,
-      screen_lines_flickering: 20,
-      screen_lines_black_dots: 15,
-    };
     const scrIssues = (screenIssues || []).filter(i => i !== 'noIssue');
     for (const issue of scrIssues) {
-      const pct = device.screenDeductions?.[issue] ?? defaultScreenDeductions[issue] ?? 0;
+      const pct = resolveLaptopDeduction('screenDeductions', issue, defaultScreenDeductions[issue] ?? 0);
       if (pct > 0) {
         const deduction = Math.round(currentPrice * (pct / 100));
         screenDeduction += deduction;
@@ -723,7 +950,7 @@ export function calculateLaptopPrice(device, selections) {
 
     let bodyDeduction = 0;
     for (const issue of (bodyIssues || [])) {
-      const pct = device.bodyDeductions?.[issue] || 0;
+      const pct = resolveLaptopDeduction('bodyDeductions', issue, 0);
       if (pct > 0) {
         const deduction = Math.round(currentPrice * (pct / 100));
         bodyDeduction += deduction;
@@ -789,7 +1016,8 @@ export function calculateLaptopPrice(device, selections) {
     // ── 2.5 Power status deduction (if laptop is off, reduce 95% of base price) ──
     let powerDeduction = 0;
     if (powerStatus === 'off') {
-      powerDeduction = Math.round(basePrice * 0.95);
+      const powerPct = resolveLaptopDeduction('functionalDeductions', 'powers_on', 95);
+      powerDeduction = Math.round(basePrice * (powerPct / 100));
       currentPrice = Math.max(currentPrice - powerDeduction, 0);
     }
 
@@ -797,7 +1025,7 @@ export function calculateLaptopPrice(device, selections) {
     let functionalDeduction = 0;
     const funcIssues = (functionalIssues || []).filter(i => i !== 'noIssues');
     for (const issue of funcIssues) {
-      const pct = device.functionalDeductions?.[issue] || 0;
+      const pct = resolveLaptopDeduction('functionalDeductions', issue, 0);
       if (pct > 0) {
         const deduction = Math.round(currentPrice * (pct / 100));
         functionalDeduction += deduction;
@@ -807,27 +1035,9 @@ export function calculateLaptopPrice(device, selections) {
 
     // ── 4. Screen issues ──
     let screenDeduction = 0;
-    const defaultScreenDeductions = {
-      screen_flawless: 0,
-      screen_scratches_minor: 5,
-      screen_scratches_major: 10,
-      screen_cracked: 25,
-      screenCracked: 25,
-      screen_discolour_none: 0,
-      screen_discolour_minor: 8,
-      screen_discolour_major: 18,
-      lineDiscolour: 18,
-      screen_spots_none: 0,
-      screen_spots_minor: 8,
-      screen_spots_major: 18,
-      screen_lines_none: 0,
-      screen_lines_visible: 18,
-      screen_lines_flickering: 20,
-      screen_lines_black_dots: 15,
-    };
     const scrIssues = (screenIssues || []).filter(i => i !== 'noIssue');
     for (const issue of scrIssues) {
-      const pct = device.screenDeductions?.[issue] ?? defaultScreenDeductions[issue] ?? 0;
+      const pct = resolveLaptopDeduction('screenDeductions', issue, defaultScreenDeductions[issue] ?? 0);
       if (pct > 0) {
         const deduction = Math.round(currentPrice * (pct / 100));
         screenDeduction += deduction;
@@ -838,7 +1048,7 @@ export function calculateLaptopPrice(device, selections) {
     // ── 5. Body issues ──
     let bodyDeduction = 0;
     for (const issue of (bodyIssues || [])) {
-      const pct = device.bodyDeductions?.[issue] || 0;
+      const pct = resolveLaptopDeduction('bodyDeductions', issue, 0);
       if (pct > 0) {
         const deduction = Math.round(currentPrice * (pct / 100));
         bodyDeduction += deduction;
