@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { deviceService } from '../services/device.service';
+import { quizService } from '../services/quiz.service';
 import { useQuote } from '../hooks/useQuote';
 import { useAuth } from '../hooks/useAuth';
 import { calculateLaptopPrice } from '../utils/priceCalculator';
@@ -124,6 +125,7 @@ export default function MacConditionQuizPage() {
   const [showResult, setShowResult] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [isSpecsModalOpen, setIsSpecsModalOpen] = useState(false);
+  const [quizConfig, setQuizConfig] = useState(null);
 
   const [powerStatus, setPowerStatus] = useState(null); // 'on' | 'off'
   const [screenScratchCondition, setScreenScratchCondition] = useState('none'); // 'none' | 'minor' | 'major' | 'cracked'
@@ -134,6 +136,19 @@ export default function MacConditionQuizPage() {
   const [bodyIssuesList, setBodyIssuesList] = useState([]);
   const [accessories, setAccessories] = useState(['bill', 'box', 'charger']);
   const [age, setAge] = useState('oneToTwo');
+
+  useEffect(() => {
+    let isMounted = true;
+    quizService.getQuizByCategory('laptop')
+      .then(data => {
+        const config = data?.quiz || data;
+        if (isMounted && config?.steps) {
+          setQuizConfig(config);
+        }
+      })
+      .catch(err => console.error('Failed to load laptop quiz config for Mac:', err));
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     deviceService.getDevice(slug).then(res => {
@@ -165,6 +180,10 @@ export default function MacConditionQuizPage() {
     if (screenLinesCondition === 'flickering') activeScreenIssues.push('screen_lines_flickering');
     if (screenLinesCondition === 'black_dots') activeScreenIssues.push('screen_lines_black_dots');
 
+    const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
+      ? device.customQuiz
+      : quizConfig;
+
     return calculateLaptopPrice(device, {
       ...specs,
       yearBracket: age,
@@ -172,9 +191,10 @@ export default function MacConditionQuizPage() {
       functionalIssues: issuesList,
       screenIssues: activeScreenIssues,
       bodyIssues: bodyIssuesList,
-      accessories: accessories
+      accessories: accessories,
+      quizConfig: effectiveQuizConfig,
     });
-  }, [device, specs, age, powerStatus, issuesList, screenScratchCondition, screenDiscolourCondition, screenSpotsCondition, screenLinesCondition, bodyIssuesList, accessories]);
+  }, [device, specs, age, powerStatus, issuesList, screenScratchCondition, screenDiscolourCondition, screenSpotsCondition, screenLinesCondition, bodyIssuesList, accessories, quizConfig]);
 
   const currentPrice = breakdown?.finalPrice || 0;
 

@@ -37,7 +37,7 @@ export const GAMING_PERCENTAGES = {
   }
 };
 
-export function calculateGamingPrice({ basePrice, answers = {}, device = {} }) {
+export function calculateGamingPrice({ basePrice, answers = {}, device = {}, quizConfig = null }) {
   let currentPrice = Number(basePrice) || 0;
   if (currentPrice <= 0) return { finalPrice: 0, deductions: [] };
 
@@ -45,8 +45,35 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {} }) {
 
   const resolveDeduction = (category, key, defaultVal) => {
     if (!key) return 0;
-    if (device?.[category]?.[key] !== undefined) return Number(device[category][key]);
-    if (device?.deductions?.[key] !== undefined) return Number(device.deductions[key]);
+    // 1. Device specific override (highest priority)
+    if (device?.[category]?.[key] !== undefined) {
+      const v = Number(device[category][key]);
+      if (Number.isFinite(v) && v >= 0) return v;
+    }
+    if (device?.deductions?.[key] !== undefined) {
+      const v = Number(device.deductions[key]);
+      if (Number.isFinite(v) && v >= 0) return v;
+    }
+    // 2. Category Quiz Configuration override from Admin Quiz Manager
+    if (quizConfig?.steps) {
+      for (const step of quizConfig.steps) {
+        for (const q of (step.questions || [])) {
+          if (q.id === key) {
+            const opt = q.options?.find(o => o.isNegative || o.id === 'no' || o.id === key);
+            if (opt?.deductionValue !== undefined && opt.deductionType === 'percentage') {
+              const val = Number(opt.deductionValue);
+              if (Number.isFinite(val) && val >= 0) return val;
+            }
+          }
+          for (const opt of (q.options || [])) {
+            if (opt.id === key && opt.deductionValue !== undefined && opt.deductionType === 'percentage') {
+              const val = Number(opt.deductionValue);
+              if (Number.isFinite(val) && val >= 0) return val;
+            }
+          }
+        }
+      }
+    }
     return defaultVal !== undefined ? defaultVal : 0;
   };
 
@@ -68,7 +95,8 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {} }) {
 
   // 1. Device Turn On
   if (answers.powerOn === 'no') {
-    applyDeduction(GAMING_PERCENTAGES.powerOn.no, 'Console Does Not Turn On (Major Defect)');
+    const powerPct = resolveDeduction('functionalDeductions', 'console_powers_on', GAMING_PERCENTAGES.powerOn.no);
+    applyDeduction(powerPct, 'Console Does Not Turn On (Major Defect)');
     return {
       finalPrice: Math.max(0, currentPrice),
       deductions,
@@ -77,7 +105,8 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {} }) {
 
   // 2. Physical Body Condition
   if (answers.bodyCondition) {
-    const bodyPct = GAMING_PERCENTAGES.bodyCondition[answers.bodyCondition];
+    const defaultPct = GAMING_PERCENTAGES.bodyCondition[answers.bodyCondition] || 0;
+    const bodyPct = resolveDeduction('bodyDeductions', answers.bodyCondition, defaultPct);
     if (bodyPct) {
       applyDeduction(bodyPct, `Body Condition: ${answers.bodyCondition}`);
     }
@@ -86,7 +115,8 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {} }) {
   // 3. Functional Issues (multi-select)
   if (Array.isArray(answers.functionalIssues)) {
     answers.functionalIssues.forEach((issue) => {
-      const issuePct = GAMING_PERCENTAGES.functionalIssues[issue];
+      const defaultPct = GAMING_PERCENTAGES.functionalIssues[issue] || 0;
+      const issuePct = resolveDeduction('functionalDeductions', issue, defaultPct);
       if (issuePct) {
         applyDeduction(issuePct, `Functional Issue: ${issue.replace(/_/g, ' ')}`);
       }
@@ -96,10 +126,22 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {} }) {
   // 4. Accessories
   if (answers.accessories) {
     const { controller, adapter, box, bill, extraController } = answers.accessories;
-    if (!controller) applyDeduction(GAMING_PERCENTAGES.accessories.controller, 'Missing Original Controller');
-    if (!adapter) applyDeduction(GAMING_PERCENTAGES.accessories.adapter, 'Missing Power Cable / Adapter');
-    if (!box) applyDeduction(GAMING_PERCENTAGES.accessories.box, 'Missing Original Box');
-    if (!bill) applyDeduction(GAMING_PERCENTAGES.accessories.bill, 'Missing Valid Bill');
+    if (!controller) {
+      const p = resolveDeduction('accessories', 'controller', GAMING_PERCENTAGES.accessories.controller);
+      applyDeduction(p, 'Missing Original Controller');
+    }
+    if (!adapter) {
+      const p = resolveDeduction('accessories', 'adapter', GAMING_PERCENTAGES.accessories.adapter);
+      applyDeduction(p, 'Missing Power Cable / Adapter');
+    }
+    if (!box) {
+      const p = resolveDeduction('accessories', 'box', GAMING_PERCENTAGES.accessories.box);
+      applyDeduction(p, 'Missing Original Box');
+    }
+    if (!bill) {
+      const p = resolveDeduction('accessories', 'bill', GAMING_PERCENTAGES.accessories.bill);
+      applyDeduction(p, 'Missing Valid Bill');
+    }
     if (extraController) applyDeduction(GAMING_PERCENTAGES.accessories.extraController, 'Extra Controller Included (+3% Bonus)');
   }
 

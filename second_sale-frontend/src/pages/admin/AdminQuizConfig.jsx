@@ -193,12 +193,15 @@ export default function AdminQuizConfig() {
     setSaveSuccess(false);
     setError(null);
     try {
-      await quizService.updateQuizByCategory(activeCategory, quizData);
+      const res = await quizService.updateQuizByCategory(activeCategory, quizData);
+      if (res?.quiz) {
+        setQuizData(res.quiz);
+      }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
       console.error(err);
-      setError(err?.response?.data?.message || 'Failed to save quiz changes.');
+      setError(err?.response?.data?.message || err?.message || 'Failed to save quiz changes.');
     } finally {
       setSaving(false);
     }

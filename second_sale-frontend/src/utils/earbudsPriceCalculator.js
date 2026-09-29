@@ -60,14 +60,41 @@ export const DEVICEKART_EARBUDS_QUIZ = {
   ]
 };
 
-export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {} }) {
+export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}, quizConfig = null }) {
   let a = Number(basePrice) || 0;
   const breakdown = {};
 
   const resolveDeduction = (category, key, defaultVal) => {
     if (!key) return 0;
-    if (device?.[category]?.[key] !== undefined) return Number(device[category][key]);
-    if (device?.deductions?.[key] !== undefined) return Number(device.deductions[key]);
+    // 1. Device specific override (highest priority)
+    if (device?.[category]?.[key] !== undefined) {
+      const v = Number(device[category][key]);
+      if (Number.isFinite(v) && v >= 0) return v;
+    }
+    if (device?.deductions?.[key] !== undefined) {
+      const v = Number(device.deductions[key]);
+      if (Number.isFinite(v) && v >= 0) return v;
+    }
+    // 2. Category Quiz Configuration override from Admin Quiz Manager
+    if (quizConfig?.steps) {
+      for (const step of quizConfig.steps) {
+        for (const q of (step.questions || [])) {
+          if (q.id === key) {
+            const opt = q.options?.find(o => o.isNegative || o.id === 'no' || o.id === key);
+            if (opt?.deductionValue !== undefined && opt.deductionType === 'percentage') {
+              const val = Number(opt.deductionValue);
+              if (Number.isFinite(val) && val >= 0) return val;
+            }
+          }
+          for (const opt of (q.options || [])) {
+            if (opt.id === key && opt.deductionValue !== undefined && opt.deductionType === 'percentage') {
+              const val = Number(opt.deductionValue);
+              if (Number.isFinite(val) && val >= 0) return val;
+            }
+          }
+        }
+      }
+    }
     return defaultVal !== undefined ? defaultVal : 0;
   };
 

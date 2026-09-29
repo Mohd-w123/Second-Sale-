@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { deviceService } from "../services/device.service";
+import { quizService } from "../services/quiz.service";
 import { useQuote } from "../hooks/useQuote";
 import { useAuth } from "../hooks/useAuth";
 import { calculateGamingPrice } from "../utils/gamingPriceCalculator";
@@ -39,6 +40,7 @@ export default function GamingConditionQuizPage() {
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stepIndex, setStepIndex] = useState(0);
+  const [quizConfig, setQuizConfig] = useState(null);
 
   const [answers, setAnswers] = useState({
     powerOn: "yes",
@@ -57,6 +59,19 @@ export default function GamingConditionQuizPage() {
   const [showResult, setShowResult] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showBreakdownModal, setShowBreakdownModal] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    quizService.getQuizByCategory('gaming')
+      .then(data => {
+        const config = data?.quiz || data;
+        if (isMounted && config?.steps) {
+          setQuizConfig(config);
+        }
+      })
+      .catch(err => console.error('Failed to load gaming quiz config:', err));
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     if (!slug) return;
@@ -78,12 +93,17 @@ export default function GamingConditionQuizPage() {
   }, [device, variant]);
 
   const valuation = useMemo(() => {
+    const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
+      ? device.customQuiz
+      : quizConfig;
+
     return calculateGamingPrice({
       basePrice,
       answers,
-      device: device || {}
+      device: device || {},
+      quizConfig: effectiveQuizConfig,
     });
-  }, [basePrice, answers, device]);
+  }, [basePrice, answers, device, quizConfig]);
 
   const STEPS = [
     {
