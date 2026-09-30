@@ -123,40 +123,95 @@ export function isDeviceWarrantyEligible(device) {
   const slug = (device.slug || '').toLowerCase();
   const brand = (device.brand || '').toLowerCase();
 
+  const text = `${name} ${slug}`.toLowerCase();
+  const clean = text.replace(/[^a-z0-9]/g, '');
+
   // 2. Apple iPhones: Only iPhone 15, 16, 17 are within active warranty window (2024-2026)
   if (brand.includes('apple') || slug.includes('iphone') || name.includes('iphone')) {
     const activeIphones = ['iphone 15', 'iphone 16', 'iphone 17'];
     return activeIphones.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
   }
 
-  // 3. Samsung Galaxy: Only recent S24, S25, Z Fold/Flip 5 & 6, A55, A35
+  // 3. Samsung Galaxy:
+  // User Rule: Warranty question is present in all 2023+ models EXCEPT the S23 series
   if (brand.includes('samsung') || slug.includes('samsung')) {
-    const activeSamsung = ['s24', 's25', 'fold 5', 'flip 5', 'fold 6', 'flip 6', 'a55', 'a35', 's23 fe'];
-    return activeSamsung.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+    // Explicit exclusion: S23 series (S23, S23+, S23 Ultra, S23 FE) -> NO WARRANTY
+    if (clean.includes('s23')) {
+      return false;
+    }
+
+    // Explicit exclusion: Older S series (S22, S21, S20, S10, S9, S8) -> NO WARRANTY
+    if (/(?:^|[^a-z0-9])s(22|21|20|10|9|8)(?:[^a-z0-9]|$)/i.test(text)) {
+      return false;
+    }
+
+    // Eligible Galaxy S series: S24, S25, S26 (and Plus, Ultra, FE, Edge variants)
+    if (/(?:^|[^a-z0-9])s(24|25|26)(?:[^a-z0-9]|$)/i.test(text) ||
+        clean.includes('s24') || clean.includes('s25') || clean.includes('s26')) {
+      return true;
+    }
+
+    // Eligible Galaxy Z series: Fold 5/6/7/8, Flip 5/6/7/8, Fold Special Edition, TriFold
+    if (/(?:fold|flip)[^a-z0-9]*(5|6|7|8)\b/i.test(text) ||
+        clean.includes('fold5') || clean.includes('flip5') ||
+        clean.includes('fold6') || clean.includes('flip6') ||
+        clean.includes('fold7') || clean.includes('flip7') ||
+        clean.includes('fold8') || clean.includes('flip8') ||
+        clean.includes('foldspecial') || clean.includes('trifold')) {
+      return true;
+    }
+
+    // Eligible Galaxy A series (from 2023+ list):
+    // A05, A05s, A06, A14, A15, A16, A25, A26, A34, A35, A36, A37, A54, A55, A56, A57
+    const eligibleA = ['a05', 'a06', 'a14', 'a15', 'a16', 'a25', 'a26', 'a34', 'a35', 'a36', 'a37', 'a54', 'a55', 'a56', 'a57'];
+    if (eligibleA.some(code => new RegExp(`(?:^|[^a-z0-9])${code}(?:s)?(?:[^a-z0-9]|$)`, 'i').test(text))) {
+      return true;
+    }
+
+    // Eligible Galaxy M series (from 2023+ list):
+    // M05, M06, M14, M15, M16, M34, M35, M54, M55, M56
+    const eligibleM = ['m05', 'm06', 'm14', 'm15', 'm16', 'm34', 'm35', 'm54', 'm55', 'm56'];
+    if (eligibleM.some(code => new RegExp(`(?:^|[^a-z0-9])${code}(?:[^a-z0-9]|$)`, 'i').test(text))) {
+      return true;
+    }
+
+    // Eligible Galaxy F series (from 2023+ list):
+    // F05, F06, F14, F15, F16, F34, F54, F55, F56
+    const eligibleF = ['f05', 'f06', 'f14', 'f15', 'f16', 'f34', 'f54', 'f55', 'f56'];
+    if (eligibleF.some(code => new RegExp(`(?:^|[^a-z0-9])${code}(?:[^a-z0-9]|$)`, 'i').test(text))) {
+      return true;
+    }
+
+    return false;
   }
 
   // 4. OnePlus: ALL series launched from Jan 2023 onwards (user requirement)
-  // OnePlus offers 2-year warranty; 2023 launches may still be in extended/service warranty.
-  // Models: Flagship (11/12/13/15), R-series (11R/12R/13R), Nord (3/4/5/6),
-  //         Nord CE (3/3 Lite/4/4 Lite/5/5 Lite/6/6 Lite), Open, N-series
-  if (brand.includes('oneplus') || slug.includes('oneplus')) {
-    const activeOnePlus = [
-      // Flagship & R-series (2023+)
-      'oneplus 11', 'oneplus 12', 'oneplus 13', 'oneplus 15',
-      'oneplus 11r', 'oneplus 12r', 'oneplus 13r',
-      // Nord series (2023+)
-      'nord 3', 'nord 4', 'nord 5', 'nord 6',
-      // Nord CE series (2023+)
-      'nord ce 3', 'nord ce 4', 'nord ce 5', 'nord ce 6',
-      'nord ce3', 'nord ce4', 'nord ce5', 'nord ce6',
-      // Nord N-series (2023+)
-      'nord n30',
-      // Foldable (2023+)
-      'oneplus open',
-      // N-series (2026+)
-      'oneplus n6', 'nord 6',
+  // Flagship (11/12/13/15), R-series (11R/12R/13R), Nord (3/4/5/6),
+  // Nord CE (3/3 Lite/4/4 Lite/5/6/6 Lite), Open, Nord N30, N6
+  if (brand.includes('oneplus') || slug.includes('oneplus') || name.includes('oneplus') || name.includes('one plus')) {
+    const activeOnePlusPatterns = [
+      // 11 series (Jan/Feb 2023)
+      'oneplus11', 'oneplus11r',
+      // 12 series (Dec 2023 / Jan 2024)
+      'oneplus12', 'oneplus12r',
+      // 13 series (Oct 2024 / Jan 2025)
+      'oneplus13', 'oneplus13r', 'oneplus13s',
+      // 15 series (Oct 2025)
+      'oneplus15', 'oneplus15r',
+      // Foldable (Oct 2023)
+      'oneplusopen',
+      // Nord 3, 4, 5, 6 series (Jul 2023+)
+      'nord3', 'nord4', 'nord5', 'nord6',
+      // Nord CE 3, 4, 5, 6 series (Apr 2023+)
+      'nordce3', 'nordce4', 'nordce5', 'nordce6',
+      // Nord N series (Jun 2023+)
+      'nordn30', 'oneplusn6', 'nordn6'
     ];
-    return activeOnePlus.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')));
+
+    if (activeOnePlusPatterns.some(pat => clean.includes(pat))) {
+      return true;
+    }
+    return false;
   }
 
   // 5. Google Pixel: Pixel 8, Pixel 9
