@@ -44,6 +44,10 @@ export const ISSUE_DEDUCTIONS = {
   screen_discoloration_major: 18,
   screen_discoloration_minor: 10,
 
+  // ─── Outer Screen Condition (Fold & Flip devices) ───────────────────────────────────
+  outer_screen_damaged: 20,        // outer screen damaged / line / broken or spot
+  outer_screen_defect: 20,
+
   // ─── Body scratches ──────────────────────────────────────────────────────────────────
   body_scratches_minor: 3,         // 1-2 scratches on body
   body_scratches_dents: 5,         // 1-2 minor dents on body
@@ -495,7 +499,8 @@ export function calculatePrice({
     'screen_cracked', 'screen_chipped', 'screen_scratches_minor', 'screen_scratches_major',
     'deadPixels', 'dead_spots_lines', 'screen_spots_minor', 'screen_lines', 'screen_faded',
     'screen_discoloration_major', 'screen_discoloration_minor',
-    'defect_screen_broken_scratch', 'defect_screen_spots_lines'
+    'defect_screen_broken_scratch', 'defect_screen_spots_lines',
+    'outer_screen_damaged', 'outer_screen_defect'
   ]);
 
   const BODY_DEFECT_KEYS = new Set([

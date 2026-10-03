@@ -33,6 +33,11 @@ import CategoryHubPage from './pages/CategoryHubPage.jsx';
 import { CATEGORY_HUBS } from './data/categoryHubs.js';
 import WhatsAppButton from './components/WhatsAppButton.jsx';
 
+// Repair Pages
+import RepairLandingPage from './pages/repair/RepairLandingPage.jsx';
+import RepairBrandPage from './pages/repair/RepairBrandPage.jsx';
+import RepairModelPage from './pages/repair/RepairModelPage.jsx';
+
 // Buy Refurbished Pages (Cashify-style with native payment flow)
 import RefurbishedCatalogPage from './pages/buy/RefurbishedCatalogPage.jsx';
 import RefurbishedProductDetailPage from './pages/buy/RefurbishedProductDetailPage.jsx';
@@ -93,6 +98,7 @@ import AdminOrders from './pages/admin/AdminOrders.jsx';
 import AdminPincodes from './pages/admin/AdminPincodes.jsx';
 import AdminSiteSettings from './pages/admin/AdminSiteSettings.jsx';
 import AdminRefurbished from './pages/admin/AdminRefurbished.jsx';
+import AdminRepair from './pages/admin/AdminRepair.jsx';
 import AdminHomepage from './pages/admin/AdminHomepage.jsx';
 import AdminPages from './pages/admin/AdminPages.jsx';
 import AdminSalesUsers from './pages/admin/AdminSalesUsers.jsx';
@@ -214,6 +220,11 @@ function App() {
           <Route path="/sell/console/:brand" element={<GamingModelSelectionPage />} />
           <Route path="/sell/console/:brand/:slug" element={<GamingModelDetailsPage />} />
           <Route path="/sell/console/:brand/:slug/quiz" element={<GamingConditionQuizPage />} />
+          {/* Repair Flow */}
+          <Route path="/repair" element={<RepairLandingPage />} />
+          <Route path="/repair/:brand" element={<RepairBrandPage />} />
+          <Route path="/repair/:brand/:model" element={<RepairModelPage />} />
+
           {/* Buy Refurbished Flow (Cashify-style) */}
           <Route path="/buy-refurbished" element={<RefurbishedCatalogPage />} />
           <Route path="/buy-refurbished/product/:slug" element={<RefurbishedProductDetailPage />} />
@@ -255,6 +266,7 @@ function App() {
             <Route path="devices" element={<AdminProtectedRoute requiredPermission="devices"><AdminDevices /></AdminProtectedRoute>} />
             <Route path="quiz" element={<AdminProtectedRoute requiredPermission="quiz"><AdminQuizConfig /></AdminProtectedRoute>} />
             <Route path="refurbished" element={<AdminProtectedRoute requiredPermission="refurbished"><AdminRefurbished /></AdminProtectedRoute>} />
+            <Route path="repair" element={<AdminProtectedRoute requiredPermission="repair"><AdminRepair /></AdminProtectedRoute>} />
             <Route path="categories" element={<AdminProtectedRoute requiredPermission="categories"><AdminCategories /></AdminProtectedRoute>} />
             <Route path="brands" element={<AdminProtectedRoute requiredPermission="devices"><AdminBrands /></AdminProtectedRoute>} />
             <Route path="partners" element={<AdminProtectedRoute requiredPermission="partners"><AdminPartners /></AdminProtectedRoute>} />

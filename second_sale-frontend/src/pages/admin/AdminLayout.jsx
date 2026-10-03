@@ -21,6 +21,7 @@ import {
   ShieldAlert,
   HelpCircle,
   Sparkles,
+  Wrench,
 } from 'lucide-react';
 import './admin.css';
 
@@ -56,6 +57,7 @@ export default function AdminLayout() {
     if (path.includes('/users')) return 'User Directory';
     if (path.includes('/devices')) return 'Device Catalog';
     if (path.includes('/refurbished')) return 'Refurbished Marketplace';
+    if (path.includes('/repair')) return 'Mobile Repair Service Manager';
     if (path.includes('/categories')) return 'Category Management';
     if (path.includes('/brands')) return 'Brand Directory & Logos';
     if (path.includes('/partners')) return 'Partner Applications';
@@ -77,6 +79,7 @@ export default function AdminLayout() {
     { key: 'devices', to: '/admin/devices', icon: Smartphone, label: 'Devices (Sell)' },
     { key: 'quiz', to: '/admin/quiz', icon: HelpCircle, label: 'Quiz & Deductions' },
     { key: 'refurbished', to: '/admin/refurbished', icon: Package, label: 'Refurbished' },
+    { key: 'repair', to: '/admin/repair', icon: Wrench, label: 'Repair Service' },
     { key: 'partners', to: '/admin/partners', icon: Handshake, label: 'Partners' },
     { key: 'orders', to: '/admin/orders', icon: ClipboardList, label: 'Orders' },
     { key: 'pincodes', to: '/admin/pincodes', icon: MapPin, label: 'Pincodes' },

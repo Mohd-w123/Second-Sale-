@@ -167,6 +167,7 @@ export const DEFAULT_QUIZZES = {
               { id: 'screen_faded', label: 'Display faded along edges', deductionType: 'percentage', deductionValue: 16, isNegative: true },
               { id: 'screen_discoloration_major', label: 'Major discoloration', deductionType: 'percentage', deductionValue: 18, isNegative: true },
               { id: 'screen_discoloration_minor', label: 'Minor discoloration', deductionType: 'percentage', deductionValue: 10, isNegative: true },
+              { id: 'outer_screen_damaged', label: 'Outer screen damaged / line / broken or spot (Fold/Flip)', deductionType: 'percentage', deductionValue: 20, isNegative: true },
             ],
           },
           {
