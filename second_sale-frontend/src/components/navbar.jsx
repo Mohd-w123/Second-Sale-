@@ -27,6 +27,7 @@ const BUY_REFURBISHED_CATEGORIES = [
 const DEFAULT_NAV_ITEMS = [
   { label: "Sell Device", hasDropdown: true },
   { label: "Buy Refurbished", hasDropdown: true, to: "/buy-refurbished" },
+  { label: "Repair", to: "/repair" },
   { label: "How It Works", to: "/#how-it-works" },
   { label: "Corporate", to: "/corporate" },
   { label: "About Us", to: "/about-us" },
@@ -218,6 +219,13 @@ export default function Navbar() {
             }
             return item;
           });
+        // Always ensure Repair link is present
+        const hasRepair = active.some((i) => i.to === "/repair" || i.label === "Repair");
+        if (!hasRepair) {
+          const buyIdx = active.findIndex((i) => i.label === "Buy Refurbished" || i.to === "/buy-refurbished");
+          const insertAt = buyIdx >= 0 ? buyIdx + 1 : 2;
+          active.splice(insertAt, 0, { label: "Repair", to: "/repair" });
+        }
         if (active.length > 0) {
           setNavItems(active);
         }
@@ -251,6 +259,13 @@ export default function Navbar() {
               }
               return item;
             });
+          // Always ensure Repair link is present
+          const hasRepair = active.some((i) => i.to === "/repair" || i.label === "Repair");
+          if (!hasRepair) {
+            const buyIdx = active.findIndex((i) => i.label === "Buy Refurbished" || i.to === "/buy-refurbished");
+            const insertAt = buyIdx >= 0 ? buyIdx + 1 : 2;
+            active.splice(insertAt, 0, { label: "Repair", to: "/repair" });
+          }
           if (active.length > 0) setNavItems(active);
         }
       } else {

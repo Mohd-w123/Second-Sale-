@@ -1018,6 +1018,42 @@ export const PanelStraightIcon = ({ className = "w-12 h-16" }) => (
   </svg>
 );
 
+// ─── Fold / Flip Outer Screen Condition Icons (Cashify Benchmark) ───
+export const FoldOuterScreenDefectIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Folded Phone Outer Cover Body */}
+    <rect x="11" y="6" width="26" height="50" rx="4" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    {/* Bottom Hinge / Fold Spine Base */}
+    <path d="M11 51H37V55C37 56.1046 36.1046 57 35 57H13C11.8954 57 11 56.1046 11 55V51Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.5" />
+    <line x1="11" y1="51" x2="37" y2="51" stroke="#1E293B" strokeWidth="2" />
+    {/* Camera Punch Hole */}
+    <circle cx="24" cy="12" r="1.5" fill="#1E293B" />
+    {/* Visible Line on Display */}
+    <line x1="31" y1="16" x2="31" y2="47" stroke="#38BDF8" strokeWidth="1.5" strokeDasharray="3 1" />
+    {/* Spots / Dead pixels on screen */}
+    <circle cx="24" cy="26" r="1.5" fill="#0284C7" />
+    <circle cx="26" cy="32" r="1.2" fill="#0284C7" />
+    {/* Scratches / Cracks on lower left */}
+    <path d="M14 47L19 40" stroke="#38BDF8" strokeWidth="1.2" strokeLinecap="round" />
+    <path d="M16 49L21 44" stroke="#38BDF8" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
+export const FoldOuterScreenCleanIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Folded Phone Outer Cover Body */}
+    <rect x="11" y="6" width="26" height="50" rx="4" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    {/* Bottom Hinge / Fold Spine Base */}
+    <path d="M11 51H37V55C37 56.1046 36.1046 57 35 57H13C11.8954 57 11 56.1046 11 55V51Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.5" />
+    <line x1="11" y1="51" x2="37" y2="51" stroke="#1E293B" strokeWidth="2" />
+    {/* Camera Punch Hole */}
+    <circle cx="24" cy="12" r="1.5" fill="#1E293B" />
+    {/* Clean sparkles at top right */}
+    <path d="M37 5L38.5 8.5L42 10L38.5 11.5L37 15L35.5 11.5L32 10L35.5 8.5L37 5Z" fill="#087F8C" />
+    <path d="M41 15L41.8 16.6L43.5 17.5L41.8 18.4L41 20L40.2 18.4L38.5 17.5L40.2 16.6L41 15Z" fill="#087F8C" />
+  </svg>
+);
+
 
 
 

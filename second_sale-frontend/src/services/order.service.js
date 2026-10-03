@@ -9,4 +9,9 @@ export const orderService = {
   updatePaymentMethod: (orderId, paymentMethod) => api.patch(`/orders/${orderId}/payment`, { paymentMethod }),
   getRefurbishedOrders: () => api.get('/refurbished/my-orders'),
   getRefurbishedOrder: (orderId) => api.get(`/refurbished/order/${orderId}`),
+  // Repair orders
+  createRepairOrder: (data) => api.post('/repair-orders', data),
+  getRepairOrders: () => api.get('/repair-orders'),
+  getRepairOrder: (orderId) => api.get(`/repair-orders/${orderId}`),
+  cancelRepairOrder: (orderId) => api.patch(`/repair-orders/${orderId}/cancel`),
 };

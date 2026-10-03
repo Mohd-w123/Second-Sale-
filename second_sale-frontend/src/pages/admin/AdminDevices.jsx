@@ -146,6 +146,7 @@ const MOBILE_DEFECT_GROUPS = [
       { key: 'screen_faded', label: 'Display Faded Along Edges', target: 'screenDeductions', default: 18 },
       { key: 'screen_discoloration_major', label: 'Major Screen Discoloration', target: 'screenDeductions', default: 20 },
       { key: 'screen_discoloration_minor', label: 'Minor Screen Discoloration', target: 'screenDeductions', default: 10 },
+      { key: 'outer_screen_damaged', label: 'Outer Screen Damaged / Line / Broken or Spot (Fold/Flip)', target: 'screenDeductions', default: 20 },
     ]
   },
   {
@@ -199,6 +200,8 @@ const SCREEN_DEDUCTION_LABELS = {
   screen_lines_black_dots: 'Black Dots on Screen (%)',
   screenCracked: 'Legacy Cracked (%)',
   lineDiscolour: 'Legacy Discolour (%)',
+  outer_screen_damaged: 'Outer Screen Damaged / Line / Broken or Spot (%)',
+  outer_screen_defect: 'Outer Screen Damaged / Line / Broken or Spot (%)',
 };
 
 const BODY_DEDUCTION_LABELS = {

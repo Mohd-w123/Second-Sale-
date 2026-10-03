@@ -18,7 +18,8 @@ import {
   Clock,
   MapPin,
   MessageCircle,
-  Sparkles
+  Sparkles,
+  Wrench,
 } from "lucide-react";
 
 const TRUST_FEATURES = [
@@ -51,12 +52,14 @@ const SELL_DEVICES = [
   { label: "Sell iMac & Mac", to: "/sell-imac/brand", icon: <Monitor size={15} /> },
   { label: "Sell Smartwatches", to: "/sell-smartwatch/brand", icon: <Watch size={15} />, isNew: true },
   { label: "Sell Gaming Consoles", to: "/sell-gaming-console/brand", icon: <Gamepad2 size={15} />, isNew: true },
+  { label: "Repair My Device", to: "/repair", icon: <Wrench size={15} />, isNew: true },
   { label: "Corporate Bulk Buyback", to: "/corporate", icon: <Sparkles size={15} /> },
 ];
 
 const COMPANY_LINKS = [
   { label: "About SecondSale", to: "/about-us" },
   { label: "How It Works", to: "/#how-it-works" },
+  { label: "Repair My Device", to: "/repair" },
   { label: "Become a Partner", to: "/partner" },
   { label: "Corporate Buyback", to: "/corporate" },
   { label: "Cashify Alternatives", to: "/alternatives/cashify-alternatives" },

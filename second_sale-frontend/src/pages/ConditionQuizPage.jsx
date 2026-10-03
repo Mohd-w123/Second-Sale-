@@ -5,6 +5,7 @@ import { quizService } from '../services/quiz.service';
 import { useQuote } from '../hooks/useQuote';
 import { useAuth } from '../hooks/useAuth';
 import { calculatePrice, isDeviceWarrantyEligible } from '../utils/priceCalculator';
+import { isFoldOrFlipDevice } from '../utils/specialModels';
 import { formatCurrency } from '../utils/formatCurrency';
 import Loader from '../components/ui/Loader';
 import NoIndexSEO from '../components/seo/NoIndexSEO';
@@ -65,6 +66,8 @@ import {
   PanelBentIcon,
   PanelLooseScreenIcon,
   PanelStraightIcon,
+  FoldOuterScreenDefectIcon,
+  FoldOuterScreenCleanIcon,
 } from '../components/quiz/QuizIcons';
 
 // --- Steps matching Cashify Mobile Flow ---
@@ -213,6 +216,39 @@ const SUB_DEFECT_CONFIGS = {
   },
 };
 
+// ─── 4. Outer Screen Condition (For Fold & Flip Dual-Screen Devices) ───────────
+const FOLD_OUTER_SCREEN_SECTION = {
+  id: 'outer_screen_condition',
+  title: '4. Outer Screen Condition',
+  subtitle: 'Check the smaller screen for discoloration, cracks, lines, spots, or any other visible damage.',
+  options: [
+    {
+      id: 'outer_screen_damaged',
+      label: 'Outer screen damaged/line/ broken or Spot',
+      icon: FoldOuterScreenDefectIcon,
+      deductionKey: 'outer_screen_damaged',
+    },
+    {
+      id: 'outer_screen_none',
+      label: 'No issue with outer screen',
+      icon: FoldOuterScreenCleanIcon,
+      deductionKey: null,
+    },
+  ],
+};
+
+const getSubDefectConfig = (defectId, isFoldOrFlip = false) => {
+  const base = SUB_DEFECT_CONFIGS[defectId];
+  if (!base) return null;
+  if (defectId === 'defect_screen_spots_lines' && isFoldOrFlip) {
+    return {
+      ...base,
+      sections: [...base.sections, FOLD_OUTER_SCREEN_SECTION],
+    };
+  }
+  return base;
+};
+
 // 18 Cashify Hardware & Physical Defects
 const FUNCTIONAL_PROBLEMS = [
   { id: 'front_camera', label: 'Front Camera not working', icon: FrontCameraIcon },
@@ -339,6 +375,7 @@ export default function ConditionQuizPage() {
 
   // Derived: calculate price & breakdown in render (uses model custom quiz if active, otherwise category master)
   const isWarrantyEligible = device ? isDeviceWarrantyEligible(device) : false;
+  const isFoldOrFlip = isFoldOrFlipDevice(device?.brand, device?.modelName);
   const selectedVariant = device?.variants?.find(v => v.storage === storage) || device?.variants?.[0];
   const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
     ? device.customQuiz
@@ -351,7 +388,7 @@ export default function ConditionQuizPage() {
   // Extract all active sub-defect deduction keys
   const activeSubDefectDeductionKeys = [];
   screenBodyDefects.forEach(defectId => {
-    const config = SUB_DEFECT_CONFIGS[defectId];
+    const config = getSubDefectConfig(defectId, isFoldOrFlip);
     if (config) {
       let hasAnsweredAny = false;
       config.sections.forEach(sec => {
@@ -450,7 +487,7 @@ export default function ConditionQuizPage() {
 
   // Validation for Step 2 Sub-defects
   const isSubDefectsComplete = !isSubDefectView || screenBodyDefects.every(d => {
-    const config = SUB_DEFECT_CONFIGS[d];
+    const config = getSubDefectConfig(d, isFoldOrFlip);
     if (!config) return true;
     return config.sections.every(sec => {
       const vals = subDefectAnswers[sec.id];
@@ -665,7 +702,7 @@ export default function ConditionQuizPage() {
                       <div className="space-y-2 mt-1">
                         {screenBodyDefects.map(d => {
                           const catLabel = CASHIFY_SCREEN_BODY_DEFECTS.find(x => x.id === d)?.label || d;
-                          const config = SUB_DEFECT_CONFIGS[d];
+                          const config = getSubDefectConfig(d, isFoldOrFlip);
                           const subLabels = config?.sections
                             .flatMap(sec => {
                               const chosen = subDefectAnswers[sec.id];
@@ -1057,7 +1094,7 @@ export default function ConditionQuizPage() {
                                 const isAlready = prev.includes(defect.id);
                                 if (isAlready) {
                                   // Clear answers for this defect's sections
-                                  const config = SUB_DEFECT_CONFIGS[defect.id];
+                                  const config = getSubDefectConfig(defect.id, isFoldOrFlip);
                                   if (config) {
                                     setSubDefectAnswers(curr => {
                                       const next = { ...curr };
@@ -1122,7 +1159,7 @@ export default function ConditionQuizPage() {
                 {STEPS[currentStepIndex]?.id === 'screen_body_defects' && isSubDefectView && (
                   <div className="space-y-10 animate-fadeIn">
                     {screenBodyDefects.map((defectId, dIdx) => {
-                      const currentConfig = SUB_DEFECT_CONFIGS[defectId];
+                      const currentConfig = getSubDefectConfig(defectId, isFoldOrFlip);
                       if (!currentConfig) return null;
 
                       return (
@@ -1439,7 +1476,7 @@ export default function ConditionQuizPage() {
                   <div className="space-y-1.5 mt-1">
                     {screenBodyDefects.map(d => {
                       const catLabel = CASHIFY_SCREEN_BODY_DEFECTS.find(x => x.id === d)?.label || d;
-                      const config = SUB_DEFECT_CONFIGS[d];
+                      const config = getSubDefectConfig(d, isFoldOrFlip);
                       const subLabels = config?.sections
                         .flatMap(sec => {
                           const chosen = subDefectAnswers[sec.id];

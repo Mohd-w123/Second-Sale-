@@ -533,3 +533,11 @@ export function isSpecialModel(brand, modelName) {
   const cleanKey = full.replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
   return SPECIAL_MODELS_KEYS.has(cleanKey);
 }
+
+export function isFoldOrFlipDevice(brand, modelName) {
+  if (!modelName && !brand) return false;
+  const b = (brand || '').trim().toLowerCase();
+  const m = (modelName || '').trim().toLowerCase();
+  const full = `${b} ${m}`;
+  return full.includes('fold') || full.includes('flip');
+}

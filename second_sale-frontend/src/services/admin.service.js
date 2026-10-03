@@ -108,6 +108,22 @@ export const adminService = {
   deleteBrand: (id) => adminApi.delete(`/brands/${id}`),
   uploadBrandLogo: (formData) => adminApi.post('/brands/upload-logo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   uploadDeviceImage: (formData) => adminApi.post('/brands/upload-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+
+  // Repair Management
+  getRepairStats: () => adminApi.get('/repairs/admin/stats'),
+  getRepairBrandsAdmin: () => adminApi.get('/repairs/admin/brands'),
+  createRepairBrand: (data) => adminApi.post('/repairs/admin/brands', data),
+  updateRepairBrand: (id, data) => adminApi.put(`/repairs/admin/brands/${id}`, data),
+  deleteRepairBrand: (id) => adminApi.delete(`/repairs/admin/brands/${id}`),
+  uploadRepairBrandLogo: (formData) => adminApi.post('/repairs/admin/upload-logo', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  uploadRepairDeviceImage: (formData) => adminApi.post('/repairs/admin/upload-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  getRepairDevices: (params) => adminApi.get('/repairs/admin/devices', { params }),
+  createRepairDevice: (data) => adminApi.post('/repairs/admin/devices', data),
+  updateRepairDevice: (id, data) => adminApi.put(`/repairs/admin/devices/${id}`, data),
+  deleteRepairDevice: (id) => adminApi.delete(`/repairs/admin/devices/${id}`),
+  getRepairOrders: (params) => adminApi.get('/repairs/admin/orders', { params }),
+  updateRepairOrderStatus: (id, data) => adminApi.patch(`/repairs/admin/orders/${id}/status`, data),
+  seedRepairDefaults: () => adminApi.post('/repairs/admin/seed'),
 };
 
 export default adminApi;

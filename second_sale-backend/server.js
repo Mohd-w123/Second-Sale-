@@ -22,6 +22,7 @@ import homepageRoutes from './routes/homepage.routes.js';
 import customPageRoutes from './routes/customPage.routes.js';
 import quizRoutes from './routes/quiz.routes.js';
 import brandRoutes from './routes/brand.routes.js';
+import repairRoutes from './routes/repair.routes.js';
 
 const app = express();
 
@@ -74,6 +75,8 @@ app.use('/api/homepage', homepageRoutes);
 app.use('/api/pages', customPageRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/brands', brandRoutes);
+app.use('/api/repairs', repairRoutes);
+app.use('/api/repair-orders', repairRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
