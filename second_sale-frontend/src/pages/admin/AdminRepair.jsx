@@ -893,6 +893,15 @@ export default function AdminRepair() {
                         <span className="font-mono font-black text-[#087F8C] text-sm bg-[#E8F6F7] px-3 py-1 rounded-lg">
                           {order.orderId}
                         </span>
+                        {order.repairMode === 'store' ? (
+                          <span className="text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            🏬 Store Visit (-₹{order.storeDiscount || 350})
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-black bg-sky-100 text-sky-800 border border-sky-300 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            🏠 Doorstep
+                          </span>
+                        )}
                         <span className="text-xs text-gray-400 font-semibold">
                           Booked on: {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </span>
@@ -967,11 +976,19 @@ export default function AdminRepair() {
                           </p>
                         </div>
 
-                        <div className="pt-2 border-t border-gray-200/60 flex justify-between items-center">
-                          <span className="font-bold text-gray-500">Total Bill:</span>
-                          <span className="text-base font-black text-[#087F8C]">
-                            ₹{order.totalAmount?.toLocaleString('en-IN')}
-                          </span>
+                        <div className="pt-2 border-t border-gray-200/60 space-y-1">
+                          {order.storeDiscount > 0 && (
+                            <div className="flex justify-between items-center text-[11px] text-emerald-700 font-bold">
+                              <span>Store Discount:</span>
+                              <span>-₹{order.storeDiscount?.toLocaleString('en-IN')}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-gray-500">Total Bill:</span>
+                            <span className="text-base font-black text-[#087F8C]">
+                              ₹{order.totalAmount?.toLocaleString('en-IN')}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>

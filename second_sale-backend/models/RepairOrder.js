@@ -29,6 +29,21 @@ const repairOrderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  repairMode: {
+    type: String,
+    enum: ['home', 'store'],
+    default: 'home',
+  },
+  storeDiscount: {
+    type: Number,
+    default: 0,
+  },
+  storeLocation: {
+    name: String,
+    address: String,
+    city: String,
+    pincode: String,
+  },
   pickup: {
     name: String,
     phone: String,
