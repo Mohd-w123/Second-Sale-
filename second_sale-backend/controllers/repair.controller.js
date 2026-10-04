@@ -136,7 +136,7 @@ export const createRepairOrder = async (req, res, next) => {
       return res.status(400).json({ message: 'Validation failed', errors: errors.array() });
     }
 
-    const { device, services, totalAmount, pickup } = req.body;
+    const { device, services, totalAmount, pickup, repairMode = 'home', storeDiscount = 0, storeLocation = null } = req.body;
 
     const order = await RepairOrder.create({
       userId: req.user?.id || req.user?._id,
@@ -144,6 +144,9 @@ export const createRepairOrder = async (req, res, next) => {
       services,
       totalAmount,
       pickup,
+      repairMode,
+      storeDiscount,
+      storeLocation,
       status: 'placed',
     });
 

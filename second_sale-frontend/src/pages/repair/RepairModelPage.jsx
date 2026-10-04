@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { getRepairBrand, getRepairModel, REPAIR_SERVICE_TYPES } from '../../data/repairData';
 import RepairBookingModal from './RepairBookingModal';
+import RepairOptionModal from './RepairOptionModal';
 
 const SERVICE_ICONS = {
   screen: (
@@ -69,6 +70,9 @@ export default function RepairModelPage() {
   const [loading, setLoading] = useState(!initialModel);
   const [selected, setSelected] = useState({}); // { [serviceId]: true }
   const [imgError, setImgError] = useState(false);
+  const [showOptionModal, setShowOptionModal] = useState(false);
+  const [repairMode, setRepairMode] = useState('home');
+  const [bookingResult, setBookingResult] = useState(null);
   const [showBooking, setShowBooking] = useState(false);
   const [booked, setBooked] = useState(false);
 
@@ -145,41 +149,87 @@ export default function RepairModelPage() {
 
   const handleBook = () => {
     if (selectedServices.length === 0) return;
+    setShowOptionModal(true);
+  };
+
+  const handleSelectOption = (mode) => {
+    setRepairMode(mode);
+    setShowOptionModal(false);
     setShowBooking(true);
   };
 
-  const handleBookingSuccess = () => {
+  const handleBookingSuccess = (result) => {
+    setBookingResult(result || {
+      repairMode,
+      storeDiscount: repairMode === 'store' ? 350 : 0,
+      finalAmount: repairMode === 'store' ? Math.max(totalAmount - 350, 0) : totalAmount,
+    });
     setShowBooking(false);
     setBooked(true);
   };
 
   if (booked) {
+    const isStore = bookingResult?.repairMode === 'store';
+    const storeDiscountApplied = isStore ? (bookingResult?.storeDiscount ?? 350) : 0;
+    const finalAmountPaid = bookingResult?.finalAmount ?? (isStore ? Math.max(totalAmount - storeDiscountApplied, 0) : totalAmount);
+
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4">
-        <div className="bg-green-50 border-2 border-green-200 rounded-3xl p-10 text-center max-w-md w-full">
-          <div className="text-6xl mb-4">✅</div>
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Repair Booked!</h2>
-          <p className="text-gray-500 text-sm mb-6">
-            Your repair request for <span className="font-bold text-gray-800">{model.name}</span> has been booked successfully.
-            Our technician will contact you shortly to confirm the appointment.
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 py-12">
+        <div className="bg-white border-2 border-emerald-200 rounded-3xl p-8 sm:p-10 text-center max-w-lg w-full shadow-2xl animate-scaleUp">
+          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black shadow-inner">
+            ✓
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black mb-3 bg-emerald-50 text-emerald-700 border border-emerald-200">
+            {isStore ? '🏬 Store Appointment Confirmed' : '🏠 Doorstep Repair Booked'}
+          </div>
+          <h2 className="text-2xl font-black text-gray-900 mb-2">
+            {isStore ? 'Store Repair Booked!' : 'Repair Booked!'}
+          </h2>
+          <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+            {isStore ? (
+              <>
+                Your appointment for <strong className="text-gray-900">{model.name}</strong> has been confirmed at{' '}
+                <strong className="text-emerald-700">{bookingResult?.storeName || 'SecondSale Store'}</strong>.
+                Visit during your selected slot and avail your instant ₹350 store discount!
+              </>
+            ) : (
+              <>
+                Your repair request for <strong className="text-gray-900">{model.name}</strong> has been booked successfully.
+                Our technician will contact you shortly to confirm the appointment.
+              </>
+            )}
           </p>
-          <div className="bg-white rounded-xl p-4 border border-gray-100 mb-6 text-left space-y-2">
+
+          <div className="bg-gray-50/80 rounded-2xl p-5 border border-gray-100 mb-6 text-left space-y-3">
+            <p className="text-[11px] font-black text-gray-400 uppercase tracking-wider">Booked Services</p>
             {selectedServices.map(s => (
               <div key={s.id} className="flex justify-between text-sm">
-                <span className="text-gray-600">{s.label}</span>
+                <span className="text-gray-600 font-medium">{s.label}</span>
                 <span className="font-bold text-gray-900">₹{s.price.toLocaleString('en-IN')}</span>
               </div>
             ))}
-            <div className="border-t border-gray-100 pt-2 flex justify-between">
-              <span className="font-bold text-gray-900">Total</span>
-              <span className="font-extrabold text-[#087F8C]">₹{totalAmount.toLocaleString('en-IN')}</span>
+
+            {isStore && storeDiscountApplied > 0 && (
+              <div className="flex justify-between text-sm text-emerald-700 font-bold bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+                <span className="flex items-center gap-1">🎉 Store Visit Discount</span>
+                <span>-₹{storeDiscountApplied.toLocaleString('en-IN')}</span>
+              </div>
+            )}
+
+            <div className="border-t border-gray-200 pt-3 flex justify-between items-center">
+              <div>
+                <span className="font-black text-gray-900 text-base">Total Payable</span>
+                {isStore && <span className="block text-[11px] text-gray-400 font-medium">Pay at store on inspection</span>}
+              </div>
+              <span className="text-xl font-black text-[#087F8C]">₹{finalAmountPaid.toLocaleString('en-IN')}</span>
             </div>
           </div>
+
           <div className="flex gap-3">
-            <Link to="/repair" className="flex-1 text-center py-3 rounded-xl border-2 border-[#087F8C] text-[#087F8C] font-bold text-sm hover:bg-[#E8F6F7] transition-colors no-underline">
+            <Link to="/repair" className="flex-1 text-center py-3.5 rounded-xl border-2 border-[#087F8C] text-[#087F8C] font-bold text-sm hover:bg-[#E8F6F7] transition-colors no-underline">
               Book Another
             </Link>
-            <Link to="/" className="flex-1 text-center py-3 rounded-xl bg-[#087F8C] text-white font-bold text-sm hover:bg-[#116466] transition-colors no-underline">
+            <Link to="/" className="flex-1 text-center py-3.5 rounded-xl bg-[#087F8C] text-white font-bold text-sm hover:bg-[#116466] transition-colors no-underline shadow-md">
               Go Home
             </Link>
           </div>
@@ -454,10 +504,19 @@ export default function RepairModelPage() {
           brand={brand}
           selectedServices={selectedServices}
           totalAmount={totalAmount}
+          initialRepairMode={repairMode}
           onClose={() => setShowBooking(false)}
           onSuccess={handleBookingSuccess}
         />
       )}
+
+      {/* Cashify Benchmark Choose Option Modal */}
+      <RepairOptionModal
+        isOpen={showOptionModal}
+        onClose={() => setShowOptionModal(false)}
+        onSelect={handleSelectOption}
+        modelName={model?.name || 'Device'}
+      />
     </div>
   );
 }
