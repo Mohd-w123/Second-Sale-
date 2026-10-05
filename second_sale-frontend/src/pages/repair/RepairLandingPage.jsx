@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { REPAIR_BRANDS, REPAIR_SERVICE_TYPES } from '../../data/repairData';
 
 const HOW_IT_WORKS = [
@@ -67,13 +67,26 @@ const SERVICE_ICON_MAP = {
 
 export default function RepairLandingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [brands, setBrands] = useState(REPAIR_BRANDS);
 
+  const scrollToBrands = (instant = false) => {
+    const el = document.getElementById('brand-section') || document.getElementById('brands');
+    if (el) {
+      el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'start' });
+    }
+  };
+
   useEffect(() => {
     document.title = 'Mobile Repair Service | Doorstep Repair | SecondSale';
     setTimeout(() => setIsVisible(true), 100);
+
+    // Automatically redirect/scroll straight to the repair brands selection section
+    const scrollTimer = setTimeout(() => {
+      scrollToBrands(false);
+    }, 180);
 
     const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
     fetch(`${API_BASE}/repairs/brands`)
@@ -84,7 +97,9 @@ export default function RepairLandingPage() {
         }
       })
       .catch(err => console.warn('Using default repair brands:', err));
-  }, []);
+
+    return () => clearTimeout(scrollTimer);
+  }, [location.pathname, location.hash]);
 
   const handleBrandClick = (brand) => {
     navigate(`/repair/${brand.slug || brand.id}`);
@@ -164,7 +179,7 @@ export default function RepairLandingPage() {
       </div>
 
       {/* ── Select Brand ─────────────────────────────────────────── */}
-      <div id="brand-section" className="max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-16">
+      <div id="brand-section" className="scroll-mt-20 sm:scroll-mt-24 max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-16">
         <div className="text-center mb-10">
           <span className="inline-block bg-[#E8F6F7] text-[#087F8C] text-xs font-bold tracking-wider uppercase px-3.5 py-1.5 rounded-full mb-3">
             Step 1

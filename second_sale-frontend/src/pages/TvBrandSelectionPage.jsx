@@ -137,7 +137,7 @@ export default function TvBrandSelectionPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
           {filteredBrands.map((b) => {
             const brandName = b.brand || b.name;
-            const logoUrl = getBrandLogo(brandName);
+            const logoUrl = b.logo || getBrandLogo(brandName);
             const isFailed = failedLogos[brandName];
 
             return (

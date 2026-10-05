@@ -27,7 +27,7 @@ const BUY_REFURBISHED_CATEGORIES = [
 const DEFAULT_NAV_ITEMS = [
   { label: "Sell Device", hasDropdown: true },
   { label: "Buy Refurbished", hasDropdown: true, to: "/buy-refurbished" },
-  { label: "Repair", to: "/repair" },
+  { label: "Repair", to: "/repair#brand-section" },
   { label: "How It Works", to: "/#how-it-works" },
   { label: "Corporate", to: "/corporate" },
   { label: "About Us", to: "/about-us" },
@@ -217,14 +217,17 @@ export default function Navbar() {
             if (item.label === "Buy Refurbished" || item.to === "/buy-refurbished") {
               return { ...item, hasDropdown: true };
             }
+            if (item.label === "Repair" || item.to === "/repair") {
+              return { ...item, to: "/repair#brand-section" };
+            }
             return item;
           });
         // Always ensure Repair link is present
-        const hasRepair = active.some((i) => i.to === "/repair" || i.label === "Repair");
+        const hasRepair = active.some((i) => i.to === "/repair" || i.to === "/repair#brand-section" || i.label === "Repair");
         if (!hasRepair) {
           const buyIdx = active.findIndex((i) => i.label === "Buy Refurbished" || i.to === "/buy-refurbished");
           const insertAt = buyIdx >= 0 ? buyIdx + 1 : 2;
-          active.splice(insertAt, 0, { label: "Repair", to: "/repair" });
+          active.splice(insertAt, 0, { label: "Repair", to: "/repair#brand-section" });
         }
         if (active.length > 0) {
           setNavItems(active);
@@ -257,14 +260,17 @@ export default function Navbar() {
               if (item.label === "Buy Refurbished" || item.to === "/buy-refurbished") {
                 return { ...item, hasDropdown: true };
               }
+              if (item.label === "Repair" || item.to === "/repair") {
+                return { ...item, to: "/repair#brand-section" };
+              }
               return item;
             });
           // Always ensure Repair link is present
-          const hasRepair = active.some((i) => i.to === "/repair" || i.label === "Repair");
+          const hasRepair = active.some((i) => i.to === "/repair" || i.to === "/repair#brand-section" || i.label === "Repair");
           if (!hasRepair) {
             const buyIdx = active.findIndex((i) => i.label === "Buy Refurbished" || i.to === "/buy-refurbished");
             const insertAt = buyIdx >= 0 ? buyIdx + 1 : 2;
-            active.splice(insertAt, 0, { label: "Repair", to: "/repair" });
+            active.splice(insertAt, 0, { label: "Repair", to: "/repair#brand-section" });
           }
           if (active.length > 0) setNavItems(active);
         }

@@ -20,6 +20,79 @@ const DEFAULT_SERVICES_SCHEMA = {
   back_panel:    { price: 1999, mrp: 2999, enabled: false, warranty: '3 Months', time: '45 mins' },
 };
 
+const WhatsAppIcon = ({ size = 16, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    style={{ display: "inline-block", verticalAlign: "middle" }}
+    aria-hidden="true"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-1.746-.872-2.892-1.564-4.043-3.548-.305-.524.305-.487.873-1.62.099-.198.05-.371-.05-.52-.099-.149-.643-1.548-.879-2.124-.236-.578-.475-.5-.652-.51-.169-.01-.363-.012-.557-.012-.198 0-.52.074-.793.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.064 2.876 1.213 3.074.149.198 2.045 3.131 4.974 4.27 2.929 1.139 2.929.76 3.85.713.922-.05 2.029-.74 2.318-1.452.288-.713.288-1.327.198-1.452-.09-.124-.297-.198-.628-.347z" />
+    <path d="M12.04 2c-5.523 0-10 4.477-10 10 0 1.851.504 3.583 1.382 5.07L2 22l5.13-1.345A9.96 9.96 0 0 0 12.04 22c5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.182a8.16 8.16 0 0 1-4.16-1.137l-.298-.177-3.045.8.813-2.97-.194-.305a8.18 8.18 0 0 1-1.255-4.393c0-4.523 3.679-8.2 8.2-8.2 2.19 0 4.247.853 5.794 2.401a8.14 8.14 0 0 1 2.402 5.795c0 4.522-3.679 8.2-8.257 8.2z" />
+  </svg>
+);
+
+const formatRepairOrderWhatsAppMessage = (order) => {
+  if (!order) return "";
+  const lines = [];
+  lines.push(`🔧 *SECOND SALE - REPAIR BOOKING DETAILS*`);
+  lines.push(`────────────────────────────`);
+  lines.push(`🆔 *Booking ID:* ${order.orderId || "N/A"}`);
+  lines.push(`📌 *Service Mode:* ${order.repairMode === 'store' ? 'Store Visit' : 'Doorstep Repair'}`);
+  lines.push(`📌 *Status:* ${(order.status || "placed").toUpperCase()}`);
+  if (order.createdAt) {
+    const formattedDate = new Date(order.createdAt).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    lines.push(`📅 *Booked On:* ${formattedDate}`);
+  }
+  lines.push(``);
+
+  lines.push(`👤 *CUSTOMER INFORMATION*`);
+  lines.push(`• *Name:* ${order.pickup?.name || "Customer"}`);
+  lines.push(`• *Phone:* ${order.pickup?.phone || "N/A"}`);
+  if (order.pickup?.address) {
+    lines.push(`• *Address:* ${order.pickup?.address}, ${order.pickup?.city || ""} ${order.pickup?.pincode ? `(${order.pickup?.pincode})` : ""}`);
+  }
+  lines.push(``);
+
+  lines.push(`📱 *DEVICE & SERVICES*`);
+  lines.push(`• *Device:* ${[order.device?.brand, order.device?.modelName].filter(Boolean).join(" ")}`);
+  if (Array.isArray(order.services) && order.services.length > 0) {
+    order.services.forEach(svc => {
+      lines.push(`• ${svc.label}: ₹${Number(svc.price || 0).toLocaleString("en-IN")}`);
+    });
+  }
+  lines.push(``);
+
+  lines.push(`⏰ *SLOT & PAYMENT*`);
+  if (order.pickup?.date) lines.push(`• *Date:* ${order.pickup?.date} (${order.pickup?.timeSlot || "Anytime"})`);
+  lines.push(`• *Payment Mode:* ${order.pickup?.paymentMethod || "Cash on Service"}`);
+  if (order.storeDiscount > 0) {
+    lines.push(`• *Store Discount:* -₹${Number(order.storeDiscount).toLocaleString("en-IN")}`);
+  }
+  lines.push(`• *Total Amount:* ₹${Number(order.totalAmount || 0).toLocaleString("en-IN")}`);
+
+  if (order.technicianName) {
+    lines.push(``);
+    lines.push(`👨‍🔧 *ASSIGNED TECHNICIAN*`);
+    lines.push(`• *Name:* ${order.technicianName}`);
+    if (order.technicianPhone) lines.push(`• *Phone:* ${order.technicianPhone}`);
+  }
+
+  lines.push(`────────────────────────────`);
+  lines.push(`_Thank you for choosing SecondSale Repair Services!_ 🔧`);
+
+  return lines.join("\n");
+};
+
 const SERVICE_META = [
   { key: 'screen',        label: 'Screen Replacement',   icon: '📱', color: '#087F8C' },
   { key: 'battery',       label: 'Battery Replacement',  icon: '🔋', color: '#10B981' },
@@ -109,10 +182,39 @@ export default function AdminRepair() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [orderSearch, setOrderSearch] = useState('');
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
+  const [quickUploadingId, setQuickUploadingId] = useState(null);
+  const [cardImgErrors, setCardImgErrors] = useState({});
 
   const showToast = (msg) => {
     setSuccessToast(msg);
     setTimeout(() => setSuccessToast(''), 3500);
+  };
+
+  const handleQuickUploadCardPhoto = async (device, file) => {
+    if (!file) return;
+    setQuickUploadingId(device._id);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await adminService.uploadRepairDeviceImage(fd);
+      if (res.data?.imageUrl) {
+        const newImgUrl = res.data.imageUrl;
+        await adminService.updateRepairDevice(device._id, { image: newImgUrl });
+        setDevices(prev => prev.map(d => (d._id === device._id || d.slug === device.slug) ? { ...d, image: newImgUrl } : d));
+        setCardImgErrors(prev => {
+          const next = { ...prev };
+          delete next[device._id + '_' + device.image];
+          delete next[device._id + '_' + newImgUrl];
+          return next;
+        });
+        showToast(`Photo updated for ${device.name}!`);
+      }
+    } catch (err) {
+      console.error('Failed to upload device photo:', err);
+      showToast(err.response?.data?.message || 'Failed to upload photo');
+    } finally {
+      setQuickUploadingId(null);
+    }
   };
 
   const fetchStats = async () => {
@@ -250,9 +352,19 @@ export default function AdminRepair() {
 
       if (editingDevice) {
         await adminService.updateRepairDevice(editingDevice._id, payload);
-        showToast(`Updated pricing for ${formData.name}`);
+        setDevices(prev => prev.map(d => d._id === editingDevice._id ? { ...d, ...payload } : d));
+        setCardImgErrors(prev => {
+          const next = { ...prev };
+          delete next[editingDevice._id + '_' + editingDevice.image];
+          delete next[editingDevice._id + '_' + payload.image];
+          return next;
+        });
+        showToast(`Updated pricing and photo for ${formData.name}`);
       } else {
-        await adminService.createRepairDevice(payload);
+        const res = await adminService.createRepairDevice(payload);
+        if (res.data?.device) {
+          setDevices(prev => [res.data.device, ...prev]);
+        }
         showToast(`Added new model ${formData.name}`);
       }
 
@@ -688,20 +800,44 @@ export default function AdminRepair() {
                     <div>
                       {/* Top Device Header */}
                       <div className="flex items-start gap-4">
-                        <div className="w-16 h-20 bg-gray-50 border border-gray-100 rounded-xl p-1 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                          {device.image ? (
+                        <div className="w-16 h-20 bg-gray-50 border border-gray-100 rounded-xl p-1 flex items-center justify-center flex-shrink-0 overflow-hidden relative group/img">
+                          {quickUploadingId === device._id ? (
+                            <div className="flex flex-col items-center justify-center gap-1 text-[9px] font-bold text-[#087F8C]">
+                              <RefreshCw className="w-4 h-4 animate-spin text-[#087F8C]" />
+                              <span>Saving...</span>
+                            </div>
+                          ) : device.image && !cardImgErrors[device._id + '_' + device.image] ? (
                             <img
                               src={device.image}
                               alt={device.name}
+                              referrerPolicy="no-referrer"
                               className="w-full h-full object-contain"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                e.currentTarget.parentElement.innerHTML = '<span class="text-2xl">📱</span>';
+                              onError={() => {
+                                setCardImgErrors(prev => ({ ...prev, [device._id + '_' + device.image]: true }));
                               }}
                             />
                           ) : (
                             <span className="text-2xl">📱</span>
                           )}
+
+                          {/* Quick change photo hover overlay */}
+                          <label
+                            className="absolute inset-0 bg-slate-900/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white"
+                            title="Change device photo"
+                          >
+                            <Upload size={14} className="text-white" />
+                            <span className="text-[9px] font-extrabold mt-0.5 tracking-tight">Change</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              disabled={quickUploadingId === device._id}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleQuickUploadCardPhoto(device, file);
+                              }}
+                            />
+                          </label>
                         </div>
 
                         <div className="min-w-0 flex-1">
@@ -907,8 +1043,25 @@ export default function AdminRepair() {
                         </span>
                       </div>
 
-                      {/* Status Dropdown */}
+                      {/* Status Dropdown & WhatsApp */}
                       <div className="flex items-center gap-2">
+                        {order.pickup?.phone && (() => {
+                          const digits = String(order.pickup.phone).replace(/\D/g, '');
+                          const phone = digits.length === 10 ? `91${digits}` : digits;
+                          const msg = encodeURIComponent(formatRepairOrderWhatsAppMessage(order));
+                          return (
+                            <a
+                              href={`https://wa.me/${phone}?text=${msg}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-[#25D366] hover:bg-[#20ba5a] transition-all shadow-xs no-underline cursor-pointer"
+                              title={`Share booking details to customer WhatsApp (${order.pickup.phone})`}
+                            >
+                              <WhatsAppIcon size={14} />
+                              <span>WhatsApp</span>
+                            </a>
+                          );
+                        })()}
                         <span className="text-xs font-bold text-gray-400">Status:</span>
                         <select
                           value={order.status}
@@ -1006,18 +1159,36 @@ export default function AdminRepair() {
                         </span>
                       </div>
 
-                      <button
-                        onClick={() => {
-                          const name = prompt('Enter technician name:', order.technicianName || '');
-                          if (name !== null) {
-                            const phone = prompt('Enter technician phone number:', order.technicianPhone || '');
-                            handleUpdateOrderStatus(order._id, 'technician_assigned', name, phone || '');
-                          }
-                        }}
-                        className="px-3 py-1 rounded-lg bg-[#087F8C] hover:bg-[#066a75] text-white font-extrabold text-[11px] transition-all cursor-pointer"
-                      >
-                        {order.technicianName ? 'Change Tech' : 'Assign Tech'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {order.technicianPhone && (() => {
+                          const digits = String(order.technicianPhone).replace(/\D/g, '');
+                          const phone = digits.length === 10 ? `91${digits}` : digits;
+                          const msg = encodeURIComponent(formatRepairOrderWhatsAppMessage(order));
+                          return (
+                            <a
+                              href={`https://wa.me/${phone}?text=${msg}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 no-underline"
+                              title={`Share booking details with technician ${order.technicianName} on WhatsApp`}
+                            >
+                              <WhatsAppIcon size={12} /> Send to Tech
+                            </a>
+                          );
+                        })()}
+                        <button
+                          onClick={() => {
+                            const name = prompt('Enter technician name:', order.technicianName || '');
+                            if (name !== null) {
+                              const phone = prompt('Enter technician phone number:', order.technicianPhone || '');
+                              handleUpdateOrderStatus(order._id, 'technician_assigned', name, phone || '');
+                            }
+                          }}
+                          className="px-3 py-1 rounded-lg bg-[#087F8C] hover:bg-[#066a75] text-white font-extrabold text-[11px] transition-all cursor-pointer"
+                        >
+                          {order.technicianName ? 'Change Tech' : 'Assign Tech'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1356,6 +1527,7 @@ export default function AdminRepair() {
                         <img
                           src={formData.image}
                           alt="Preview"
+                          referrerPolicy="no-referrer"
                           className="w-full h-full object-contain"
                           onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />

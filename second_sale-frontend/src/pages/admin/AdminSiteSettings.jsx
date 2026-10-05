@@ -1947,7 +1947,7 @@ export default function AdminSiteSettings() {
                 </label>
                 <input
                   type="text"
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 98204 55509"
                   value={footerPhone}
                   onChange={(e) => setFooterPhone(e.target.value)}
                   className="w-full px-3.5 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono"

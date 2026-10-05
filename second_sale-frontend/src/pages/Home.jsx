@@ -73,6 +73,13 @@ const DEVICE_CATEGORIES = [
     icon: "console",
     color: "#EDE9FE",
   },
+  {
+    label: "Television",
+    desc: "Sell your old TV",
+    to: "/sell-tv/brand",
+    icon: "tv",
+    color: "#E0F2FE",
+  },
 ];
 
 const POPULAR_SEARCHES = ["iPhone 15", "Samsung S24", "OnePlus 12", "MacBook Air", "iPad Pro"];
@@ -826,22 +833,150 @@ export default function HomePage() {
     );
   };
 
-  const renderDeviceCategories = (sec) => {
-    const categories =
-      Array.isArray(sec?.content?.categories) && sec.content.categories.length > 0
-        ? sec.content.categories
-        : DEVICE_CATEGORIES;
+function DeviceCategorySlider({ sec }) {
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startScrollLeftRef = useRef(0);
+  const hasMovedRef = useRef(false);
 
-    return (
-      <section key="deviceCategories" className="py-8 sm:py-10 bg-white">
-        <div className="max-w-[1200px] mx-auto px-4">
-          {sec?.title && sec.title !== "Sell Your Device Categories" && (
-            <div className="mb-6 text-center">
-              <h2 className="text-2xl font-black text-[#0F2D5B]">{sec.title}</h2>
-              {sec.subtitle && <p className="text-xs text-gray-500 mt-1">{sec.subtitle}</p>}
-            </div>
-          )}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
+  const categories =
+    Array.isArray(sec?.content?.categories) && sec.content.categories.length > 0
+      ? sec.content.categories
+      : DEVICE_CATEGORIES;
+
+  const updateScrollState = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 6);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    // Check after DOM layout calculation
+    const timer = setTimeout(updateScrollState, 100);
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [categories]);
+
+  const handleScroll = (direction) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const card = el.querySelector(".category-card");
+    const cardWidth = card ? card.offsetWidth + 16 : 180;
+    const scrollAmount = cardWidth * 2;
+    el.scrollBy({
+      left: direction === "left" ? -scrollAmount : scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    isDraggingRef.current = true;
+    hasMovedRef.current = false;
+    startXRef.current = e.pageX - (scrollRef.current?.offsetLeft || 0);
+    startScrollLeftRef.current = scrollRef.current?.scrollLeft || 0;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDraggingRef.current || !scrollRef.current) return;
+    const x = e.pageX - (scrollRef.current.offsetLeft || 0);
+    const walk = (x - startXRef.current) * 1.2;
+    if (Math.abs(walk) > 4) {
+      hasMovedRef.current = true;
+    }
+    scrollRef.current.scrollLeft = startScrollLeftRef.current - walk;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    isDraggingRef.current = false;
+    setTimeout(() => {
+      hasMovedRef.current = false;
+    }, 60);
+  };
+
+  const handleLinkClick = (e) => {
+    if (hasMovedRef.current) {
+      e.preventDefault();
+    }
+  };
+
+  return (
+    <section key="deviceCategories" className="py-8 sm:py-10 bg-white">
+      <div className="max-w-[1200px] mx-auto px-4">
+        {sec?.title && sec.title !== "Sell Your Device Categories" && (
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-black text-[#0F2D5B]">{sec.title}</h2>
+            {sec.subtitle && <p className="text-xs text-gray-500 mt-1">{sec.subtitle}</p>}
+          </div>
+        )}
+
+        <div className="relative group/cats">
+          {/* Left Arrow Button */}
+          <button
+            type="button"
+            onClick={() => handleScroll("left")}
+            disabled={!canScrollLeft}
+            aria-label="Previous categories"
+            className={`absolute -left-2 sm:-left-4 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white shadow-md hover:shadow-xl border border-gray-200 text-gray-700 hover:text-[#087F8C] hover:border-[#087F8C]/40 flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 ${
+              canScrollLeft ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
+            }`}
+          >
+            <ChevronLeft size={22} strokeWidth={2.5} />
+          </button>
+
+          {/* Right Arrow Button */}
+          <button
+            type="button"
+            onClick={() => handleScroll("right")}
+            disabled={!canScrollRight}
+            aria-label="Next categories"
+            className={`absolute -right-2 sm:-right-4 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white shadow-md hover:shadow-xl border border-gray-200 text-gray-700 hover:text-[#087F8C] hover:border-[#087F8C]/40 flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 ${
+              canScrollRight ? "opacity-100 scale-100" : "opacity-0 scale-75 pointer-events-none"
+            }`}
+          >
+            <ChevronRight size={22} strokeWidth={2.5} />
+          </button>
+
+          {/* Edge Fade Gradients for smooth visual boundary */}
+          <div
+            className={`pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white via-white/80 to-transparent z-10 transition-opacity duration-300 ${
+              canScrollLeft ? "opacity-100" : "opacity-0"
+            }`}
+          />
+          <div
+            className={`pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white via-white/80 to-transparent z-10 transition-opacity duration-300 ${
+              canScrollRight ? "opacity-100" : "opacity-0"
+            }`}
+          />
+
+          {/* Slider Row - flex-nowrap to keep all categories on one continuous sliding track */}
+          <div
+            ref={scrollRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUpOrLeave}
+            onMouseLeave={handleMouseUpOrLeave}
+            className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-2 px-1 cursor-grab active:cursor-grabbing select-none"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
             {categories.map((cat, idx) => {
               const defaultCat = DEVICE_CATEGORIES[idx % DEVICE_CATEGORIES.length] || DEVICE_CATEGORIES[0];
               const color = cat.color || defaultCat.color || "#E8F6F7";
@@ -862,7 +997,8 @@ export default function HomePage() {
                 <Link
                   to={cat.to || "/sell-old-mobile-phones/brand"}
                   key={cat.label || idx}
-                  className="group flex flex-col items-center text-center rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#087F8C]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 no-underline relative overflow-hidden"
+                  onClick={handleLinkClick}
+                  className="category-card group flex flex-col items-center text-center rounded-2xl p-4 sm:p-5 border border-gray-100 hover:border-[#087F8C]/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 no-underline relative overflow-hidden shrink-0 w-[138px] sm:w-[150px] md:w-[158px] lg:w-[162px] snap-start"
                   style={{ backgroundColor: color + "35" }}
                 >
                   <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform duration-300">
@@ -906,7 +1042,7 @@ export default function HomePage() {
                   <h3 className="text-sm sm:text-base font-extrabold text-[#0F2D5B] group-hover:text-[#087F8C] transition-colors leading-snug mb-1">
                     {cat.label}
                   </h3>
-                  <p className="text-[11px] text-gray-400 font-medium leading-tight">
+                  <p className="text-[11px] text-gray-400 font-medium leading-tight line-clamp-1">
                     {cat.desc}
                   </p>
 
@@ -919,8 +1055,13 @@ export default function HomePage() {
             })}
           </div>
         </div>
-      </section>
-    );
+      </div>
+    </section>
+  );
+}
+
+  const renderDeviceCategories = (sec) => {
+    return <DeviceCategorySlider key="deviceCategories" sec={sec} />;
   };
 
   const renderStats = (sec) => {

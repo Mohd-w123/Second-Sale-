@@ -81,27 +81,27 @@ function mkDevice({ brand, modelName, slug, processorFamily, generation, tier, v
 const devices = [
   mkDevice({
     brand: 'Apple', modelName: 'Macbook Air 2025', slug: 'apple-macbook-air-2025',
-    processorFamily: 'Apple M4 Pro', generation: 'M-Series', tier: 'Premium',
+    processorFamily: 'Apple M4', generation: 'M-Series', tier: 'Premium',
     imageUrl: "https://fdn.gsmarena.com/imgroot/news/25/03/macbook-air-m4/inline/-1200/gsmarena_001.jpg",
-    variants: [{ basePrice: 70000 }],
+    variants: [{ processor: 'Apple M4', ram: '16GB', storage: '256 GB SSD', basePrice: 70000 }],
   }),
   mkDevice({
     brand: 'Apple', modelName: 'MacBook Pro 2025', slug: 'apple-macbook-pro-2025',
-    processorFamily: 'Apple M4 Pro', generation: 'M-Series', tier: 'Premium',
+    processorFamily: 'Apple M5', generation: 'M-Series', tier: 'Premium',
     imageUrl: "https://m.media-amazon.com/images/I/615tKndaduL._SY450_.jpg",
-    variants: [{ basePrice: 95000 }],
+    variants: [{ processor: 'Apple M5', ram: '16GB', storage: '1 TB SSD', basePrice: 95000 }],
   }),
   mkDevice({
     brand: 'Apple', modelName: 'Macbook Neo Series', slug: 'apple-macbook-neo-series',
-    processorFamily: 'Apple M2', generation: 'M-Series', tier: 'Mid-range',
+    processorFamily: 'Apple A18 Pro', generation: 'M-Series', tier: 'Mid-range',
     imageUrl: "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/macbook-neo-color-select-202603-indigo-256gb?wid=5120&hei=3280&fmt=webp&qlt=90&.v=TytZbDBUUnRqRElRcFlBSHpmZVVDNFdhaFd1bmVlZEFaaDd5ZjhzZmNGaVdKMmdJd3ZvNzN4czNSeDVZUEswZkRNSlovakh3TEZaVjd3SkhSOUZwUlBjVTIwcEJjL3Axby9SNE1La0phb1g0ZmZZOVFIdEFOcmw0MUsya3ZPUXE&traceId=1",
-    variants: [{ basePrice: 36000 }],
+    variants: [{ processor: 'Apple A18 Pro', ram: '8GB', storage: '256 GB SSD', basePrice: 36000 }],
   }),
   mkDevice({
     brand: 'Apple', modelName: 'Macbook Air 2026', slug: 'apple-macbook-air-2026',
-    processorFamily: 'Apple M4 Pro', generation: 'M-Series', tier: 'Premium',
+    processorFamily: 'Apple M5', generation: 'M-Series', tier: 'Premium',
     imageUrl: "https://m.media-amazon.com/images/I/71eX66ytH+L._SY450_.jpg",
-    variants: [{ basePrice: 70000 }],
+    variants: [{ processor: 'Apple M5', ram: '16GB', storage: '512 GB SSD', basePrice: 75000 }],
   }),
   mkDevice({
     brand: 'Apple', modelName: 'MacBook Pro 2024', slug: 'apple-macbook-pro-2024',

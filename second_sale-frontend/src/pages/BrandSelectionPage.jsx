@@ -106,11 +106,11 @@ export default function BrandSelectionPage() {
           >
             <div
               className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold transition-transform duration-200 group-hover:scale-110 overflow-hidden"
-              style={{ backgroundColor: getBrandColor(b.brand) }}
+              style={{ backgroundColor: b.color || getBrandColor(b.brand) }}
             >
-              {(!failedLogos[b.brand] && getBrandLogo(b.brand)) ? (
+              {(!failedLogos[b.brand] && (b.logo || getBrandLogo(b.brand))) ? (
                 <img 
-                  src={getBrandLogo(b.brand)} 
+                  src={b.logo || getBrandLogo(b.brand)} 
                   alt={b.brand}
                   className="w-full h-full object-contain p-2"
                   onError={() => handleLogoError(b.brand)}

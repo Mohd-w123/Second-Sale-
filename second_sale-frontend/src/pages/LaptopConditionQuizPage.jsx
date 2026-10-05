@@ -182,13 +182,22 @@ export default function LaptopConditionQuizPage() {
       );
       if ((!specs || isBadAppleSpecs) && dev) {
         const defVariant = dev.variants?.[0] || {};
-        const defaultAppleProc = dev.modelName?.includes('2025') || dev.modelName?.includes('2026') 
-          ? 'Apple M4' 
-          : (dev.modelName?.includes('2024') || dev.modelName?.includes('2023') ? 'Apple M3' : 'Apple M2');
+        const isAir = (dev.modelName || '').toLowerCase().includes('air');
+        const defaultAppleProc = dev.modelName?.includes('2026')
+          ? (isAir ? 'Apple M5' : 'Apple M5 Pro')
+          : dev.modelName?.includes('2025')
+            ? (isAir ? 'Apple M4' : 'Apple M5')
+            : (dev.modelName?.includes('2024') || dev.modelName?.includes('2023') ? 'Apple M3' : 'Apple M2');
+        const defaultAppleRam = (dev.modelName?.includes('2025') || dev.modelName?.includes('2026'))
+          ? '16GB'
+          : '8GB';
+        const defaultAppleStorage = (dev.modelName?.includes('2026') && isAir)
+          ? '512 GB SSD'
+          : '256 GB SSD';
         setSpecs({
           processor: dev.processorFamily || dev.processor || (devIsApple ? defaultAppleProc : 'Intel Core i5'),
-          ram: defVariant.ram || dev.ram || (devIsApple ? '16 GB' : '8 GB'),
-          storage: defVariant.storage || (dev.storage && !dev.storage.includes('HDD') ? dev.storage : (devIsApple ? '256 GB SSD' : '512 GB SSD'))
+          ram: defVariant.ram || dev.ram || (devIsApple ? defaultAppleRam : '8 GB'),
+          storage: defVariant.storage || (dev.storage && !dev.storage.includes('HDD') ? dev.storage : (devIsApple ? defaultAppleStorage : '512 GB SSD'))
         });
       }
     }).catch(() => setLoading(false));

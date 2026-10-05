@@ -8,6 +8,21 @@ import { formatCurrency } from '../utils/formatCurrency';
 import Loader from '../components/ui/Loader';
 import NoIndexSEO from '../components/seo/NoIndexSEO';
 
+const WhatsAppIcon = ({ size = 16, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    style={{ display: "inline-block", verticalAlign: "middle" }}
+    aria-hidden="true"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-1.746-.872-2.892-1.564-4.043-3.548-.305-.524.305-.487.873-1.62.099-.198.05-.371-.05-.52-.099-.149-.643-1.548-.879-2.124-.236-.578-.475-.5-.652-.51-.169-.01-.363-.012-.557-.012-.198 0-.52.074-.793.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.064 2.876 1.213 3.074.149.198 2.045 3.131 4.974 4.27 2.929 1.139 2.929.76 3.85.713.922-.05 2.029-.74 2.318-1.452.288-.713.288-1.327.198-1.452-.09-.124-.297-.198-.628-.347z" />
+    <path d="M12.04 2c-5.523 0-10 4.477-10 10 0 1.851.504 3.583 1.382 5.07L2 22l5.13-1.345A9.96 9.96 0 0 0 12.04 22c5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.182a8.16 8.16 0 0 1-4.16-1.137l-.298-.177-3.045.8.813-2.97-.194-.305a8.18 8.18 0 0 1-1.255-4.393c0-4.523 3.679-8.2 8.2-8.2 2.19 0 4.247.853 5.794 2.401a8.14 8.14 0 0 1 2.402 5.795c0 4.522-3.679 8.2-8.257 8.2z" />
+  </svg>
+);
+
 export default function OrderTrackingPage() {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -97,15 +112,35 @@ export default function OrderTrackingPage() {
               <h1 className="text-2xl font-black text-[#111827] mb-1">Order #: <span className="uppercase">{orderId}</span></h1>
               <p className="text-[#EF4444] font-black text-sm uppercase tracking-wider">PIN : 7803</p>
             </div>
-            {order.device?.category !== 'tv' && (
-              <button
-                onClick={() => setShowReport(true)}
-                className="flex items-center gap-2 bg-[#F9FAFB] border border-gray-100 text-[#087F8C] px-6 py-3 rounded-2xl font-black text-sm hover:bg-white transition-all shadow-sm"
+            <div className="flex items-center gap-3 flex-wrap">
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `📦 *SecondSale Order Tracking Details*\n` +
+                  `Order ID: ${order.orderId || orderId}\n` +
+                  `Device: ${[order.device?.brand, order.device?.modelName].filter(Boolean).join(' ')} ${order.device?.storage || ''}\n` +
+                  `Pickup: ${order.pickup?.date || ''} (${order.pickup?.timeSlot || ''})\n` +
+                  `Status: ${(order.status || 'placed').toUpperCase()}\n` +
+                  `Offered Price: ₹${Number(order.priceBreakdown?.finalPrice || 0).toLocaleString('en-IN')}\n\n` +
+                  `Live Track: ${typeof window !== 'undefined' ? window.location.origin : ''}/orders/${order.orderId || orderId}`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white px-5 py-3 rounded-2xl font-black text-xs transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98] no-underline"
+                title="Share order details to anyone on WhatsApp"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
-                See Device Report
-              </button>
-            )}
+                <WhatsAppIcon size={16} />
+                <span>Share on WhatsApp</span>
+              </a>
+              {order.device?.category !== 'tv' && (
+                <button
+                  onClick={() => setShowReport(true)}
+                  className="flex items-center gap-2 bg-[#F9FAFB] border border-gray-100 text-[#087F8C] px-6 py-3 rounded-2xl font-black text-sm hover:bg-white transition-all shadow-sm cursor-pointer"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
+                  See Device Report
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-y-2 gap-x-8 text-sm font-bold">

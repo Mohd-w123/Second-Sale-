@@ -26,12 +26,16 @@ export const getBrands = async (req, res, next) => {
     ]);
 
     // Attach dynamic logo and styling from Brand collection
-    const brandDocs = await Brand.find({ isActive: true }).select('name slug logo color order');
+    const brandDocs = await Brand.find({ isActive: { $ne: false } }).select('name slug logo color order');
     const brandMap = new Map();
-    brandDocs.forEach((b) => brandMap.set(b.name.toLowerCase(), b));
+    brandDocs.forEach((b) => {
+      if (b.name) brandMap.set(b.name.toLowerCase().trim(), b);
+      if (b.slug) brandMap.set(b.slug.toLowerCase().trim(), b);
+    });
 
     const enrichedBrands = brands.map((b) => {
-      const bDoc = brandMap.get(b.brand.toLowerCase());
+      const bName = (b.brand || '').toLowerCase().trim();
+      const bDoc = brandMap.get(bName);
       return {
         ...b,
         logo: bDoc?.logo || '',

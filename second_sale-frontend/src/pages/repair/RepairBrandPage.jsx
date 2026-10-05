@@ -33,6 +33,7 @@ export default function RepairBrandPage() {
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
           setModels(data);
+          setImgErrors({});
         }
       })
       .catch(err => console.warn('Using default repair models for brand:', err))
@@ -43,7 +44,12 @@ export default function RepairBrandPage() {
       .then(res => res.json())
       .then(brandsData => {
         if (Array.isArray(brandsData)) {
-          const match = brandsData.find(b => b.slug === brandSlug || b.id === brandSlug);
+          const s = (brandSlug || '').toLowerCase().trim();
+          const match = brandsData.find(b => 
+            (b.slug && b.slug.toLowerCase().trim() === s) || 
+            (b.id && String(b.id).toLowerCase().trim() === s) ||
+            (b.name && b.name.toLowerCase().trim() === s)
+          );
           if (match) {
             setBrand(match);
           }
@@ -214,10 +220,11 @@ export default function RepairBrandPage() {
                 >
                   {/* Phone Image */}
                   <div className="w-full h-28 sm:h-32 flex items-center justify-center p-1 overflow-hidden">
-                    {!imgErrors[model.id || model.slug] ? (
+                    {model.image && !imgErrors[model.id || model.slug] ? (
                       <img
                         src={model.image}
                         alt={model.name}
+                        referrerPolicy="no-referrer"
                         className="h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                         onError={() => setImgErrors(p => ({ ...p, [model.id || model.slug]: true }))}
                       />

@@ -62,6 +62,7 @@ export default function AdminDashboard() {
       icon: <Users size={20} className="text-[#087F8C]" />,
       bg: 'rgba(59, 130, 246, 0.1)',
       accent: '#60a5fa',
+      to: '/admin/users',
     },
     {
       label: 'Devices Catalog',
@@ -69,6 +70,7 @@ export default function AdminDashboard() {
       icon: <Smartphone size={20} className="text-purple-400" />,
       bg: 'rgba(168, 85, 247, 0.1)',
       accent: '#c084fc',
+      to: '/admin/devices',
     },
     {
       label: 'Total Orders',
@@ -76,6 +78,7 @@ export default function AdminDashboard() {
       icon: <ClipboardList size={20} className="text-emerald-400" />,
       bg: 'rgba(16, 185, 129, 0.1)',
       accent: '#34d399',
+      to: '/admin/orders',
     },
     {
       label: 'Partners App',
@@ -83,6 +86,7 @@ export default function AdminDashboard() {
       icon: <Handshake size={20} className="text-amber-400" />,
       bg: 'rgba(245, 158, 11, 0.1)',
       accent: '#fbbf24',
+      to: '/admin/partners',
     },
     {
       label: 'Total Revenue',
@@ -90,6 +94,7 @@ export default function AdminDashboard() {
       icon: <IndianRupee size={20} className="text-rose-400" />,
       bg: 'rgba(244, 63, 94, 0.1)',
       accent: '#fb7185',
+      to: '/admin/orders?status=completed',
     },
   ];
 
@@ -108,17 +113,24 @@ export default function AdminDashboard() {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {statCards.map((card, idx) => (
-          <div 
+          <Link 
+            to={card.to}
             key={idx} 
-            className="admin-stat-card" 
+            className="admin-stat-card no-underline block cursor-pointer group" 
             style={{ '--card-accent': card.accent }}
+            title={`View ${card.label}`}
           >
-            <div className="admin-stat-icon" style={{ backgroundColor: card.bg }}>
-              {card.icon}
+            <div className="flex items-center justify-between mb-1">
+              <div className="admin-stat-icon" style={{ backgroundColor: card.bg }}>
+                {card.icon}
+              </div>
+              <span className="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 group-hover:text-slate-700 group-hover:bg-slate-100 transition-all duration-200">
+                <ArrowRight size={14} className="transform group-hover:translate-x-0.5 transition-transform" />
+              </span>
             </div>
             <div className="admin-stat-value">{card.value}</div>
             <div className="admin-stat-label">{card.label}</div>
-          </div>
+          </Link>
         ))}
       </div>
 
