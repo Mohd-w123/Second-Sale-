@@ -309,20 +309,25 @@ export default function Navbar() {
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
 
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
   const debounceTimer = useRef(null);
   const dropdownRef = useRef(null);
   const buyDropdownRef = useRef(null);
+  const moreDropdownRef = useRef(null);
   const sellCloseTimerRef = useRef(null);
   const buyCloseTimerRef = useRef(null);
+  const moreCloseTimerRef = useRef(null);
   const categoryHoverTimerRef = useRef(null);
 
   const openSellDropdown = useCallback(() => {
     if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
     if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+    if (moreCloseTimerRef.current) clearTimeout(moreCloseTimerRef.current);
     setBuyDropdownOpen(false);
+    setMoreDropdownOpen(false);
     setSellDropdownOpen(true);
   }, []);
 
@@ -336,7 +341,9 @@ export default function Navbar() {
   const openBuyDropdown = useCallback(() => {
     if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
     if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+    if (moreCloseTimerRef.current) clearTimeout(moreCloseTimerRef.current);
     setSellDropdownOpen(false);
+    setMoreDropdownOpen(false);
     setBuyDropdownOpen(true);
   }, []);
 
@@ -344,6 +351,22 @@ export default function Navbar() {
     if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
     buyCloseTimerRef.current = setTimeout(() => {
       setBuyDropdownOpen(false);
+    }, delay);
+  }, []);
+
+  const openMoreDropdown = useCallback(() => {
+    if (moreCloseTimerRef.current) clearTimeout(moreCloseTimerRef.current);
+    if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
+    if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+    setSellDropdownOpen(false);
+    setBuyDropdownOpen(false);
+    setMoreDropdownOpen(true);
+  }, []);
+
+  const closeMoreDropdownWithDelay = useCallback((delay = 220) => {
+    if (moreCloseTimerRef.current) clearTimeout(moreCloseTimerRef.current);
+    moreCloseTimerRef.current = setTimeout(() => {
+      setMoreDropdownOpen(false);
     }, delay);
   }, []);
 
@@ -371,10 +394,12 @@ export default function Navbar() {
   useEffect(() => {
     if (sellCloseTimerRef.current) clearTimeout(sellCloseTimerRef.current);
     if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
+    if (moreCloseTimerRef.current) clearTimeout(moreCloseTimerRef.current);
     if (categoryHoverTimerRef.current) clearTimeout(categoryHoverTimerRef.current);
     setMobileMenuOpen(false);
     setSellDropdownOpen(false);
     setBuyDropdownOpen(false);
+    setMoreDropdownOpen(false);
   }, [location.pathname]);
 
   const handleMobileExpand = (label) => {
@@ -440,6 +465,10 @@ export default function Navbar() {
       if (buyDropdownRef.current && !buyDropdownRef.current.contains(e.target)) {
         if (buyCloseTimerRef.current) clearTimeout(buyCloseTimerRef.current);
         setBuyDropdownOpen(false);
+      }
+      if (moreDropdownRef.current && !moreDropdownRef.current.contains(e.target)) {
+        if (moreCloseTimerRef.current) clearTimeout(moreCloseTimerRef.current);
+        setMoreDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -572,7 +601,7 @@ export default function Navbar() {
           )}
         </div>
       )}
-      <div className="max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-8 h-[68px] gap-4">
+      <div className="w-full max-w-[1440px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-[68px] gap-2 lg:gap-3 xl:gap-4">
 
         {/* Logo */}
         <Link to="/" className="flex items-center no-underline shrink-0">
@@ -585,16 +614,23 @@ export default function Navbar() {
 
         {/* Desktop Nav Items */}
         <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 shrink-0">
-          {navItems.map((item) => {
+          {navItems.map((item, idx) => {
             const isSell = item.label === "Sell Device" || (item.hasDropdown && item.label !== "Buy Refurbished" && item.to !== "/buy-refurbished");
             const isBuy = item.label === "Buy Refurbished" || item.to === "/buy-refurbished";
             const isOpen = isSell ? sellDropdownOpen : isBuy ? buyDropdownOpen : false;
             const itemRef = isSell ? dropdownRef : isBuy ? buyDropdownRef : undefined;
 
+            let visibilityClass = "block";
+            if (idx === 3 || idx === 4) {
+              visibilityClass = "hidden xl:block";
+            } else if (idx >= 5) {
+              visibilityClass = "hidden 2xl:block";
+            }
+
             return (
               <div
                 key={item._id || item.label}
-                className="relative"
+                className={`relative ${visibilityClass}`}
                 ref={itemRef}
                 onMouseEnter={() => {
                   if (isSell) openSellDropdown();
@@ -814,10 +850,85 @@ export default function Navbar() {
               </div>
             );
           })}
+
+          {/* "More" Dropdown for items hidden on lg and xl screens */}
+          {navItems.length > 3 && (
+            <div
+              className="relative hidden lg:block 2xl:hidden"
+              ref={moreDropdownRef}
+              onMouseEnter={openMoreDropdown}
+              onMouseLeave={() => closeMoreDropdownWithDelay(220)}
+            >
+              <button
+                type="button"
+                className={`flex items-center gap-1 px-2 xl:px-3 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent ${
+                  moreDropdownOpen
+                    ? "text-[#087F8C] bg-[#E8F6F7]"
+                    : "text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMoreDropdownOpen(!moreDropdownOpen);
+                }}
+              >
+                <span>More</span>
+                <span className={`transition-transform duration-200 ${moreDropdownOpen ? "rotate-180" : ""}`}>
+                  <ChevronDown />
+                </span>
+              </button>
+
+              {moreDropdownOpen && (
+                <div
+                  className="absolute top-full left-0 mt-1 bg-white border border-slate-100 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.12)] z-[2000] p-2 w-52 dropdown-animate overflow-hidden flex flex-col gap-0.5 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:bg-transparent"
+                  onMouseEnter={openMoreDropdown}
+                  onMouseLeave={() => closeMoreDropdownWithDelay(220)}
+                >
+                  {navItems.slice(3).map((item, sliceIdx) => {
+                    const isShownOnXl = sliceIdx < 2; // Items at index 3 & 4 (e.g. How It Works, Corporate) are shown in top bar on xl+
+                    return (
+                      <div
+                        key={item._id || item.label}
+                        className={isShownOnXl ? "xl:hidden" : "block"}
+                      >
+                        {item.isExternal ? (
+                          <a
+                            href={item.to}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={() => setMoreDropdownOpen(false)}
+                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] no-underline font-semibold text-xs xl:text-sm"
+                          >
+                            <span>{item.label}</span>
+                            <ChevronRight size={13} className="text-slate-300" />
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] font-semibold text-xs xl:text-sm text-left border-none bg-transparent cursor-pointer"
+                            onClick={() => {
+                              setMoreDropdownOpen(false);
+                              if (item.to?.startsWith("/#")) {
+                                const el = document.getElementById(item.to.replace("/#", ""));
+                                if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
+                              }
+                              if (item.to) navigate(item.to);
+                            }}
+                          >
+                            <span>{item.label}</span>
+                            <ChevronRight size={13} className="text-slate-300" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Search (Desktop) */}
-        <div className="hidden md:block flex-1 min-w-[200px] xl:min-w-[260px] max-w-sm relative" ref={searchRef}>
+        <div className="hidden md:block flex-1 min-w-[140px] sm:min-w-[170px] max-w-[220px] xl:max-w-[280px] relative shrink" ref={searchRef}>
           <input
             type="text"
             placeholder="Search device (e.g. iPhone 15)"
@@ -835,35 +946,35 @@ export default function Navbar() {
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-3 shrink-0">
-          {/* Secure & Trusted badge */}
-          <div className="hidden xl:flex items-center gap-1.5 text-xs font-semibold text-[#087F8C]">
+        <div className="flex items-center gap-2 sm:gap-2.5 xl:gap-3 shrink-0">
+          {/* Secure & Trusted badge - shown on wide screens */}
+          <div className="hidden 2xl:flex items-center gap-1.5 text-xs font-semibold text-[#087F8C] whitespace-nowrap">
             <ShieldCheck />
-            Secure & Trusted
+            <span>Secure & Trusted</span>
           </div>
 
           {isLoggedIn ? (
-            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
+            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors shrink-0">
               <div className="w-8 h-8 rounded-full bg-[#087F8C] text-white flex items-center justify-center text-xs font-bold">
                 {userName?.[0]?.toUpperCase() || "U"}
               </div>
             </Link>
           ) : (
-            <Link to="/login" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors">
+            <Link to="/login" className="hidden sm:flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors shrink-0">
               <UserIcon />
             </Link>
           )}
 
           <Link
             to="/sell-old-mobile-phones/brand"
-            className="hidden sm:inline-flex btn-gradient font-bold text-sm px-5 py-2.5 rounded-xl no-underline hover:-translate-y-px active:translate-y-0"
+            className="hidden sm:inline-flex btn-gradient font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl no-underline hover:-translate-y-px active:translate-y-0 whitespace-nowrap shrink-0 shadow-sm"
           >
             Sell Now
           </Link>
 
           {/* Hamburger */}
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] transition-colors shrink-0"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
