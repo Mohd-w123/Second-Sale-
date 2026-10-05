@@ -116,7 +116,7 @@ export default function SmartwatchBrandSelectionPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
         {filteredBrands.map((b) => {
           const brandName = b.brand || b.name;
-          const logoUrl = getBrandLogo(brandName);
+          const logoUrl = b.logo || getBrandLogo(brandName);
           const hasFailed = failedLogos[brandName];
 
           return (

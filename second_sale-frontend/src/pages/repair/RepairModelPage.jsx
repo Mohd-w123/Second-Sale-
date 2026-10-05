@@ -94,6 +94,7 @@ export default function RepairModelPage() {
       .then(data => {
         if (data && data.services) {
           setModel(data);
+          setImgError(false);
           if (!brand || brand.name !== data.brand) {
             setBrand({
               name: data.brand,
@@ -264,10 +265,11 @@ export default function RepairModelPage() {
             <div className="bg-white rounded-3xl border border-gray-200/80 p-5 sm:p-6 mb-5 flex items-center justify-between gap-5 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="w-20 h-24 flex items-center justify-center rounded-2xl bg-gray-50 border border-gray-100 flex-shrink-0 overflow-hidden p-2">
-                  {!imgError ? (
+                  {model.image && !imgError ? (
                     <img
                       src={model.image}
                       alt={model.name}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-contain"
                       onError={() => setImgError(true)}
                     />

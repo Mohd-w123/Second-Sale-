@@ -111,8 +111,10 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
+    if (!location.hash && location.pathname !== '/repair') {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname, location.hash]);
 
   // Sync Favicon dynamically from Site Settings
   useEffect(() => {

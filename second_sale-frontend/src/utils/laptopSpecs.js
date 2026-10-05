@@ -21,20 +21,22 @@ export const WINDOWS_PROCESSORS = [
 ];
 
 export const MAC_PROCESSORS = [
+  'Apple M5 Pro', 'Apple M5 Max', 'Apple M5',
   'Apple M4 Pro', 'Apple M4 Max', 'Apple M4',
   'Apple M3 Pro', 'Apple M3 Max', 'Apple M3',
   'Apple M2 Pro', 'Apple M2 Max', 'Apple M2',
   'Apple M1 Pro', 'Apple M1 Max', 'Apple M1',
-  'Apple M5',
-  'Intel Core i7', 'Intel Core i5', 'Intel Core i9', 'Intel Core i3'
+  'Apple A18 Pro',
+  'Intel Core i9', 'Intel Core i7', 'Intel Core i5', 'Intel Core i3',
+  'Intel Core M', 'Intel Core m3', 'Intel Core m5', 'Intel Core m7'
 ];
 
 export const MAC_RAM = [
-  '8GB', '16GB', '18GB', '24GB', '32GB', '36GB', '48GB', '64GB', '96GB', '128GB'
+  '4GB', '8GB', '16GB', '18GB', '24GB', '32GB', '36GB', '48GB', '64GB', '96GB', '128GB'
 ];
 
 export const MAC_STORAGE = [
-  '256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'
+  '128 GB SSD', '256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'
 ];
 
 /**
@@ -56,124 +58,319 @@ export function getValidMacProcessors(device) {
     }
   }
 
-  // 1. M4 Generation (2025 / 2026 / M4 in name or processorFamily)
-  if (pf.includes('m4') || name.includes('m4') || slug.includes('m4') || name.includes('2025') || name.includes('2026')) {
-    if (name.includes('air')) {
-      return ['Apple M4'];
-    }
-    return ['Apple M4 Pro', 'Apple M4 Max', 'Apple M4'];
+  // 1. MacBook Air 2026: Apple M5 chip only (13.6-inch & 15.3-inch)
+  if (name.includes('2026') && name.includes('air')) {
+    return ['Apple M5'];
   }
 
-  // 2. M3 Generation (2024 / M3 in name or processorFamily)
-  if (pf.includes('m3') || name.includes('m3') || slug.includes('m3') || name.includes('2024')) {
-    if (name.includes('air')) {
-      return ['Apple M3'];
-    }
-    return ['Apple M3 Pro', 'Apple M3 Max', 'Apple M3'];
+  // 2. MacBook Pro 2026: Apple M5 Pro / M5 Max
+  if (name.includes('2026') && name.includes('pro')) {
+    return ['Apple M5 Pro', 'Apple M5 Max'];
   }
 
-  // 3. M2 Generation (2022 / 2023 / M2 in name or processorFamily)
-  if (pf.includes('m2') || name.includes('m2') || slug.includes('m2') || name.includes('2023') || name.includes('2022')) {
-    if (name.includes('air') || name.includes('neo') || name.includes('13')) {
-      return ['Apple M2'];
-    }
-    return ['Apple M2 Pro', 'Apple M2 Max', 'Apple M2'];
+  // 3. MacBook Neo (2026 Neo 13-inch): Apple A18 Pro
+  if (name.includes('neo')) {
+    return ['Apple A18 Pro'];
   }
 
-  // 4. M1 Generation (2020 M1 / 2021 M1 Pro/Max)
-  if (pf.includes('m1') || name.includes('m1') || slug.includes('m1') || name.includes('2021')) {
-    if (name.includes('air') || name.includes('13')) {
+  // 4. MacBook Air 2025: Apple M4 chip only (13.6-inch & 15.3-inch)
+  if (name.includes('2025') && name.includes('air')) {
+    return ['Apple M4'];
+  }
+
+  // 5. MacBook Pro 2025: Apple M5 (14-inch) or Apple M4 Pro / M4 Max
+  if (name.includes('2025') && name.includes('pro')) {
+    return ['Apple M5', 'Apple M4 Pro', 'Apple M4 Max'];
+  }
+
+  // 6. MacBook Air 2024: Apple M3 chip only (13.6-inch & 15.3-inch)
+  if (name.includes('2024') && name.includes('air')) {
+    return ['Apple M3'];
+  }
+
+  // 7. MacBook Pro 2024: Apple M4, Apple M4 Pro, Apple M4 Max
+  if (name.includes('2024') && name.includes('pro')) {
+    return ['Apple M4', 'Apple M4 Pro', 'Apple M4 Max'];
+  }
+
+  // 8. MacBook Air 2023 & 2022: Apple M2 chip only
+  if ((name.includes('2023') || name.includes('2022')) && name.includes('air')) {
+    return ['Apple M2'];
+  }
+
+  // 9. MacBook Pro 2023: Apple M2 Pro, M2 Max (Jan) or Apple M3, M3 Pro, M3 Max (Nov)
+  if (name.includes('2023') && name.includes('pro')) {
+    return ['Apple M2 Pro', 'Apple M2 Max', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max'];
+  }
+
+  // 10. MacBook Pro 2022 (13-inch M2): Apple M2
+  if (name.includes('2022') && name.includes('pro')) {
+    return ['Apple M2'];
+  }
+
+  // 11. MacBook Pro 2021 (14-inch & 16-inch): Apple M1 Pro, Apple M1 Max
+  if (name.includes('2021') && name.includes('pro')) {
+    return ['Apple M1 Pro', 'Apple M1 Max'];
+  }
+
+  // 12. MacBook Air 2020:
+  // - MacBook Air 2020 M1: Apple M1
+  // - MacBook Air 2020 Retina (Intel): Intel Core i3 / i5 / i7
+  if (name.includes('2020') && name.includes('air')) {
+    if (name.includes('intel') || pf.includes('intel') || gen.includes('intel')) {
+      return ['Intel Core i3', 'Intel Core i5', 'Intel Core i7'];
+    }
+    return ['Apple M1'];
+  }
+
+  // 13. MacBook Pro 2020:
+  // - MacBook Pro 2020 Apple Silicon: Apple M1
+  // - MacBook Pro 2020 Intel: Intel Core i5 / i7
+  if (name.includes('2020') && name.includes('pro')) {
+    if (name.includes('apple silicon') || name.includes('m1') || pf.includes('m1')) {
       return ['Apple M1'];
     }
-    return ['Apple M1 Pro', 'Apple M1 Max', 'Apple M1'];
+    return ['Intel Core i5', 'Intel Core i7'];
   }
 
-  // 5. Intel Macs (2015-2020 Intel models)
+  // 14. 2019 Models: Intel Core i5 / i7 / i9
+  if (name.includes('2019')) {
+    if (name.includes('16') || name.includes('15')) {
+      return ['Intel Core i7', 'Intel Core i9'];
+    }
+    return ['Intel Core i5', 'Intel Core i7'];
+  }
+
+  // 15. 2018 Models: Intel Core i5 / i7 / i9
+  if (name.includes('2018')) {
+    if (name.includes('15')) {
+      return ['Intel Core i7', 'Intel Core i9'];
+    }
+    return ['Intel Core i5', 'Intel Core i7'];
+  }
+
+  // 16. 2017 Models:
+  if (name.includes('2017')) {
+    if (name.includes('retina') && (name.includes('12') || !name.includes('pro'))) {
+      return ['Intel Core m3', 'Intel Core i5', 'Intel Core i7'];
+    }
+    if (name.includes('15')) {
+      return ['Intel Core i7'];
+    }
+    return ['Intel Core i5', 'Intel Core i7'];
+  }
+
+  // 17. 2016 Models:
+  if (name.includes('2016')) {
+    if (name.includes('retina') && (name.includes('12') || !name.includes('pro'))) {
+      return ['Intel Core m3', 'Intel Core m5', 'Intel Core m7'];
+    }
+    if (name.includes('15')) {
+      return ['Intel Core i7'];
+    }
+    return ['Intel Core i5', 'Intel Core i7'];
+  }
+
+  // 18. 2015 Models:
+  if (name.includes('2015')) {
+    if (name.includes('retina') && (name.includes('12') || !name.includes('pro'))) {
+      return ['Intel Core M'];
+    }
+    if (name.includes('15')) {
+      return ['Intel Core i7'];
+    }
+    return ['Intel Core i5', 'Intel Core i7'];
+  }
+
+  // 19. 2014 & 2013 Models:
+  if (name.includes('2014') || name.includes('2013')) {
+    if (name.includes('15')) {
+      return ['Intel Core i7'];
+    }
+    return ['Intel Core i5', 'Intel Core i7'];
+  }
+
+  // Fallbacks based on processorFamily:
+  if (pf.includes('m5 pro') || pf.includes('m5 max')) return ['Apple M5 Pro', 'Apple M5 Max'];
+  if (pf.includes('m5')) return ['Apple M5'];
+  if (pf.includes('m4 pro') || pf.includes('m4 max')) return ['Apple M4 Pro', 'Apple M4 Max', 'Apple M4'];
+  if (pf.includes('m4')) return ['Apple M4'];
+  if (pf.includes('m3 pro') || pf.includes('m3 max')) return ['Apple M3 Pro', 'Apple M3 Max', 'Apple M3'];
+  if (pf.includes('m3')) return ['Apple M3'];
+  if (pf.includes('m2 pro') || pf.includes('m2 max')) return ['Apple M2 Pro', 'Apple M2 Max', 'Apple M2'];
+  if (pf.includes('m2')) return ['Apple M2'];
+  if (pf.includes('m1 pro') || pf.includes('m1 max')) return ['Apple M1 Pro', 'Apple M1 Max'];
+  if (pf.includes('m1')) return ['Apple M1'];
+
+  // Generic Intel fallback
   if (gen.includes('intel') || pf.includes('intel') || name.includes('intel')) {
     return ['Intel Core i5', 'Intel Core i7', 'Intel Core i9'];
   }
 
-  // 6. Generic M-Series fallback (never show Intel)
-  if (gen.includes('m-series') || pf.startsWith('apple') || slug.includes('apple-macbook')) {
-    return [
-      'Apple M4 Pro', 'Apple M4 Max', 'Apple M4',
-      'Apple M3 Pro', 'Apple M3 Max', 'Apple M3',
-      'Apple M2 Pro', 'Apple M2 Max', 'Apple M2',
-      'Apple M1 Pro', 'Apple M1 Max', 'Apple M1'
-    ];
-  }
-
-  // Default fallback
-  return ['Intel Core i5', 'Intel Core i7', 'Intel Core i9'];
+  return ['Apple M5', 'Apple M4', 'Apple M3', 'Apple M2', 'Apple M1'];
 }
 
 /**
- * Returns valid RAM capacities for a chosen Mac processor based on Apple Unified Memory architecture.
+ * Returns valid RAM capacities for a chosen Mac processor and device context based on Apple Unified Memory architecture.
  */
-export function getValidMacRam(selectedProcessor) {
-  if (!selectedProcessor) {
-    return ['8GB', '16GB', '24GB', '32GB', '36GB', '48GB', '64GB'];
-  }
-  const proc = selectedProcessor.toLowerCase();
+export function getValidMacRam(selectedProcessor, device) {
+  const devName = (device?.modelName || '').toLowerCase();
+  const proc = (selectedProcessor || device?.processorFamily || '').toLowerCase();
 
-  // Max chips: 32GB, 36GB, 48GB, 64GB, 96GB, 128GB
-  if (proc.includes('max')) {
-    return ['32GB', '36GB', '48GB', '64GB', '96GB', '128GB'];
+  // 1. MacBook Neo (A18 Pro): 8GB unified fixed
+  if (devName.includes('neo') || proc.includes('a18')) {
+    return ['8GB'];
   }
 
-  // Pro chips: 16GB, 18GB, 24GB, 32GB, 36GB, 48GB
-  if (proc.includes('pro') && proc.includes('apple')) {
-    if (proc.includes('m4')) {
-      return ['16GB', '24GB', '48GB'];
-    }
-    if (proc.includes('m3')) {
-      return ['18GB', '36GB'];
-    }
-    return ['16GB', '32GB'];
+  // 2. MacBook Air 2026 (Apple M5) & MacBook Air 2025 (Apple M4):
+  // Benchmark: 16GB unified; configurable to 24GB or 32GB
+  if (devName.includes('air') && (devName.includes('2026') || devName.includes('2025') || proc === 'apple m5')) {
+    return ['16GB', '24GB', '32GB'];
   }
 
-  // Base M-chips (M1, M2, M3, M4): 8GB, 16GB, 24GB
-  if (proc.includes('apple m')) {
-    if (proc.includes('m1')) {
-      return ['8GB', '16GB'];
-    }
+  // 3. Apple M5 Pro / M5 Max (2026 Pro models): 36GB-128GB unified
+  if (proc.includes('m5 max') || proc.includes('m5 pro')) {
+    return ['36GB', '48GB', '64GB', '96GB', '128GB'];
+  }
+
+  // 4. Apple M5 base (MacBook Air 2026 or MacBook Pro 14 2025):
+  // Benchmark: 16GB unified; configurable to 24GB or 32GB
+  if (proc === 'apple m5' || (proc.includes('m5') && !proc.includes('pro') && !proc.includes('max'))) {
+    return ['16GB', '24GB', '32GB'];
+  }
+
+  // 5. Apple M4 Max (2024 Pro models):
+  if (proc.includes('m4 max') || proc.includes('max')) {
+    return ['36GB', '48GB', '64GB', '96GB', '128GB'];
+  }
+
+  // 6. Apple M4 Pro (2024 Pro models): 16GB, 24GB, 48GB
+  if (proc.includes('m4 pro')) {
+    return ['16GB', '24GB', '48GB'];
+  }
+
+  // 7. Apple M4 base (Air 2025 or Pro 14 entry 2024): 16GB, 24GB, 32GB
+  if (proc === 'apple m4' || (proc.includes('m4') && !proc.includes('pro') && !proc.includes('max'))) {
+    return ['16GB', '24GB', '32GB'];
+  }
+
+  // 8. Apple M3 Pro / M3 Max:
+  if (proc.includes('m3 max')) {
+    return ['36GB', '48GB', '64GB', '96GB', '128GB'];
+  }
+  if (proc.includes('m3 pro')) {
+    return ['18GB', '36GB'];
+  }
+
+  // 9. Apple M3 base (Air 2024 / Pro 14 Nov 2023): 8GB, 16GB, 24GB
+  if (proc.includes('m3')) {
     return ['8GB', '16GB', '24GB'];
   }
 
-  // Intel chips: 8GB, 16GB, 32GB, 64GB
-  if (proc.includes('intel')) {
+  // 10. Apple M2 Pro / M2 Max:
+  if (proc.includes('m2 max')) {
+    return ['32GB', '64GB', '96GB'];
+  }
+  if (proc.includes('m2 pro')) {
+    return ['16GB', '32GB'];
+  }
+
+  // 11. Apple M2 base (Air 2022/2023, Pro 13 2022): 8GB, 16GB, 24GB
+  if (proc.includes('m2')) {
+    return ['8GB', '16GB', '24GB'];
+  }
+
+  // 12. Apple M1 Pro / M1 Max (2021):
+  if (proc.includes('m1 max')) {
+    return ['32GB', '64GB'];
+  }
+  if (proc.includes('m1 pro')) {
+    return ['16GB', '32GB'];
+  }
+
+  // 13. Apple M1 base (Air 2020, Pro 13 2020): 8GB, 16GB
+  if (proc.includes('m1')) {
+    return ['8GB', '16GB'];
+  }
+
+  // 14. Intel Macs:
+  // 2013-2015 Air: 4GB, 8GB
+  if (devName.includes('air') && (devName.includes('2013') || devName.includes('2014') || devName.includes('2015'))) {
+    return ['4GB', '8GB'];
+  }
+  // 2013-2015 Pro Retina: 4GB, 8GB, 16GB
+  if (devName.includes('retina') && (devName.includes('2013') || devName.includes('2014') || devName.includes('2015'))) {
+    return ['4GB', '8GB', '16GB'];
+  }
+  // 2016-2017 Pro & 12-inch MacBook: 8GB, 16GB
+  if (devName.includes('2016') || devName.includes('2017')) {
+    return ['8GB', '16GB'];
+  }
+  // 2018-2020 Intel Pro: 8GB, 16GB, 32GB, 64GB
+  if (devName.includes('pro') && (devName.includes('2018') || devName.includes('2019') || devName.includes('2020'))) {
     return ['8GB', '16GB', '32GB', '64GB'];
   }
 
-  return ['8GB', '16GB', '24GB', '32GB', '64GB'];
+  return ['8GB', '16GB', '24GB', '32GB'];
 }
 
 /**
- * Returns valid Storage tiers for a chosen Mac processor.
+ * Returns valid Storage tiers for a chosen Mac processor and device context.
  */
-export function getValidMacStorage(selectedProcessor) {
-  if (!selectedProcessor) {
-    return ['256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD'];
-  }
-  const proc = selectedProcessor.toLowerCase();
+export function getValidMacStorage(selectedProcessor, device) {
+  const devName = (device?.modelName || '').toLowerCase();
+  const proc = (selectedProcessor || device?.processorFamily || '').toLowerCase();
 
-  // Max chips: 512GB to 8TB
-  if (proc.includes('max')) {
+  // 1. MacBook Air 2026 (Apple M5): 512GB-4TB SSD
+  if (devName.includes('air') && devName.includes('2026')) {
+    return ['512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD'];
+  }
+
+  // 2. MacBook Neo 2026 (A18 Pro): 256GB or 512GB SSD
+  if (devName.includes('neo') || proc.includes('a18')) {
+    return ['256 GB SSD', '512 GB SSD'];
+  }
+
+  // 3. MacBook Pro 2026 (M5 Pro / M5 Max): 2TB-8TB SSD
+  if (devName.includes('2026') && (devName.includes('pro') || proc.includes('m5 pro') || proc.includes('m5 max'))) {
+    return ['2 TB SSD', '4 TB SSD', '8 TB SSD'];
+  }
+
+  // 4. MacBook Pro 2025 (M5): 1TB-4TB SSD
+  if (devName.includes('2025') && devName.includes('pro') && proc.includes('m5')) {
+    return ['1 TB SSD', '2 TB SSD', '4 TB SSD'];
+  }
+
+  // 5. Max or Pro chips across M1-M4 (MacBook Pro 14/16 inch): 512GB-8TB SSD
+  if (proc.includes('max') || proc.includes('pro')) {
     return ['512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'];
   }
 
-  // Pro chips: 512GB to 8TB
-  if (proc.includes('pro') && proc.includes('apple')) {
-    return ['512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD', '8 TB SSD'];
-  }
-
-  // Base M-chips: 256GB to 2TB
+  // 6. Base M-chips (Apple M5, M4, M3, M2, M1) for Air & 13-inch Pro:
   if (proc.includes('apple m')) {
+    if (proc === 'apple m5') {
+      return ['512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD'];
+    }
     return ['256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD'];
   }
 
-  // Intel chips: 128GB to 2TB
-  return ['128 GB SSD', '256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD'];
+  // 7. 12-inch MacBook (2015, 2016, 2017): 256GB or 512GB SSD
+  if (devName.includes('retina') && (devName.includes('12') || !devName.includes('pro'))) {
+    return ['256 GB SSD', '512 GB SSD'];
+  }
+
+  // 8. Older Air (2013-2017): 128GB-512GB flash storage / SSD
+  if (devName.includes('air') && (devName.includes('2013') || devName.includes('2014') || devName.includes('2015') || devName.includes('2017'))) {
+    return ['128 GB SSD', '256 GB SSD', '512 GB SSD'];
+  }
+
+  // 9. Intel Air 2018 / 2019: 128GB-1TB SSD
+  if (devName.includes('air') && (devName.includes('2018') || devName.includes('2019'))) {
+    return ['128 GB SSD', '256 GB SSD', '512 GB SSD', '1 TB SSD'];
+  }
+
+  // 10. Intel Pro models:
+  return ['128 GB SSD', '256 GB SSD', '512 GB SSD', '1 TB SSD', '2 TB SSD', '4 TB SSD'];
 }
 
 export const MASTER_PROCESSORS = [...WINDOWS_PROCESSORS, ...MAC_PROCESSORS];

@@ -1,6 +1,55 @@
-import logo from "../../assets/logo-secondsale.png";
+import { useState, useEffect } from "react";
+import defaultLogo from "../../assets/logo-secondsale.png";
 
-export default function PageLoader({ text = "Loading SecondSale..." }) {
+export default function PageLoader({ text = "Loading SecondSale...", customLogo = null }) {
+  const [logoSrc, setLogoSrc] = useState(() => {
+    if (customLogo) return customLogo;
+    try {
+      return localStorage.getItem("site_logo") || defaultLogo;
+    } catch {
+      return defaultLogo;
+    }
+  });
+
+  useEffect(() => {
+    if (customLogo) {
+      setLogoSrc(customLogo);
+      return;
+    }
+
+    const API_BASE =
+      import.meta.env.VITE_API_BASE_URL ||
+      import.meta.env.VITE_API_URL ||
+      "http://localhost:5000/api";
+
+    const fetchLogo = () => {
+      fetch(`${API_BASE}/site-settings`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.logoUrl) {
+            setLogoSrc(data.logoUrl);
+            try {
+              localStorage.setItem("site_logo", data.logoUrl);
+            } catch {}
+          }
+        })
+        .catch(() => {});
+    };
+
+    fetchLogo();
+
+    const handleSettingsUpdate = (e) => {
+      if (e.detail?.logoUrl) {
+        setLogoSrc(e.detail.logoUrl);
+      } else {
+        fetchLogo();
+      }
+    };
+
+    window.addEventListener("site-settings-updated", handleSettingsUpdate);
+    return () => window.removeEventListener("site-settings-updated", handleSettingsUpdate);
+  }, [customLogo]);
+
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white/95 backdrop-blur-md transition-all duration-500">
       <div className="flex flex-col items-center max-w-xs text-center px-4">
@@ -8,22 +57,24 @@ export default function PageLoader({ text = "Loading SecondSale..." }) {
         <div className="relative mb-6 flex items-center justify-center">
           <div className="absolute w-24 h-24 rounded-full bg-[#087F8C]/15 animate-ping opacity-60" />
           <img
-            src={logo}
+            src={logoSrc}
             alt="SecondSale"
+            onError={() => setLogoSrc(defaultLogo)}
             className="h-12 sm:h-14 w-auto object-contain relative z-10 drop-shadow-sm transition-transform duration-300"
           />
         </div>
 
         {/* Smooth indeterminate progress line */}
         <div className="w-48 h-1.5 bg-slate-100 rounded-full overflow-hidden relative shadow-inner mb-3.5">
-          <div className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] rounded-full w-24 animate-[shimmer_1.5s_infinite_linear]" 
-               style={{
-                 animation: 'loaderSlide 1.4s ease-in-out infinite'
-               }}
+          <div
+            className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] rounded-full w-24"
+            style={{
+              animation: "loaderSlide 1.4s ease-in-out infinite",
+            }}
           />
         </div>
 
-        {/* Text */}
+        {/* Dynamic Text */}
         <p className="text-xs font-bold text-slate-500 tracking-wide uppercase font-sans">
           {text}
         </p>

@@ -749,6 +749,7 @@ export default function AdminHomepage() {
                                   { label: "Earbuds", desc: "Sell AirPods & Earbuds", to: "/sell-earbuds/brand", icon: "earbuds", color: "#ECFDF5" },
                                   { label: "Smartwatch", desc: "Sell Apple & smartwatches", to: "/sell-smartwatch/brand", icon: "smartwatch", color: "#FEF3C7" },
                                   { label: "Gaming Console", desc: "Sell PS5, Xbox & Switch", to: "/sell-gaming/brand", icon: "console", color: "#EDE9FE" },
+                                  { label: "Television", desc: "Sell your old TV", to: "/sell-tv/brand", icon: "tv", color: "#E0F2FE" },
                                 ];
                                 updateContentField(index, 'categories', defaultCats);
                               }}
@@ -786,6 +787,7 @@ export default function AdminHomepage() {
                             { label: "Earbuds", desc: "Sell AirPods & Earbuds", to: "/sell-earbuds/brand", icon: "earbuds", color: "#ECFDF5" },
                             { label: "Smartwatch", desc: "Sell Apple & smartwatches", to: "/sell-smartwatch/brand", icon: "smartwatch", color: "#FEF3C7" },
                             { label: "Gaming Console", desc: "Sell PS5, Xbox & Switch", to: "/sell-gaming/brand", icon: "console", color: "#EDE9FE" },
+                            { label: "Television", desc: "Sell your old TV", to: "/sell-tv/brand", icon: "tv", color: "#E0F2FE" },
                           ]).map((cat, catIdx) => (
                             <div
                               key={catIdx}

@@ -110,6 +110,13 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
           to: "/sell-gaming/brand",
           icon: "console",
           color: "#EDE9FE"
+        },
+        {
+          label: "Television",
+          desc: "Sell your old TV",
+          to: "/sell-tv/brand",
+          icon: "tv",
+          color: "#E0F2FE"
         }
       ]
     },

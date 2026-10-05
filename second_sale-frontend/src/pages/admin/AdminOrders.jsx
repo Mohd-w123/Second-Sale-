@@ -1,11 +1,171 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { adminService } from "../../services/admin.service";
 import {
   Search, ChevronLeft, ChevronRight, X, MapPin, Smartphone, User,
   Calendar, CreditCard, Tv, Phone, CheckCircle2, AlertCircle,
-  Trash2, ExternalLink, Eye, Image as ImageIcon, Sparkles, Filter
+  Trash2, ExternalLink, Eye, Image as ImageIcon, Sparkles, Filter,
+  Copy, Check, Share2
 } from "lucide-react";
 import "./admin.css";
+
+const WhatsAppIcon = ({ size = 16, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    style={{ display: "inline-block", verticalAlign: "middle" }}
+    aria-hidden="true"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-1.746-.872-2.892-1.564-4.043-3.548-.305-.524.305-.487.873-1.62.099-.198.05-.371-.05-.52-.099-.149-.643-1.548-.879-2.124-.236-.578-.475-.5-.652-.51-.169-.01-.363-.012-.557-.012-.198 0-.52.074-.793.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.064 2.876 1.213 3.074.149.198 2.045 3.131 4.974 4.27 2.929 1.139 2.929.76 3.85.713.922-.05 2.029-.74 2.318-1.452.288-.713.288-1.327.198-1.452-.09-.124-.297-.198-.628-.347z" />
+    <path d="M12.04 2c-5.523 0-10 4.477-10 10 0 1.851.504 3.583 1.382 5.07L2 22l5.13-1.345A9.96 9.96 0 0 0 12.04 22c5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.182a8.16 8.16 0 0 1-4.16-1.137l-.298-.177-3.045.8.813-2.97-.194-.305a8.18 8.18 0 0 1-1.255-4.393c0-4.523 3.679-8.2 8.2-8.2 2.19 0 4.247.853 5.794 2.401a8.14 8.14 0 0 1 2.402 5.795c0 4.522-3.679 8.2-8.257 8.2z" />
+  </svg>
+);
+
+const formatPhoneForWhatsApp = (rawPhone) => {
+  if (!rawPhone) return "";
+  const digits = String(rawPhone).replace(/\D/g, "");
+  if (digits.length === 10) return `91${digits}`;
+  if (digits.length === 12 && digits.startsWith("91")) return digits;
+  if (digits.length > 10) return digits;
+  return digits;
+};
+
+const formatOrderWhatsAppMessage = (order) => {
+  if (!order) return "";
+  const d = order.device || {};
+  const p = order.pickup || {};
+  const pb = order.priceBreakdown || {};
+  const customerName = order.userId?.name || p.name || "Customer";
+  const customerPhone = order.userId?.phone || p.phone || "N/A";
+  const customerEmail = order.userId?.email || p.email || "";
+
+  const lines = [];
+  lines.push(`📦 *SECOND SALE - ORDER DETAILS*`);
+  lines.push(`────────────────────────────`);
+  lines.push(`🆔 *Order ID:* ${order.orderId || "N/A"}`);
+  if (order.createdAt) {
+    const formattedDate = new Date(order.createdAt).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    lines.push(`📅 *Order Date:* ${formattedDate}`);
+  }
+  lines.push(`📌 *Status:* ${(order.status || "placed").toUpperCase()}`);
+  lines.push(``);
+
+  lines.push(`👤 *CUSTOMER DETAILS*`);
+  lines.push(`• *Name:* ${customerName}`);
+  lines.push(`• *Phone:* ${customerPhone}`);
+  if (customerEmail && customerEmail !== "N/A") {
+    lines.push(`• *Email:* ${customerEmail}`);
+  }
+  lines.push(``);
+
+  lines.push(`📍 *PICKUP INFORMATION*`);
+  if (p.address) lines.push(`• *Address:* ${p.address}`);
+  if (p.landmark) lines.push(`• *Landmark:* ${p.landmark}`);
+  const cityState = [p.city, p.state].filter(Boolean).join(", ");
+  if (cityState) lines.push(`• *City/State:* ${cityState}`);
+  if (p.pincode) lines.push(`• *Pincode:* ${p.pincode}`);
+  if (p.date) lines.push(`• *Pickup Date:* ${p.date}`);
+  if (p.timeSlot) lines.push(`• *Time Slot:* ${p.timeSlot}`);
+  if (p.paymentMethod) lines.push(`• *Payment Mode:* ${p.paymentMethod}`);
+  lines.push(``);
+
+  lines.push(`📱 *PRODUCT SPECIFICATIONS*`);
+  lines.push(`• *Device:* ${[d.brand, d.modelName].filter(Boolean).join(" ") || "Device"}`);
+  if (d.category) lines.push(`• *Category:* ${d.category.toUpperCase()}`);
+  if (d.storage) lines.push(`• *Storage:* ${d.storage}`);
+  if (d.ram) lines.push(`• *RAM:* ${d.ram}`);
+  if (d.processor) lines.push(`• *Processor:* ${d.processor}`);
+  if (d.generation) lines.push(`• *Generation:* ${d.generation}`);
+  if (d.graphicsCard) lines.push(`• *GPU:* ${d.graphicsCard}`);
+  if (d.screenSize) lines.push(`• *Screen Size:* ${d.screenSize}`);
+  if (d.storageType) lines.push(`• *Storage Type:* ${d.storageType}`);
+  if (d.deviceAge) lines.push(`• *Device Age:* ${d.deviceAge}`);
+  if (d.batteryHealth) lines.push(`• *Battery Health:* ${d.batteryHealth}`);
+  if (d.screenCondition) lines.push(`• *Screen Condition:* ${d.screenCondition}`);
+  if (d.bodyCondition) lines.push(`• *Body Condition:* ${d.bodyCondition}`);
+  if (d.isTouchScreenWorking !== undefined && d.isTouchScreenWorking !== null) {
+    lines.push(`• *Touchscreen Working:* ${d.isTouchScreenWorking ? "Yes" : "No"}`);
+  }
+  if (d.isScreenOriginal !== undefined && d.isScreenOriginal !== null) {
+    lines.push(`• *Screen Original:* ${d.isScreenOriginal ? "Yes" : "No"}`);
+  }
+  if (d.underWarranty !== undefined && d.underWarranty !== null) {
+    lines.push(`• *Under Warranty:* ${d.underWarranty ? "Yes" : "No"}`);
+  }
+  if (Array.isArray(d.physicalIssues) && d.physicalIssues.length > 0) {
+    lines.push(`• *Physical Issues:* ${d.physicalIssues.map(s => s.replace(/_/g, " ")).join(", ")}`);
+  }
+  if (Array.isArray(d.functionalIssues) && d.functionalIssues.length > 0) {
+    lines.push(`• *Functional Issues:* ${d.functionalIssues.map(s => s.replace(/_/g, " ")).join(", ")}`);
+  }
+  if (Array.isArray(d.technicalIssues) && d.technicalIssues.length > 0) {
+    lines.push(`• *Technical Issues:* ${d.technicalIssues.map(s => s.replace(/_/g, " ")).join(", ")}`);
+  }
+  if (d.accessories) {
+    const acc = Array.isArray(d.accessories) ? d.accessories.map(s => s.replace(/_/g, " ")).join(", ") : d.accessories;
+    if (acc) lines.push(`• *Accessories:* ${acc}`);
+  }
+  lines.push(``);
+
+  lines.push(`💰 *PRICING BREAKDOWN*`);
+  if (pb.basePrice) lines.push(`• *Base Price:* ₹${Number(pb.basePrice).toLocaleString("en-IN")}`);
+  if (pb.ageAdjustment) lines.push(`• *Age Adjustment:* ₹${Number(pb.ageAdjustment).toLocaleString("en-IN")}`);
+  if (pb.conditionAdjustment) lines.push(`• *Condition Adjustment:* ₹${Number(pb.conditionAdjustment).toLocaleString("en-IN")}`);
+  if (pb.screenAdjustment) lines.push(`• *Screen Adjustment:* ₹${Number(pb.screenAdjustment).toLocaleString("en-IN")}`);
+  if (pb.functionalDeduction) lines.push(`• *Functional Deduction:* -₹${Math.abs(Number(pb.functionalDeduction)).toLocaleString("en-IN")}`);
+  if (pb.batteryDeduction) lines.push(`• *Battery Deduction:* -₹${Math.abs(Number(pb.batteryDeduction)).toLocaleString("en-IN")}`);
+  if (pb.accessoriesBonus) lines.push(`• *Accessories Bonus:* +₹${Number(pb.accessoriesBonus).toLocaleString("en-IN")}`);
+  lines.push(`• *Final Price Offered:* ₹${Number(pb.finalPrice || 0).toLocaleString("en-IN")}`);
+  lines.push(`────────────────────────────`);
+  lines.push(`_Thank you for choosing SecondSale!_ 🌿`);
+
+  return lines.join("\n");
+};
+
+const formatTvLeadWhatsAppMessage = (lead) => {
+  if (!lead) return "";
+  const c = lead.customer || {};
+  const lines = [];
+  lines.push(`📺 *SECOND SALE - TV QUOTE REQUEST*`);
+  lines.push(`────────────────────────────`);
+  lines.push(`🆔 *Lead ID:* ${lead.leadId || "N/A"}`);
+  lines.push(`📌 *Status:* ${(lead.status || "new").toUpperCase()}`);
+  lines.push(``);
+
+  lines.push(`👤 *CUSTOMER DETAILS*`);
+  lines.push(`• *Name:* ${c.name || "Customer"}`);
+  lines.push(`• *Phone:* ${c.phone || "N/A"}`);
+  if (c.city || c.pincode) lines.push(`• *Location:* ${[c.city, c.pincode].filter(Boolean).join(" - ")}`);
+  if (c.address) lines.push(`• *Address:* ${c.address}`);
+  lines.push(``);
+
+  lines.push(`📺 *TV SPECIFICATIONS*`);
+  lines.push(`• *Brand:* ${[lead.brand, lead.customBrand].filter(Boolean).join(" ") || "N/A"}`);
+  if (lead.screenSize) lines.push(`• *Screen Size:* ${lead.screenSize}`);
+  if (lead.tvType) lines.push(`• *Display Type:* ${lead.tvType}`);
+  if (lead.condition) lines.push(`• *Condition:* ${lead.condition}`);
+  if (lead.workingStatus) lines.push(`• *Working Status:* ${lead.workingStatus}`);
+  if (lead.age) lines.push(`• *Age:* ${lead.age}`);
+  if (lead.additionalNotes) lines.push(`• *User Notes:* ${lead.additionalNotes}`);
+  lines.push(``);
+
+  lines.push(`💰 *PRICING & OFFER*`);
+  if (lead.offeredPrice) lines.push(`• *Offered Price:* ₹${Number(lead.offeredPrice).toLocaleString("en-IN")}`);
+  if (lead.adminNotes) lines.push(`• *Admin Notes:* ${lead.adminNotes}`);
+  lines.push(`────────────────────────────`);
+  lines.push(`_SecondSale TV Callback Team_ 🌿`);
+
+  return lines.join("\n");
+};
 
 const ORDER_STATUSES = [
   "placed", 
@@ -30,9 +190,22 @@ const TV_STATUSES = [
 /* ── Order Detail Modal (Device Orders) ──────────────────────────────── */
 function OrderDetailModal({ order, onClose }) {
   if (!order) return null;
+  const [copied, setCopied] = useState(false);
+  const [customPhone, setCustomPhone] = useState("");
   const d = order.device || {};
   const p = order.pickup || {};
   const pb = order.priceBreakdown || {};
+
+  const rawPhone = order.userId?.phone || p.phone || "";
+  const cleanPhone = formatPhoneForWhatsApp(rawPhone);
+  const whatsappMsg = formatOrderWhatsAppMessage(order);
+  const genericWhatsAppLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMsg)}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(whatsappMsg);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
 
   const InfoRow = ({ label, value }) =>
     value ? (
@@ -60,7 +233,7 @@ function OrderDetailModal({ order, onClose }) {
 
   return (
     <div className="admin-modal-backdrop" onClick={onClose}>
-      <div className="admin-modal" style={{ maxWidth: 600 }} onClick={e => e.stopPropagation()}>
+      <div className="admin-modal" style={{ maxWidth: 680 }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="admin-modal-header">
           <div>
@@ -69,7 +242,19 @@ function OrderDetailModal({ order, onClose }) {
               {order.orderId}
             </p>
           </div>
-          <button className="admin-modal-close" onClick={onClose}><X size={16} /></button>
+          <div className="flex items-center gap-2">
+            <a
+              href={genericWhatsAppLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#25D366] hover:bg-[#20ba5a] transition-all shadow-xs no-underline cursor-pointer"
+              title="Share order details to anyone on WhatsApp"
+            >
+              <WhatsAppIcon size={14} />
+              <span>Share to Anyone</span>
+            </a>
+            <button className="admin-modal-close" onClick={onClose}><X size={16} /></button>
+          </div>
         </div>
 
         {/* Body */}
@@ -144,6 +329,76 @@ function OrderDetailModal({ order, onClose }) {
           </Section>
 
         </div>
+
+        {/* Footer with WhatsApp & Share Actions */}
+        <div className="admin-modal-footer flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50/90 border-t border-slate-100 p-4 rounded-b-2xl">
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-all shadow-xs cursor-pointer"
+            title="Copy formatted order details to clipboard"
+          >
+            {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+            <span>{copied ? "Copied Details!" : "Copy Order Text"}</span>
+          </button>
+
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-end">
+            {/* Custom Phone Number input to send to anyone */}
+            <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-xs">
+              <input
+                type="tel"
+                placeholder="Mobile number..."
+                value={customPhone}
+                onChange={e => setCustomPhone(e.target.value.replace(/\D/g, ''))}
+                className="w-28 text-xs px-2 py-1 bg-transparent border-0 outline-none text-slate-800 placeholder-slate-400 font-mono"
+              />
+              <a
+                href={customPhone.length >= 10 ? `https://wa.me/${formatPhoneForWhatsApp(customPhone)}?text=${encodeURIComponent(whatsappMsg)}` : '#'}
+                onClick={(e) => {
+                  if (customPhone.length < 10) {
+                    e.preventDefault();
+                    alert('Please enter a valid 10-digit mobile number to send WhatsApp details');
+                  }
+                }}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`px-2.5 py-1 text-xs font-extrabold rounded-lg transition-all ${
+                  customPhone.length >= 10
+                    ? 'bg-[#25D366] hover:bg-[#20ba5a] text-white cursor-pointer no-underline'
+                    : 'bg-slate-100 text-slate-400 cursor-not-allowed no-underline'
+                }`}
+                title="Send directly to this mobile number on WhatsApp"
+              >
+                Send
+              </a>
+            </div>
+
+            {cleanPhone ? (
+              <a
+                href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMsg)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all shadow-xs no-underline cursor-pointer"
+                title={`Send directly to customer (${rawPhone}) on WhatsApp`}
+              >
+                <WhatsAppIcon size={14} />
+                <span>Customer</span>
+              </a>
+            ) : null}
+
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMsg)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-[#25D366] hover:bg-[#20ba5a] rounded-xl transition-all shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] no-underline cursor-pointer"
+              title="Open WhatsApp to send details to anyone (any contact, group or chat)"
+            >
+              <WhatsAppIcon size={15} />
+              <span>Send to Anyone</span>
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -192,7 +447,21 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
               <p className="text-xs font-mono font-bold text-[#087F8C] mt-0.5">{lead.leadId}</p>
             </div>
           </div>
-          <button className="admin-modal-close" onClick={onClose}><X size={16} /></button>
+          <div className="flex items-center gap-2">
+            {formatPhoneForWhatsApp(c.phone) && (
+              <a
+                href={`https://wa.me/${formatPhoneForWhatsApp(c.phone)}?text=${encodeURIComponent(formatTvLeadWhatsAppMessage(lead))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#25D366] hover:bg-[#20ba5a] transition-all shadow-xs no-underline cursor-pointer"
+                title={`Send TV Quote details to customer (${c.phone}) on WhatsApp`}
+              >
+                <WhatsAppIcon size={14} />
+                <span>WhatsApp</span>
+              </a>
+            )}
+            <button className="admin-modal-close" onClick={onClose}><X size={16} /></button>
+          </div>
         </div>
 
         {/* Body */}
@@ -207,12 +476,25 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
                 <span className="text-[11px] font-800 text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <User size={13} className="text-[#087F8C]" /> Customer Information
                 </span>
-                <a
-                  href={`tel:${c.phone}`}
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200"
-                >
-                  <Phone size={11} /> Call Now
-                </a>
+                <div className="flex items-center gap-1.5">
+                  {c.phone && (
+                    <a
+                      href={`https://wa.me/${formatPhoneForWhatsApp(c.phone)}?text=${encodeURIComponent(formatTvLeadWhatsAppMessage(lead))}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-[#25D366] hover:bg-[#20ba5a] px-2.5 py-1 rounded-lg no-underline transition-colors"
+                      title="Send quote & details to WhatsApp"
+                    >
+                      <WhatsAppIcon size={12} /> WhatsApp
+                    </a>
+                  )}
+                  <a
+                    href={`tel:${c.phone}`}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200"
+                  >
+                    <Phone size={11} /> Call Now
+                  </a>
+                </div>
               </div>
               <div className="space-y-1.5 text-sm">
                 <div className="font-bold text-slate-900">{c.name || "Customer"}</div>
@@ -413,6 +695,7 @@ function TvLeadDetailModal({ lead, onClose, onUpdate, onDelete }) {
 
 /* ── Main Orders & TV Quote Requests Manager ─────────────────────────── */
 export default function AdminOrders() {
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState("devices"); // "devices" | "tv"
 
   // ── Device Orders State ───────────────────────
@@ -422,10 +705,19 @@ export default function AdminOrders() {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(() => searchParams.get("status") || "");
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // Sync status if search params change
+  useEffect(() => {
+    const qStatus = searchParams.get("status");
+    if (qStatus !== null) {
+      setStatus(qStatus);
+      setPage(1);
+    }
+  }, [searchParams]);
 
   // ── TV Leads State ────────────────────────────
   const [tvLeads, setTvLeads] = useState([]);
@@ -718,26 +1010,57 @@ export default function AdminOrders() {
                           </span>
                         </td>
                         <td>
-                          <button
-                            onClick={() => setSelectedOrder(order)}
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 5,
-                              padding: "5px 12px",
-                              borderRadius: 8,
-                              fontSize: 11,
-                              fontWeight: 700,
-                              background: "#E8F6F7",
-                              color: "#087F8C",
-                              border: "1px solid rgba(8, 127, 140, 0.25)",
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <MapPin size={12} /> View Details
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => setSelectedOrder(order)}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 5,
+                                padding: "5px 12px",
+                                borderRadius: 8,
+                                fontSize: 11,
+                                fontWeight: 700,
+                                background: "#E8F6F7",
+                                color: "#087F8C",
+                                border: "1px solid rgba(8, 127, 140, 0.25)",
+                                cursor: "pointer",
+                                transition: "all 0.15s ease",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              <MapPin size={12} /> View Details
+                            </button>
+                            {(() => {
+                              const msg = encodeURIComponent(formatOrderWhatsAppMessage(order));
+                              const link = `https://api.whatsapp.com/send?text=${msg}`;
+                              return (
+                                <a
+                                  href={link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Share Order Details to Anyone on WhatsApp"
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: 28,
+                                    height: 28,
+                                    borderRadius: 8,
+                                    background: "#ECFDF5",
+                                    color: "#059669",
+                                    border: "1px solid rgba(16, 185, 129, 0.3)",
+                                    cursor: "pointer",
+                                    transition: "all 0.15s ease",
+                                    flexShrink: 0,
+                                  }}
+                                  className="hover:bg-emerald-100 hover:scale-105 active:scale-95 no-underline"
+                                >
+                                  <WhatsAppIcon size={14} />
+                                </a>
+                              );
+                            })()}
+                          </div>
                         </td>
                         <td className="text-right">
                           <select
@@ -934,6 +1257,36 @@ export default function AdminOrders() {
                               >
                                 <Eye size={12} /> Review Quote
                               </button>
+                              {(() => {
+                                const phone = formatPhoneForWhatsApp(lead.customer?.phone);
+                                const msg = encodeURIComponent(formatTvLeadWhatsAppMessage(lead));
+                                const link = phone ? `https://wa.me/${phone}?text=${msg}` : `https://api.whatsapp.com/send?text=${msg}`;
+                                return (
+                                  <a
+                                    href={link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title={phone ? `Share with Customer on WhatsApp (${lead.customer?.phone})` : "Share TV Quote on WhatsApp"}
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      width: 28,
+                                      height: 28,
+                                      borderRadius: 8,
+                                      background: "#ECFDF5",
+                                      color: "#059669",
+                                      border: "1px solid rgba(16, 185, 129, 0.3)",
+                                      cursor: "pointer",
+                                      transition: "all 0.15s ease",
+                                      flexShrink: 0,
+                                    }}
+                                    className="hover:bg-emerald-100 hover:scale-105 active:scale-95 no-underline"
+                                  >
+                                    <WhatsAppIcon size={14} />
+                                  </a>
+                                );
+                              })()}
                             </div>
                           </td>
                         </tr>

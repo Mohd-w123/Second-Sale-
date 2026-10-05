@@ -117,7 +117,7 @@ export default function GamingBrandSelectionPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-6 max-w-3xl mx-auto">
         {filteredBrands.map((b) => {
           const brandName = b.brand || b.name;
-          const logoUrl = getBrandLogo(brandName);
+          const logoUrl = b.logo || getBrandLogo(brandName);
           const hasFailed = failedLogos[brandName];
 
           return (

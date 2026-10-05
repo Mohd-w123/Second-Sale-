@@ -52,14 +52,14 @@ const SELL_DEVICES = [
   { label: "Sell iMac & Mac", to: "/sell-imac/brand", icon: <Monitor size={15} /> },
   { label: "Sell Smartwatches", to: "/sell-smartwatch/brand", icon: <Watch size={15} />, isNew: true },
   { label: "Sell Gaming Consoles", to: "/sell-gaming-console/brand", icon: <Gamepad2 size={15} />, isNew: true },
-  { label: "Repair My Device", to: "/repair", icon: <Wrench size={15} />, isNew: true },
+  { label: "Repair My Device", to: "/repair#brand-section", icon: <Wrench size={15} />, isNew: true },
   { label: "Corporate Bulk Buyback", to: "/corporate", icon: <Sparkles size={15} /> },
 ];
 
 const COMPANY_LINKS = [
   { label: "About SecondSale", to: "/about-us" },
   { label: "How It Works", to: "/#how-it-works" },
-  { label: "Repair My Device", to: "/repair" },
+  { label: "Repair My Device", to: "/repair#brand-section" },
   { label: "Become a Partner", to: "/partner" },
   { label: "Corporate Buyback", to: "/corporate" },
   { label: "Cashify Alternatives", to: "/alternatives/cashify-alternatives" },
@@ -280,13 +280,16 @@ export default function Footer() {
                 </div>
                 <span>{footerConfig?.email || "support@secondsale.com"}</span>
               </div>
-              {footerConfig?.phone && (
-                <div className="flex items-center gap-3 text-slate-400">
-                  <div className="w-7 h-7 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-blue-400 shrink-0">
+              {Boolean(footerConfig?.phone || footerConfig?.whatsapp) && (
+                <a
+                  href={`tel:${String(footerConfig?.phone || footerConfig?.whatsapp || '9820455509').replace(/[^\d+]/g, '')}`}
+                  className="flex items-center gap-3 text-slate-400 hover:text-blue-300 transition-colors no-underline group"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-blue-400 shrink-0 group-hover:border-blue-400/50">
                     <Smartphone size={13} />
                   </div>
-                  <span>{footerConfig.phone}</span>
-                </div>
+                  <span>{footerConfig?.phone || `+91 ${String(footerConfig.whatsapp).replace(/\D/g, '').slice(-10)}`}</span>
+                </a>
               )}
               {footerConfig?.whatsapp && (
                 <a

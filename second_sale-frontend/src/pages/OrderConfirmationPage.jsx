@@ -5,6 +5,21 @@ import { formatCurrency } from '../utils/formatCurrency';
 import Loader from '../components/ui/Loader';
 import NoIndexSEO from '../components/seo/NoIndexSEO';
 
+const WhatsAppIcon = ({ size = 16, className = "" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    style={{ display: "inline-block", verticalAlign: "middle" }}
+    aria-hidden="true"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-1.746-.872-2.892-1.564-4.043-3.548-.305-.524.305-.487.873-1.62.099-.198.05-.371-.05-.52-.099-.149-.643-1.548-.879-2.124-.236-.578-.475-.5-.652-.51-.169-.01-.363-.012-.557-.012-.198 0-.52.074-.793.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.064 2.876 1.213 3.074.149.198 2.045 3.131 4.974 4.27 2.929 1.139 2.929.76 3.85.713.922-.05 2.029-.74 2.318-1.452.288-.713.288-1.327.198-1.452-.09-.124-.297-.198-.628-.347z" />
+    <path d="M12.04 2c-5.523 0-10 4.477-10 10 0 1.851.504 3.583 1.382 5.07L2 22l5.13-1.345A9.96 9.96 0 0 0 12.04 22c5.523 0 10-4.477 10-10s-4.477-10-10-10zm0 18.182a8.16 8.16 0 0 1-4.16-1.137l-.298-.177-3.045.8.813-2.97-.194-.305a8.18 8.18 0 0 1-1.255-4.393c0-4.523 3.679-8.2 8.2-8.2 2.19 0 4.247.853 5.794 2.401a8.14 8.14 0 0 1 2.402 5.795c0 4.522-3.679 8.2-8.257 8.2z" />
+  </svg>
+);
+
 export default function OrderConfirmationPage() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
@@ -23,6 +38,18 @@ export default function OrderConfirmationPage() {
 
   if (loading) return <Loader />;
   if (!order) return <div className="text-center py-20 font-bold text-gray-500">Order not found.</div>;
+
+  const shareWhatsAppMessage = [
+    `📦 *My SecondSale Order Confirmation*`,
+    `────────────────────────────`,
+    `🆔 *Order ID:* ${order.orderId || orderId}`,
+    `📱 *Device:* ${[order.device?.brand, order.device?.modelName].filter(Boolean).join(" ")} ${order.device?.storage || ''}`,
+    order.pickup?.date ? `📅 *Pickup Date:* ${order.pickup.date} (${order.pickup?.timeSlot || 'Scheduled'})` : null,
+    `💰 *Offered Price:* ₹${Number(order.priceBreakdown?.finalPrice || 0).toLocaleString('en-IN')}`,
+    order.pickup?.city ? `📍 *Pickup Location:* ${[order.pickup.city, order.pickup.state].filter(Boolean).join(', ')}` : null,
+    `────────────────────────────`,
+    `🔗 *Track Order:* ${typeof window !== 'undefined' ? window.location.origin : ''}/orders/${order.orderId || orderId}`
+  ].filter(Boolean).join('\n');
 
   const pickupDate = order.pickup?.date ? new Date(order.pickup.date) : new Date();
   const dayName = pickupDate.toLocaleDateString('en-IN', { weekday: 'long' });
@@ -83,14 +110,26 @@ export default function OrderConfirmationPage() {
           <div className="flex-1 space-y-8">
             {/* Order Details */}
             <div className="bg-white rounded-[40px] border border-gray-100 p-8 sm:p-10 shadow-sm relative">
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                   <h3 className="text-xl font-black text-[#111827]">Order Details</h3>
                   <p className="text-xs font-bold text-gray-400 mt-1">Order ID: <span className="uppercase">{orderId}</span></p>
                 </div>
-                <Link to={`/orders/${orderId}`} className="text-[#087F8C] font-black text-sm bg-[#E8F6F7] px-5 py-2.5 rounded-xl border border-[#087F8C]/10 hover:bg-[#087F8C] hover:text-white transition-all">
-                  Track Order
-                </Link>
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareWhatsAppMessage)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-black text-xs px-4 py-2.5 rounded-xl transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98] no-underline"
+                    title="Share order details to anyone on WhatsApp"
+                  >
+                    <WhatsAppIcon size={15} />
+                    <span>Share on WhatsApp</span>
+                  </a>
+                  <Link to={`/orders/${orderId}`} className="text-[#087F8C] font-black text-sm bg-[#E8F6F7] px-5 py-2.5 rounded-xl border border-[#087F8C]/10 hover:bg-[#087F8C] hover:text-white transition-all no-underline">
+                    Track Order
+                  </Link>
+                </div>
               </div>
 
               <div className="bg-gray-50/50 rounded-[32px] p-8 sm:p-10 border border-gray-100/50 flex flex-col md:flex-row items-center gap-10">

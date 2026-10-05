@@ -317,6 +317,7 @@ export const updateFooter = async (req, res) => {
     if (footer?.whatsapp) {
       settings.whatsappNumber = String(footer.whatsapp).trim();
     }
+    settings.markModified('footer');
     await settings.save();
     res.json(settings);
   } catch (err) {

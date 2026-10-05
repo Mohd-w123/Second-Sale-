@@ -13,7 +13,19 @@ import {
 } from '../utils/laptopSpecs';
 
 export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, initialValues }) {
-  const [selectedProcessor, setSelectedProcessor] = useState(() => initialValues?.processor || null);
+  // Detect if device is Apple/Mac — no Generation question for Mac
+  const isMac = device?.brand === 'Apple' || device?.processorFamily?.startsWith('Apple');
+  const validMacProcs = isMac ? getValidMacProcessors(device) : [];
+
+  const [selectedProcessor, setSelectedProcessor] = useState(() => {
+    if (initialValues?.processor) {
+      if (isMac && !validMacProcs.includes(initialValues.processor)) {
+        return validMacProcs.length === 1 ? validMacProcs[0] : null;
+      }
+      return initialValues.processor;
+    }
+    return (isMac && validMacProcs.length === 1) ? validMacProcs[0] : null;
+  });
   const [selectedRam, setSelectedRam] = useState(() => initialValues?.ram || null);
   const [selectedStorage, setSelectedStorage] = useState(() => initialValues?.storage || null);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -21,13 +33,14 @@ export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, i
   const [prevInitialValues, setPrevInitialValues] = useState(initialValues);
   if (initialValues !== prevInitialValues) {
     setPrevInitialValues(initialValues);
-    setSelectedProcessor(initialValues?.processor || null);
+    const initProc = initialValues?.processor;
+    const finalProc = (isMac && initProc && !validMacProcs.includes(initProc))
+      ? (validMacProcs.length === 1 ? validMacProcs[0] : null)
+      : (initProc || (isMac && validMacProcs.length === 1 ? validMacProcs[0] : null));
+    setSelectedProcessor(finalProc);
     setSelectedRam(initialValues?.ram || null);
     setSelectedStorage(initialValues?.storage || null);
   }
-
-  // Detect if device is Apple/Mac — no Generation question for Mac
-  const isMac = device?.brand === 'Apple' || device?.processorFamily?.startsWith('Apple');
 
   if (!device) return null;
 
@@ -159,9 +172,9 @@ function OverlayList({ type, isMac, device, selectedProcessor, onSelect }) {
   if (type === 'processor') {
     options = isMac ? getValidMacProcessors(device) : WINDOWS_PROCESSORS;
   } else if (type === 'ram') {
-    options = isMac ? getValidMacRam(selectedProcessor) : MASTER_RAM;
+    options = isMac ? getValidMacRam(selectedProcessor, device) : MASTER_RAM;
   } else if (type === 'storage') {
-    options = isMac ? getValidMacStorage(selectedProcessor) : MASTER_STORAGE;
+    options = isMac ? getValidMacStorage(selectedProcessor, device) : MASTER_STORAGE;
   }
 
   const filteredOptions = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));
