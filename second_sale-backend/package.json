@@ -18,7 +18,8 @@
     "seed:laptop:acer": "node seeds/seedLaptopAcer.js",
     "seed:laptop:microsoft": "node seeds/seedLaptopMicrosoft.js",
     "seed:laptop:msi": "node seeds/seedLaptopMSI.js",
-    "seed:laptop:razer": "node seeds/seedLaptopRazer.js"
+    "seed:laptop:razer": "node seeds/seedLaptopRazer.js",
+    "sync:cashify": "node scripts/syncCashify.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
