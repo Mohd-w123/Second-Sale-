@@ -856,13 +856,13 @@ export function calculateLaptopPrice(device, selections) {
     functionalIssues = [],
     screenIssues = [],
     bodyIssues = [],
-    accessories,
+    accessories = [],
     powerStatus,
     screenSize,
     quizConfig,
   } = selections;
 
-  let basePrice;
+  let basePrice = 0;
 
   const defaultScreenDeductions = {
     screen_flawless: 0,
@@ -885,7 +885,6 @@ export function calculateLaptopPrice(device, selections) {
 
   const resolveLaptopDeduction = (group, key, defaultVal = 0) => {
     if (!key) return 0;
-    // 1. Device specific override (highest priority)
     if (device?.[group]?.[key] !== undefined) {
       const val = Number(device[group][key]);
       if (Number.isFinite(val) && val >= 0) return val;
@@ -894,7 +893,6 @@ export function calculateLaptopPrice(device, selections) {
       const val = Number(device.deductions[key]);
       if (Number.isFinite(val) && val >= 0) return val;
     }
-    // 2. Category Quiz Configuration override from Admin Quiz Manager
     if (quizConfig?.steps) {
       for (const step of quizConfig.steps) {
         for (const q of (step.questions || [])) {
@@ -917,51 +915,76 @@ export function calculateLaptopPrice(device, selections) {
     return defaultVal;
   };
 
-  // ── 1. Find base price from variants for ALL laptop brands (Cashify catalog standard) ──
-  const variantList = device.variants || [];
-  let variant = variantList.find(v =>
-    (!ram || v.ram === ram) &&
-    (!storage || v.storage === storage) &&
-    (!selections.processor || v.processor === selections.processor) &&
-    (!selections.generation || v.generation === selections.generation)
+  // ── 1. Find base price & apply dynamic configuration deltas (Cashify market standard) ──
+  const variantList = device?.variants || [];
+
+  // Check for an exact variant match first
+  let exactVariant = variantList.find(v =>
+    v.ram && v.storage &&
+    v.ram === ram && v.storage === storage &&
+    (!selections.processor || v.processor === selections.processor)
   );
 
-  if (variant && variant.basePrice) {
-    basePrice = Number(variant.basePrice);
-  } else if (variantList.length === 1 && variantList[0].basePrice) {
-    basePrice = Number(variantList[0].basePrice);
-  } else if (variantList.length > 1 && variantList[0].basePrice) {
+  if (exactVariant && exactVariant.basePrice) {
+    basePrice = Number(exactVariant.basePrice);
+  } else if (variantList.length > 0 && variantList[0].basePrice) {
     const baseline = variantList[0];
     basePrice = Number(baseline.basePrice);
 
-    // Dynamic RAM adjustment from baseline
-    const parseRam = (r) => parseInt(r) || 8;
-    const baseRam = baseline.ram ? parseRam(baseline.ram) : 8;
-    const selRam = ram ? parseRam(ram) : baseRam;
-    basePrice += (selRam - baseRam) * 250;
+    // RAM increment (Cashify standard: basic/4GB is baseline, 8GB +1500, 16GB +3200, 32GB +6000)
+    const parseRam = (r) => parseInt(r) || 0;
+    const baseRamNum = baseline.ram ? parseRam(baseline.ram) : 4;
+    const selRamNum = ram ? parseRam(ram) : baseRamNum;
+    if (selRamNum > baseRamNum) {
+      if (selRamNum >= 32) basePrice += 6000;
+      else if (selRamNum >= 16) basePrice += 3200;
+      else if (selRamNum >= 8) basePrice += 1500;
+    }
 
-    // Dynamic Storage adjustment from baseline
-    const parseStorage = (st) => {
-      if (!st) return 0;
-      let totalGB = 0;
-      const parts = st.split('+');
-      parts.forEach(p => {
-        const val = parseInt(p.trim()) || 0;
-        const isTB = p.toUpperCase().includes('TB');
-        totalGB += isTB ? val * 1024 : val;
-      });
-      return totalGB;
-    };
-    const baselineGB = parseStorage(baseline.storage) || 256;
-    const selectedGB = parseStorage(storage) || baselineGB;
-    basePrice += (selectedGB - baselineGB) * 6;
-  } else if (device.basePrice) {
+    // Storage increment (Cashify standard: basic/128GB is baseline, 256GB SSD +1200, 512GB SSD +2200, 1TB SSD +4500)
+    const sStr = (storage || '').toLowerCase();
+    let totalSSDGB = 0;
+    if (sStr.includes('ssd')) {
+      const match = sStr.match(/(\d+)\s*(gb|tb)/);
+      if (match) {
+        const val = parseInt(match[1]);
+        totalSSDGB = match[2] === 'tb' ? val * 1024 : val;
+      }
+    }
+    if (totalSSDGB >= 2048) basePrice += 8000;
+    else if (totalSSDGB >= 1024) basePrice += 4500;
+    else if (totalSSDGB >= 512) basePrice += 2200;
+    else if (totalSSDGB >= 256) basePrice += 1200;
+
+    // Dedicated GPU increment (+4500)
+    if (selections.hasGpu && selections.isGpuWorking) {
+      basePrice += 4500;
+    }
+
+    // Processor upgrade delta over baseline
+    const selProc = selections.processor || '';
+    const baseProc = baseline.processor || device.processorFamily || '';
+    if (selProc && baseProc && selProc.toLowerCase() !== baseProc.toLowerCase()) {
+      const getProcTier = (p) => {
+        const s = p.toLowerCase();
+        if (s.includes('i9') || s.includes('ryzen 9') || s.includes('ultra 9')) return 4;
+        if (s.includes('i7') || s.includes('ryzen 7') || s.includes('ultra 7')) return 3;
+        if (s.includes('i5') || s.includes('ryzen 5') || s.includes('ultra 5')) return 2;
+        if (s.includes('i3') || s.includes('ryzen 3') || s.includes('ultra 3')) return 1;
+        return 1;
+      };
+      const diff = getProcTier(selProc) - getProcTier(baseProc);
+      if (diff > 0) {
+        basePrice += diff * 3500;
+      }
+    }
+  } else if (device?.basePrice) {
     basePrice = Number(device.basePrice);
   } else {
-    // Last-resort fallback if laptop has zero variants in database
-    const deviceProcessor = device.generation
+    // Fallback if no prices exist in DB
+    const deviceProcessor = device?.generation
       ? `${device.processorFamily || ''} - ${device.generation}`
-      : (device.processorFamily || '');
+      : (device?.processorFamily || '');
     const processor = selections.processor || deviceProcessor;
     const { base: functionalBase, increment: cpuIncrement } = getProcessorValuation(processor);
     const ramIncrement = getRamIncrement(ram);
@@ -973,8 +996,9 @@ export function calculateLaptopPrice(device, selections) {
     basePrice = Math.round(componentSum * brandMultiplier);
   }
 
-  // ── 2. Age multiplier (Cashify benchmark: < 1 yr: 1.0, 1-3 yrs: 0.88, > 3 yrs: 0.75) ──
-  const ageMultiplier = device.ageMultipliers?.[yearBracket] || getAgeMultiplier(yearBracket);
+  // ── 2. Age multiplier (Cashify ground truth: <1yr: 1.0, 1-3yr: 0.88, >3yr: 0.75) ──
+  // NOTE: Cashify uses standard age depreciation. Stale database ageMultipliers (e.g. 0.78, 0.62) are bypassed.
+  const ageMultiplier = getAgeMultiplier(yearBracket);
   const workingBase = Math.round(basePrice * ageMultiplier);
   const ageAdjustment = workingBase - basePrice;
 
@@ -1020,13 +1044,22 @@ export function calculateLaptopPrice(device, selections) {
   bodyDeduction = Math.round(workingBase * (totalBodyPct / 100));
   currentPrice = Math.max(currentPrice - bodyDeduction, 0);
 
-  // ── 7. Accessories bonus & missing deductions ──
-  const accList = Array.isArray(accessories) ? [...accessories] : [];
-  if (yearBracket && yearBracket !== 'lessThan1' && !accList.includes('bill')) {
-    accList.push('bill');
+  // ── 7. Accessories (Cashify benchmark: base price includes charger & box; deduct if missing) ──
+  const accList = Array.isArray(accessories) ? accessories : [];
+  let accessoriesDeduction = 0;
+  if (!accList.includes('charger')) {
+    // Missing charger: -8% of working base
+    accessoriesDeduction += Math.round(workingBase * 0.08);
   }
-  const accBonus = accList.reduce((sum, item) => sum + (device.accessoriesBonus?.[item] || 0), 0);
-  currentPrice += accBonus;
+  if (!accList.includes('box')) {
+    // Missing box: -2% of working base
+    accessoriesDeduction += Math.round(workingBase * 0.02);
+  }
+  if (yearBracket === 'lessThan1' && !accList.includes('bill')) {
+    // In-warranty window (<1yr) but missing GST bill: -5%
+    accessoriesDeduction += Math.round(workingBase * 0.05);
+  }
+  currentPrice = Math.max(currentPrice - accessoriesDeduction, 0);
 
   // ── 8. Final price clamping with 5% scrap floor and clean ₹100 rounding ──
   const floorPrice = Math.round(basePrice * 0.05);
@@ -1039,7 +1072,8 @@ export function calculateLaptopPrice(device, selections) {
     functionalDeduction: -functionalDeduction,
     screenDeduction: -screenDeduction,
     bodyDeduction: -bodyDeduction,
-    accessoriesBonus: accBonus,
+    accessoriesDeduction: -accessoriesDeduction,
+    accessoriesBonus: 0,
     finalPrice,
   };
 }
