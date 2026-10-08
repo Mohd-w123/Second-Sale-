@@ -562,4 +562,115 @@ export const deleteSalesUser = async (req, res, next) => {
   }
 };
 
+// ─── Cashify Pricing Benchmark & Calibration ──────────────────────────────────
+
+export const getPricingStats = async (req, res, next) => {
+  try {
+    const stats = await Device.aggregate([
+      { $match: { isActive: true } },
+      { $unwind: '$variants' },
+      {
+        $group: {
+          _id: '$category',
+          deviceCount: { $addToSet: '$_id' },
+          variantCount: { $sum: 1 },
+          avgBasePrice: { $avg: '$variants.basePrice' },
+          minBasePrice: { $min: '$variants.basePrice' },
+          maxBasePrice: { $max: '$variants.basePrice' },
+        },
+      },
+      {
+        $project: {
+          category: '$_id',
+          totalDevices: { $size: '$deviceCount' },
+          totalVariants: '$variantCount',
+          avgBasePrice: { $round: ['$avgBasePrice', 0] },
+          minBasePrice: '$minBasePrice',
+          maxBasePrice: '$maxBasePrice',
+        },
+      },
+      { $sort: { totalDevices: -1 } },
+    ]);
+    res.json(stats);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const calibrateDevicePrices = async (req, res, next) => {
+  try {
+    const { category, multiplier = 1, fixedDelta = 0, dryRun = false } = req.body;
+    const numMultiplier = Number(multiplier);
+    const numDelta = Number(fixedDelta);
+
+    if (isNaN(numMultiplier) || numMultiplier <= 0) {
+      return res.status(400).json({ message: 'Invalid multiplier. Must be a positive number (e.g. 1.026 for +2.6%).' });
+    }
+
+    const filter = { isActive: true };
+    if (category && category !== 'all') {
+      filter.category = category;
+    }
+
+    const devices = await Device.find(filter);
+    let totalUpdated = 0;
+    let totalVariantsUpdated = 0;
+    const sampleChanges = [];
+
+    for (const dev of devices) {
+      let modified = false;
+      const originalSample = dev.variants?.[0]?.basePrice || dev.basePrice;
+
+      if (Array.isArray(dev.variants) && dev.variants.length > 0) {
+        dev.variants.forEach((v) => {
+          if (v.basePrice && v.basePrice > 0) {
+            const newPrice = Math.round((v.basePrice * numMultiplier + numDelta) / 10) * 10;
+            if (newPrice !== v.basePrice) {
+              v.basePrice = Math.max(newPrice, 500);
+              totalVariantsUpdated++;
+              modified = true;
+            }
+          }
+        });
+      }
+
+      if (dev.basePrice && dev.basePrice > 0) {
+        const newBase = Math.round((dev.basePrice * numMultiplier + numDelta) / 10) * 10;
+        if (newBase !== dev.basePrice) {
+          dev.basePrice = Math.max(newBase, 500);
+          modified = true;
+        }
+      }
+
+      if (modified) {
+        totalUpdated++;
+        if (sampleChanges.length < 5) {
+          sampleChanges.push({
+            modelName: dev.modelName,
+            brand: dev.brand,
+            category: dev.category,
+            before: originalSample,
+            after: dev.variants?.[0]?.basePrice || dev.basePrice,
+          });
+        }
+        if (!dryRun) {
+          await dev.save();
+        }
+      }
+    }
+
+    res.json({
+      message: `Successfully calibrated ${totalUpdated} devices (${totalVariantsUpdated} variants).`,
+      totalDevices: devices.length,
+      totalUpdated,
+      totalVariantsUpdated,
+      sampleChanges,
+      dryRun,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 

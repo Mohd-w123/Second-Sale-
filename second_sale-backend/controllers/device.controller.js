@@ -115,9 +115,11 @@ export const calculatePrice = async (req, res, next) => {
         return res.status(400).json({ message: 'All laptop fields are required' });
       }
 
-      const variant = device.variants.find(v => v.ram === ram && v.storage === storage);
+      const variant = (device.variants || []).find(v => 
+        (!ram || v.ram === ram) && (!storage || v.storage === storage)
+      ) || device.variants?.[0];
       if (!variant) {
-        return res.status(400).json({ message: 'Invalid RAM + Storage variant' });
+        return res.status(400).json({ message: 'No valid variant found for laptop' });
       }
 
       const basePrice = variant.basePrice;

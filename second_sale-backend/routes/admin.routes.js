@@ -22,6 +22,8 @@ import {
   createSalesUser,
   updateSalesUser,
   deleteSalesUser,
+  getPricingStats,
+  calibrateDevicePrices,
 } from '../controllers/admin.controller.js';
 
 const router = Router();
@@ -39,7 +41,9 @@ router.get('/stats', requirePermission('dashboard'), getDashboardStats);
 router.get('/users', requirePermission('users'), getAllUsers);
 router.get('/users/:id', requirePermission('users'), getUserById);
 
-// Devices
+// Devices & Pricing Calibration
+router.get('/devices/pricing-stats', requirePermission('devices'), getPricingStats);
+router.post('/devices/calibrate-prices', requirePermission('devices'), calibrateDevicePrices);
 router.get('/devices', requirePermission('devices'), getAllDevices);
 router.get('/devices/:id', requirePermission('devices'), getDeviceById);
 router.post('/devices', requirePermission('devices'), createDevice);

@@ -1,11 +1,11 @@
 // Default Quiz Configurations based on live Cashify ground truth
 // seedVersion: increment when deduction values change to auto-reset stale DB configs
-export const QUIZ_SEED_VERSION = 5;
+export const QUIZ_SEED_VERSION = 6;
 
 export const DEFAULT_QUIZZES = {
   mobile: {
     category: 'mobile',
-    seedVersion: 5,
+    seedVersion: 6,
     steps: [
       {
         id: 'device_details',
@@ -53,7 +53,7 @@ export const DEFAULT_QUIZZES = {
             required: true,
             options: [
               { id: 'yes', label: 'Yes', deductionType: 'percentage', deductionValue: 0, isNegative: false },
-              { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 20, isNegative: true },
+              { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 14, isNegative: true },
             ],
           },
           {
@@ -64,7 +64,7 @@ export const DEFAULT_QUIZZES = {
             required: true,
             options: [
               { id: 'yes', label: 'Yes', deductionType: 'percentage', deductionValue: 0, isNegative: false },
-              { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 21, isNegative: true },
+              { id: 'no', label: 'No', deductionType: 'percentage', deductionValue: 2, isNegative: true },
             ],
           },
           {

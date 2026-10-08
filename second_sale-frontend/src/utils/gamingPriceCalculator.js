@@ -38,10 +38,11 @@ export const GAMING_PERCENTAGES = {
 };
 
 export function calculateGamingPrice({ basePrice, answers = {}, device = {}, quizConfig = null }) {
-  let currentPrice = Number(basePrice) || 0;
-  if (currentPrice <= 0) return { finalPrice: 0, deductions: [] };
+  const numericBase = Number(basePrice) || 0;
+  if (numericBase <= 0) return { basePrice: 0, finalPrice: 0, totalDeductionPct: 0, deductions: [] };
 
   const deductions = [];
+  let totalDeductionPct = 0;
 
   const resolveDeduction = (category, key, defaultVal) => {
     if (!key) return 0;
@@ -79,26 +80,20 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {}, qui
 
   const applyDeduction = (pct, label) => {
     if (!pct || pct === 0) return;
-    if (pct > 0) {
-      // Deduction
-      const amount = Math.round((pct / 100) * currentPrice);
-      currentPrice = Math.max(0, currentPrice - amount);
-      deductions.push({ label, percentage: pct, amount: -amount });
-    } else {
-      // Bonus (negative percentage)
-      const bonusPct = Math.abs(pct);
-      const amount = Math.round((bonusPct / 100) * currentPrice);
-      currentPrice = currentPrice + amount;
-      deductions.push({ label, percentage: pct, amount: +amount });
-    }
+    totalDeductionPct += pct;
+    const amount = Math.round((Math.abs(pct) / 100) * numericBase);
+    deductions.push({ label, percentage: pct, amount: pct > 0 ? -amount : +amount });
   };
 
   // 1. Device Turn On
   if (answers.powerOn === 'no') {
     const powerPct = resolveDeduction('functionalDeductions', 'console_powers_on', GAMING_PERCENTAGES.powerOn.no);
     applyDeduction(powerPct, 'Console Does Not Turn On (Major Defect)');
+    const finalPrice = Math.max(Math.round(numericBase * (1 - powerPct / 100) / 10) * 10, Math.round(numericBase * 0.05));
     return {
-      finalPrice: Math.max(0, currentPrice),
+      basePrice: numericBase,
+      finalPrice,
+      totalDeductionPct: powerPct,
       deductions,
     };
   }
@@ -154,8 +149,15 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {}, qui
     }
   }
 
+  totalDeductionPct = Math.min(totalDeductionPct, 88);
+  const floorPrice = Math.round(numericBase * 0.05);
+  const rawFinal = Math.max(numericBase * (1 - totalDeductionPct / 100), floorPrice);
+  const finalPrice = Math.round(rawFinal / 10) * 10;
+
   return {
-    finalPrice: Math.max(0, currentPrice),
+    basePrice: numericBase,
+    finalPrice,
+    totalDeductionPct,
     deductions,
   };
 }
