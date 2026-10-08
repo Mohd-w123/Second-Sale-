@@ -284,7 +284,7 @@ export default function LaptopConditionQuizPage() {
   };
 
   const handleGetBestPrice = () => {
-    if (!age) setAge('above_11');
+    if (!age) setAge('twoToThree');
     setShowOtpModal(true);
   };
 
@@ -374,7 +374,7 @@ export default function LaptopConditionQuizPage() {
                   {!isApple && (
                     <EvaluationDetailRow label="Dedicated GPU" value={hasGpu === 'yes' ? `Available (${isGpuWorking === 'yes' ? 'Working' : 'Not Working'})` : 'Not Available'} color={hasGpu === 'yes' && isGpuWorking === 'yes' ? '#087F8C' : '#EF4444'} />
                   )}
-                  <EvaluationDetailRow label="Device Age" value={age ? AGE_OPTIONS.find(o => o.key === age).label : '-'} color="#087F8C" />
+                  <EvaluationDetailRow label="Device Age" value={age ? (AGE_OPTIONS.find(o => o.key === age)?.label || age) : '-'} color="#087F8C" />
                   <EvaluationDetailRow label="Functional Issues" value={issuesList.length > 0 ? issuesList.length + ' issue(s)' : 'No Issues'} color={issuesList.length > 0 ? '#EF4444' : '#087F8C'} />
                   <EvaluationDetailRow
                     label="Screen Condition"
@@ -1022,7 +1022,7 @@ export default function LaptopConditionQuizPage() {
                   />
                   <SummaryItem label="Body" value={bodyIssuesList.length > 0 ? `${bodyIssuesList.length} issue(s)` : currentStepIndex >= STEPS.findIndex(s => s.id === 'body') ? 'No Issues' : '-'} active={currentStepIndex >= STEPS.findIndex(s => s.id === 'body')} />
                   <SummaryItem label="Accessories" value={accessories.length > 0 ? accessories.map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ') : currentStepIndex >= STEPS.findIndex(s => s.id === 'accessories') ? 'None' : '-'} active={currentStepIndex >= STEPS.findIndex(s => s.id === 'accessories')} />
-                  <SummaryItem label="Age" value={age ? AGE_OPTIONS.find(o => o.key === age).label : '-'} active={currentStepIndex >= STEPS.findIndex(s => s.id === 'age')} />
+                  <SummaryItem label="Age" value={age ? (AGE_OPTIONS.find(o => o.key === age)?.label || age) : '-'} active={currentStepIndex >= STEPS.findIndex(s => s.id === 'age')} />
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 text-center">
