@@ -616,47 +616,63 @@ export const calibrateDevicePrices = async (req, res, next) => {
     let totalUpdated = 0;
     let totalVariantsUpdated = 0;
     const sampleChanges = [];
+    const bulkOps = [];
 
     for (const dev of devices) {
       let modified = false;
       const originalSample = dev.variants?.[0]?.basePrice || dev.basePrice;
+      let updatedVariants = null;
+      let newBase = null;
 
       if (Array.isArray(dev.variants) && dev.variants.length > 0) {
-        dev.variants.forEach((v) => {
+        updatedVariants = dev.variants.map((v) => {
           if (v.basePrice && v.basePrice > 0) {
             const newPrice = Math.round((v.basePrice * numMultiplier + numDelta) / 10) * 10;
             if (newPrice !== v.basePrice) {
-              v.basePrice = Math.max(newPrice, 500);
               totalVariantsUpdated++;
               modified = true;
+              return { ...(v.toObject ? v.toObject() : v), basePrice: Math.max(newPrice, 500) };
             }
           }
+          return v.toObject ? v.toObject() : v;
         });
       }
 
       if (dev.basePrice && dev.basePrice > 0) {
-        const newBase = Math.round((dev.basePrice * numMultiplier + numDelta) / 10) * 10;
-        if (newBase !== dev.basePrice) {
-          dev.basePrice = Math.max(newBase, 500);
+        const computedBase = Math.round((dev.basePrice * numMultiplier + numDelta) / 10) * 10;
+        if (computedBase !== dev.basePrice) {
+          newBase = Math.max(computedBase, 500);
           modified = true;
         }
       }
 
       if (modified) {
         totalUpdated++;
+        const updateFields = {};
+        if (updatedVariants) updateFields.variants = updatedVariants;
+        if (newBase !== null) updateFields.basePrice = newBase;
+
+        bulkOps.push({
+          updateOne: {
+            filter: { _id: dev._id },
+            update: { $set: updateFields },
+          },
+        });
+
         if (sampleChanges.length < 5) {
           sampleChanges.push({
             modelName: dev.modelName,
             brand: dev.brand,
             category: dev.category,
             before: originalSample,
-            after: dev.variants?.[0]?.basePrice || dev.basePrice,
+            after: updatedVariants?.[0]?.basePrice || newBase,
           });
         }
-        if (!dryRun) {
-          await dev.save();
-        }
       }
+    }
+
+    if (!dryRun && bulkOps.length > 0) {
+      await Device.bulkWrite(bulkOps);
     }
 
     res.json({
