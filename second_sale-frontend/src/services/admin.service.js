@@ -46,6 +46,8 @@ export const adminService = {
   createDevice: (data) => adminApi.post('/admin/devices', data),
   updateDevice: (id, data) => adminApi.put(`/admin/devices/${id}`, data),
   deleteDevice: (id) => adminApi.delete(`/admin/devices/${id}`),
+  getPricingStats: () => adminApi.get('/admin/devices/pricing-stats'),
+  calibratePrices: (data) => adminApi.post('/admin/devices/calibrate-prices', data),
 
   // Partners
   getPartners: (params) => adminApi.get('/admin/partners', { params }),

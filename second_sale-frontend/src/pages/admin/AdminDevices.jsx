@@ -346,6 +346,68 @@ export default function AdminDevices() {
   const [brandSuggestions, setBrandSuggestions] = useState([]);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  // Cashify Pricing Benchmark & Calibration State
+  const [showCalibrateModal, setShowCalibrateModal] = useState(false);
+  const [pricingStats, setPricingStats] = useState([]);
+  const [calibCategory, setCalibCategory] = useState('mobile');
+  const [calibPercent, setCalibPercent] = useState('2.6');
+  const [calibLoading, setCalibLoading] = useState(false);
+  const [calibResult, setCalibResult] = useState(null);
+  const [resetQuizLoading, setResetQuizLoading] = useState(false);
+  const [resetQuizMessage, setResetQuizMessage] = useState('');
+
+  const handleOpenCalibrate = async () => {
+    setShowCalibrateModal(true);
+    setCalibResult(null);
+    setResetQuizMessage('');
+    try {
+      const res = await adminService.getPricingStats();
+      setPricingStats(res.data || []);
+    } catch (err) {
+      console.error('Failed to load pricing stats:', err);
+    }
+  };
+
+  const handleRunCalibration = async (dryRun = false) => {
+    setCalibLoading(true);
+    setCalibResult(null);
+    try {
+      const pct = parseFloat(calibPercent) || 0;
+      const multiplier = 1 + (pct / 100);
+      const res = await adminService.calibratePrices({
+        category: calibCategory,
+        multiplier,
+        dryRun,
+      });
+      setCalibResult(res.data);
+      if (!dryRun) {
+        fetchDevices();
+        const statsRes = await adminService.getPricingStats();
+        setPricingStats(statsRes.data || []);
+      }
+    } catch (err) {
+      console.error('Calibration failed:', err);
+      alert(err.response?.data?.message || 'Price calibration failed');
+    } finally {
+      setCalibLoading(false);
+    }
+  };
+
+  const handleResetQuizDefaults = async (cat) => {
+    if (!window.confirm(`Reset ${cat} quiz deduction weights to live Cashify benchmark standards?`)) return;
+    setResetQuizLoading(true);
+    setResetQuizMessage('');
+    try {
+      await quizService.resetQuizToDefaults(cat);
+      setResetQuizMessage(`Successfully reset ${cat} quiz deductions to Cashify ground truth!`);
+    } catch (err) {
+      console.error('Reset quiz failed:', err);
+      alert('Failed to reset quiz configuration');
+    } finally {
+      setResetQuizLoading(false);
+    }
+  };
+
   useEffect(() => {
     adminService.getBrands()
       .then((res) => {
@@ -797,11 +859,22 @@ export default function AdminDevices() {
           </select>
         </div>
 
-        {/* Add Device Button */}
-        <button onClick={handleCreateOpen} className="admin-btn admin-btn-primary self-start">
-          <Plus size={16} />
-          <span>Add New Device</span>
-        </button>
+        {/* Actions */}
+        <div className="flex items-center gap-2 self-start flex-wrap">
+          <button
+            type="button"
+            onClick={handleOpenCalibrate}
+            className="admin-btn border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100 transition shadow-sm font-semibold flex items-center gap-1.5"
+            title="Calibrate base prices and deduction weights against Cashify standards"
+          >
+            <Sparkles size={16} className="text-amber-600" />
+            <span>Cashify Pricing Benchmark</span>
+          </button>
+          <button onClick={handleCreateOpen} className="admin-btn admin-btn-primary">
+            <Plus size={16} />
+            <span>Add New Device</span>
+          </button>
+        </div>
       </div>
 
       {/* Devices Catalog Grid */}
@@ -2057,6 +2130,223 @@ export default function AdminDevices() {
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Cashify Pricing Calibration & Benchmark Modal */}
+      {showCalibrateModal && (
+        <div className="admin-modal-backdrop" onClick={() => setShowCalibrateModal(false)}>
+          <div className="admin-modal max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header bg-gradient-to-r from-amber-500/10 via-teal-500/10 to-transparent">
+              <div className="flex items-center gap-2">
+                <Sparkles size={20} className="text-amber-600" />
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800">Cashify Pricing Benchmark & Calibration</h3>
+                  <p className="text-xs text-slate-500">Align catalog base prices and evaluation quiz deductions with Cashify live market rates</p>
+                </div>
+              </div>
+              <button onClick={() => setShowCalibrateModal(false)} className="admin-modal-close">
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Category Live Stats */}
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Category Overview</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                  {pricingStats.map((st) => (
+                    <div
+                      key={st.category}
+                      onClick={() => setCalibCategory(st.category)}
+                      className={`p-2.5 rounded-xl border text-center cursor-pointer transition ${
+                        calibCategory === st.category
+                          ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
+                          : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="text-[11px] font-bold uppercase text-slate-600 truncate">{st.category}</div>
+                      <div className="text-base font-extrabold text-slate-900 mt-0.5">{st.totalDevices}</div>
+                      <div className="text-[10px] text-slate-400">Avg ₹{Number(st.avgBasePrice).toLocaleString('en-IN')}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Calibration Controls */}
+              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-4">
+                <h4 className="text-sm font-bold text-slate-900 flex items-center justify-between">
+                  <span>1. Base Price Multiplier Calibration</span>
+                  <span className="text-xs font-normal text-slate-500">Applies to device catalog variants</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Target Category</label>
+                    <select
+                      value={calibCategory}
+                      onChange={(e) => setCalibCategory(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white font-medium"
+                    >
+                      <option value="all">All Categories ({pricingStats.reduce((a, b) => a + b.totalDevices, 0)} devices)</option>
+                      <option value="mobile">Mobiles</option>
+                      <option value="laptop">Laptops</option>
+                      <option value="tablet">Tablets</option>
+                      <option value="smartwatch">Smartwatches</option>
+                      <option value="earbuds">Earbuds</option>
+                      <option value="gaming">Gaming Consoles</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Adjustment Percentage (+ / - %)</label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={calibPercent}
+                        onChange={(e) => setCalibPercent(e.target.value)}
+                        placeholder="e.g. 2.6"
+                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white font-bold text-slate-900 pr-8"
+                      />
+                      <span className="absolute right-3 top-2.5 text-xs font-bold text-slate-400">%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preset Fast Calibration Buttons */}
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-500 mr-2">Quick Presets:</span>
+                  <div className="inline-flex flex-wrap gap-1.5 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => { setCalibCategory('mobile'); setCalibPercent('2.6'); }}
+                      className="text-xs px-2.5 py-1 rounded-md bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold transition"
+                    >
+                      Mobile +2.6% (Cashify Sync)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setCalibCategory('laptop'); setCalibPercent('5.0'); }}
+                      className="text-xs px-2.5 py-1 rounded-md bg-teal-100 hover:bg-teal-200 text-teal-900 font-semibold transition"
+                    >
+                      Laptop +5%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCalibPercent('2.0')}
+                      className="text-xs px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium transition"
+                    >
+                      +2%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCalibPercent('5.0')}
+                      className="text-xs px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium transition"
+                    >
+                      +5%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCalibPercent('-2.0')}
+                      className="text-xs px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium transition"
+                    >
+                      -2%
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCalibPercent('-5.0')}
+                      className="text-xs px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium transition"
+                    >
+                      -5%
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    disabled={calibLoading}
+                    onClick={() => handleRunCalibration(true)}
+                    className="admin-btn admin-btn-ghost text-xs"
+                  >
+                    {calibLoading ? 'Checking...' : 'Preview Changes (Dry Run)'}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={calibLoading}
+                    onClick={() => handleRunCalibration(false)}
+                    className="admin-btn admin-btn-primary text-xs"
+                  >
+                    {calibLoading ? 'Applying...' : `Apply Calibration to ${calibCategory.toUpperCase()}`}
+                  </button>
+                </div>
+
+                {/* Dry Run / Applied Result Card */}
+                {calibResult && (
+                  <div className={`p-3.5 rounded-lg border text-xs space-y-2 ${calibResult.dryRun ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'}`}>
+                    <div className="font-bold flex items-center justify-between">
+                      <span>{calibResult.dryRun ? '🔍 PREVIEW (No Changes Saved Yet)' : '✅ SUCCESS (Changes Saved to Database)'}</span>
+                      <span>{calibResult.totalUpdated} devices ({calibResult.totalVariantsUpdated} variants)</span>
+                    </div>
+                    {calibResult.sampleChanges?.length > 0 && (
+                      <div className="space-y-1 pt-1 border-t border-slate-200/50">
+                        <div className="font-semibold text-[11px] opacity-75">Sample Variant Adjustments:</div>
+                        {calibResult.sampleChanges.map((s, idx) => (
+                          <div key={idx} className="flex justify-between font-mono text-[11px]">
+                            <span>{s.brand} {s.modelName}</span>
+                            <span>₹{Number(s.before).toLocaleString('en-IN')} → <strong className="text-emerald-700">₹{Number(s.after).toLocaleString('en-IN')}</strong></span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Cashify Quiz Deduction Sync */}
+              <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-3">
+                <h4 className="text-sm font-bold text-slate-900 flex items-center justify-between">
+                  <span>2. Cashify Quiz Deductions Reset</span>
+                  <span className="text-xs font-normal text-slate-500">Resets deduction weights to exact Cashify ground truth</span>
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Resets the question deduction weights (screen damage, body condition, hardware defects, warranty matrix: 0% in-warranty, 12% no bill, 14% out-of-warranty, 16% out-of-warranty + no bill) to Cashify's validated benchmarks.
+                </p>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {['mobile', 'laptop', 'tablet', 'smartwatch', 'earbuds', 'gaming'].map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      disabled={resetQuizLoading}
+                      onClick={() => handleResetQuizDefaults(cat)}
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-50 hover:bg-[#E8F6F7] hover:border-[#087F8C] hover:text-[#087F8C] transition flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      <RefreshCw size={12} className={resetQuizLoading ? 'animate-spin' : ''} />
+                      <span className="capitalize">Reset {cat} Quiz</span>
+                    </button>
+                  ))}
+                </div>
+
+                {resetQuizMessage && (
+                  <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+                    {resetQuizMessage}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="admin-modal-footer">
+              <button
+                type="button"
+                onClick={() => setShowCalibrateModal(false)}
+                className="admin-btn admin-btn-primary"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

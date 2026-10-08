@@ -205,16 +205,18 @@ export default function TabletConditionQuizPage() {
       : quizConfig;
 
     // Calculate new price dynamically based on user inputs
+    const isUnderWarranty = underWarranty !== null ? underWarranty : (deviceAge !== 'Above 11 Months');
     const result = calculatePrice({
       brand: device.brand,
       modelName: device.modelName,
       device,
       basePrice: variant.basePrice,
       deviceAge,
+      isWarrantyEligible: true,
       ableToMakeCalls: ableToMakeCalls ?? true,
       isTouchScreenWorking: isTouchScreenWorking ?? true,
       isScreenOriginal: isScreenOriginal ?? true,
-      underWarranty: underWarranty ?? true,
+      underWarranty: isUnderWarranty,
       hasGSTBill: selectedAccessories.includes('Bill'),
       eSIMSupport,
       screenCondition,

@@ -61,8 +61,11 @@ export const DEVICEKART_EARBUDS_QUIZ = {
 };
 
 export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}, quizConfig = null }) {
-  let a = Number(basePrice) || 0;
+  const numericBase = Number(basePrice) || 0;
+  if (numericBase <= 0) return { basePrice: 0, finalPrice: 0, totalDeductionPct: 0, breakdown: {}, isRejected: false };
+
   const breakdown = {};
+  let totalDeductionPct = 0;
 
   const resolveDeduction = (category, key, defaultVal) => {
     if (!key) return 0;
@@ -101,9 +104,9 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}
   const applyDeduction = (key, label, pct) => {
     const n = Number(pct) || 0;
     if (n === 0) return;
-    const r = Math.round((Math.abs(n) / 100) * a);
-    breakdown[key] = { label, pct: n, amount: r };
-    a = n > 0 ? Math.max(a - r, 0) : a + r;
+    totalDeductionPct += n;
+    const amount = Math.round((Math.abs(n) / 100) * numericBase);
+    breakdown[key] = { label, pct: n, amount };
   };
 
   // 1. Does the Earbuds switch on?
@@ -111,9 +114,10 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}
   if (isPowerNo) {
     const powerPct = resolveDeduction("functionalDeductions", "power_no", 90);
     applyDeduction("power_no", `Does Not Power On (-${powerPct}%)`, powerPct);
+    const finalPrice = Math.max(Math.round(numericBase * (1 - powerPct / 100) / 10) * 10, Math.round(numericBase * 0.05));
     return {
-      basePrice,
-      finalPrice: Math.max(Math.round(a), 0),
+      basePrice: numericBase,
+      finalPrice,
       totalDeductionPct: powerPct,
       breakdown,
       isRejected: true,
@@ -162,11 +166,13 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}
     applyDeduction("age", "Age Above 11 Months (-12%)", 12);
   }
 
-  const finalPrice = Math.max(Math.round(a), 0);
-  const totalDeductionPct = basePrice > 0 ? Math.round(((basePrice - finalPrice) / basePrice) * 100) : 0;
+  totalDeductionPct = Math.min(totalDeductionPct, 88);
+  const floorPrice = Math.round(numericBase * 0.05);
+  const rawFinal = Math.max(numericBase * (1 - totalDeductionPct / 100), floorPrice);
+  const finalPrice = Math.round(rawFinal / 10) * 10;
 
   return {
-    basePrice,
+    basePrice: numericBase,
     finalPrice,
     totalDeductionPct,
     breakdown,

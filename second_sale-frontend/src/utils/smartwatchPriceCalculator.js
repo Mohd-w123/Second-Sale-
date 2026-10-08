@@ -49,10 +49,11 @@ export const SMARTWATCH_PERCENTAGES = {
 };
 
 export function calculateSmartwatchPrice({ basePrice, answers = {}, device = {}, quizConfig = null }) {
-  let currentPrice = Number(basePrice) || 0;
-  if (currentPrice <= 0) return { finalPrice: 0, deductions: [] };
+  const numericBase = Number(basePrice) || 0;
+  if (numericBase <= 0) return { basePrice: 0, finalPrice: 0, totalDeductionPct: 0, deductions: [] };
 
   const deductions = [];
+  let totalDeductionPct = 0;
 
   const resolveDeduction = (category, key, defaultVal) => {
     if (!key) return 0;
@@ -90,17 +91,20 @@ export function calculateSmartwatchPrice({ basePrice, answers = {}, device = {},
 
   const applyDeduction = (pct, label) => {
     if (!pct || pct <= 0) return;
-    const amount = Math.round((pct / 100) * currentPrice);
-    currentPrice = Math.max(0, currentPrice - amount);
+    totalDeductionPct += pct;
+    const amount = Math.round((pct / 100) * numericBase);
     deductions.push({ label, percentage: pct, amount });
   };
 
-  // 1. Device Turn On
+  // 1. Device Turn On (Dead check)
   if (answers.powerOn === 'no' || answers.powerOn === 'power_no') {
     const powerPct = resolveDeduction('functionalDeductions', 'power_no', SMARTWATCH_PERCENTAGES.powerOn.no);
     applyDeduction(powerPct, 'Device Does Not Turn On (Major Defect)');
+    const finalPrice = Math.max(Math.round(numericBase * (1 - powerPct / 100) / 10) * 10, Math.round(numericBase * 0.05));
     return {
-      finalPrice: Math.max(0, currentPrice),
+      basePrice: numericBase,
+      finalPrice,
+      totalDeductionPct: powerPct,
       deductions,
     };
   }
@@ -169,11 +173,14 @@ export function calculateSmartwatchPrice({ basePrice, answers = {}, device = {},
     }
   }
 
-  const finalPrice = Math.max(0, currentPrice);
-  const totalDeductionPct = basePrice > 0 ? Math.round(((basePrice - finalPrice) / basePrice) * 100) : 0;
+  // Total deduction capped at 88% to maintain scrap floor
+  totalDeductionPct = Math.min(totalDeductionPct, 88);
+  const floorPrice = Math.round(numericBase * 0.05);
+  const rawFinal = Math.max(numericBase * (1 - totalDeductionPct / 100), floorPrice);
+  const finalPrice = Math.round(rawFinal / 10) * 10;
 
   return {
-    basePrice,
+    basePrice: numericBase,
     finalPrice,
     totalDeductionPct,
     deductions,
