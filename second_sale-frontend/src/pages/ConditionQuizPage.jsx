@@ -106,6 +106,14 @@ const CASHIFY_SCREEN_BODY_DEFECTS = [
   },
 ];
 
+// Cashify In-Warranty Mobile Age Brackets
+const MOBILE_AGE_OPTIONS = [
+  { id: 'below_3_months', label: 'Below 3 months', sub: 'Valid bill mandatory' },
+  { id: '3_to_6_months', label: '3 months - 6 months', sub: 'Valid bill mandatory' },
+  { id: '6_to_11_months', label: '6 months - 11 months', sub: 'Valid bill mandatory' },
+  { id: 'above_11_months', label: 'Above 11 months', sub: '' },
+];
+
 // ─── CASHIFY SUB-STEP DEFECT SPECIFICATIONS ────────────────────────────────
 const SUB_DEFECT_CONFIGS = {
   defect_screen_broken_scratch: {
@@ -323,6 +331,7 @@ export default function ConditionQuizPage() {
   const [isTouchScreenWorking, setIsTouchScreenWorking] = useState(null);
   const [isScreenOriginal, setIsScreenOriginal] = useState(null);
   const [underWarranty, setUnderWarranty] = useState(null);
+  const [mobileAge, setMobileAge] = useState(null); // 'below_3_months' | '3_to_6_months' | '6_to_11_months' | 'above_11_months'
   const [hasGSTBill, setHasGSTBill] = useState(null);
   const [eSIMSupport, seteSIMSupport] = useState(null); // 'single_esim' | 'dual_esim'
 
@@ -356,6 +365,7 @@ export default function ConditionQuizPage() {
       }
       if (!isDeviceWarrantyEligible(dev)) {
         setUnderWarranty(false);
+        setMobileAge('above_11_months');
         setHasGSTBill(false);
       }
     }).catch(() => {
@@ -376,14 +386,22 @@ export default function ConditionQuizPage() {
   // Derived: calculate price & breakdown in render (uses model custom quiz if active, otherwise category master)
   const isWarrantyEligible = device ? isDeviceWarrantyEligible(device) : false;
   const isFoldOrFlip = isFoldOrFlipDevice(device?.brand, device?.modelName);
+  const hasScreenOrPanelDamage =
+    screenBodyDefects.includes('defect_screen_broken_scratch') ||
+    screenBodyDefects.includes('defect_panel_missing_broken');
   const selectedVariant = device?.variants?.find(v => v.storage === storage) || device?.variants?.[0];
   const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
     ? device.customQuiz
     : quizConfig;
 
   const computedDeviceAge = isWarrantyEligible
-    ? (underWarranty ? '0 - 3 Months' : 'Above 11 Months')
-    : 'Above 11 Months';
+    ? (underWarranty
+        ? (mobileAge === '3_to_6_months' ? '3 months - 6 months'
+           : mobileAge === '6_to_11_months' ? '6 months - 11 months'
+           : mobileAge === 'above_11_months' ? 'Above 11 months'
+           : 'Below 3 months')
+        : 'Above 11 months')
+    : 'Above 11 months';
 
   // Extract all active sub-defect deduction keys
   const activeSubDefectDeductionKeys = [];
@@ -417,6 +435,8 @@ export default function ConditionQuizPage() {
     device,
     basePrice: selectedVariant?.basePrice || 0,
     deviceAge: computedDeviceAge,
+    mobileAge,
+    screenBodyDefects,
     isWarrantyEligible,
     ableToMakeCalls: ableToMakeCalls ?? true,
     isTouchScreenWorking: isTouchScreenWorking ?? true,
@@ -482,7 +502,11 @@ export default function ConditionQuizPage() {
     ableToMakeCalls !== null &&
     isTouchScreenWorking !== null &&
     isScreenOriginal !== null &&
-    (!isWarrantyEligible || (underWarranty !== null && hasGSTBill !== null)) &&
+    (!isWarrantyEligible || (
+      underWarranty === false
+        ? (hasGSTBill !== null)
+        : (underWarranty === true && mobileAge !== null && hasGSTBill !== null)
+    )) &&
     (!isEsimDevice || eSIMSupport !== null);
 
   // Validation for Step 2 Sub-defects
@@ -643,7 +667,17 @@ export default function ConditionQuizPage() {
                     </p>
                   </div>
 
-                  {isWarrantyEligible ? (
+                  {hasScreenOrPanelDamage ? (
+                    <div>
+                      <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
+                        MANUFACTURER WARRANTY
+                      </span>
+                      <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+                        Not Applicable (Physical damage voids warranty — 0% deduction)
+                      </p>
+                    </div>
+                  ) : isWarrantyEligible ? (
                     <>
                       <div>
                         <span className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider block mb-1">
@@ -651,7 +685,7 @@ export default function ConditionQuizPage() {
                         </span>
                         <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
                           <span className={`w-2 h-2 rounded-full ${underWarranty ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
-                          {underWarranty ? 'Yes (Under Warranty)' : 'No (Out of Warranty)'}
+                          {underWarranty ? `Yes (${computedDeviceAge})` : 'No (Out of Warranty)'}
                         </p>
                       </div>
 
@@ -973,7 +1007,12 @@ export default function ConditionQuizPage() {
                         <div className="grid grid-cols-2 gap-4">
                           <button
                             type="button"
-                            onClick={() => setUnderWarranty(true)}
+                            onClick={() => {
+                              setUnderWarranty(true);
+                              if (!mobileAge || mobileAge === 'above_11_months') {
+                                setMobileAge('below_3_months');
+                              }
+                            }}
                             className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
                               underWarranty === true
                                 ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
@@ -984,7 +1023,10 @@ export default function ConditionQuizPage() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setUnderWarranty(false)}
+                            onClick={() => {
+                              setUnderWarranty(false);
+                              setMobileAge('above_11_months');
+                            }}
                             className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
                               underWarranty === false
                                 ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
@@ -993,6 +1035,54 @@ export default function ConditionQuizPage() {
                           >
                             No
                           </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Q4.1: Mobile Age Question (Cashify exact — shown when device is under warranty) */}
+                    {isWarrantyEligible && underWarranty === true && (
+                      <div className="space-y-3 pt-2">
+                        <div>
+                          <h3 className="text-base font-bold text-gray-900">What is your mobile age?</h3>
+                          <p className="text-xs text-gray-400">
+                            (Because you chose your device is under brand's warranty)
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {MOBILE_AGE_OPTIONS.map(opt => {
+                            const isSelected = mobileAge === opt.id;
+                            return (
+                              <button
+                                key={opt.id}
+                                type="button"
+                                onClick={() => {
+                                  setMobileAge(opt.id);
+                                  if (opt.id === 'above_11_months') {
+                                    setUnderWarranty(false);
+                                  }
+                                }}
+                                className={`p-4 rounded-xl border-2 text-left transition-all cursor-pointer flex items-center justify-between ${
+                                  isSelected
+                                    ? 'border-[#087F8C] bg-[#E8F6F7]'
+                                    : 'border-gray-100 bg-white hover:border-gray-200'
+                                }`}
+                              >
+                                <div>
+                                  <span className={`block font-bold text-sm ${isSelected ? 'text-[#087F8C]' : 'text-gray-900'}`}>
+                                    {opt.label}
+                                  </span>
+                                  {opt.sub && (
+                                    <span className="text-[11px] text-gray-400 font-medium block mt-0.5">{opt.sub}</span>
+                                  )}
+                                </div>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                  isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'
+                                }`}>
+                                  {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                                </div>
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -1440,11 +1530,16 @@ export default function ConditionQuizPage() {
                     <span>Screen Original:</span>
                     <span className="font-bold text-gray-900">{isScreenOriginal === null ? '—' : isScreenOriginal ? 'Yes' : 'No'}</span>
                   </div>
-                  {isWarrantyEligible ? (
+                  {hasScreenOrPanelDamage ? (
+                    <div className="flex justify-between">
+                      <span>Warranty Status:</span>
+                      <span className="font-bold text-gray-900">Not Applicable (Screen/Panel Damage)</span>
+                    </div>
+                  ) : isWarrantyEligible ? (
                     <>
                       <div className="flex justify-between">
                         <span>Mobile Under Warranty:</span>
-                        <span className="font-bold text-gray-900">{underWarranty === null ? '—' : underWarranty ? 'Yes' : 'No'}</span>
+                        <span className="font-bold text-gray-900">{underWarranty === null ? '—' : underWarranty ? `Yes (${computedDeviceAge})` : 'No'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>GST Valid Bill:</span>

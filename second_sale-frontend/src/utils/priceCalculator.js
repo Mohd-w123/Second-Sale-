@@ -98,6 +98,11 @@ export const ISSUE_DEDUCTIONS = {
   noBox: 3,
   noCharger: 3,
 
+  // ─── Mobile Age Deductions (Under warranty brackets) ───
+  age_below_3_months: 0,
+  age_3_to_6_months: 4,
+  age_6_to_11_months: 8,
+
   // ─── WARRANTY & BILL COMBINED DEDUCTIONS (Cashify matrix, NOT from quiz config) ───
   // These keys are resolved ONLY via device-specific overrides or these ISSUE_DEDUCTIONS defaults
   // They must NEVER be picked up from quiz config (manufacturer_warranty question "No" option = 20%)
@@ -270,6 +275,8 @@ export function calculatePrice({
   device = {},
   basePrice = 0,
   deviceAge,
+  mobileAge,
+  screenBodyDefects = [],
   isWarrantyEligible: userSpecifiedWarrantyEligible,
   ableToMakeCalls,
   doesTabletSwitchOn,
@@ -423,11 +430,29 @@ export function calculatePrice({
     breakdown.cellularNetworkFaulty = cellPct;
   }
 
-  // 5. Warranty & GST Invoice Evaluation (Exact Cashify Matrix — NO compounding, NO quiz config interference)
-  // NOTE: We deliberately bypass getDeductionPct() here because the quiz config's manufacturer_warranty
-  // question "No" option returns 20% (the old default), which wrongly overrides the combined-case values.
-  // Instead we use: device-specific override → ISSUE_DEDUCTIONS → hardcoded fallback.
-  if (!isSpecial && isEligibleForWarranty) {
+  // 5. Warranty & GST Invoice Evaluation (Exact Cashify Matrix)
+  // Cashify Rule: If Option 1 ("Broken/scratch on device screen") or Option 4 ("Device panel missing/broken")
+  // is selected, physical damage voids manufacturer warranty. Cashify does NOT apply out-of-warranty or warranty-lost
+  // deductions on top of physical damage (warranty does not count / 0% warranty deduction).
+  const hasScreenOrPanelDamage =
+    (Array.isArray(screenBodyDefects) && (
+      screenBodyDefects.includes('defect_screen_broken_scratch') ||
+      screenBodyDefects.includes('defect_panel_missing_broken')
+    )) ||
+    (Array.isArray(physicalIssues) && physicalIssues.some(k =>
+      k === 'defect_screen_broken_scratch' ||
+      k === 'defect_panel_missing_broken' ||
+      k === 'panel_missing_broken' ||
+      k === 'panel_missing' ||
+      k === 'panel_cracked' ||
+      k === 'screen_cracked' ||
+      k === 'screen_cracked_ow' ||
+      k === 'screen_chipped' ||
+      k === 'screen_chipped_ow' ||
+      k === 'glass_crack'
+    ));
+
+  if (!isSpecial && isEligibleForWarranty && !hasScreenOrPanelDamage) {
     const hasWarranty = Boolean(underWarranty);
     const hasBill = Boolean(hasGSTBill);
 
@@ -442,14 +467,31 @@ export function calculatePrice({
       return fallback;
     };
 
-    if (hasWarranty && hasBill) {
-      // Full active warranty with valid GST bill: 0% deduction
-    } else if (hasWarranty && !hasBill) {
+    // Age bracket parsing
+    const ageKey = String(mobileAge || deviceAge || '').toLowerCase();
+    const is3to6m = ageKey.includes('3_to_6') || ageKey.includes('3 - 6') || ageKey.includes('3 to 6') || ageKey.includes('3 months - 6 months');
+    const is6to11m = ageKey.includes('6_to_11') || ageKey.includes('6 - 11') || ageKey.includes('6 to 11') || ageKey.includes('6 months - 11 months');
+    const isAbove11m = ageKey.includes('above_11') || ageKey.includes('above 11') || ageKey.includes('>11');
+
+    if (hasWarranty && !isAbove11m && hasBill) {
+      // Device under manufacturer warranty with valid bill
+      if (is3to6m) {
+        const agePct = getWarrantyPct('age_3_to_6_months', 4);
+        totalDeductionPct += agePct;
+        breakdown.deviceAge = agePct;
+      } else if (is6to11m) {
+        const agePct = getWarrantyPct('age_6_to_11_months', 8);
+        totalDeductionPct += agePct;
+        breakdown.deviceAge = agePct;
+      } else {
+        // Below 3 months: 0% deduction
+      }
+    } else if (hasWarranty && !isAbove11m && !hasBill) {
       // In warranty window, but without bill → Apple/OEM rejects warranty claim
       const noBillPct = getWarrantyPct('noBillWarrantyLost', 12);
       totalDeductionPct += noBillPct;
       breakdown.noBillWarrantyLost = noBillPct;
-    } else if (!hasWarranty && hasBill) {
+    } else if ((!hasWarranty || isAbove11m) && hasBill) {
       // Warranty expired, valid bill present
       const expPct = getWarrantyPct('outOfWarranty', 14);
       totalDeductionPct += expPct;
@@ -460,6 +502,9 @@ export function calculatePrice({
       totalDeductionPct += outPct;
       breakdown.outOfWarrantyAndNoBill = outPct;
     }
+  } else if (hasScreenOrPanelDamage) {
+    // Physical damage voids warranty — Cashify waives warranty penalty (0% deduction)
+    breakdown.warrantyWaived = 0;
   }
 
   // 6. eSIM variant deduction (fully admin-configurable via Quiz & Deductions panel)
