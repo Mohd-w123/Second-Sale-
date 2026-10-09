@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { deviceService } from '../services/device.service';
 import { quizService } from '../services/quiz.service';
@@ -70,13 +70,6 @@ import {
   FoldOuterScreenCleanIcon,
 } from '../components/quiz/QuizIcons';
 
-// --- Steps matching Cashify Mobile Flow ---
-const STEPS = [
-  { id: 'device_details', label: 'Device Details' },
-  { id: 'screen_body_defects', label: 'Screen & Body' },
-  { id: 'functional_issues', label: 'Functional Problems' },
-  { id: 'accessories', label: 'Accessories' },
-];
 
 // Screen & Body Defects (Cashify Step 2 - Primary Selection)
 const CASHIFY_SCREEN_BODY_DEFECTS = [
@@ -394,7 +387,30 @@ export default function ConditionQuizPage() {
     ? device.customQuiz
     : quizConfig;
 
-  const computedDeviceAge = isWarrantyEligible
+  // Dynamic Steps: Mobile Age is the dedicated final step if under manufacturer warranty
+  // If first option (defect_screen_broken_scratch) or fourth option (defect_panel_missing_broken) is selected,
+  // physical damage voids warranty, the device is out of warranty, and the age question is NOT shown.
+  const STEPS = useMemo(() => {
+    const steps = [
+      { id: 'device_details', label: 'Device Details' },
+      { id: 'screen_body_defects', label: 'Screen & Body' },
+      { id: 'functional_issues', label: 'Functional Problems' },
+      { id: 'accessories', label: 'Accessories' },
+    ];
+    if (isWarrantyEligible && underWarranty === true && !hasScreenOrPanelDamage) {
+      steps.push({ id: 'mobile_age', label: 'Mobile Age' });
+    }
+    return steps;
+  }, [isWarrantyEligible, underWarranty, hasScreenOrPanelDamage]);
+
+  // Keep currentStepIndex in bounds if STEPS length changes
+  useEffect(() => {
+    if (currentStepIndex >= STEPS.length) {
+      setCurrentStepIndex(Math.max(0, STEPS.length - 1));
+    }
+  }, [STEPS.length, currentStepIndex]);
+
+  const computedDeviceAge = (isWarrantyEligible && !hasScreenOrPanelDamage)
     ? (underWarranty
         ? (mobileAge === '3_to_6_months' ? '3 months - 6 months'
            : mobileAge === '6_to_11_months' ? '6 months - 11 months'
@@ -441,8 +457,8 @@ export default function ConditionQuizPage() {
     ableToMakeCalls: ableToMakeCalls ?? true,
     isTouchScreenWorking: isTouchScreenWorking ?? true,
     isScreenOriginal: isScreenOriginal ?? true,
-    underWarranty: isWarrantyEligible ? (underWarranty ?? true) : false,
-    hasGSTBill: isWarrantyEligible ? (hasGSTBill ?? true) : false,
+    underWarranty: (isWarrantyEligible && !hasScreenOrPanelDamage) ? (underWarranty ?? true) : false,
+    hasGSTBill: (isWarrantyEligible && !hasScreenOrPanelDamage) ? (hasGSTBill ?? true) : false,
     eSIMSupport: eSIMSupport,  // null | 'single_esim' | 'dual_esim' | 'esim_only_global'
     screenCondition: 'none',
     bodyCondition: 'good',
@@ -468,8 +484,8 @@ export default function ConditionQuizPage() {
         ableToMakeCalls,
         isTouchScreenWorking,
         isScreenOriginal,
-        underWarranty: isWarrantyEligible ? underWarranty : false,
-        hasGSTBill: isWarrantyEligible ? hasGSTBill : false,
+        underWarranty: (isWarrantyEligible && !hasScreenOrPanelDamage) ? underWarranty : false,
+        hasGSTBill: (isWarrantyEligible && !hasScreenOrPanelDamage) ? hasGSTBill : false,
         isWarrantyEligible,
         eSIMSupport,
         screenBodyDefects,
@@ -502,11 +518,7 @@ export default function ConditionQuizPage() {
     ableToMakeCalls !== null &&
     isTouchScreenWorking !== null &&
     isScreenOriginal !== null &&
-    (!isWarrantyEligible || (
-      underWarranty === false
-        ? (hasGSTBill !== null)
-        : (underWarranty === true && mobileAge !== null && hasGSTBill !== null)
-    )) &&
+    (!isWarrantyEligible || (underWarranty !== null && hasGSTBill !== null)) &&
     (!isEsimDevice || eSIMSupport !== null);
 
   // Validation for Step 2 Sub-defects
@@ -520,18 +532,22 @@ export default function ConditionQuizPage() {
   });
 
   const isNextDisabled =
-    (currentStepIndex === 0 && !isStep1Valid) ||
-    (currentStepIndex === 1 && isSubDefectView && !isSubDefectsComplete);
+    (STEPS[currentStepIndex]?.id === 'device_details' && !isStep1Valid) ||
+    (STEPS[currentStepIndex]?.id === 'screen_body_defects' && isSubDefectView && !isSubDefectsComplete) ||
+    (STEPS[currentStepIndex]?.id === 'mobile_age' && !mobileAge);
 
   const handleNextStep = () => {
-    if (currentStepIndex === 0) {
+    const currentStep = STEPS[currentStepIndex]?.id;
+
+    if (currentStep === 'device_details') {
       if (!isStep1Valid) return;
       setCurrentStepIndex(1);
       setIsSubDefectView(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    if (currentStepIndex === 1) {
+
+    if (currentStep === 'screen_body_defects') {
       if (!isSubDefectView) {
         if (screenBodyDefects.length === 0) {
           setCurrentStepIndex(2);
@@ -545,18 +561,39 @@ export default function ConditionQuizPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    if (currentStepIndex === 2) {
+
+    if (currentStep === 'functional_issues') {
       setCurrentStepIndex(3);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    if (currentStepIndex === 3) {
+
+    if (currentStep === 'accessories') {
+      if (STEPS.some(s => s.id === 'mobile_age')) {
+        setCurrentStepIndex(4);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      } else {
+        handleGetBestPrice();
+        return;
+      }
+    }
+
+    if (currentStep === 'mobile_age') {
+      if (!mobileAge) return;
       handleGetBestPrice();
+      return;
     }
   };
 
   const handlePrevStep = () => {
-    if (currentStepIndex === 1) {
+    const currentStep = STEPS[currentStepIndex]?.id;
+
+    if (currentStep === 'device_details') {
+      return;
+    }
+
+    if (currentStep === 'screen_body_defects') {
       if (isSubDefectView) {
         setIsSubDefectView(false);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -566,7 +603,8 @@ export default function ConditionQuizPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    if (currentStepIndex === 2) {
+
+    if (currentStep === 'functional_issues') {
       if (screenBodyDefects.length > 0) {
         setCurrentStepIndex(1);
         setIsSubDefectView(true);
@@ -578,8 +616,18 @@ export default function ConditionQuizPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    setCurrentStepIndex(prev => Math.max(prev - 1, 0));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (currentStep === 'accessories') {
+      setCurrentStepIndex(2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (currentStep === 'mobile_age') {
+      setCurrentStepIndex(3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
   };
 
   // Result / Final Quote View
@@ -859,7 +907,7 @@ export default function ConditionQuizPage() {
                     <div key={s.id} className="flex items-center gap-2">
                       <span className={`text-xs font-bold ${isCurrent ? 'text-[#087F8C]' : isCompleted ? 'text-gray-700' : 'text-gray-400'}`}>
                         {s.label}
-                        {isCurrent && currentStepIndex === 1 && isSubDefectView && (
+                        {isCurrent && s.id === 'screen_body_defects' && isSubDefectView && (
                           <span className="text-[#087F8C]/80 font-semibold ml-1">
                             (Details)
                           </span>
@@ -875,8 +923,8 @@ export default function ConditionQuizPage() {
                   className="h-full bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] transition-all duration-500"
                   style={{
                     width: `${
-                      currentStepIndex === 1 && isSubDefectView
-                        ? (1.75 / STEPS.length) * 100
+                      STEPS[currentStepIndex]?.id === 'screen_body_defects' && isSubDefectView
+                        ? ((currentStepIndex + 0.5) / STEPS.length) * 100
                         : ((currentStepIndex + 1) / STEPS.length) * 100
                     }%`
                   }}
@@ -1035,54 +1083,6 @@ export default function ConditionQuizPage() {
                           >
                             No
                           </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Q4.1: Mobile Age Question (Cashify exact — shown when device is under warranty) */}
-                    {isWarrantyEligible && underWarranty === true && (
-                      <div className="space-y-3 pt-2">
-                        <div>
-                          <h3 className="text-base font-bold text-gray-900">What is your mobile age?</h3>
-                          <p className="text-xs text-gray-400">
-                            (Because you chose your device is under brand's warranty)
-                          </p>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {MOBILE_AGE_OPTIONS.map(opt => {
-                            const isSelected = mobileAge === opt.id;
-                            return (
-                              <button
-                                key={opt.id}
-                                type="button"
-                                onClick={() => {
-                                  setMobileAge(opt.id);
-                                  if (opt.id === 'above_11_months') {
-                                    setUnderWarranty(false);
-                                  }
-                                }}
-                                className={`p-4 rounded-xl border-2 text-left transition-all cursor-pointer flex items-center justify-between ${
-                                  isSelected
-                                    ? 'border-[#087F8C] bg-[#E8F6F7]'
-                                    : 'border-gray-100 bg-white hover:border-gray-200'
-                                }`}
-                              >
-                                <div>
-                                  <span className={`block font-bold text-sm ${isSelected ? 'text-[#087F8C]' : 'text-gray-900'}`}>
-                                    {opt.label}
-                                  </span>
-                                  {opt.sub && (
-                                    <span className="text-[11px] text-gray-400 font-medium block mt-0.5">{opt.sub}</span>
-                                  )}
-                                </div>
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                                  isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'
-                                }`}>
-                                  {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
-                                </div>
-                              </button>
-                            );
-                          })}
                         </div>
                       </div>
                     )}
@@ -1471,6 +1471,91 @@ export default function ConditionQuizPage() {
                     </div>
                   </div>
                 )}
+
+                {/* ─── CASHIFY DEDICATED LAST STEP: What is your mobile age? (Screenshot 1) ─── */}
+                {STEPS[currentStepIndex]?.id === 'mobile_age' && (
+                  <div className="space-y-8 py-2">
+                    <div className="text-center space-y-1">
+                      <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+                        What is your mobile age?
+                      </h2>
+                      <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                        (Because you chose your device is under brand's warranty)
+                      </p>
+                    </div>
+
+                    <div className="space-y-4 max-w-3xl mx-auto pt-4">
+                      {/* Top row: 3 cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {MOBILE_AGE_OPTIONS.slice(0, 3).map(opt => {
+                          const isSelected = mobileAge === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => {
+                                setMobileAge(opt.id);
+                              }}
+                              className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center gap-3.5 ${
+                                isSelected
+                                  ? 'border-[#087F8C] bg-[#E8F6F7]/50 shadow-sm'
+                                  : 'border-gray-100 bg-white hover:border-gray-200'
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                                isSelected ? 'border-[#087F8C]' : 'border-gray-300'
+                              }`}>
+                                {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-[#087F8C]" />}
+                              </div>
+                              <div className="flex-1">
+                                <span className={`block font-bold text-sm ${isSelected ? 'text-[#087F8C]' : 'text-gray-900'}`}>
+                                  {opt.label}
+                                </span>
+                                {opt.sub && (
+                                  <span className="text-[11px] text-gray-400 font-medium block mt-0.5">
+                                    {opt.sub}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Bottom row: Above 11 months card */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {MOBILE_AGE_OPTIONS.slice(3).map(opt => {
+                          const isSelected = mobileAge === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => {
+                                setMobileAge(opt.id);
+                              }}
+                              className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center gap-3.5 ${
+                                isSelected
+                                  ? 'border-[#087F8C] bg-[#E8F6F7]/50 shadow-sm'
+                                  : 'border-gray-100 bg-white hover:border-gray-200'
+                              }`}
+                            >
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                                isSelected ? 'border-[#087F8C]' : 'border-gray-300'
+                              }`}>
+                                {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-[#087F8C]" />}
+                              </div>
+                              <div className="flex-1">
+                                <span className={`block font-bold text-sm ${isSelected ? 'text-[#087F8C]' : 'text-gray-900'}`}>
+                                  {opt.label}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Stepper Navigation Buttons */}
@@ -1497,7 +1582,8 @@ export default function ConditionQuizPage() {
                   <button
                     type="button"
                     onClick={handleGetBestPrice}
-                    className="btn-gradient text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-[#087F8C]/20 transition-all flex items-center gap-2 cursor-pointer"
+                    disabled={isNextDisabled}
+                    className="btn-gradient text-white font-black px-10 py-4 rounded-xl shadow-lg shadow-[#087F8C]/20 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-40"
                   >
                     <span>Get Exact Value</span>
                     <ArrowRight size={18} />
