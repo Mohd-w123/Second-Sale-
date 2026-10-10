@@ -315,38 +315,43 @@ export function calculatePrice({
   // Dynamic helper: resolves deduction percentage from device DB overrides, quiz config, then defaults
   const getDeductionPct = (key, category = '') => {
     if (!key) return 0;
-    // 1. Device specific override (highest priority, only if valid percentage <= 100)
+    const baseKey = key.replace(/_ow$/, '');
+    // 1. Device specific override from Admin Panel (highest priority, only if valid percentage <= 100)
     if (device) {
-      if (category === 'screen' && device.screenDeductions?.[key] !== undefined) {
-        const val = sanitizePct(device.screenDeductions[key]);
+      if (category === 'screen' && (device.screenDeductions?.[key] !== undefined || device.screenDeductions?.[baseKey] !== undefined)) {
+        const val = sanitizePct(device.screenDeductions[key] ?? device.screenDeductions[baseKey]);
         if (val !== null) return val;
       }
-      if (category === 'body' && device.bodyDeductions?.[key] !== undefined) {
-        const val = sanitizePct(device.bodyDeductions[key]);
+      if (category === 'body' && (device.bodyDeductions?.[key] !== undefined || device.bodyDeductions?.[baseKey] !== undefined)) {
+        const val = sanitizePct(device.bodyDeductions[key] ?? device.bodyDeductions[baseKey]);
         if (val !== null) return val;
       }
-      if (category === 'functional' && device.functionalDeductions?.[key] !== undefined) {
-        const val = sanitizePct(device.functionalDeductions[key]);
+      if (category === 'functional' && (device.functionalDeductions?.[key] !== undefined || device.functionalDeductions?.[baseKey] !== undefined)) {
+        const val = sanitizePct(device.functionalDeductions[key] ?? device.functionalDeductions[baseKey]);
         if (val !== null) return val;
       }
-      if (device.functionalDeductions?.[key] !== undefined) {
-        const val = sanitizePct(device.functionalDeductions[key]);
+      if (device.functionalDeductions?.[key] !== undefined || device.functionalDeductions?.[baseKey] !== undefined) {
+        const val = sanitizePct(device.functionalDeductions[key] ?? device.functionalDeductions[baseKey]);
         if (val !== null) return val;
       }
-      if (device.screenDeductions?.[key] !== undefined) {
-        const val = sanitizePct(device.screenDeductions[key]);
+      if (device.screenDeductions?.[key] !== undefined || device.screenDeductions?.[baseKey] !== undefined) {
+        const val = sanitizePct(device.screenDeductions[key] ?? device.screenDeductions[baseKey]);
         if (val !== null) return val;
       }
-      if (device.bodyDeductions?.[key] !== undefined) {
-        const val = sanitizePct(device.bodyDeductions[key]);
+      if (device.bodyDeductions?.[key] !== undefined || device.bodyDeductions?.[baseKey] !== undefined) {
+        const val = sanitizePct(device.bodyDeductions[key] ?? device.bodyDeductions[baseKey]);
         if (val !== null) return val;
       }
-      if (device.deductions?.[key] !== undefined) {
-        const val = sanitizePct(device.deductions[key]);
+      if (device.deductions?.[key] !== undefined || device.deductions?.[baseKey] !== undefined) {
+        const val = sanitizePct(device.deductions[key] ?? device.deductions[baseKey]);
         if (val !== null) return val;
       }
       if (device[key] !== undefined && typeof device[key] === 'number') {
         const val = sanitizePct(device[key]);
+        if (val !== null) return val;
+      }
+      if (device[baseKey] !== undefined && typeof device[baseKey] === 'number') {
+        const val = sanitizePct(device[baseKey]);
         if (val !== null) return val;
       }
     }
@@ -456,14 +461,33 @@ export function calculatePrice({
     const hasWarranty = Boolean(underWarranty);
     const hasBill = Boolean(hasGSTBill);
 
-    // Helper: only check device-level overrides and ISSUE_DEDUCTIONS, skip quiz config entirely
+    // Helper: checks device-level admin overrides (functionalDeductions & deductions), then market benchmarks
     const getWarrantyPct = (key, fallback) => {
       // 1. Device-specific admin override (highest priority)
-      const devVal = device?.deductions?.[key];
-      if (devVal !== undefined) { const v = Number(devVal); if (Number.isFinite(v) && v > 0 && v <= 100) return v; }
+      const devVal = device?.functionalDeductions?.[key] ?? device?.deductions?.[key] ?? device?.[key];
+      if (devVal !== undefined) {
+        const v = Number(devVal);
+        if (Number.isFinite(v) && v > 0 && v <= 100) return v;
+      }
+      // Check aliases configured in admin panel (e.g. noBill for noBillWarrantyLost)
+      if (key === 'noBillWarrantyLost' && device?.functionalDeductions?.noBill !== undefined) {
+        const v = Number(device.functionalDeductions.noBill);
+        if (Number.isFinite(v) && v > 0 && v <= 100) return v;
+      }
+      if (key === 'outOfWarrantyAndNoBill' && device?.functionalDeductions?.outOfWarranty !== undefined) {
+        const ow = Number(device.functionalDeductions.outOfWarranty);
+        if (Number.isFinite(ow) && ow > 0 && ow <= 90) {
+          const nb = Number(device.functionalDeductions.noBill);
+          const add = (Number.isFinite(nb) && nb > 0 && nb <= 10) ? nb : 2;
+          return Math.min(ow + add, 100);
+        }
+      }
       // 2. Market benchmark
       const issueVal = ISSUE_DEDUCTIONS[key];
-      if (issueVal !== undefined) { const v = Number(issueVal); if (Number.isFinite(v) && v > 0 && v <= 100) return v; }
+      if (issueVal !== undefined) {
+        const v = Number(issueVal);
+        if (Number.isFinite(v) && v > 0 && v <= 100) return v;
+      }
       return fallback;
     };
 
@@ -572,10 +596,13 @@ export function calculatePrice({
     if (SCREEN_DEFECT_KEYS.has(id)) {
       hasSpecificScreenDefect = true;
       // Warranty-sensitive keys: use higher _ow rate when device is confirmed out-of-warranty
+      // ONLY when admin has NOT set an explicit override in device.screenDeductions!
       let effectiveKey = id;
       if (WARRANTY_SENSITIVE_SCREEN_KEYS.has(id) && underWarranty === false) {
         const owKey = `${id}_ow`;
-        if (ISSUE_DEDUCTIONS[owKey] !== undefined) effectiveKey = owKey;
+        if (device?.screenDeductions?.[id] === undefined && ISSUE_DEDUCTIONS[owKey] !== undefined) {
+          effectiveKey = owKey;
+        }
       }
       const pct = getDeductionPct(effectiveKey, 'screen');
       if (pct > 0) {

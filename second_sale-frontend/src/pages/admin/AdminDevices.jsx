@@ -2005,6 +2005,7 @@ export default function AdminDevices() {
                               <label>{MOBILE_FUNCTIONAL_LABELS[key] || key}</label>
                               <input
                                 type="number"
+                                step="any"
                                 value={formData.functionalDeductions?.[key] ?? ''}
                                 onChange={(e) => handleNestedChange('functionalDeductions', key, e.target.value)}
                               />
