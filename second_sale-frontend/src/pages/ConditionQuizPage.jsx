@@ -721,8 +721,8 @@ export default function ConditionQuizPage() {
                         MANUFACTURER WARRANTY
                       </span>
                       <p className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-                        Not Applicable (Physical damage voids warranty — 0% deduction)
+                        <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                        No (Out of Warranty — Physical damage)
                       </p>
                     </div>
                   ) : isWarrantyEligible ? (
@@ -1619,7 +1619,7 @@ export default function ConditionQuizPage() {
                   {hasScreenOrPanelDamage ? (
                     <div className="flex justify-between">
                       <span>Warranty Status:</span>
-                      <span className="font-bold text-gray-900">Not Applicable (Screen/Panel Damage)</span>
+                      <span className="font-bold text-gray-900">No (Out of Warranty)</span>
                     </div>
                   ) : isWarrantyEligible ? (
                     <>
