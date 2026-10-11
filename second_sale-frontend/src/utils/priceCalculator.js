@@ -112,9 +112,10 @@ export const ISSUE_DEDUCTIONS = {
 };
 
 // ─── CASHIFY WARRANTY ELIGIBILITY RULE ─────────────────────────────────────
+// ─── CASHIFY WARRANTY ELIGIBILITY RULE ─────────────────────────────────────
 /**
- * Cashify Rule: Determines if a device model is eligible for manufacturer warranty (launched within the last ~14-18 months).
- * Older legacy models (iPhone 11/12/13/14, Galaxy S21/S22/S23, older laptops, etc.) skip the Age & Warranty step completely.
+ * Cashify Rule: Determines if a device model is eligible for manufacturer warranty (launched within the last 3 years, 2023+).
+ * Older legacy models (iPhone 11/12/13, Galaxy S21/S22, older 4G budget phones, etc.) skip the Age & Warranty step completely.
  */
 export function isDeviceWarrantyEligible(device) {
   if (!device) return false;
@@ -123,9 +124,11 @@ export function isDeviceWarrantyEligible(device) {
   if (typeof device.isWarrantyEligible === 'boolean') {
     return device.isWarrantyEligible;
   }
+  const currentYear = new Date().getFullYear();
+  const minEligibleYear = currentYear - 3; // Within 3 years (e.g. 2023+)
+
   if (device.releaseYear) {
-    const currentYear = new Date().getFullYear();
-    return Number(device.releaseYear) >= (currentYear - 1);
+    return Number(device.releaseYear) >= minEligibleYear;
   }
 
   const name = (device.modelName || '').toLowerCase();
@@ -135,28 +138,30 @@ export function isDeviceWarrantyEligible(device) {
   const text = `${name} ${slug}`.toLowerCase();
   const clean = text.replace(/[^a-z0-9]/g, '');
 
-  // 2. Apple iPhones: Only iPhone 15, 16, 17 are within active warranty window (2024-2026)
-  if (brand.includes('apple') || slug.includes('iphone') || name.includes('iphone')) {
-    const activeIphones = ['iphone 15', 'iphone 16', 'iphone 17'];
-    return activeIphones.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+  // 2. Check if model name or slug has a recent launch year (>= minEligibleYear, e.g. 2023+)
+  const yearMatch = text.match(/20\d{2}/);
+  if (yearMatch) {
+    const year = parseInt(yearMatch[0], 10);
+    return year >= minEligibleYear;
   }
 
-  // 3. Samsung Galaxy:
-  // User Rule: Warranty question is present in all 2023+ models EXCEPT the S23 series
-  if (brand.includes('samsung') || slug.includes('samsung')) {
-    // Explicit exclusion: S23 series (S23, S23+, S23 Ultra, S23 FE) -> NO WARRANTY
-    if (clean.includes('s23')) {
-      return false;
-    }
+  // 3. Apple iPhones: iPhone 14, 15, 16, 17, iPhone SE (2022/3rd gen) are within 3-year window
+  if (brand.includes('apple') || slug.includes('iphone') || name.includes('iphone')) {
+    const activeIphones = ['iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone se 3', 'iphone se 2022'];
+    return activeIphones.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')));
+  }
 
+  // 4. Samsung Galaxy:
+  // Within 3 years: S23, S24, S25, S26 series, Fold/Flip 5/6/7, A/M/F series from 2023 onwards
+  if (brand.includes('samsung') || slug.includes('samsung')) {
     // Explicit exclusion: Older S series (S22, S21, S20, S10, S9, S8) -> NO WARRANTY
     if (/(?:^|[^a-z0-9])s(22|21|20|10|9|8)(?:[^a-z0-9]|$)/i.test(text)) {
       return false;
     }
 
-    // Eligible Galaxy S series: S24, S25, S26 (and Plus, Ultra, FE, Edge variants)
-    if (/(?:^|[^a-z0-9])s(24|25|26)(?:[^a-z0-9]|$)/i.test(text) ||
-        clean.includes('s24') || clean.includes('s25') || clean.includes('s26')) {
+    // Eligible Galaxy S series within 3 years: S23, S24, S25, S26 (and Plus, Ultra, FE)
+    if (/(?:^|[^a-z0-9])s(23|24|25|26)(?:[^a-z0-9]|$)/i.test(text) ||
+        clean.includes('s23') || clean.includes('s24') || clean.includes('s25') || clean.includes('s26')) {
       return true;
     }
 
@@ -171,8 +176,8 @@ export function isDeviceWarrantyEligible(device) {
     }
 
     // Eligible Galaxy A series (from 2023+ list):
-    // A05, A05s, A06, A14, A15, A16, A25, A26, A34, A35, A36, A37, A54, A55, A56, A57
-    const eligibleA = ['a05', 'a06', 'a14', 'a15', 'a16', 'a25', 'a26', 'a34', 'a35', 'a36', 'a37', 'a54', 'a55', 'a56', 'a57'];
+    // A05, A06, A14, A15, A16, A24, A25, A26, A34, A35, A36, A37, A54, A55, A56, A57
+    const eligibleA = ['a05', 'a06', 'a14', 'a15', 'a16', 'a24', 'a25', 'a26', 'a34', 'a35', 'a36', 'a37', 'a54', 'a55', 'a56', 'a57'];
     if (eligibleA.some(code => new RegExp(`(?:^|[^a-z0-9])${code}(?:s)?(?:[^a-z0-9]|$)`, 'i').test(text))) {
       return true;
     }
@@ -194,53 +199,110 @@ export function isDeviceWarrantyEligible(device) {
     return false;
   }
 
-  // 4. OnePlus: ALL series launched from Jan 2023 onwards (user requirement)
-  // Flagship (11/12/13/15), R-series (11R/12R/13R), Nord (3/4/5/6),
-  // Nord CE (3/3 Lite/4/4 Lite/5/6/6 Lite), Open, Nord N30, N6
+  // 5. Motorola (Moto):
+  // G series (G85, G84, G64, G54, G45, G35, G34, G24, G14, G04, G04s, G05, G73, G23, G13)
+  // Edge series (Edge 40, Edge 50 series, Edge 60)
+  // Razr series (Razr 40, Razr 50 series)
+  if (brand.includes('motorola') || brand.includes('moto') || slug.includes('motorola') || slug.includes('moto-') || name.startsWith('moto')) {
+    const activeMotoG = ['g85', 'g84', 'g73', 'g64', 'g54', 'g53', 'g45', 'g35', 'g34', 'g24', 'g23', 'g14', 'g13', 'g05', 'g04'];
+    if (activeMotoG.some(code => new RegExp(`(?:^|[^a-z0-9])${code}(?:s)?(?:[^a-z0-9]|$)`, 'i').test(text) || clean.includes(code))) {
+      return true;
+    }
+    if (/edge[^\d]*(40|50|60)\b/i.test(text) || clean.includes('edge40') || clean.includes('edge50') || clean.includes('edge60')) {
+      return true;
+    }
+    if (/razr[^\d]*(40|50|60)\b/i.test(text) || clean.includes('razr40') || clean.includes('razr50') || clean.includes('razr60')) {
+      return true;
+    }
+    if (clean.includes('thinkphone')) return true;
+    return false;
+  }
+
+  // 6. OnePlus: ALL series launched within the last 3 years (Jan 2023 onwards)
   if (brand.includes('oneplus') || slug.includes('oneplus') || name.includes('oneplus') || name.includes('one plus')) {
     const activeOnePlusPatterns = [
-      // 11 series (Jan/Feb 2023)
       'oneplus11', 'oneplus11r',
-      // 12 series (Dec 2023 / Jan 2024)
       'oneplus12', 'oneplus12r',
-      // 13 series (Oct 2024 / Jan 2025)
       'oneplus13', 'oneplus13r', 'oneplus13s',
-      // 15 series (Oct 2025)
       'oneplus15', 'oneplus15r',
-      // Foldable (Oct 2023)
       'oneplusopen',
-      // Nord 3, 4, 5, 6 series (Jul 2023+)
       'nord3', 'nord4', 'nord5', 'nord6',
-      // Nord CE 3, 4, 5, 6 series (Apr 2023+)
       'nordce3', 'nordce4', 'nordce5', 'nordce6',
-      // Nord N series (Jun 2023+)
       'nordn30', 'oneplusn6', 'nordn6'
     ];
-
     if (activeOnePlusPatterns.some(pat => clean.includes(pat))) {
       return true;
     }
     return false;
   }
 
-  // 5. Google Pixel: Pixel 8, Pixel 9
+  // 7. Google Pixel: Pixel 7a, Pixel Fold, Pixel 8, Pixel 9, Pixel 10
   if (brand.includes('google') || slug.includes('pixel')) {
-    const activePixel = ['pixel 8', 'pixel 9'];
-    return activePixel.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+    const activePixel = ['pixel 7a', 'pixel fold', 'pixel 8', 'pixel 9', 'pixel 10'];
+    return activePixel.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')));
   }
 
-  // 6. Xiaomi / Redmi / Poco: 14, 15, Note 13, Note 14, F6, X6
+  // 8. Xiaomi / Redmi / Poco (2023+):
   if (brand.includes('xiaomi') || brand.includes('redmi') || brand.includes('poco')) {
-    const activeXiaomi = ['xiaomi 14', 'xiaomi 15', 'note 13', 'note 14', 'poco f6', 'poco x6'];
-    return activeXiaomi.some(p => name.includes(p) || slug.includes(p.replace(' ', '-')));
+    const activeXiaomi = [
+      'xiaomi 13', 'xiaomi 14', 'xiaomi 15',
+      'note 12', 'note 13', 'note 14',
+      'redmi 12', 'redmi 13', 'redmi 14',
+      'poco f5', 'poco f6', 'poco f7',
+      'poco x5', 'poco x6', 'poco x7',
+      'poco m5', 'poco m6', 'poco m7',
+      'poco c51', 'poco c55', 'poco c61', 'poco c65'
+    ];
+    return activeXiaomi.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')) || clean.includes(p.replace(/ /g, '')));
   }
 
-  // 7. Check if model name has a recent year (>= 2024)
-  const currentYear = new Date().getFullYear();
-  const yearMatch = name.match(/20\d{2}/);
-  if (yearMatch) {
-    const year = parseInt(yearMatch[0], 10);
-    return year >= (currentYear - 1);
+  // 9. Vivo & iQOO (2023+):
+  if (brand.includes('vivo') || brand.includes('iqoo') || slug.includes('vivo') || slug.includes('iqoo')) {
+    const activeVivo = [
+      'x90', 'x100', 'x200',
+      'v27', 'v29', 'v30', 'v40', 'v50',
+      't2', 't3', 't4',
+      'y27', 'y28', 'y36', 'y56', 'y100', 'y200', 'y300',
+      'iqoo 11', 'iqoo 12', 'iqoo 13', 'neo 7', 'neo 9', 'neo 10', 'z7', 'z9', 'z10'
+    ];
+    return activeVivo.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')) || clean.includes(p.replace(/ /g, '')));
+  }
+
+  // 10. Oppo (2023+):
+  if (brand.includes('oppo') || slug.includes('oppo')) {
+    const activeOppo = [
+      'find n2', 'find n3', 'find x6', 'find x7', 'find x8',
+      'reno 9', 'reno 10', 'reno 11', 'reno 12', 'reno 13',
+      'f23', 'f25', 'f27',
+      'a38', 'a58', 'a78', 'a79', 'a59', 'a60', 'a80'
+    ];
+    return activeOppo.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')) || clean.includes(p.replace(/ /g, '')));
+  }
+
+  // 11. Realme (2023+):
+  if (brand.includes('realme') || slug.includes('realme')) {
+    const activeRealme = [
+      'realme 11', 'realme 12', 'realme 13', 'realme 14',
+      'gt 3', 'gt 5', 'gt 6', 'gt 7', 'gt neo 5',
+      'narzo 60', 'narzo 70', 'narzo 80', 'narzo n53', 'narzo n55', 'narzo n61', 'narzo n63', 'narzo n65',
+      'c51', 'c53', 'c55', 'c61', 'c63', 'c65', 'c67',
+      'p1', 'p2'
+    ];
+    return activeRealme.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')) || clean.includes(p.replace(/ /g, '')));
+  }
+
+  // 12. Nothing / CMF (2023+):
+  if (brand.includes('nothing') || slug.includes('nothing') || brand.includes('cmf')) {
+    return true; // Nothing brand launched all devices between 2022-2025, all within 3 years
+  }
+
+  // 13. Other brands (Infinix, Tecno, Honor, etc.):
+  if (brand.includes('infinix') || brand.includes('tecno') || brand.includes('honor')) {
+    const activeOthers = [
+      'zero 30', 'gt 10', 'gt 20', 'note 30', 'note 40', 'hot 30', 'hot 40', 'hot 50',
+      'camon 20', 'camon 30', 'magic 5', 'magic 6', 'honor 90', 'honor 200'
+    ];
+    return activeOthers.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')) || clean.includes(p.replace(/ /g, '')));
   }
 
   return false;
