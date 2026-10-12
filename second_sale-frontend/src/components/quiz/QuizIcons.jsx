@@ -733,6 +733,137 @@ export const LaptopScreenBlackDotsIcon = ({ className = "w-16 h-12" }) => (
 );
 
 // ==========================================
+// 9.5 LAPTOP BODY & PHYSICAL CONDITION ICONS (Cashify Exact)
+// ==========================================
+
+export const LaptopBodyNoScratchesIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M14 10L36 22L28 36L6 24L14 10Z" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M6 24L28 36L48 24L26 12L6 24Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5" strokeLinejoin="round" />
+    {/* Clean sparkles */}
+    <path d="M48 8L49.5 11L52.5 12.5L49.5 14L48 17L46.5 14L43.5 12.5L46.5 11L48 8Z" fill="#10B981" />
+    <circle cx="54" cy="20" r="1.5" fill="#10B981" />
+  </svg>
+);
+
+export const LaptopBodyMinorScratchesIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M14 10L36 22L28 36L6 24L14 10Z" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M6 24L28 36L48 24L26 12L6 24Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5" strokeLinejoin="round" />
+    {/* 1-2 scratches on lid */}
+    <line x1="16" y1="18" x2="24" y2="22" stroke="#F59E0B" strokeWidth="1.75" strokeLinecap="round" />
+    <line x1="22" y1="16" x2="28" y2="20" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const LaptopBodyMajorScratchesIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M14 10L36 22L28 36L6 24L14 10Z" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M6 24L28 36L48 24L26 12L6 24Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5" strokeLinejoin="round" />
+    {/* Multiple scratches */}
+    <line x1="14" y1="16" x2="24" y2="22" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
+    <line x1="20" y1="14" x2="30" y2="20" stroke="#EF4444" strokeWidth="1.75" strokeLinecap="round" />
+    <line x1="18" y1="24" x2="26" y2="28" stroke="#EF4444" strokeWidth="1.75" strokeLinecap="round" />
+  </svg>
+);
+
+export const LaptopDentTopNoneIcon = LaptopBodyNoScratchesIcon;
+
+export const LaptopDentTopMinorIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M14 10L36 22L28 36L6 24L14 10Z" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M6 24L28 36L48 24L26 12L6 24Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5" strokeLinejoin="round" />
+    {/* Minor dent indicator */}
+    <path d="M22 17L25 15L27 18" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="25" cy="16" r="3" fill="#F59E0B" fillOpacity="0.2" />
+  </svg>
+);
+
+export const LaptopDentTopMajorIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <path d="M14 10L36 22L28 36L6 24L14 10Z" fill="#FEF2F2" stroke="#DC2626" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M6 24L28 36L48 24L26 12L6 24Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5" strokeLinejoin="round" />
+    {/* Major dent / bent notch */}
+    <path d="M18 12L22 16L24 11" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="22" cy="14" r="5" fill="#DC2626" fillOpacity="0.25" />
+  </svg>
+);
+
+export const LaptopDentBaseNoneIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="12" y="10" width="40" height="24" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M4 34H60L56 38H8L4 34Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M52 8L53.5 11L56.5 12.5L53.5 14L52 17L50.5 14L47.5 12.5L50.5 11L52 8Z" fill="#10B981" />
+  </svg>
+);
+
+export const LaptopDentBaseMinorIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="12" y="10" width="40" height="24" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M4 34H60L56 38H8L4 34Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    {/* Dent notch on base */}
+    <path d="M26 38L28 35L30 38" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="28" cy="36" r="3" fill="#F59E0B" fillOpacity="0.2" />
+  </svg>
+);
+
+export const LaptopDentBaseMajorIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="12" y="10" width="40" height="24" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M4 34H60L56 38H8L4 34Z" fill="#FEF2F2" stroke="#DC2626" strokeWidth="2" strokeLinejoin="round" />
+    {/* Major dent notch on base */}
+    <path d="M24 38L27 33L31 38" stroke="#DC2626" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="27" cy="35" r="5" fill="#DC2626" fillOpacity="0.25" />
+  </svg>
+);
+
+export const LaptopHingesGoodIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="14" y="8" width="36" height="24" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M6 32H58L54 36H10L6 32Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M50 6L51.5 9L54.5 10.5L51.5 12L50 15L48.5 12L45.5 10.5L48.5 9L50 6Z" fill="#10B981" />
+  </svg>
+);
+
+export const LaptopHingesLooseIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Tilted screen showing wobbly hinge */}
+    <path d="M12 10L46 6L50 30L16 34Z" stroke="#EF4444" strokeWidth="2" fill="#FEF2F2" strokeLinejoin="round" />
+    <path d="M6 34H58L54 38H10L6 34Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    {/* Hinge wobble marks */}
+    <path d="M13 28L9 24M15 32L11 36" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M49 26L53 22M51 30L55 34" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+export const LaptopPanelGoodIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="14" y="8" width="36" height="24" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M6 32H58L54 36H10L6 32Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M50 6L51.5 9L54.5 10.5L51.5 12L50 15L48.5 12L45.5 10.5L48.5 9L50 6Z" fill="#10B981" />
+  </svg>
+);
+
+export const LaptopPanelLooseIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="14" y="8" width="36" height="24" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M6 32H58L54 36H10L6 32Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2" strokeLinejoin="round" />
+    {/* Gap / separation line */}
+    <path d="M8 30L26 27L40 30" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+
+export const LaptopPanelCrackedIcon = ({ className = "w-16 h-12" }) => (
+  <svg viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="14" y="8" width="36" height="24" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M6 32H58L54 36H10L6 32Z" fill="#FEF2F2" stroke="#DC2626" strokeWidth="2" strokeLinejoin="round" />
+    {/* Cracked corner/panel */}
+    <path d="M46 12L40 18L44 24" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M10 32L16 28L14 36" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// ==========================================
 // 8. CASHIFY SMARTPHONE DEFECT & HARDWARE ICONS
 // ==========================================
 

@@ -771,60 +771,164 @@ export function calculatePrice({
 }
 
 
-function getProcessorValuation(processorStr) {
+// ─── PROCESSOR VALUATION & GENERATION SCORING (CASHIFY BENCHMARK) ──────────
+/**
+ * Evaluates processor value by combining CPU family tier (i3/i5/i7/i9/Ryzen/etc.)
+ * and generation era (2nd to 14th Gen / Ultra / M-series).
+ * Baseline is Intel Core i3 - 10th Gen = 0.
+ */
+export function getProcessorScore(procStr) {
+  if (!procStr) return 0;
+  const p = procStr.toLowerCase();
+
+  // 1. Tier Valuation (Relative to Core i3 = 0)
+  let tierVal = 0;
+  if (p.includes('i9') || p.includes('ryzen 9') || p.includes('ultra 9') || p.includes('m3 max') || p.includes('m4 max') || p.includes('m5 max')) {
+    tierVal = 6700; // Flagship
+  } else if (p.includes('i7') || p.includes('ryzen 7') || p.includes('ultra 7') || p.includes('m1 pro') || p.includes('m2 pro') || p.includes('m3 pro') || p.includes('m4 pro')) {
+    tierVal = 3200; // Performance
+  } else if (p.includes('i5') || p.includes('ryzen 5') || p.includes('ultra 5') || p.includes('m1') || p.includes('m2') || p.includes('m3') || p.includes('m4') || p.includes('m5')) {
+    tierVal = 1200; // Mainstream (+1200 over i3)
+  } else if (p.includes('i3') || p.includes('ryzen 3') || p.includes('ultra 3')) {
+    tierVal = 0;    // Baseline
+  } else if (p.includes('celeron') || p.includes('pentium') || p.includes('athlon') || p.includes('a-series') || p.includes('e-series') || p.includes('a4') || p.includes('a6') || p.includes('a8') || p.includes('a10') || p.includes('core 2 duo') || p.includes('core m') || p.includes('atom')) {
+    tierVal = -2000; // Budget / legacy entry
+  }
+
+  // 2. Generation Era Valuation (Relative to 10th Gen = 0)
+  let genVal = 0;
+  const genMatch = p.match(/(\d+)(?:st|nd|rd|th)\s*gen/);
+  let genNum = 10; // Default baseline = 10th Gen
+
+  if (genMatch) {
+    const rawGen = parseInt(genMatch[1], 10);
+    if (p.includes('ryzen')) {
+      // Map Ryzen generations to Intel equivalents:
+      // Ryzen 2nd Gen ≈ 8th Gen, Ryzen 3rd Gen ≈ 10th Gen, Ryzen 4th/5th Gen ≈ 11th Gen, Ryzen 6th/7th Gen ≈ 13th Gen, Ryzen 8th Gen ≈ 14th Gen
+      if (rawGen <= 2) genNum = 8;
+      else if (rawGen === 3) genNum = 10;
+      else if (rawGen === 4 || rawGen === 5) genNum = 11;
+      else if (rawGen === 6 || rawGen === 7) genNum = 13;
+      else genNum = 14;
+    } else {
+      genNum = rawGen;
+    }
+  } else if (p.includes('ultra') || p.includes('series 1') || p.includes('series 2') || p.includes('series 3') || p.includes('elite') || p.includes('ryzen ai')) {
+    genNum = 14;
+  } else if (p.includes('apple m4') || p.includes('apple m5')) {
+    genNum = 14;
+  } else if (p.includes('apple m3')) {
+    genNum = 13;
+  } else if (p.includes('apple m2')) {
+    genNum = 12;
+  } else if (p.includes('apple m1')) {
+    genNum = 11;
+  } else if (p.includes('core 2 duo') || p.includes('atom') || p.includes('e-series') || p.includes('e1') || p.includes('c-60') || p.includes('c-70') || p.includes('brazos')) {
+    genNum = 3;
+  }
+
+  // Map generation number to market value relative to 10th Gen (0):
+  if (genNum >= 14) genVal = 6500;
+  else if (genNum === 13) genVal = 4500;
+  else if (genNum === 12) genVal = 2800;
+  else if (genNum === 11) genVal = 1200;
+  else if (genNum === 10) genVal = 0;       // 10th Gen baseline
+  else if (genNum === 9) genVal = -700;
+  else if (genNum === 8) genVal = -1400;
+  else if (genNum === 7) genVal = -2100;
+  else if (genNum === 6) genVal = -2900;
+  else if (genNum === 5) genVal = -3850;     // 5th Gen: -3,850
+  else if (genNum === 4) genVal = -4700;
+  else if (genNum === 3) genVal = -5500;
+  else if (genNum <= 2) genVal = -6200;
+
+  return tierVal + genVal;
+}
+
+export function getProcessorValuation(processorStr) {
   if (!processorStr) return { base: 2500, increment: 0 };
-  const p = processorStr.toLowerCase();
-
-  const isRyzen = p.includes('ryzen');
-  const isLatest = p.includes('12th') || p.includes('13th') || p.includes('14th') || p.includes('ultra') || p.includes('elite') || p.includes('plus') || p.includes('ryzen 3 6th') || p.includes('ryzen 3 7th') || p.includes('ryzen 3 8th') || p.includes('ryzen 5 6th') || p.includes('ryzen 5 7th') || p.includes('ryzen 5 8th') || p.includes('ryzen 7 6th') || p.includes('ryzen 7 7th') || p.includes('ryzen 7 8th') || p.includes('ryzen 9 6th') || p.includes('ryzen AI') || p.includes('series 1') || p.includes('series 2') || p.includes('series 3');
-
-  const isOlderModern = p.includes('8th') || p.includes('9th') || p.includes('10th') || p.includes('11th') || p.includes('2nd gen') || p.includes('3rd gen') || p.includes('4th gen') || p.includes('5th gen') || (isRyzen && !isLatest);
-
-  // Core i9 / Ryzen 9 / Core Ultra 9 / Snapdragon X Elite
-  if (p.includes('i9') || p.includes('ryzen 9') || p.includes('ultra 9') || p.includes('elite')) {
-    if (isLatest) return { base: 5000, increment: 20000 };
-    if (isOlderModern) return { base: 5000, increment: 10000 };
-    return { base: 2500, increment: 0 };
-  }
-
-  // Core i7 / Ryzen 7 / Core Ultra 7
-  if (p.includes('i7') || p.includes('ryzen 7') || p.includes('ultra 7')) {
-    if (isLatest) return { base: 5000, increment: 14000 };
-    if (isOlderModern) return { base: 5000, increment: 5500 };
-    return { base: 2500, increment: 0 };
-  }
-
-  // Core i5 / Ryzen 5 / Core Ultra 5
-  if (p.includes('i5') || p.includes('ryzen 5') || p.includes('ultra 5')) {
-    if (isLatest) return { base: 5000, increment: 8500 };
-    if (isOlderModern) return { base: 5000, increment: 3500 };
-    return { base: 2500, increment: 0 };
-  }
-
-  // Core i3 / Ryzen 3 / Core Ultra 3
-  if (p.includes('i3') || p.includes('ryzen 3') || p.includes('ultra 3')) {
-    if (isLatest) return { base: 5000, increment: 4500 };
-    if (isOlderModern) return { base: 5000, increment: 1500 };
-    return { base: 2500, increment: 0 };
-  }
-
-  // Default fallbacks for other processors
-  if (isLatest || isOlderModern) {
-    return { base: 5000, increment: 0 };
-  }
-  return { base: 2500, increment: 0 };
+  const score = getProcessorScore(processorStr);
+  const base = score < 0 ? Math.max(1500, 2500 + score) : 2500;
+  const increment = Math.max(0, score);
+  return { base, increment };
 }
 
 export function getProcessorIncrement(processorStr) {
   return getProcessorValuation(processorStr).increment;
 }
 
+export function getCpuBasePrice(procStr) {
+  if (!procStr) return 18200;
+  const p = procStr.toLowerCase();
+
+  // 1. Generation Era Extraction
+  const genMatch = p.match(/(\d+)(?:st|nd|rd|th)\s*gen/);
+  let genNum = 10; // Default baseline = 10th Gen
+
+  if (genMatch) {
+    const rawGen = parseInt(genMatch[1], 10);
+    if (p.includes('ryzen')) {
+      if (rawGen <= 2) genNum = 8;
+      else if (rawGen === 3) genNum = 10;
+      else if (rawGen === 4 || rawGen === 5) genNum = 11;
+      else if (rawGen === 6 || rawGen === 7) genNum = 13;
+      else genNum = 14;
+    } else {
+      genNum = rawGen;
+    }
+  } else if (p.includes('ultra') || p.includes('series 1') || p.includes('series 2') || p.includes('series 3') || p.includes('elite') || p.includes('ryzen ai')) {
+    genNum = 14;
+  } else if (p.includes('apple m4') || p.includes('apple m5')) {
+    genNum = 14;
+  } else if (p.includes('apple m3')) {
+    genNum = 13;
+  } else if (p.includes('apple m2')) {
+    genNum = 12;
+  } else if (p.includes('apple m1')) {
+    genNum = 11;
+  } else if (p.includes('core 2 duo') || p.includes('atom') || p.includes('e-series') || p.includes('e1') || p.includes('c-60') || p.includes('c-70') || p.includes('brazos')) {
+    genNum = 3;
+  }
+
+  // 2. Base value by Generation Era (Calibrated against Core i5 Cashify benchmarks)
+  let genBase = 18200;
+  if (genNum >= 14) genBase = 31180;      // 14th Gen Core i5 (Dell Latitude benchmark: 31,180 + 3,700 = 34,880 -> 26,160)
+  else if (genNum === 13) genBase = 27200;
+  else if (genNum === 12) genBase = 23800;
+  else if (genNum === 11) genBase = 20800;
+  else if (genNum === 10) genBase = 18200;
+  else if (genNum === 9) genBase = 16000;
+  else if (genNum === 8) genBase = 14200;
+  else if (genNum === 7) genBase = 12800;
+  else if (genNum === 6) genBase = 11600;
+  else if (genNum === 5) genBase = 10740;  // 5th Gen Core i5 (HP 15 Series benchmark: 10,740 + 3,700 = 14,440 -> 10,830)
+  else if (genNum === 4) genBase = 9600;
+  else if (genNum === 3) genBase = 8600;
+  else if (genNum <= 2) genBase = 7600;
+
+  // 3. Family Tier Adjustments (Relative to Core i5 = 0)
+  let tierDelta = 0;
+  if (p.includes('i9') || p.includes('ryzen 9') || p.includes('ultra 9') || p.includes('m3 max') || p.includes('m4 max') || p.includes('m5 max')) {
+    tierDelta = genNum >= 12 ? 9500 : 5500;
+  } else if (p.includes('i7') || p.includes('ryzen 7') || p.includes('ultra 7') || p.includes('m1 pro') || p.includes('m2 pro') || p.includes('m3 pro') || p.includes('m4 pro')) {
+    tierDelta = genNum >= 12 ? 4500 : 2500;
+  } else if (p.includes('i5') || p.includes('ryzen 5') || p.includes('ultra 5') || p.includes('m1') || p.includes('m2') || p.includes('m3') || p.includes('m4') || p.includes('m5')) {
+    tierDelta = 0; // i5 is reference
+  } else if (p.includes('i3') || p.includes('ryzen 3') || p.includes('ultra 3')) {
+    tierDelta = genNum >= 12 ? -2500 : (genNum >= 8 ? -1800 : -1200);
+  } else if (p.includes('celeron') || p.includes('pentium') || p.includes('athlon') || p.includes('a-series') || p.includes('e-series') || p.includes('a4') || p.includes('a6') || p.includes('a8') || p.includes('a10') || p.includes('core 2 duo') || p.includes('core m') || p.includes('atom')) {
+    tierDelta = -3500;
+  }
+
+  return Math.max(genBase + tierDelta, 4500);
+}
+
 function getRamIncrement(ramStr) {
   if (!ramStr) return 0;
   const num = parseInt(ramStr) || 0;
-  if (num >= 32) return 5500;
-  if (num >= 16) return 2800;
-  if (num >= 8) return 1200;
+  if (num >= 32) return 6000;
+  if (num >= 16) return 3200;
+  if (num >= 8) return 1500;
   return 0;
 }
 
@@ -851,9 +955,10 @@ function getStorageIncrement(storageStr) {
     val = val * 1024;
   }
 
+  if (val >= 2048) return 8000;
   if (val >= 1024) return 4500;
   if (val >= 512) return 2200;
-  if (val >= 256) return 1000;
+  if (val >= 256) return 1200;
   return 0;
 }
 
@@ -1009,21 +1114,63 @@ export function calculateLaptopPrice(device, selections) {
 
   const defaultScreenDeductions = {
     screen_flawless: 0,
-    screen_scratches_minor: 5,
-    screen_scratches_major: 10,
+    screen_scratches_minor: 4,
+    screen_scratches_major: 8,
     screen_cracked: 25,
     screenCracked: 25,
     screen_discolour_none: 0,
-    screen_discolour_minor: 8,
-    screen_discolour_major: 18,
-    lineDiscolour: 18,
+    screen_discolour_minor: 6,
+    screen_discolour_major: 15,
+    lineDiscolour: 15,
     screen_spots_none: 0,
-    screen_spots_minor: 8,
-    screen_spots_major: 18,
+    screen_spots_minor: 6,
+    screen_spots_major: 15,
     screen_lines_none: 0,
-    screen_lines_visible: 18,
-    screen_lines_flickering: 20,
-    screen_lines_black_dots: 15,
+    screen_lines_visible: 15,
+    screen_lines_flickering: 18,
+    screen_lines_black_dots: 14,
+  };
+
+  const defaultFunctionalDeductions = {
+    keyboard: 7,
+    cdDrive: 5,
+    trackpad: 8,
+    battery: 8,
+    speakers: 4,
+    wifi: 6,
+    ports: 6,
+    webcam: 5,
+    charging: 7,
+    hardDisk: 10,
+    motherboard: 30,
+    bluetooth: 5,
+  };
+
+  const defaultBodyDeductions = {
+    body_scratches_none: 0,
+    body_scratches_minor: 3,
+    body_scratches_major: 6,
+    minorScratch: 3,
+    majorScratch: 6,
+    dent_top_none: 0,
+    dent_top_minor_upto2: 3,
+    dent_top_minor_more2: 6,
+    dent_top_major: 12,
+    minorDentTop: 3,
+    majorDentTop: 12,
+    dent_base_none: 0,
+    dent_base_minor_upto2: 3,
+    dent_base_minor_more2: 6,
+    dent_base_major: 12,
+    minorDentBase: 3,
+    majorDentBase: 12,
+    hinges_none: 0,
+    hinges_loose: 6,
+    looseHinges: 6,
+    panel_none: 0,
+    panel_loose: 6,
+    panel_cracked: 12,
+    panelCracked: 12,
   };
 
   const resolveLaptopDeduction = (group, key, defaultVal = 0) => {
@@ -1061,82 +1208,30 @@ export function calculateLaptopPrice(device, selections) {
   // ── 1. Find base price & apply dynamic configuration deltas (Cashify market standard) ──
   const variantList = device?.variants || [];
 
-  // Check for an exact variant match first
+  // Check for an exact variant match with fully specified hardware (e.g. MacBooks or specific Gaming SKU)
   let exactVariant = variantList.find(v =>
     v.ram && v.storage &&
     v.ram === ram && v.storage === storage &&
-    (!selections.processor || v.processor === selections.processor)
+    v.processor && selections.processor &&
+    v.processor.toLowerCase() === selections.processor.toLowerCase() &&
+    v.basePrice > 0
   );
 
   if (exactVariant && exactVariant.basePrice) {
     basePrice = Number(exactVariant.basePrice);
-  } else if (variantList.length > 0 && variantList[0].basePrice) {
-    const baseline = variantList[0];
-    basePrice = Number(baseline.basePrice);
-
-    // RAM increment (Cashify standard: basic/4GB is baseline, 8GB +1500, 16GB +3200, 32GB +6000)
-    const parseRam = (r) => parseInt(r) || 0;
-    const baseRamNum = baseline.ram ? parseRam(baseline.ram) : 4;
-    const selRamNum = ram ? parseRam(ram) : baseRamNum;
-    if (selRamNum > baseRamNum) {
-      if (selRamNum >= 32) basePrice += 6000;
-      else if (selRamNum >= 16) basePrice += 3200;
-      else if (selRamNum >= 8) basePrice += 1500;
-    }
-
-    // Storage increment (Cashify standard: basic/128GB is baseline, 256GB SSD +1200, 512GB SSD +2200, 1TB SSD +4500)
-    const sStr = (storage || '').toLowerCase();
-    let totalSSDGB = 0;
-    if (sStr.includes('ssd')) {
-      const match = sStr.match(/(\d+)\s*(gb|tb)/);
-      if (match) {
-        const val = parseInt(match[1]);
-        totalSSDGB = match[2] === 'tb' ? val * 1024 : val;
-      }
-    }
-    if (totalSSDGB >= 2048) basePrice += 8000;
-    else if (totalSSDGB >= 1024) basePrice += 4500;
-    else if (totalSSDGB >= 512) basePrice += 2200;
-    else if (totalSSDGB >= 256) basePrice += 1200;
-
-    // Dedicated GPU increment (+4500)
-    if (selections.hasGpu && selections.isGpuWorking) {
-      basePrice += 4500;
-    }
-
-    // Processor upgrade delta over baseline
-    const selProc = selections.processor || '';
-    const baseProc = baseline.processor || device.processorFamily || '';
-    if (selProc && baseProc && selProc.toLowerCase() !== baseProc.toLowerCase()) {
-      const getProcTier = (p) => {
-        const s = p.toLowerCase();
-        if (s.includes('i9') || s.includes('ryzen 9') || s.includes('ultra 9')) return 4;
-        if (s.includes('i7') || s.includes('ryzen 7') || s.includes('ultra 7')) return 3;
-        if (s.includes('i5') || s.includes('ryzen 5') || s.includes('ultra 5')) return 2;
-        if (s.includes('i3') || s.includes('ryzen 3') || s.includes('ultra 3')) return 1;
-        return 1;
-      };
-      const diff = getProcTier(selProc) - getProcTier(baseProc);
-      if (diff > 0) {
-        basePrice += diff * 3500;
-      }
-    }
-  } else if (device?.basePrice) {
-    basePrice = Number(device.basePrice);
   } else {
-    // Fallback if no prices exist in DB
-    const deviceProcessor = device?.generation
-      ? `${device.processorFamily || ''} - ${device.generation}`
-      : (device?.processorFamily || '');
-    const processor = selections.processor || deviceProcessor;
-    const { base: functionalBase, increment: cpuIncrement } = getProcessorValuation(processor);
+    // Dynamic Laptop Hardware Valuation (Cashify Standard):
+    // Computes market value from Processor Generation + RAM + Storage + GPU + Brand/Tier
+    const selProc = selections.processor || (device?.generation ? `${device?.processorFamily || ''} - ${device?.generation}` : device?.processorFamily) || '';
+    const cpuBase = getCpuBasePrice(selProc);
     const ramIncrement = getRamIncrement(ram);
     const storageIncrement = getStorageIncrement(storage);
+    const hasWorkingGpu = selections.gpuStatus ? selections.gpuStatus === 'available' : (selections.hasGpu && selections.isGpuWorking);
+    const gpuIncrement = hasWorkingGpu ? 4500 : 0;
     const screenSizeIncrement = getScreenSizeIncrement(screenSize);
-    const gpuIncrement = getGpuIncrement(selections.hasGpu, selections.isGpuWorking);
-    const componentSum = functionalBase + cpuIncrement + ramIncrement + storageIncrement + gpuIncrement + screenSizeIncrement;
+
     const brandMultiplier = getBrandMultiplier(device);
-    basePrice = Math.round(componentSum * brandMultiplier);
+    basePrice = Math.round((cpuBase + ramIncrement + storageIncrement + gpuIncrement + screenSizeIncrement) * brandMultiplier);
   }
 
   // ── 2. Age multiplier (Cashify ground truth: <1yr: 1.0, 1-3yr: 0.88, >3yr: 0.75) ──
@@ -1160,7 +1255,7 @@ export function calculateLaptopPrice(device, selections) {
   const funcIssues = (functionalIssues || []).filter(i => i !== 'noIssues');
   let totalFuncPct = 0;
   for (const issue of funcIssues) {
-    const pct = resolveLaptopDeduction('functionalDeductions', issue, 0);
+    const pct = resolveLaptopDeduction('functionalDeductions', issue, defaultFunctionalDeductions[issue] ?? 0);
     totalFuncPct += pct;
   }
   functionalDeduction = Math.round(workingBase * (totalFuncPct / 100));
@@ -1181,7 +1276,7 @@ export function calculateLaptopPrice(device, selections) {
   let bodyDeduction = 0;
   let totalBodyPct = 0;
   for (const issue of (bodyIssues || [])) {
-    const pct = resolveLaptopDeduction('bodyDeductions', issue, 0);
+    const pct = resolveLaptopDeduction('bodyDeductions', issue, defaultBodyDeductions[issue] ?? 0);
     totalBodyPct += pct;
   }
   bodyDeduction = Math.round(workingBase * (totalBodyPct / 100));
@@ -1204,9 +1299,9 @@ export function calculateLaptopPrice(device, selections) {
   }
   currentPrice = Math.max(currentPrice - accessoriesDeduction, 0);
 
-  // ── 8. Final price clamping with 5% scrap floor and clean ₹100 rounding ──
+  // ── 8. Final price clamping with 5% scrap floor and clean ₹10 rounding (Cashify standard) ──
   const floorPrice = Math.round(basePrice * 0.05);
-  const finalPrice = Math.max(Math.round(currentPrice / 100) * 100, floorPrice);
+  const finalPrice = Math.max(Math.round(currentPrice / 10) * 10, floorPrice);
 
   return {
     basePrice,
