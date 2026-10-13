@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { deviceService } from '../services/device.service';
 import { quizService } from '../services/quiz.service';
@@ -10,6 +10,14 @@ import Loader from '../components/ui/Loader';
 import LaptopSpecModal from '../components/LaptopSpecModal';
 import EvaluationOtpModal from '../components/quiz/EvaluationOtpModal';
 import { Lock } from 'lucide-react';
+import {
+  CASHIFY_PROCESSORS,
+  CASHIFY_RAM,
+  CASHIFY_HARD_DISK,
+  getValidMacProcessors,
+  getValidMacRam,
+  getValidMacStorage
+} from '../utils/laptopSpecs';
 import {
   KeyboardIcon,
   OpticalDiscIcon,
@@ -197,6 +205,10 @@ export default function LaptopConditionQuizPage() {
 
   const isApple = (brand || '').toLowerCase() === 'apple' || (device?.brand || '').toLowerCase() === 'apple';
 
+  const processorOptions = useMemo(() => CASHIFY_PROCESSORS, []);
+  const ramOptions = useMemo(() => CASHIFY_RAM, []);
+  const hardDiskOptions = useMemo(() => CASHIFY_HARD_DISK, []);
+
   useEffect(() => {
     let isMounted = true;
     quizService.getQuizByCategory('laptop')
@@ -215,31 +227,12 @@ export default function LaptopConditionQuizPage() {
       const dev = res.data;
       setDevice(dev);
       setLoading(false);
-      const devIsApple = (brand || '').toLowerCase() === 'apple' || (dev?.brand || '').toLowerCase() === 'apple';
-      const isBadAppleSpecs = devIsApple && specs && (
-        specs.processor?.includes('Intel Core i3') ||
-        specs.storage?.includes('HDD') ||
-        specs.ram === '4GB' ||
-        specs.ram === '6GB'
-      );
-      if ((!specs || isBadAppleSpecs) && dev) {
+      if (!specs && dev) {
         const defVariant = dev.variants?.[0] || {};
-        const isAir = (dev.modelName || '').toLowerCase().includes('air');
-        const defaultAppleProc = dev.modelName?.includes('2026')
-          ? (isAir ? 'Apple M5' : 'Apple M5 Pro')
-          : dev.modelName?.includes('2025')
-            ? (isAir ? 'Apple M4' : 'Apple M5')
-            : (dev.modelName?.includes('2024') || dev.modelName?.includes('2023') ? 'Apple M3' : 'Apple M2');
-        const defaultAppleRam = (dev.modelName?.includes('2025') || dev.modelName?.includes('2026'))
-          ? '16GB'
-          : '8GB';
-        const defaultAppleStorage = (dev.modelName?.includes('2026') && isAir)
-          ? '512 GB SSD'
-          : '256 GB SSD';
         setSpecs({
-          processor: dev.processorFamily || dev.processor || (devIsApple ? defaultAppleProc : 'Intel Core i5'),
-          ram: defVariant.ram || dev.ram || (devIsApple ? defaultAppleRam : '8 GB'),
-          storage: defVariant.storage || (dev.storage && !dev.storage.includes('HDD') ? dev.storage : (devIsApple ? defaultAppleStorage : '512 GB SSD'))
+          processor: dev.processorFamily || dev.processor || 'Intel Core i3',
+          ram: defVariant.ram || dev.ram || '8 GB',
+          storage: defVariant.storage || dev.storage || '128 GB SSD'
         });
       }
     }).catch(() => setLoading(false));
@@ -592,35 +585,37 @@ export default function LaptopConditionQuizPage() {
               {STEPS[currentStepIndex]?.id === 'specs' && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-black text-[#111827]">2. System Configuration Details</h3>
-                    <p className="text-sm font-medium text-gray-500 mt-1">Confirm your processor, RAM and storage configuration</p>
+                    <h3 className="text-xl font-black text-[#111827]">System Configuration Details</h3>
+                    <p className="text-sm font-medium text-gray-500 mt-1">
+                      Choose your laptop's processor, memory (RAM), and storage configuration from the options below.
+                    </p>
                   </div>
-                  <div className="bg-gray-50 rounded-3xl p-8 space-y-4 mb-6 border border-gray-100">
-                    <div className="flex justify-between items-center border-b border-gray-200/50 pb-3">
-                      <span className="text-sm font-bold text-gray-700">Processor</span>
-                      <span className="text-sm font-black text-gray-900">{specs.processor || 'Standard'}</span>
-                    </div>
-                    {!isApple && (
-                      <div className="flex justify-between items-center border-b border-gray-200/50 pb-3">
-                        <span className="text-sm font-bold text-gray-700">Generation</span>
-                        <span className="text-sm font-black text-gray-900">{specs.generation || 'Standard'}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between items-center border-b border-gray-200/50 pb-3">
-                      <span className="text-sm font-bold text-gray-700">RAM</span>
-                      <span className="text-sm font-black text-gray-900">{specs.ram || 'Standard'}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-bold text-gray-700">Storage</span>
-                      <span className="text-sm font-black text-gray-900">{specs.storage || 'Standard'}</span>
-                    </div>
+
+                  <div className="space-y-5 bg-white p-6 rounded-3xl border border-gray-100 shadow-xs">
+                    <ConfigDropdown
+                      label="Processor"
+                      value={specs?.processor || ''}
+                      options={processorOptions}
+                      placeholder="Select Processor"
+                      onChange={(val) => setSpecs(prev => ({ ...(prev || {}), processor: val }))}
+                    />
+
+                    <ConfigDropdown
+                      label="RAM"
+                      value={specs?.ram || ''}
+                      options={ramOptions}
+                      placeholder="Select RAM"
+                      onChange={(val) => setSpecs(prev => ({ ...(prev || {}), ram: val }))}
+                    />
+
+                    <ConfigDropdown
+                      label="Hard Disk"
+                      value={specs?.storage || ''}
+                      options={hardDiskOptions}
+                      placeholder="Select Hard Disk"
+                      onChange={(val) => setSpecs(prev => ({ ...(prev || {}), storage: val }))}
+                    />
                   </div>
-                  <button
-                    onClick={() => setIsSpecsModalOpen(true)}
-                    className="w-full py-4 border-2 border-gray-200 hover:border-[#087F8C] hover:bg-[#E8F6F7] hover:text-[#087F8C] rounded-2xl text-sm font-black text-gray-700 transition-all cursor-pointer"
-                  >
-                    Modify Specifications
-                  </button>
                 </div>
               )}
 
@@ -1156,7 +1151,7 @@ export default function LaptopConditionQuizPage() {
                     }
                     className="btn-gradient text-white font-bold px-8 py-4 rounded-xl transition-all disabled:opacity-50 cursor-pointer shadow-md shadow-[#087F8C]/15"
                   >
-                    Next Step →
+                    Continue →
                   </button>
                 ) : (
                   <button
@@ -1205,9 +1200,9 @@ export default function LaptopConditionQuizPage() {
 
                 <div className="space-y-5">
                   <SummaryItem label="Power Status" value={powerStatus ? (powerStatus === 'on' ? 'Turns On' : 'Does Not Turn On') : '-'} active={powerStatus !== null} />
-                  <SummaryItem label="Processor" value={specs.processor || '-'} active={true} />
-                  <SummaryItem label="RAM" value={specs.ram || '-'} active={true} />
-                  <SummaryItem label="Storage" value={specs.storage || '-'} active={true} />
+                  <SummaryItem label="Processor" value={specs?.processor || '-'} active={true} />
+                  <SummaryItem label="RAM" value={specs?.ram || '-'} active={true} />
+                  <SummaryItem label="Hard Disk" value={specs?.storage || '-'} active={true} />
                   <SummaryItem label="Screen Size" value={screenSize ? SCREEN_SIZE_OPTIONS.find(o => o.key === screenSize)?.label : '-'} active={screenSize !== null} />
                   {!isApple && (
                     <SummaryItem
@@ -1341,6 +1336,98 @@ function SummaryItem({ label, value, active }) {
         <div className={`w-2 h-2 rounded-full ${active ? 'bg-[#087F8C]' : 'bg-gray-300'}`} />
         <p className={`text-[13px] font-bold ${active ? 'text-gray-800' : 'text-gray-500'}`}>{value}</p>
       </div>
+    </div>
+  );
+}
+
+function ConfigDropdown({ label, value, options, onChange, placeholder = 'Select...' }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  const filtered = options.filter(opt =>
+    opt.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-2 relative" ref={dropdownRef}>
+      <label className="block text-sm font-bold text-gray-800">{label}</label>
+      <button
+        type="button"
+        onClick={() => { setIsOpen(!isOpen); setSearch(''); }}
+        className="w-full bg-white border border-gray-200 hover:border-[#087F8C] rounded-2xl px-5 py-4 text-left flex items-center justify-between transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-[#087F8C]/20 cursor-pointer"
+      >
+        <span className={`text-base font-semibold ${value ? 'text-gray-900' : 'text-gray-400'}`}>
+          {value || placeholder}
+        </span>
+        <svg
+          className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#087F8C]' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+          {options.length > 8 && (
+            <div className="p-3 border-b border-gray-100 bg-gray-50/70">
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder={`Search ${label}...`}
+                className="w-full px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl outline-none focus:border-[#087F8C] focus:ring-1 focus:ring-[#087F8C] text-gray-800"
+                autoFocus
+              />
+            </div>
+          )}
+          <div className="max-h-60 overflow-y-auto py-1 divide-y divide-gray-50">
+            {filtered.length > 0 ? (
+              filtered.map(opt => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-5 py-3 text-sm font-semibold transition-colors flex items-center justify-between cursor-pointer ${
+                    opt === value
+                      ? 'bg-[#E8F6F7] text-[#087F8C] font-bold'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <span>{opt}</span>
+                  {opt === value && (
+                    <svg className="w-4 h-4 text-[#087F8C] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              ))
+            ) : (
+              <div className="p-4 text-center text-xs text-gray-400 font-bold uppercase tracking-wider">
+                No matching options
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
