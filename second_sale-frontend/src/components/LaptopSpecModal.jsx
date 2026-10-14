@@ -104,7 +104,6 @@ export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, i
             
             <OverlayList 
               type={openDropdown}
-              isMac={isMac}
               device={device}
               selectedProcessor={selectedProcessor}
               onSelect={(val) => handleSelect(openDropdown, val)}
@@ -146,7 +145,7 @@ function SpecSelect({ label, value, disabled, setOpen }) {
   );
 }
 
-function OverlayList({ type, isMac, device, selectedProcessor, onSelect }) {
+function OverlayList({ type, device, selectedProcessor, onSelect }) {
   const [search, setSearch] = useState('');
   
   let options = [];
