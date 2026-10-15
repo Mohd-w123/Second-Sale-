@@ -40,7 +40,7 @@ export default function TvConditionQuizPage() {
   const [doesTvSwitchOn, setDoesTvSwitchOn] = useState(true);
   const [displayType, setDisplayType] = useState('led');
   const [smartTv, setSmartTv] = useState('smart_android');
-  const [resolution, setResolution] = useState('4k');
+  const [resolution, setResolution] = useState('fhd');
   const [screenCondition, setScreenCondition] = useState('flawless');
   const [physicalCondition, setPhysicalCondition] = useState('flawless');
 
@@ -48,7 +48,7 @@ export default function TvConditionQuizPage() {
   const [functionalDefects, setFunctionalDefects] = useState([]);
 
   // Step 3: Accessories & Documents
-  const [accessories, setAccessories] = useState(['remote', 'power_cable', 'stand', 'box', 'bill']);
+  const [accessories, setAccessories] = useState(['remote', 'power_cable', 'stand']);
 
   // Step 4: TV Age
   const [tvAge, setTvAge] = useState('1_to_3_years');
@@ -452,39 +452,38 @@ export default function TvConditionQuizPage() {
           {currentStep === 0 && (
             <div className="space-y-7 animate-fadeIn">
               <div>
-                <span className="text-xs font-bold text-[#087F8C] uppercase tracking-wider">
-                  Step 1 of 4 • Device Details
-                </span>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
-                  Tell us a few things about your TV
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  Tell us a few things about your device!
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Check the mentioned display specifications and physical condition
+                  Check mentioned parameters for device.
                 </p>
               </div>
 
               {/* 1. Does TV Switch On */}
               <div className="space-y-2.5">
                 <label className="block text-sm font-bold text-slate-900">
-                  1. Does the Television switch on and display normally?
+                  Does the Television switch on?
                 </label>
+                <p className="text-xs text-slate-500">
+                  We currently only accept devices that switch on
+                </p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { val: true, label: "Yes", sub: "Powers on & boots to home screen" },
-                    { val: false, label: "No", sub: "Dead, does not turn on or blank" }
+                    { val: true, label: "Yes" },
+                    { val: false, label: "No" }
                   ].map(item => (
                     <button
                       key={String(item.val)}
                       type="button"
                       onClick={() => setDoesTvSwitchOn(item.val)}
-                      className={`p-3.5 rounded-xl border-2 text-left transition ${
+                      className={`py-4 px-5 rounded-2xl border-2 text-center transition cursor-pointer font-bold text-sm ${
                         doesTvSwitchOn === item.val
-                          ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-sm font-bold text-slate-900 block">{item.label}</span>
-                      <span className="text-xs text-slate-500 mt-0.5 block">{item.sub}</span>
+                      {item.label}
                     </button>
                   ))}
                 </div>
@@ -493,27 +492,29 @@ export default function TvConditionQuizPage() {
               {/* 2. Display Type */}
               <div className="space-y-2.5">
                 <label className="block text-sm font-bold text-slate-900">
-                  2. Display Technology
+                  Display Type
                 </label>
+                <p className="text-xs text-slate-500">
+                  Select the display type of your TV
+                </p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { id: 'led', label: 'LED', sub: 'Standard LED backlight' },
-                    { id: 'qled', label: 'QLED', sub: 'Quantum Dot panel' },
-                    { id: 'oled', label: 'OLED', sub: 'Self-lit organic pixels' },
-                    { id: 'lcd', label: 'LCD', sub: 'Older CCFL display' },
+                    { id: 'lcd', label: 'LCD' },
+                    { id: 'led', label: 'LED' },
+                    { id: 'qled', label: 'QLED' },
+                    { id: 'oled', label: 'OLED' },
                   ].map(item => (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setDisplayType(item.id)}
-                      className={`p-3.5 rounded-xl border-2 text-left transition ${
+                      className={`py-4 px-4 rounded-2xl border-2 text-center transition cursor-pointer font-bold text-sm ${
                         displayType === item.id
-                          ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-sm font-bold text-slate-900 block">{item.label}</span>
-                      <span className="text-[11px] text-slate-500 mt-0.5 block">{item.sub}</span>
+                      {item.label}
                     </button>
                   ))}
                 </div>
@@ -522,26 +523,28 @@ export default function TvConditionQuizPage() {
               {/* 3. Smart TV */}
               <div className="space-y-2.5">
                 <label className="block text-sm font-bold text-slate-900">
-                  3. Smart Television Operating System
+                  Smart Television
                 </label>
+                <p className="text-xs text-slate-500">
+                  Is your TV smart? If yes, kindly check for the OS installed
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { id: 'smart_android', label: 'Yes - Android / Google TV', sub: 'Google Play Store & built-in Chromecast' },
-                    { id: 'smart_non_android', label: 'Yes - Non Android', sub: 'Samsung Tizen, LG webOS, etc.' },
-                    { id: 'non_smart', label: 'No (Standard TV)', sub: 'Requires set-top box or firestick' },
+                    { id: 'smart_android', label: 'Yes-Android' },
+                    { id: 'smart_non_android', label: 'Yes-Non Android' },
+                    { id: 'non_smart', label: 'No' },
                   ].map(item => (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setSmartTv(item.id)}
-                      className={`p-3.5 rounded-xl border-2 text-left transition ${
+                      className={`py-4 px-4 rounded-2xl border-2 text-center transition cursor-pointer font-bold text-sm ${
                         smartTv === item.id
-                          ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-sm font-bold text-slate-900 block">{item.label}</span>
-                      <span className="text-[11px] text-slate-500 mt-0.5 block">{item.sub}</span>
+                      {item.label}
                     </button>
                   ))}
                 </div>
@@ -550,27 +553,29 @@ export default function TvConditionQuizPage() {
               {/* 4. Resolution */}
               <div className="space-y-2.5">
                 <label className="block text-sm font-bold text-slate-900">
-                  4. Television Resolution
+                  Television Resolution
                 </label>
+                <p className="text-xs text-slate-500">
+                  Select the resolution of your TV
+                </p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { id: '4k', label: 'Ultra HD 4K', sub: '3840 x 2160' },
-                    { id: 'fhd', label: 'Full HD', sub: '1920 x 1080' },
-                    { id: 'hd_ready', label: 'HD Ready', sub: '1366 x 768' },
-                    { id: '8k', label: 'Ultra HD 8K', sub: '7680 x 4320' },
+                    { id: 'hd_ready', label: 'HD Ready' },
+                    { id: 'fhd', label: 'Full HD' },
+                    { id: '4k', label: 'Ultra HD 4K' },
+                    { id: '8k', label: 'Ultra HD 8K' },
                   ].map(item => (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setResolution(item.id)}
-                      className={`p-3.5 rounded-xl border-2 text-left transition ${
+                      className={`py-4 px-4 rounded-2xl border-2 text-center transition cursor-pointer font-bold text-sm ${
                         resolution === item.id
-                          ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-sm font-bold text-slate-900 block">{item.label}</span>
-                      <span className="text-[11px] text-slate-500 mt-0.5 block">{item.sub}</span>
+                      {item.label}
                     </button>
                   ))}
                 </div>
@@ -579,26 +584,28 @@ export default function TvConditionQuizPage() {
               {/* 5. Screen Condition */}
               <div className="space-y-2.5">
                 <label className="block text-sm font-bold text-slate-900">
-                  5. Screen Condition
+                  Screen Condition
                 </label>
+                <p className="text-xs text-slate-500">
+                  Check device's screen for line(s), dot(s) and/or crack(s)
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { id: 'flawless', label: 'Flawless', sub: 'Clean display, zero spots, lines or cracks' },
-                    { id: 'lines_dots', label: 'Screen Lines / Dots', sub: '1 or 2 visible lines or color spots' },
-                    { id: 'cracked', label: 'Screen Broken / Cracked', sub: 'Cracked glass, black ink bleed, or broken matrix' },
+                    { id: 'flawless', label: 'Flawless' },
+                    { id: 'lines_dots', label: 'Screen Lines/Dots' },
+                    { id: 'cracked', label: 'Screen Broken/Cracked' },
                   ].map(item => (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setScreenCondition(item.id)}
-                      className={`p-3.5 rounded-xl border-2 text-left transition ${
+                      className={`py-4 px-4 rounded-2xl border-2 text-center transition cursor-pointer font-bold text-sm ${
                         screenCondition === item.id
-                          ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-sm font-bold text-slate-900 block">{item.label}</span>
-                      <span className="text-[11px] text-slate-500 mt-0.5 block">{item.sub}</span>
+                      {item.label}
                     </button>
                   ))}
                 </div>
@@ -607,26 +614,28 @@ export default function TvConditionQuizPage() {
               {/* 6. Physical Condition */}
               <div className="space-y-2.5">
                 <label className="block text-sm font-bold text-slate-900">
-                  6. Physical Body Condition
+                  Physical Condition
                 </label>
+                <p className="text-xs text-slate-500">
+                  Check device's body for scratch(es), dent(s) and/or crack(s)
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { id: 'flawless', label: 'Flawless', sub: 'Pristine bezel and back chassis' },
-                    { id: 'scratches', label: 'Scratches on Frame', sub: 'Minor normal wear and scuffs on body' },
-                    { id: 'dented_cracked', label: 'Dented / Cracked Body', sub: 'Deep dents, broken back cover or chipped frame' },
+                    { id: 'flawless', label: 'Flawless' },
+                    { id: 'scratches', label: 'Scratches' },
+                    { id: 'dented_cracked', label: 'Dented/Cracked' },
                   ].map(item => (
                     <button
                       key={item.id}
                       type="button"
                       onClick={() => setPhysicalCondition(item.id)}
-                      className={`p-3.5 rounded-xl border-2 text-left transition ${
+                      className={`py-4 px-4 rounded-2xl border-2 text-center transition cursor-pointer font-bold text-sm ${
                         physicalCondition === item.id
-                          ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-sm font-bold text-slate-900 block">{item.label}</span>
-                      <span className="text-[11px] text-slate-500 mt-0.5 block">{item.sub}</span>
+                      {item.label}
                     </button>
                   ))}
                 </div>
@@ -652,10 +661,10 @@ export default function TvConditionQuizPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {[
                   { id: 'button_faulty', label: 'Button not working', sub: 'TV physical power/volume buttons loose or faulty', icon: PowerButtonIcon },
-                  { id: 'port_faulty', label: 'USB / HDMI Port not working', sub: 'HDMI 1/2 or USB ports not detecting devices', icon: UsbPortIcon },
-                  { id: 'speaker_faulty', label: 'Speaker faulty / cracked sound', sub: 'Distorted audio, crackling sound, or no output', icon: SpeakerIcon },
+                  { id: 'port_faulty', label: 'USB/HDMI Port not working', sub: 'HDMI 1/2 or USB ports not detecting devices', icon: UsbPortIcon },
+                  { id: 'speaker_faulty', label: 'Speaker is faulty/cracked sound', sub: 'Distorted audio, crackling sound, or no output', icon: SpeakerIcon },
                   { id: 'bluetooth_faulty', label: 'Bluetooth is faulty', sub: 'Cannot connect wireless headphones or soundbar', icon: BluetoothIcon },
-                  { id: 'wifi_faulty', label: 'Wi-Fi is faulty', sub: 'Cannot connect to home Wi-Fi network or drops connection', icon: WifiSignalIcon },
+                  { id: 'wifi_faulty', label: 'Wifi is faulty', sub: 'Cannot connect to home Wi-Fi network or drops connection', icon: WifiSignalIcon },
                 ].map(item => {
                   const Icon = item.icon;
                   const isChecked = functionalDefects.includes(item.id);
@@ -719,11 +728,11 @@ export default function TvConditionQuizPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {[
-                  { id: 'remote', label: 'Original TV Remote Controller', sub: 'Working original remote with all buttons' },
-                  { id: 'power_cable', label: 'Power Cable / Cord(s)', sub: 'Original power cable and adapter' },
-                  { id: 'stand', label: 'Default Stand (Table Legs/Base)', sub: 'Original TV desk stand base or feet' },
-                  { id: 'box', label: 'Box (With Same Serial No)', sub: 'Original packaging box' },
-                  { id: 'bill', label: 'Valid Purchase Bill (With Serial No)', sub: 'GST bill or invoice with serial number' },
+                  { id: 'remote', label: 'Original Remote', sub: 'Original remote controller in working condition' },
+                  { id: 'power_cable', label: 'Power Cable/Cord(s)', sub: 'Original power cable and adapter' },
+                  { id: 'stand', label: 'Default Stand', sub: 'Original TV desk stand base or feet' },
+                  { id: 'box', label: 'Box (With Same Serial No)', sub: 'Original manufacturer packaging box' },
+                  { id: 'bill', label: 'Bill (With Same Serial No)', sub: 'Valid purchase bill / invoice matching serial number' },
                 ].map(item => {
                   const isChecked = accessories.includes(item.id);
                   return (
@@ -775,7 +784,7 @@ export default function TvConditionQuizPage() {
               <div className="space-y-3">
                 {[
                   { id: 'less_than_1', label: 'Less than 1 year (in warranty)', sub: 'Device under official manufacturer warranty with valid bill' },
-                  { id: '1_to_3_years', label: 'Between 1 - 3 years', sub: 'Device is out of manufacturer warranty' },
+                  { id: '1_to_3_years', label: 'Between 1-3 years', sub: 'Device is out of manufacturer warranty' },
                   { id: 'more_than_3_years', label: 'More than 3 years', sub: 'Older model with standard market age deduction' },
                 ].map(item => (
                   <button
