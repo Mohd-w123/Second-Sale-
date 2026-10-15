@@ -7,19 +7,46 @@ import SEOHead from "../components/seo/SEOHead";
 import { Tv, Search, ShieldCheck, Zap, Truck } from "lucide-react";
 
 export const TV_BRANDS_CONFIG = [
-  { name: "Samsung", logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg", color: "#1428a0" },
-  { name: "LG", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bf/LG_logo_%282015%29.svg", color: "#a50034" },
-  { name: "Sony", logo: "https://upload.wikimedia.org/wikipedia/commons/c/ca/Sony_logo.svg", color: "#000000" },
-  { name: "Xiaomi", logo: "https://upload.wikimedia.org/wikipedia/commons/2/29/Xiaomi_logo.svg", color: "#ff6700" },
-  { name: "OnePlus", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f8/OP_LU_Reg_1L_RGB_red_pos.svg", color: "#eb0028" },
-  { name: "TCL", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b3/TCL_Technology_Logo.svg", color: "#e2001a" },
-  { name: "Vu", logo: "https://upload.wikimedia.org/wikipedia/commons/e/e0/Vu_Televisions_Logo.png", color: "#111111" },
-  { name: "Haier", logo: "https://upload.wikimedia.org/wikipedia/commons/2/27/Haier_logo.svg", color: "#005aab" },
-  { name: "Motorola", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Motorola_new_logo.svg", color: "#00142e" },
-  { name: "Sansui", logo: "https://upload.wikimedia.org/wikipedia/commons/0/07/Sansui_logo.svg", color: "#d90000" },
+  { name: "Xiaomi", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/cb96df6e-080f.jpg?w=200", color: "#ff6700" },
+  { name: "Samsung", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/406a512d-e8dd.jpg?w=200", color: "#1428a0" },
+  { name: "OnePlus", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/dfb6c340-010f.jpg?w=200", color: "#eb0028" },
+  { name: "Motorola", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/1dcd7fda-0141.jpg?w=200", color: "#00142e" },
+  { name: "Nokia", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/fef4e5ae-6507.jpg?w=200", color: "#124191" },
+  { name: "Sony", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/125aada5-a86f.jpg?w=200", color: "#000000" },
+  { name: "Micromax", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/7bdd775a-6d1e.jpg?w=200", color: "#f26522" },
+  { name: "Haier", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/01475b30-dee9.jpg?w=200", color: "#005aab" },
+  { name: "LG", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/bdbdc48e-dd24.jpg?w=200", color: "#a50034" },
+  { name: "Onida", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/ea1c6af5-ea74.jpg?w=200", color: "#c8102e" },
+  { name: "Videocon", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/573595fe96088.jpg?w=200", color: "#5bb846" },
+  { name: "Sansui", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/fd603226-dbe3.jpg?w=200", color: "#d90000" },
+  { name: "Philips", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/9535df81-5a3c.jpg?w=200", color: "#0b5ed7" },
+  { name: "Panasonic", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/45cf78a0-601e.jpg?w=200", color: "#004098" },
+  { name: "Toshiba", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/99979e7c-a3e1.jpg?w=200", color: "#e60012" },
+  { name: "Intex", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/7d38aacc-176b.jpg?w=200", color: "#d2232a" },
+  { name: "TCL", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/986f2bc3-7006.jpg?w=200", color: "#e2001a" },
+  { name: "Vu", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/35534ab1-0483.jpg?w=200", color: "#111111" },
+  { name: "BPL", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/865e9527-9762.jpg?w=200", color: "#004797" },
+  { name: "Hisense", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/9497e5b1-ecc6.jpg?w=200", color: "#009999" },
+  { name: "AOC", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/f18f9a96-c06e.jpg?w=200", color: "#00205b" },
+  { name: "Belco", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/b5fea7ce-e15a.jpg?w=200", color: "#437e29" },
+  { name: "Bravieo", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/92f89616-1fb7.jpg?w=200", color: "#1a1a1a" },
+  { name: "Blaupunkt", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/8dc6c085-2250.jpg?w=200", color: "#003b7a" },
+  { name: "Kodak", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/c521bcd2-e3a5.jpg?w=200", color: "#ffb81c" },
+  { name: "Lloyd", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/fea79b86-cb5f.jpg?w=200", color: "#005baa" },
+  { name: "iFFalcon", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/4698e113-166c.jpg?w=200", color: "#ff4500" },
+  { name: "Thomson", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/dc594838-2bcc.jpg?w=200", color: "#e30613" },
+  { name: "Sanyo", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/4583ab70-38df.jpg?w=200", color: "#e2001a" },
+  { name: "Polaroid", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/421353a5-6332.jpg?w=200", color: "#ff6f00" },
+  { name: "Oscar", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/fb01ac20-e308.jpg?w=200", color: "#222222" },
+  { name: "Noble", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/02faaba1-c0e8.jpg?w=200", color: "#1a1a1a" },
+  { name: "Mitashi", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/e397c364-739c.jpg?w=200", color: "#006699" },
+  { name: "Weston", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/ffb71bdf-f731.jpg?w=200", color: "#c00000" },
+  { name: "Coocaa", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/f4a76556-8fe1.jpg?w=200", color: "#ff6600" },
+  { name: "MarQ", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/6e2f36d5-bf81.jpg?w=200", color: "#2874f0" },
+  { name: "InFocus", logo: "https://s3ng.cashify.in/cashify/brand/img/xhdpi/913e8e55-6051.jpg?w=200", color: "#1e398b" }
 ];
 
-const TV_BRAND_ORDER = ["Samsung", "LG", "Sony", "Xiaomi", "OnePlus", "TCL", "Vu", "Haier", "Motorola", "Sansui"];
+const TV_BRAND_ORDER = TV_BRANDS_CONFIG.map(b => b.name);
 
 const sortBrands = (brandsList) => {
   return [...brandsList].sort((a, b) => {
@@ -134,7 +161,7 @@ export default function TvBrandSelectionPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-5">
           {filteredBrands.map((b) => {
             const brandName = b.brand || b.name;
             const logoUrl = b.logo || getBrandLogo(brandName);

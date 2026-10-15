@@ -27,7 +27,26 @@ export default function TvModelSelectionPage() {
       });
   }, [brand]);
 
-  const filtered = models.filter(m =>
+  const SIZE_ORDER = [
+    "24 to 32",
+    "33 to 40",
+    "41 to 50",
+    "51 to 60",
+    "61 to 70",
+    "71 to 80",
+    "above 80"
+  ];
+
+  const sortedModels = [...models].sort((a, b) => {
+    const aIdx = SIZE_ORDER.findIndex(s => a.modelName.toLowerCase().includes(s));
+    const bIdx = SIZE_ORDER.findIndex(s => b.modelName.toLowerCase().includes(s));
+    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+    if (aIdx !== -1) return -1;
+    if (bIdx !== -1) return 1;
+    return a.modelName.localeCompare(b.modelName);
+  });
+
+  const filtered = sortedModels.filter(m =>
     m.modelName.toLowerCase().includes(search.toLowerCase())
   );
 
