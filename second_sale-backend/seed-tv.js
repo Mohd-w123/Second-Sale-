@@ -23,26 +23,26 @@ const TV_BRANDS = [
 ];
 
 const SIZE_TIERS = [
-  { name: "24 to 32 inches TV", slugSuffix: "24-to-32-inches-tv", baseMultiplier: 1.0, basePrice: 6500 },
-  { name: "33 to 40 inches TV", slugSuffix: "33-to-40-inches-tv", baseMultiplier: 1.5, basePrice: 10500 },
-  { name: "41 to 50 inches TV", slugSuffix: "41-to-50-inches-tv", baseMultiplier: 2.2, basePrice: 17500 },
-  { name: "51 to 60 inches TV", slugSuffix: "51-to-60-inches-tv", baseMultiplier: 3.2, basePrice: 28000 },
-  { name: "61 to 70 inches TV", slugSuffix: "61-to-70-inches-tv", baseMultiplier: 4.8, basePrice: 45000 },
-  { name: "71 to 80 inches TV", slugSuffix: "71-to-80-inches-tv", baseMultiplier: 7.0, basePrice: 75000 },
-  { name: "Above 80 inches TV", slugSuffix: "above-80-inches-tv", baseMultiplier: 11.0, basePrice: 125000 },
+  { name: "24 to 32 inches TV", slugSuffix: "24-to-32-inches-tv", basePrice: 3990 },
+  { name: "33 to 40 inches TV", slugSuffix: "33-to-40-inches-tv", basePrice: 5990 },
+  { name: "41 to 50 inches TV", slugSuffix: "41-to-50-inches-tv", basePrice: 8280 },
+  { name: "51 to 60 inches TV", slugSuffix: "51-to-60-inches-tv", basePrice: 9900 },
+  { name: "61 to 70 inches TV", slugSuffix: "61-to-70-inches-tv", basePrice: 11790 },
+  { name: "71 to 80 inches TV", slugSuffix: "71-to-80-inches-tv", basePrice: 12780 },
+  { name: "Above 80 inches TV", slugSuffix: "above-80-inches-tv", basePrice: 16500 },
 ];
 
-// Brand price weight multiplier (Sony/Samsung/LG carry higher resale value)
+// Brand price weight multiplier (Calibrated to Cashify live TV getUpTo catalog)
 const BRAND_MULTIPLIERS = {
-  Sony: 1.35,
-  Samsung: 1.25,
-  LG: 1.20,
-  OnePlus: 1.10,
-  Xiaomi: 1.0,
-  TCL: 0.95,
-  Vu: 0.90,
-  Motorola: 0.90,
-  Haier: 0.85,
+  Samsung: 1.0,     // Samsung 41-50" = ₹8,280 (Cashify exact benchmark)
+  LG: 0.99,          // LG 41-50" = ₹8,190 (Cashify exact benchmark)
+  Sony: 0.97,        // Sony 41-50" = ₹8,010 (Cashify exact benchmark)
+  OnePlus: 0.95,
+  Xiaomi: 0.92,
+  TCL: 0.88,
+  Vu: 0.85,
+  Motorola: 0.85,
+  Haier: 0.82,
   Sansui: 0.80,
 };
 
@@ -75,7 +75,9 @@ async function seedTVs() {
       for (const tier of SIZE_TIERS) {
         const modelName = `${b.name} ${tier.name}`;
         const slug = `${b.name.toLowerCase()}-${tier.slugSuffix}`;
-        const calculatedPrice = Math.round((tier.basePrice * bMult) / 100) * 100;
+        const calculatedPrice = bMult === 1.0
+          ? tier.basePrice
+          : Math.round((tier.basePrice * bMult) / 10) * 10;
 
         tvDevices.push({
           category: "tv",
