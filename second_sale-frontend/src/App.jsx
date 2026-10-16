@@ -227,6 +227,17 @@ function App() {
           <Route path="/repair/:brand" element={<RepairBrandPage />} />
           <Route path="/repair/:brand/:model" element={<RepairModelPage />} />
 
+          {/* Cashify-compatible Repair Service Direct Routes */}
+          <Route path="/screen-repair" element={<RepairLandingPage defaultService="screen" />} />
+          <Route path="/battery-repair" element={<RepairLandingPage defaultService="battery" />} />
+          <Route path="/camera-repair" element={<RepairLandingPage defaultService="back_camera" />} />
+          <Route path="/front-camera-repair" element={<RepairLandingPage defaultService="front_camera" />} />
+          <Route path="/charging-jack-repair" element={<RepairLandingPage defaultService="charging_jack" />} />
+          <Route path="/mic-repair" element={<RepairLandingPage defaultService="mic" />} />
+          <Route path="/speaker-repair" element={<RepairLandingPage defaultService="speaker" />} />
+          <Route path="/receiver-repair" element={<RepairLandingPage defaultService="receiver" />} />
+          <Route path="/back-panel-repair" element={<RepairLandingPage defaultService="back_panel" />} />
+
           {/* Buy Refurbished Flow (Cashify-style) */}
           <Route path="/buy-refurbished" element={<RefurbishedCatalogPage />} />
           <Route path="/buy-refurbished/product/:slug" element={<RefurbishedProductDetailPage />} />

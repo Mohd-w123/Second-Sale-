@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { REPAIR_BRANDS, REPAIR_SERVICE_TYPES } from '../../data/repairData';
 
 const HOW_IT_WORKS = [
@@ -63,12 +63,21 @@ const SERVICE_ICON_MAP = {
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
     </svg>
   ),
+  back_panel: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
+      <rect x="2" y="4" width="20" height="16" rx="3"/><path d="M8 4v16"/>
+    </svg>
+  ),
 };
 
-export default function RepairLandingPage() {
+export default function RepairLandingPage({ defaultService = null }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentServiceParam = searchParams.get('service') || defaultService || null;
+
+  const [selectedService, setSelectedService] = useState(currentServiceParam);
+  const [brandSearch, setBrandSearch] = useState('');
   const [isVisible, setIsVisible] = useState(false);
   const [brands, setBrands] = useState(REPAIR_BRANDS);
 
@@ -83,27 +92,59 @@ export default function RepairLandingPage() {
     document.title = 'Mobile Repair Service | Doorstep Repair | SecondSale';
     setTimeout(() => setIsVisible(true), 100);
 
-    // Automatically redirect/scroll straight to the repair brands selection section
-    const scrollTimer = setTimeout(() => {
-      scrollToBrands(false);
-    }, 180);
+    // Only scroll if a service is specifically targeted in URL or props
+    if (currentServiceParam) {
+      const scrollTimer = setTimeout(() => {
+        scrollToBrands(false);
+      }, 250);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [currentServiceParam]);
 
+  useEffect(() => {
     const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
     fetch(`${API_BASE}/repairs/brands`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          setBrands(data);
+          // Merge with REPAIR_BRANDS logos if logo is missing
+          const merged = data.map(b => {
+            const staticMatch = REPAIR_BRANDS.find(sb => sb.slug === b.slug || sb.id === b.slug);
+            return {
+              ...b,
+              logo: b.logo || staticMatch?.logo,
+              color: b.color || staticMatch?.color,
+            };
+          });
+          setBrands(merged);
         }
       })
       .catch(err => console.warn('Using default repair brands:', err));
+  }, []);
 
-    return () => clearTimeout(scrollTimer);
-  }, [location.pathname, location.hash]);
+  const handleServiceClick = (serviceId) => {
+    if (selectedService === serviceId) {
+      setSelectedService(null);
+      setSearchParams({}, { replace: true });
+    } else {
+      setSelectedService(serviceId);
+      setSearchParams({ service: serviceId }, { replace: true });
+      scrollToBrands(false);
+    }
+  };
 
   const handleBrandClick = (brand) => {
-    navigate(`/repair/${brand.slug || brand.id}`);
+    const brandSlug = brand.slug || brand.id;
+    const query = selectedService ? `?service=${selectedService}` : '';
+    navigate(`/repair/${brandSlug}${query}`);
   };
+
+  const activeServiceMeta = REPAIR_SERVICE_TYPES.find(s => s.id === selectedService);
+
+  const filteredBrands = brands.filter(b => {
+    if (!brandSearch.trim()) return true;
+    return b.name.toLowerCase().includes(brandSearch.toLowerCase().trim());
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -137,7 +178,7 @@ export default function RepairLandingPage() {
                 ))}
               </div>
               <button
-                onClick={() => { const el = document.getElementById('brand-section'); el?.scrollIntoView({ behavior: 'smooth' }); }}
+                onClick={() => scrollToBrands(false)}
                 className="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold text-base px-7 py-3.5 rounded-2xl shadow-xl transition-all duration-200 hover:scale-105 cursor-pointer"
               >
                 Book Repair Now
@@ -158,71 +199,168 @@ export default function RepairLandingPage() {
         </div>
       </div>
 
-      {/* ── Services Strip ───────────────────────────────────────── */}
-      <div className="bg-gray-50 border-b border-gray-100">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-1 h-5 rounded-full" style={{ background: '#087F8C' }} />
-            <h2 className="text-base font-bold text-gray-800">Services Available</h2>
+      {/* ── Services Strip (Clickable Cashify Flow) ───────────────── */}
+      <div className="bg-gray-50 border-b border-gray-100 sticky top-0 z-20 shadow-xs backdrop-blur-md bg-gray-50/95">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-5">
+          <div className="flex items-center justify-between mb-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-5 rounded-full" style={{ background: '#087F8C' }} />
+              <h2 className="text-sm sm:text-base font-bold text-gray-800">Services Available</h2>
+              <span className="text-xs text-gray-400 hidden sm:inline">(Click a service to view phone brands)</span>
+            </div>
+            {selectedService && (
+              <button
+                onClick={() => {
+                  setSelectedService(null);
+                  setSearchParams({}, { replace: true });
+                }}
+                className="text-xs font-bold text-[#087F8C] hover:text-red-500 transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <span>✕</span> Clear Filter
+              </button>
+            )}
           </div>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
-            {REPAIR_SERVICE_TYPES.map(svc => (
-              <div key={svc.id} className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl border border-gray-100 hover:border-[#087F8C] hover:shadow-sm transition-all duration-200 cursor-pointer group">
-                <div className="text-[#087F8C] group-hover:scale-110 transition-transform duration-200">
-                  {SERVICE_ICON_MAP[svc.id] || <span className="text-2xl">{svc.icon}</span>}
-                </div>
-                <span className="text-xs font-semibold text-gray-700 text-center leading-tight">{svc.label}</span>
-              </div>
-            ))}
+          <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2.5">
+            {REPAIR_SERVICE_TYPES.map(svc => {
+              const isSelected = selectedService === svc.id;
+              return (
+                <button
+                  key={svc.id}
+                  onClick={() => handleServiceClick(svc.id)}
+                  title={`Select ${svc.label}`}
+                  className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-200 cursor-pointer group text-left relative ${
+                    isSelected
+                      ? 'bg-[#E8F6F7] border-[#087F8C] shadow-sm ring-2 ring-[#087F8C]/20 -translate-y-0.5'
+                      : 'bg-white border-gray-200/80 hover:border-[#087F8C] hover:shadow-sm hover:-translate-y-0.5'
+                  }`}
+                >
+                  {isSelected && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#087F8C] text-white rounded-full flex items-center justify-center text-[10px] font-black shadow-xs">
+                      ✓
+                    </span>
+                  )}
+                  <div className={`transition-transform duration-200 group-hover:scale-110 ${isSelected ? 'text-[#087F8C]' : 'text-gray-600 group-hover:text-[#087F8C]'}`}>
+                    {SERVICE_ICON_MAP[svc.id] || <span className="text-2xl">{svc.icon}</span>}
+                  </div>
+                  <span className={`text-[11px] sm:text-xs font-semibold text-center leading-tight line-clamp-2 ${isSelected ? 'text-[#087F8C] font-bold' : 'text-gray-700'}`}>
+                    {svc.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* ── Select Brand ─────────────────────────────────────────── */}
-      <div id="brand-section" className="scroll-mt-20 sm:scroll-mt-24 max-w-[1200px] mx-auto px-4 sm:px-8 py-12 sm:py-16">
-        <div className="text-center mb-10">
+      <div id="brand-section" className="scroll-mt-20 sm:scroll-mt-24 max-w-[1200px] mx-auto px-4 sm:px-8 py-10 sm:py-14">
+        {/* Active Service Banner (Cashify-style context) */}
+        {activeServiceMeta && (
+          <div className="mb-8 bg-gradient-to-r from-[#E8F6F7] via-[#F0FAFB] to-[#E8F6F7] border-2 border-[#087F8C]/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-fadeIn">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-[#087F8C] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                {SERVICE_ICON_MAP[activeServiceMeta.id] || <span className="text-2xl">{activeServiceMeta.icon}</span>}
+              </div>
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#087F8C]">
+                  <span className="w-2 h-2 rounded-full bg-[#087F8C] animate-ping" />
+                  Selected Repair Service
+                </div>
+                <h3 className="text-base sm:text-lg font-extrabold text-gray-900">{activeServiceMeta.label}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{activeServiceMeta.description} • Choose your phone brand below</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setSelectedService(null);
+                setSearchParams({}, { replace: true });
+              }}
+              className="text-xs font-bold text-gray-600 hover:text-red-600 px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-red-50 hover:border-red-200 transition-colors self-start sm:self-center cursor-pointer"
+            >
+              Change / View All Services
+            </button>
+          </div>
+        )}
+
+        <div className="text-center mb-8">
           <span className="inline-block bg-[#E8F6F7] text-[#087F8C] text-xs font-bold tracking-wider uppercase px-3.5 py-1.5 rounded-full mb-3">
             Step 1
           </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">Select Your Phone Brand</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">Select Your Phone Brand</h2>
           <p className="text-gray-500 text-sm max-w-md mx-auto">
-            Choose your phone brand to see available models and repair pricing.
+            {activeServiceMeta 
+              ? `Select phone brand to view models with ${activeServiceMeta.label} pricing`
+              : 'Choose your phone brand to see available models and repair pricing.'}
           </p>
+
+          {/* Quick Brand Search */}
+          <div className="mt-5 max-w-md mx-auto relative">
+            <input
+              type="text"
+              placeholder="Search brand (e.g. Apple, Samsung, OnePlus, Vivo)..."
+              value={brandSearch}
+              onChange={e => setBrandSearch(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-[#087F8C] transition-all"
+            />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            {brandSearch && (
+              <button
+                onClick={() => setBrandSearch('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
-          {brands.map(brand => (
+        {filteredBrands.length === 0 ? (
+          <div className="bg-gray-50 rounded-2xl p-10 text-center border border-gray-200 max-w-md mx-auto">
+            <p className="text-sm font-bold text-gray-600">No brand found matching "{brandSearch}"</p>
             <button
-              key={brand.slug || brand.id}
-              onClick={() => handleBrandClick(brand)}
-              className="group flex flex-col items-center gap-3 bg-white rounded-2xl border-2 border-gray-100 p-5 sm:p-6 transition-all duration-200 hover:border-[#087F8C] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(8,127,140,0.15)] cursor-pointer"
+              onClick={() => setBrandSearch('')}
+              className="mt-2 text-xs font-bold text-[#087F8C] hover:underline cursor-pointer"
             >
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gray-50/80 border border-gray-100 p-2.5 flex items-center justify-center overflow-hidden group-hover:scale-110 group-hover:bg-white group-hover:shadow-md transition-all duration-200 flex-shrink-0">
-                {brand.logo ? (
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="w-full h-full object-contain"
-                    onError={e => {
-                      e.currentTarget.style.display = 'none';
-                      if (e.currentTarget.parentElement) {
-                        e.currentTarget.parentElement.innerText = brand.name?.[0] || '📱';
-                      }
-                    }}
-                  />
-                ) : (
-                  <span className="text-xl font-black text-gray-500">{brand.name?.[0] || '📱'}</span>
-                )}
-              </div>
-              <div className="text-center">
-                <p className="text-sm sm:text-base font-bold text-gray-900">{brand.name}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {brand.modelCount ? `${brand.modelCount} Models` : 'Repair Available'}
-                </p>
-              </div>
+              Clear search
             </button>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-5">
+            {filteredBrands.map(brand => (
+              <button
+                key={brand.slug || brand.id}
+                onClick={() => handleBrandClick(brand)}
+                className="group flex flex-col items-center gap-3 bg-white rounded-2xl border-2 border-gray-100 p-5 sm:p-6 transition-all duration-200 hover:border-[#087F8C] hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(8,127,140,0.15)] cursor-pointer text-center"
+              >
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gray-50/80 border border-gray-100 p-2.5 flex items-center justify-center overflow-hidden group-hover:scale-110 group-hover:bg-white group-hover:shadow-md transition-all duration-200 flex-shrink-0">
+                  {brand.logo ? (
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="w-full h-full object-contain"
+                      onError={e => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.parentElement) {
+                          e.currentTarget.parentElement.innerText = brand.name?.[0] || '📱';
+                        }
+                      }}
+                    />
+                  ) : (
+                    <span className="text-xl font-black text-gray-500">{brand.name?.[0] || '📱'}</span>
+                  )}
+                </div>
+                <div className="text-center">
+                  <p className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-[#087F8C] transition-colors">{brand.name}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {brand.modelCount ? `${brand.modelCount} Models` : 'Repair Available'}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── How It Works ─────────────────────────────────────────── */}
