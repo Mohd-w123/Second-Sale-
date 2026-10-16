@@ -1,6 +1,6 @@
 /**
  * Gaming Console Price Calculator
- * Matches DeviceKart's sequential percentage deduction & bonus engine (Yv model)
+ * Matches Cashify live deduction & bonus matrix
  */
 export const GAMING_PERCENTAGES = {
   powerOn: {
@@ -8,32 +8,33 @@ export const GAMING_PERCENTAGES = {
   },
   bodyCondition: {
     flawless: 0,
-    good: 5,
-    average: 17,
-    broken: 40,
+    good: 20.93, // Yields exact ₹15,300 on ₹19,350 PS4 base
+    average: 30,
+    broken: 50,
+    below_average: 50,
   },
   functionalIssues: {
     cd_drive: 15,
     usb_ports: 10,
     hdmi_port: 20,
     lan_port: 5,
-    bluetooth: 39,
-    wifi: 39,
+    bluetooth: 10,
+    wifi: 15,
   },
   accessories: {
-    controller: 10,
-    adapter: 3,
-    box: 5,
+    controller: 15,
+    adapter: 5,
+    box: 3,
     bill: 0,
-    extraController: -3, // -3% Bonus
+    extraController: -5, // -5% Bonus
   },
   gameCds: {
     0: 0,
-    1: -1, // -1% Bonus
-    2: -2, // -2% Bonus
-    3: -3, // -3% Bonus
-    4: -4, // -4% Bonus
-    5: -5, // -5% Bonus
+    1: -2, // -2% Bonus
+    2: -4, // -4% Bonus
+    3: -6, // -6% Bonus
+    4: -8, // -8% Bonus
+    5: -10, // -10% Bonus
   }
 };
 
@@ -137,7 +138,7 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {}, qui
       const p = resolveDeduction('accessories', 'bill', GAMING_PERCENTAGES.accessories.bill);
       applyDeduction(p, 'Missing Valid Bill');
     }
-    if (extraController) applyDeduction(GAMING_PERCENTAGES.accessories.extraController, 'Extra Controller Included (+3% Bonus)');
+    if (extraController) applyDeduction(GAMING_PERCENTAGES.accessories.extraController, 'Extra Controller Included (+5% Bonus)');
   }
 
   // 5. Game CDs
@@ -149,8 +150,8 @@ export function calculateGamingPrice({ basePrice, answers = {}, device = {}, qui
     }
   }
 
-  totalDeductionPct = Math.min(totalDeductionPct, 88);
-  const floorPrice = Math.round(numericBase * 0.05);
+  totalDeductionPct = Math.min(totalDeductionPct, 90);
+  const floorPrice = Math.round(numericBase * 0.10);
   const rawFinal = Math.max(numericBase * (1 - totalDeductionPct / 100), floorPrice);
   const finalPrice = Math.round(rawFinal / 10) * 10;
 

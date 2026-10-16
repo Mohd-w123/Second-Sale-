@@ -41,7 +41,7 @@ export default function EarbudsConditionQuizPage() {
     connectivityIssues: "no",  // "yes" | "no"
     physicalIssues: "no",      // "yes" | "no"
     accessoriesAvailable: "yes", // "yes" | "no"
-    age: "Below 6 Months"      // "Below 6 Months" | "6 to 11 Months" | "Above 11 Months"
+    age: "Below 3 Months"      // "Below 3 Months" | "3 to 6 Months" | "6 to 11 Months" | "Above 11 Months"
   });
 
   const [showResult, setShowResult] = useState(false);
@@ -147,9 +147,15 @@ export default function EarbudsConditionQuizPage() {
   // Age Options on Step 2 (Matching Cashify Live)
   const AGE_OPTIONS = [
     {
-      value: "Below 6 Months",
-      title: "Below 6 Months",
-      desc: "Device is under 6 months old with valid bill / invoice.",
+      value: "Below 3 Months",
+      title: "Below 3 Months",
+      desc: "Device is under 3 months old with valid bill / invoice.",
+      badge: "Brand Warranty"
+    },
+    {
+      value: "3 to 6 Months",
+      title: "3 to 6 Months",
+      desc: "Device is between 3 to 6 months old with valid bill.",
       badge: "Brand Warranty"
     },
     {

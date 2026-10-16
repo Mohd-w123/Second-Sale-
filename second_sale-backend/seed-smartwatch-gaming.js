@@ -18,7 +18,7 @@ const SMARTWATCH_MODELS = [
     slug: "apple-watch-ultra-2",
     imageUrl: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ultra-band-unselect-gallery-1-202409?wid=800&hei=800&fmt=jpeg&qlt=90",
     description: "Sell your Apple Watch Ultra 2 online with SecondSale. Instant quote & free doorstep pickup.",
-    variants: [{ storage: "49mm", basePrice: 38000 }],
+    variants: [{ storage: "49mm", basePrice: 39500 }],
     isActive: true,
   },
   {
@@ -28,7 +28,7 @@ const SMARTWATCH_MODELS = [
     slug: "apple-watch-series-10",
     imageUrl: "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/s10-case-unselect-gallery-1-202409?wid=800&hei=800&fmt=jpeg&qlt=90",
     description: "Sell your Apple Watch Series 10 online with SecondSale. Highest buyback price.",
-    variants: [{ storage: "46mm", basePrice: 28000 }, { storage: "42mm", basePrice: 25000 }],
+    variants: [{ storage: "46mm", basePrice: 28500 }, { storage: "42mm", basePrice: 25500 }],
     isActive: true,
   },
   {
@@ -38,7 +38,7 @@ const SMARTWATCH_MODELS = [
     slug: "apple-watch-series-9",
     imageUrl: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/s9-case-unselect-gallery-1-202309?wid=800&hei=800&fmt=jpeg&qlt=90",
     description: "Sell your Apple Watch Series 9 online with SecondSale.",
-    variants: [{ storage: "45mm", basePrice: 22000 }, { storage: "41mm", basePrice: 19500 }],
+    variants: [{ storage: "45mm", basePrice: 18200 }, { storage: "41mm", basePrice: 16500 }],
     isActive: true,
   },
   {
@@ -48,7 +48,7 @@ const SMARTWATCH_MODELS = [
     slug: "apple-watch-ultra",
     imageUrl: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MQDY3?wid=800&hei=800&fmt=jpeg&qlt=90",
     description: "Sell your Apple Watch Ultra online with SecondSale.",
-    variants: [{ storage: "49mm", basePrice: 25000 }],
+    variants: [{ storage: "49mm", basePrice: 26500 }],
     isActive: true,
   },
   {
@@ -58,7 +58,7 @@ const SMARTWATCH_MODELS = [
     slug: "apple-watch-series-8",
     imageUrl: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MP6V3?wid=800&hei=800&fmt=jpeg&qlt=90",
     description: "Sell your Apple Watch Series 8 online with SecondSale.",
-    variants: [{ storage: "45mm", basePrice: 17000 }, { storage: "41mm", basePrice: 15000 }],
+    variants: [{ storage: "45mm", basePrice: 15800 }, { storage: "41mm", basePrice: 14200 }],
     isActive: true,
   },
   {
@@ -68,7 +68,7 @@ const SMARTWATCH_MODELS = [
     slug: "apple-watch-se-2nd-gen",
     imageUrl: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MP7G3?wid=800&hei=800&fmt=jpeg&qlt=90",
     description: "Sell your Apple Watch SE 2nd Gen online with SecondSale.",
-    variants: [{ storage: "44mm", basePrice: 12000 }, { storage: "40mm", basePrice: 10500 }],
+    variants: [{ storage: "44mm", basePrice: 11500 }, { storage: "40mm", basePrice: 10200 }],
     isActive: true,
   },
   {
@@ -78,7 +78,7 @@ const SMARTWATCH_MODELS = [
     slug: "apple-watch-series-7",
     imageUrl: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MKUQ3?wid=800&hei=800&fmt=jpeg&qlt=90",
     description: "Sell your Apple Watch Series 7 online with SecondSale.",
-    variants: [{ storage: "45mm", basePrice: 13500 }, { storage: "41mm", basePrice: 11500 }],
+    variants: [{ storage: "45mm", basePrice: 13000 }, { storage: "41mm", basePrice: 11500 }],
     isActive: true,
   },
 
@@ -90,7 +90,7 @@ const SMARTWATCH_MODELS = [
     slug: "oneplus-watch-2",
     imageUrl: "https://fdn2.gsmarena.com/vv/bigpic/oneplus-watch-2r.jpg",
     description: "Sell your OnePlus Watch 2 with Wear OS and dual-engine architecture online.",
-    variants: [{ storage: "46mm", basePrice: 12500 }],
+    variants: [{ storage: "46mm", basePrice: 12800 }],
     isActive: true,
   },
   {
@@ -100,7 +100,7 @@ const SMARTWATCH_MODELS = [
     slug: "oneplus-watch-2r",
     imageUrl: "https://fdn2.gsmarena.com/vv/bigpic/oneplus-watch-2r.jpg",
     description: "Sell your lightweight OnePlus Watch 2R online with SecondSale.",
-    variants: [{ storage: "46mm", basePrice: 9200 }],
+    variants: [{ storage: "46mm", basePrice: 9500 }],
     isActive: true,
   },
   {
@@ -132,7 +132,7 @@ const SMARTWATCH_MODELS = [
     slug: "samsung-galaxy-watch-ultra",
     imageUrl: "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-watch-ultra.jpg",
     description: "Sell your rugged Samsung Galaxy Watch Ultra online with SecondSale.",
-    variants: [{ storage: "47mm", basePrice: 28000 }],
+    variants: [{ storage: "47mm", basePrice: 29500 }],
     isActive: true,
   },
   {
@@ -142,7 +142,7 @@ const SMARTWATCH_MODELS = [
     slug: "samsung-galaxy-watch-7",
     imageUrl: "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-watch7.jpg",
     description: "Sell your Samsung Galaxy Watch 7 with Galaxy AI online.",
-    variants: [{ storage: "44mm", basePrice: 16000 }, { storage: "40mm", basePrice: 14000 }],
+    variants: [{ storage: "44mm", basePrice: 16500 }, { storage: "40mm", basePrice: 14500 }],
     isActive: true,
   },
   {
@@ -152,7 +152,7 @@ const SMARTWATCH_MODELS = [
     slug: "samsung-galaxy-watch-6-classic",
     imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2307/gallery/in-galaxy-watch6-classic-47mm-r965-sm-r965fzkainu-537406214?$650_519_PNG$",
     description: "Sell your Samsung Galaxy Watch 6 Classic online with SecondSale.",
-    variants: [{ storage: "47mm", basePrice: 14000 }, { storage: "43mm", basePrice: 12000 }],
+    variants: [{ storage: "47mm", basePrice: 14500 }, { storage: "43mm", basePrice: 12500 }],
     isActive: true,
   },
   {
@@ -162,7 +162,7 @@ const SMARTWATCH_MODELS = [
     slug: "samsung-galaxy-watch-6",
     imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2307/gallery/in-galaxy-watch6-44mm-r945-sm-r945fzkainu-537405908?$650_519_PNG$",
     description: "Sell your Samsung Galaxy Watch 6 online with SecondSale.",
-    variants: [{ storage: "44mm", basePrice: 11000 }, { storage: "40mm", basePrice: 9500 }],
+    variants: [{ storage: "44mm", basePrice: 11500 }, { storage: "40mm", basePrice: 9800 }],
     isActive: true,
   },
   {
@@ -172,7 +172,7 @@ const SMARTWATCH_MODELS = [
     slug: "samsung-galaxy-watch-5-pro",
     imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2208/gallery/in-galaxy-watch5-pro-45mm-r925-sm-r925fzkainu-533190827?$650_519_PNG$",
     description: "Sell your Samsung Galaxy Watch 5 Pro online with SecondSale.",
-    variants: [{ storage: "45mm", basePrice: 10500 }],
+    variants: [{ storage: "45mm", basePrice: 10800 }],
     isActive: true,
   },
   {
@@ -182,7 +182,7 @@ const SMARTWATCH_MODELS = [
     slug: "samsung-galaxy-watch-5",
     imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2208/gallery/in-galaxy-watch5-44mm-r910-sm-r910nzsainu-533190479?$650_519_PNG$",
     description: "Sell your Samsung Galaxy Watch 5 online with SecondSale.",
-    variants: [{ storage: "44mm", basePrice: 8000 }, { storage: "40mm", basePrice: 7000 }],
+    variants: [{ storage: "44mm", basePrice: 8200 }, { storage: "40mm", basePrice: 7200 }],
     isActive: true,
   },
   {
@@ -192,7 +192,7 @@ const SMARTWATCH_MODELS = [
     slug: "samsung-galaxy-watch-4",
     imageUrl: "https://images.samsung.com/is/image/samsung/p6pim/in/2108/gallery/in-galaxy-watch4-44mm-r870-sm-r870nzsainu-488691167?$650_519_PNG$",
     description: "Sell your Samsung Galaxy Watch 4 online with SecondSale.",
-    variants: [{ storage: "44mm", basePrice: 5500 }, { storage: "40mm", basePrice: 4500 }],
+    variants: [{ storage: "44mm", basePrice: 5600 }, { storage: "40mm", basePrice: 4600 }],
     isActive: true,
   },
 
@@ -204,7 +204,7 @@ const SMARTWATCH_MODELS = [
     slug: "google-pixel-watch-3",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Google_Pixel_Watch_2%2C_shown_in_Shibuya_Stream.jpg/800px-Google_Pixel_Watch_2%2C_shown_in_Shibuya_Stream.jpg",
     description: "Sell your Google Pixel Watch 3 with Actua display and Fitbit readiness online.",
-    variants: [{ storage: "45mm", basePrice: 21000 }, { storage: "41mm", basePrice: 18500 }],
+    variants: [{ storage: "45mm", basePrice: 21500 }, { storage: "41mm", basePrice: 19000 }],
     isActive: true,
   },
   {
@@ -214,7 +214,7 @@ const SMARTWATCH_MODELS = [
     slug: "google-pixel-watch-2",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Google_Pixel_Watch_2%2C_shown_in_Shibuya_Stream.jpg/800px-Google_Pixel_Watch_2%2C_shown_in_Shibuya_Stream.jpg",
     description: "Sell your Google Pixel Watch 2 with cEDA sensor online with SecondSale.",
-    variants: [{ storage: "41mm", basePrice: 13500 }],
+    variants: [{ storage: "41mm", basePrice: 13800 }],
     isActive: true,
   },
   {
@@ -224,7 +224,7 @@ const SMARTWATCH_MODELS = [
     slug: "google-pixel-watch-1st-gen",
     imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Google_Pixel_Watch_-_1.jpg/800px-Google_Pixel_Watch_-_1.jpg",
     description: "Sell your original Google Pixel Watch online with SecondSale.",
-    variants: [{ storage: "41mm", basePrice: 8500 }],
+    variants: [{ storage: "41mm", basePrice: 8800 }],
     isActive: true,
   },
 ];
@@ -234,11 +234,11 @@ const GAMING_MODELS = [
   {
     category: "gaming",
     brand: "Sony",
-    modelName: "PlayStation 5 Pro",
-    slug: "sony-playstation-5-pro",
-    imageUrl: "https://gmedia.playstation.com/is/image/SIEPDC/ps5-product-thumbnail-01-en-14sep21?$facebook$",
-    description: "Sell your PlayStation 5 Pro with upgraded GPU and AI upscaling online.",
-    variants: [{ storage: "2TB Digital Edition", basePrice: 48000 }],
+    modelName: "PlayStation 5 Slim",
+    slug: "sony-playstation-5-slim",
+    imageUrl: "https://gmedia.playstation.com/is/image/SIEPDC/ps5-slim-disc-console-product-shot-01-en-24nov23?$facebook$",
+    description: "Sell your Sony PS5 Slim online with SecondSale.",
+    variants: [{ storage: "1TB Disc Edition", basePrice: 48750 }, { storage: "1TB Digital Edition", basePrice: 41500 }],
     isActive: true,
   },
   {
@@ -249,16 +249,6 @@ const GAMING_MODELS = [
     imageUrl: "https://gmedia.playstation.com/is/image/SIEPDC/ps5-product-thumbnail-01-en-14sep21?$facebook$",
     description: "Sell your Sony PlayStation 5 console online. Highest cash quote, doorstep pickup.",
     variants: [{ storage: "Disc Edition", basePrice: 38250 }, { storage: "Digital Edition", basePrice: 32500 }],
-    isActive: true,
-  },
-  {
-    category: "gaming",
-    brand: "Sony",
-    modelName: "PlayStation 5 Slim",
-    slug: "sony-playstation-5-slim",
-    imageUrl: "https://gmedia.playstation.com/is/image/SIEPDC/ps5-slim-disc-console-product-shot-01-en-24nov23?$facebook$",
-    description: "Sell your Sony PS5 Slim online with SecondSale.",
-    variants: [{ storage: "1TB Disc Edition", basePrice: 41250 }, { storage: "1TB Digital Edition", basePrice: 35000 }],
     isActive: true,
   },
   {
@@ -278,7 +268,7 @@ const GAMING_MODELS = [
     slug: "sony-playstation-4-slim",
     imageUrl: "https://gmedia.playstation.com/is/image/SIEPDC/ps4-slim-image-block-01-en-24jul20?$facebook$",
     description: "Sell your Sony PS4 Slim online with SecondSale.",
-    variants: [{ storage: "1TB", basePrice: 17550 }, { storage: "500GB", basePrice: 15500 }],
+    variants: [{ storage: "1TB", basePrice: 19350 }, { storage: "500GB", basePrice: 16800 }],
     isActive: true,
   },
   {
@@ -288,7 +278,17 @@ const GAMING_MODELS = [
     slug: "sony-playstation-4",
     imageUrl: "https://m.media-amazon.com/images/I/71Pg8i9kZzL._SL1500_.jpg",
     description: "Sell your Sony PlayStation 4 online with SecondSale.",
-    variants: [{ storage: "500GB", basePrice: 15950 }],
+    variants: [{ storage: "1TB", basePrice: 17200 }, { storage: "500GB", basePrice: 15950 }],
+    isActive: true,
+  },
+  {
+    category: "gaming",
+    brand: "Sony",
+    modelName: "PlayStation 3 Slim",
+    slug: "sony-playstation-3-slim",
+    imageUrl: "https://m.media-amazon.com/images/I/71Pg8i9kZzL._SL1500_.jpg",
+    description: "Sell your Sony PlayStation 3 Slim console online with SecondSale.",
+    variants: [{ storage: "320GB", basePrice: 4500 }],
     isActive: true,
   },
 
@@ -300,7 +300,7 @@ const GAMING_MODELS = [
     slug: "microsoft-xbox-series-x",
     imageUrl: "https://compass-ssl.xbox.com/assets/f0/85/f085223c-ecd9-42b7-8d02-a7f45dbb6a03.png?n=Xbox-Series-X_Hero-Mobile_02_767x767.png",
     description: "Sell your Xbox Series X online with SecondSale.",
-    variants: [{ storage: "1TB", basePrice: 34500 }],
+    variants: [{ storage: "1TB", basePrice: 36500 }],
     isActive: true,
   },
   {
@@ -310,7 +310,7 @@ const GAMING_MODELS = [
     slug: "microsoft-xbox-series-s",
     imageUrl: "https://compass-ssl.xbox.com/assets/26/ba/26ba6981-d144-4828-b99b-efb2b2b19cf3.png?n=Xbox-Series-S_Hero-Mobile_02_767x767.png",
     description: "Sell your Xbox Series S online with SecondSale.",
-    variants: [{ storage: "1TB Carbon Black", basePrice: 22000 }, { storage: "512GB", basePrice: 18500 }],
+    variants: [{ storage: "1TB Carbon Black", basePrice: 24000 }, { storage: "512GB", basePrice: 19500 }],
     isActive: true,
   },
   {
@@ -320,7 +320,7 @@ const GAMING_MODELS = [
     slug: "microsoft-xbox-one-x",
     imageUrl: "https://m.media-amazon.com/images/I/61-qvS2yQAL._SL1000_.jpg",
     description: "Sell your Xbox One X online with SecondSale.",
-    variants: [{ storage: "1TB", basePrice: 14500 }],
+    variants: [{ storage: "1TB", basePrice: 15500 }],
     isActive: true,
   },
   {
@@ -330,7 +330,7 @@ const GAMING_MODELS = [
     slug: "microsoft-xbox-one-s",
     imageUrl: "https://compass-ssl.xbox.com/assets/f0/85/f085223c-ecd9-42b7-8d02-a7f45dbb6a03.png?n=Xbox-Series-X_Hero-Mobile_02_767x767.png",
     description: "Sell your Xbox One S console online with SecondSale.",
-    variants: [{ storage: "1TB", basePrice: 11500 }, { storage: "500GB", basePrice: 9800 }],
+    variants: [{ storage: "1TB", basePrice: 12800 }, { storage: "500GB", basePrice: 10500 }],
     isActive: true,
   },
 ];

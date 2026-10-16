@@ -129,43 +129,9 @@ export default function GamingConditionQuizPage() {
       ]
     },
     {
-      id: "bodyCondition",
-      stepNum: 2,
-      title: "Chassis & Casing",
-      question: "Select Body Condition of your Console",
-      desc: "Check outer faceplates, ventilation grilles, and stand attachments.",
-      type: "chassis_cards",
-      options: [
-        {
-          id: "flawless",
-          title: "Flawless / Like New",
-          desc: "Pristine console casing, zero scratches or scuffs, vents completely clean.",
-          badge: "Best Value",
-          badgeColor: "bg-emerald-500 text-white",
-          icon: ConsoleChassisFlawlessIcon
-        },
-        {
-          id: "average",
-          title: "Minor Wear / Scratches",
-          desc: "Light surface scratches or scuffs on outer plates from normal usage.",
-          badge: "Normal Wear",
-          badgeColor: "bg-amber-500 text-white",
-          icon: ConsoleChassisScratchedIcon
-        },
-        {
-          id: "broken",
-          title: "Broken / Heavy Dents",
-          desc: "Cracked faceplate, broken ventilation grills, or deep impact marks.",
-          badge: "Heavy Damage",
-          badgeColor: "bg-red-500 text-white",
-          icon: ConsoleChassisDamagedIcon
-        }
-      ]
-    },
-    {
       id: "functionalIssues",
-      stepNum: 3,
-      title: "Hardware Functional Issues",
+      stepNum: 2,
+      title: "Functional Condition",
       question: "Select Functional Issues with your Console",
       desc: "Tap all hardware components that are faulty. If everything works normally, simply click Continue.",
       type: "functional_cards",
@@ -180,7 +146,7 @@ export default function GamingConditionQuizPage() {
     },
     {
       id: "accessories",
-      stepNum: 4,
+      stepNum: 3,
       title: "Original Accessories",
       question: "Which Original Accessories do you have?",
       desc: "Original wireless controllers and cables increase your cash payout.",
@@ -190,23 +156,65 @@ export default function GamingConditionQuizPage() {
         { id: "adapter", label: "Power & HDMI Cables", icon: ConsolePowerCableIcon },
         { id: "box", label: "Original Brand Box", icon: BoxPackagingIcon },
         { id: "bill", label: "Valid Bill / Invoice", icon: BillDocumentIcon },
-        { id: "extraController", label: "Extra Controller (+3% Bonus)", icon: ConsoleControllerIcon, isBonus: true }
+        { id: "extraController", label: "Extra Controller (+5% Bonus)", icon: ConsoleControllerIcon, isBonus: true }
       ]
     },
     {
       id: "gameCds",
-      stepNum: 5,
+      stepNum: 4,
       title: "Original Game CDs",
       question: "How many Original Game CDs are you selling with the console?",
       desc: "Genuine game discs add bonus value directly to your quote.",
       type: "cds_selector",
       options: [
         { id: "0", label: "No Game CDs", bonus: "0%" },
-        { id: "1", label: "1 Original Game CD", bonus: "+1% Cash Bonus" },
-        { id: "2", label: "2 Original Game CDs", bonus: "+2% Cash Bonus" },
-        { id: "3", label: "3 Original Game CDs", bonus: "+3% Cash Bonus" },
-        { id: "4", label: "4 Original Game CDs", bonus: "+4% Cash Bonus" },
-        { id: "5", label: "5+ Original Game CDs", bonus: "+5% Cash Bonus" }
+        { id: "1", label: "1 Original Game CD", bonus: "+2% Cash Bonus" },
+        { id: "2", label: "2 Original Game CDs", bonus: "+4% Cash Bonus" },
+        { id: "3", label: "3 Original Game CDs", bonus: "+6% Cash Bonus" },
+        { id: "4", label: "4 Original Game CDs", bonus: "+8% Cash Bonus" },
+        { id: "5", label: "5+ Original Game CDs", bonus: "+10% Cash Bonus" }
+      ]
+    },
+    {
+      id: "bodyCondition",
+      stepNum: 5,
+      title: "Physical Condition",
+      question: "Select Body Condition of your Console",
+      desc: "Check outer faceplates, ventilation grilles, and cosmetic finish.",
+      type: "chassis_cards",
+      options: [
+        {
+          id: "flawless",
+          title: "Flawless / Like New",
+          desc: "Pristine console casing, zero scratches or scuffs, vents completely clean.",
+          badge: "Flawless",
+          badgeColor: "bg-emerald-500 text-white",
+          icon: ConsoleChassisFlawlessIcon
+        },
+        {
+          id: "good",
+          title: "Good Condition",
+          desc: "Minor normal wear, 1-2 light scratches, casing intact without cracks.",
+          badge: "Good",
+          badgeColor: "bg-blue-500 text-white",
+          icon: ConsoleChassisFlawlessIcon
+        },
+        {
+          id: "average",
+          title: "Minor Wear / Scratches",
+          desc: "Light surface scratches or scuffs on outer plates from normal usage.",
+          badge: "Average",
+          badgeColor: "bg-amber-500 text-white",
+          icon: ConsoleChassisScratchedIcon
+        },
+        {
+          id: "broken",
+          title: "Broken / Heavy Dents",
+          desc: "Cracked faceplate, broken ventilation grills, or deep impact marks.",
+          badge: "Heavy Damage",
+          badgeColor: "bg-red-500 text-white",
+          icon: ConsoleChassisDamagedIcon
+        }
       ]
     }
   ];
@@ -540,9 +548,9 @@ export default function GamingConditionQuizPage() {
                 </div>
               )}
 
-              {/* Step 2: Chassis Cards */}
+              {/* Chassis / Body Condition Cards */}
               {currentStep.type === "chassis_cards" && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {currentStep.options.map(opt => {
                     const IconComp = opt.icon;
                     const isSelected = answers.bodyCondition === opt.id;

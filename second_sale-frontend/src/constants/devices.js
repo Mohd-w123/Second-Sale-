@@ -103,10 +103,12 @@ export const TABLET_BRANDS = [
 
 export const EARBUDS_BRANDS = [
   { name: "Apple", color: "white", models: 7, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png" },
+  { name: "Samsung", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
+  { name: "Sony", color: "white", models: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png" },
   { name: "Bose", color: "white", models: 5, logo: "https://cdn.worldvectorlogo.com/logos/bose.svg" },
   { name: "Google", color: "white", models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/960px-Google_Favicon_2025.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail" },
-  { name: "Samsung", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
   { name: "OnePlus", color: "white", models: 5, logo: "https://cdn.worldvectorlogo.com/logos/oneplus-wordmark-4.svg" },
+  { name: "Sennheiser", color: "white", models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Sennheiser_Logo.svg/1280px-Sennheiser_Logo.svg.png" },
   { name: "Nothing", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Nothing.svg/960px-Nothing.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220722094956" }
 ];
 

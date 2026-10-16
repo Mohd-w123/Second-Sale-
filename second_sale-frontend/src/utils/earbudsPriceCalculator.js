@@ -114,7 +114,7 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}
   if (isPowerNo) {
     const powerPct = resolveDeduction("functionalDeductions", "power_no", 90);
     applyDeduction("power_no", `Does Not Power On (-${powerPct}%)`, powerPct);
-    const finalPrice = Math.max(Math.round(numericBase * (1 - powerPct / 100) / 10) * 10, Math.round(numericBase * 0.05));
+    const finalPrice = Math.max(Math.round(numericBase * (1 - powerPct / 100) / 10) * 10, Math.round(numericBase * 0.10));
     return {
       basePrice: numericBase,
       finalPrice,
@@ -128,7 +128,7 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}
   // 2. Are there any speaker/mic issues in your device?
   const hasAudioIssues = answers.speakerMicIssues === "yes" || answers.voice_mic === "voice_faulty" || answers.micIssue;
   if (hasAudioIssues) {
-    const micPct = resolveDeduction("functionalDeductions", "voice_mic", 20);
+    const micPct = resolveDeduction("functionalDeductions", "voice_mic", 25);
     applyDeduction("voice_mic", `Speaker / Mic Issues (-${micPct}%)`, micPct);
   }
 
@@ -148,7 +148,7 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}
 
   // 5. Is original charging case, charging cable, invoice and box available?
   if (answers.accessoriesAvailable === "no") {
-    const accPct = 15;
+    const accPct = 25;
     applyDeduction("missing_accessories", `Missing Original Accessories/Box (-${accPct}%)`, accPct);
   } else if (Array.isArray(answers.accessories)) {
     if (!answers.accessories.includes("acc_case") && !answers.accessories.includes("case")) {
@@ -160,14 +160,20 @@ export function calculateEarbudsPrice({ basePrice = 0, answers = {}, device = {}
   }
 
   // 6. Age of your device
-  if (answers.age === "age_6_11" || answers.age === "6 to 11 Months") {
-    applyDeduction("age", "Age 6–11 Months (-7%)", 7);
-  } else if (answers.age === "age_above_11" || answers.age === "Above 11 Months" || answers.age === "age_11_plus") {
-    applyDeduction("age", "Age Above 11 Months (-12%)", 12);
+  if (answers.age === "Below 3 Months" || answers.age === "age_0_3") {
+    // 0%
+  } else if (answers.age === "3 to 6 Months" || answers.age === "age_3_6") {
+    applyDeduction("age", "Age 3–6 Months (-7%)", 7);
+  } else if (answers.age === "Below 6 Months" || answers.age === "age_0_6") {
+    // 0%
+  } else if (answers.age === "6 to 11 Months" || answers.age === "age_6_11") {
+    applyDeduction("age", "Age 6–11 Months (-10%)", 10);
+  } else if (answers.age === "Above 11 Months" || answers.age === "age_above_11" || answers.age === "age_11_plus") {
+    applyDeduction("age", "Age Above 11 Months (-15%)", 15);
   }
 
-  totalDeductionPct = Math.min(totalDeductionPct, 88);
-  const floorPrice = Math.round(numericBase * 0.05);
+  totalDeductionPct = Math.min(totalDeductionPct, 90);
+  const floorPrice = Math.round(numericBase * 0.10);
   const rawFinal = Math.max(numericBase * (1 - totalDeductionPct / 100), floorPrice);
   const finalPrice = Math.round(rawFinal / 10) * 10;
 
