@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import api from "../services/api";
 import SEOHead from "../components/seo/SEOHead";
 import { buildSchemaGraph, organizationSchema, websiteSchema } from "../utils/schema";
@@ -210,6 +210,38 @@ export default function PartnerPage() {
       .catch(() => {});
   }, []);
 
+  const { heroHtml, benefitsAndRestHtml } = useMemo(() => {
+    if (!dbPage?.content) return { heroHtml: "", benefitsAndRestHtml: "" };
+    const html = dbPage.content;
+    const marker = "<!-- WHAT WE OFFER -->";
+    if (html.includes(marker)) {
+      const idx = html.indexOf(marker);
+      return {
+        heroHtml: html.substring(0, idx),
+        benefitsAndRestHtml: html.substring(idx),
+      };
+    }
+    const benefitsMarker = "Partner Benefits";
+    if (html.includes(benefitsMarker)) {
+      const bIdx = html.indexOf(benefitsMarker);
+      const sectionStart = html.lastIndexOf("<section", bIdx);
+      if (sectionStart !== -1) {
+        return {
+          heroHtml: html.substring(0, sectionStart),
+          benefitsAndRestHtml: html.substring(sectionStart),
+        };
+      }
+    }
+    const firstSectionClose = html.indexOf("</section>");
+    if (firstSectionClose !== -1) {
+      return {
+        heroHtml: html.substring(0, firstSectionClose + 10),
+        benefitsAndRestHtml: html.substring(firstSectionClose + 10),
+      };
+    }
+    return { heroHtml: html, benefitsAndRestHtml: "" };
+  }, [dbPage?.content]);
+
   return (
     <div className="w-full bg-white antialiased">
       <SEOHead
@@ -223,11 +255,17 @@ export default function PartnerPage() {
       />
       {dbPage?.content ? (
         <div className="max-w-[1200px] mx-auto px-4 py-8">
-          <div dangerouslySetInnerHTML={{ __html: dbPage.content }} />
-          <div className="mt-12 max-w-2xl mx-auto bg-white border border-gray-100 shadow-xl rounded-[28px] p-6 sm:p-10">
+          {/* Section 1: Hero Header */}
+          {heroHtml && <div dangerouslySetInnerHTML={{ __html: heroHtml }} />}
+
+          {/* Section 2: Partner Onboarding Form (Directly Above Partner Benefits) */}
+          <section id="partner-form" className="mb-14 sm:mb-16 max-w-2xl mx-auto bg-white border border-gray-100 shadow-xl rounded-[28px] p-6 sm:p-10 relative z-10 scroll-mt-24">
             <div className="mb-6 text-center">
-              <h3 className="text-xl font-black text-gray-900 mb-1">Partner Onboarding Form</h3>
-              <p className="text-xs text-gray-400">Join 3,000+ active partner centers across India with zero onboarding fee.</p>
+              <span className="inline-block bg-[#E8F6F7] text-[#087F8C] text-xs font-bold tracking-wider uppercase px-4 py-1.5 rounded-full mb-3 border border-[#087F8C]/10">
+                Quick Registration
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-1">Partner Onboarding Form</h3>
+              <p className="text-xs sm:text-sm text-gray-400">Join 3,000+ active partner centers across India with zero onboarding fee.</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -345,7 +383,7 @@ export default function PartnerPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className={`w-full rounded-xl py-3 font-black text-sm shadow-lg transition duration-200 mt-2 ${submitting ? "bg-gray-400 cursor-not-allowed" : "btn-gradient shadow-[#087F8C]/20"} text-white border-none cursor-pointer`}
+                className={`w-full rounded-xl py-3.5 font-black text-sm shadow-lg transition duration-200 mt-2 ${submitting ? "bg-gray-400 cursor-not-allowed" : "btn-gradient shadow-[#087F8C]/20"} text-white border-none cursor-pointer`}
               >
                 {submitting ? "Submitting..." : "Register Storefront Profile"}
               </button>
@@ -361,7 +399,12 @@ export default function PartnerPage() {
                 </div>
               )}
             </form>
-          </div>
+          </section>
+
+          {/* Section 3 & Onwards: Partner Benefits & other details */}
+          {benefitsAndRestHtml && (
+            <div dangerouslySetInnerHTML={{ __html: benefitsAndRestHtml }} />
+          )}
         </div>
       ) : (
         <>

@@ -1,11 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import { REPAIR_BRANDS, getRepairBrand, getRepairModels } from '../../data/repairData';
+import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { REPAIR_BRANDS, REPAIR_SERVICE_TYPES, getRepairBrand, getRepairModels } from '../../data/repairData';
 import { Search, ChevronRight } from 'lucide-react';
 
 export default function RepairBrandPage() {
   const { brand: brandSlug } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const serviceParam = searchParams.get('service');
+  const activeService = REPAIR_SERVICE_TYPES.find(s => s.id === serviceParam);
+
   const [search, setSearch] = useState('');
   const [selectedSeries, setSelectedSeries] = useState('All');
   const [imgErrors, setImgErrors] = useState({});
@@ -145,6 +149,32 @@ export default function RepairBrandPage() {
           </div>
         </div>
 
+        {/* Active Service Banner (Cashify-style context) */}
+        {activeService && (
+          <div className="mb-6 bg-gradient-to-r from-[#E8F6F7] via-[#F0FAFB] to-[#E8F6F7] border border-[#087F8C]/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#087F8C] text-white flex items-center justify-center text-xl flex-shrink-0 shadow-xs">
+                {activeService.icon || '🛠️'}
+              </div>
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#087F8C]">
+                  <span>Selected Service:</span>
+                  <span className="underline decoration-2">{activeService.label}</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  Select your {brandDisplayName} model below to see instant repair price &amp; book doorstep appointment
+                </p>
+              </div>
+            </div>
+            <Link
+              to={`/repair/${brandSlug}`}
+              className="text-xs font-bold text-gray-500 hover:text-gray-800 px-3.5 py-1.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors self-start sm:self-center whitespace-nowrap"
+            >
+              View All Repairs
+            </Link>
+          </div>
+        )}
+
         {/* ── Select Series Section ─────────────────────────────────── */}
         {seriesList.length > 0 && (
           <div className="mb-8">
@@ -212,35 +242,47 @@ export default function RepairBrandPage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
-              {filtered.map(model => (
-                <Link
-                  key={model.id || model.slug}
-                  to={`/repair/${brandSlug}/${model.id || model.slug}`}
-                  className="group bg-white border border-gray-200/90 rounded-2xl p-4 flex flex-col items-center justify-between text-center hover:border-[#087F8C] hover:shadow-md transition-all duration-200 cursor-pointer min-h-[190px] no-underline"
-                >
-                  {/* Phone Image */}
-                  <div className="w-full h-28 sm:h-32 flex items-center justify-center p-1 overflow-hidden">
-                    {model.image && !imgErrors[model.id || model.slug] ? (
-                      <img
-                        src={model.image}
-                        alt={model.name}
-                        referrerPolicy="no-referrer"
-                        className="h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-                        onError={() => setImgErrors(p => ({ ...p, [model.id || model.slug]: true }))}
-                      />
-                    ) : (
-                      <div className="text-4xl text-gray-300">📱</div>
-                    )}
-                  </div>
+              {filtered.map(model => {
+                const servicePricing = serviceParam && model.services?.[serviceParam];
+                return (
+                  <Link
+                    key={model.id || model.slug}
+                    to={`/repair/${brandSlug}/${model.id || model.slug}${serviceParam ? `?service=${serviceParam}` : ''}`}
+                    className="group bg-white border border-gray-200/90 rounded-2xl p-4 flex flex-col items-center justify-between text-center hover:border-[#087F8C] hover:shadow-md transition-all duration-200 cursor-pointer min-h-[210px] no-underline relative"
+                  >
+                    {/* Phone Image */}
+                    <div className="w-full h-28 sm:h-32 flex items-center justify-center p-1 overflow-hidden">
+                      {model.image && !imgErrors[model.id || model.slug] ? (
+                        <img
+                          src={model.image}
+                          alt={model.name}
+                          referrerPolicy="no-referrer"
+                          className="h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+                          onError={() => setImgErrors(p => ({ ...p, [model.id || model.slug]: true }))}
+                        />
+                      ) : (
+                        <div className="text-4xl text-gray-300">📱</div>
+                      )}
+                    </div>
 
-                  {/* Model Name */}
-                  <div className="w-full pt-2">
-                    <p className="text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-[#087F8C] transition-colors line-clamp-2 leading-tight">
-                      {model.name}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+                    {/* Model Name & Service Price Preview */}
+                    <div className="w-full pt-2">
+                      <p className="text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-[#087F8C] transition-colors line-clamp-2 leading-tight mb-1.5">
+                        {model.name}
+                      </p>
+                      {servicePricing?.price ? (
+                        <div className="inline-block bg-[#E8F6F7] text-[#087F8C] font-extrabold text-[11px] sm:text-xs px-2.5 py-1 rounded-lg">
+                          ₹{servicePricing.price.toLocaleString('en-IN')}
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-gray-400 font-medium">
+                          {model.series || 'Doorstep Repair'}
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
@@ -249,7 +291,7 @@ export default function RepairBrandPage() {
         <div className="pt-8 border-t border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-gray-800">Check Other Brands</h3>
-            <Link to="/repair" className="text-xs font-bold text-[#087F8C] hover:underline">
+            <Link to={`/repair${serviceParam ? `?service=${serviceParam}` : ''}`} className="text-xs font-bold text-[#087F8C] hover:underline">
               All Brands &gt;
             </Link>
           </div>
@@ -258,7 +300,7 @@ export default function RepairBrandPage() {
             {REPAIR_BRANDS.filter(b => b.slug !== brandSlug).map(b => (
               <Link
                 key={b.id || b.slug}
-                to={`/repair/${b.slug}`}
+                to={`/repair/${b.slug}${serviceParam ? `?service=${serviceParam}` : ''}`}
                 className="px-4 py-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 transition-all no-underline"
               >
                 {b.name}

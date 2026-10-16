@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { getRepairBrand, getRepairModel, REPAIR_SERVICE_TYPES } from '../../data/repairData';
 import RepairBookingModal from './RepairBookingModal';
 import RepairOptionModal from './RepairOptionModal';
@@ -61,6 +61,8 @@ const SERVICE_ICONS = {
 export default function RepairModelPage() {
   const { brand: brandSlug, model: modelId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const serviceParam = searchParams.get('service');
 
   const initialBrand = getRepairBrand(brandSlug);
   const initialModel = getRepairModel(brandSlug, modelId);
@@ -68,7 +70,7 @@ export default function RepairModelPage() {
   const [brand, setBrand] = useState(initialBrand);
   const [model, setModel] = useState(initialModel);
   const [loading, setLoading] = useState(!initialModel);
-  const [selected, setSelected] = useState({}); // { [serviceId]: true }
+  const [selected, setSelected] = useState(() => (serviceParam ? { [serviceParam]: true } : {})); // { [serviceId]: true }
   const [imgError, setImgError] = useState(false);
   const [showOptionModal, setShowOptionModal] = useState(false);
   const [repairMode, setRepairMode] = useState('home');
@@ -81,6 +83,13 @@ export default function RepairModelPage() {
       document.title = `${model.name} Repair | SecondSale`;
     }
   }, [model]);
+
+  // Keep selected service in sync if serviceParam is provided and model is loaded
+  useEffect(() => {
+    if (serviceParam && model?.services && model.services[serviceParam]) {
+      setSelected(prev => ({ ...prev, [serviceParam]: true }));
+    }
+  }, [serviceParam, model]);
 
   // Fetch dynamic model & pricing from backend
   useEffect(() => {
@@ -251,9 +260,9 @@ export default function RepairModelPage() {
         <nav className="flex items-center gap-1.5 text-xs text-gray-400 mb-6 flex-wrap">
           <Link to="/" className="hover:text-[#087F8C] transition-colors">Home</Link>
           <span>›</span>
-          <Link to="/repair" className="hover:text-[#087F8C] transition-colors">Repair</Link>
+          <Link to={`/repair${serviceParam ? `?service=${serviceParam}` : ''}`} className="hover:text-[#087F8C] transition-colors">Repair</Link>
           <span>›</span>
-          <Link to={`/repair/${brandSlug}`} className="hover:text-[#087F8C] transition-colors capitalize">{brand.name}</Link>
+          <Link to={`/repair/${brandSlug}${serviceParam ? `?service=${serviceParam}` : ''}`} className="hover:text-[#087F8C] transition-colors capitalize">{brand.name}</Link>
           <span>›</span>
           <span className="text-gray-700 font-medium">{model.name}</span>
         </nav>
@@ -292,13 +301,39 @@ export default function RepairModelPage() {
               </div>
 
               <Link
-                to={`/repair/${brandSlug}`}
+                to={`/repair/${brandSlug}${serviceParam ? `?service=${serviceParam}` : ''}`}
                 className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:text-[#087F8C] hover:border-[#087F8C] hover:bg-[#E8F6F7]/50 transition-all no-underline flex-shrink-0"
               >
                 <span>Change Model</span>
                 <span className="text-xs">›</span>
               </Link>
             </div>
+
+            {/* Pre-selected Service Notice (Cashify Flow) */}
+            {serviceParam && model?.services?.[serviceParam] && (
+              <div className="mb-5 bg-gradient-to-r from-[#E8F6F7] to-[#F0FAFB] border-2 border-[#087F8C]/40 rounded-2xl p-4 flex items-center justify-between shadow-xs animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#087F8C] text-white flex items-center justify-center shadow-xs">
+                    {SERVICE_ICONS[serviceParam] || <span>🛠️</span>}
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-extrabold text-[#087F8C] uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#087F8C] animate-pulse" />
+                      Pre-selected Service
+                    </div>
+                    <div className="text-sm font-bold text-gray-900">
+                      {services.find(s => s.id === serviceParam)?.label}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-extrabold text-[#087F8C]">
+                    ₹{model.services[serviceParam].price.toLocaleString('en-IN')}
+                  </div>
+                  <div className="text-[10px] text-gray-500 font-medium">Ready to Book</div>
+                </div>
+              </div>
+            )}
 
             {/* Service List */}
             <div className="bg-white rounded-3xl border border-gray-200/80 p-5 sm:p-7 shadow-sm">
