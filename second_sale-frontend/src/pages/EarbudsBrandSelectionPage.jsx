@@ -35,7 +35,15 @@ export default function EarbudsBrandSelectionPage() {
   useEffect(() => {
     deviceService.getBrands("earbuds").then(res => {
       if (res.data && res.data.length > 0) {
-        setBrands(sortEarbudsBrands(res.data));
+        const enriched = res.data.map(b => {
+          const match = EARBUDS_BRANDS.find(eb => eb.name.toLowerCase() === (b.brand || '').toLowerCase());
+          return {
+            ...b,
+            logo: b.logo || match?.logo || '',
+            color: b.color || match?.color || '#000000',
+          };
+        });
+        setBrands(sortEarbudsBrands(enriched));
       } else {
         const fallback = EARBUDS_BRANDS.map(b => ({
           brand: b.name,

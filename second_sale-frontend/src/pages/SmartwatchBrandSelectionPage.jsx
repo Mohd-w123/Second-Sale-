@@ -35,7 +35,15 @@ export default function SmartwatchBrandSelectionPage() {
   useEffect(() => {
     deviceService.getBrands("smartwatch").then(res => {
       if (res.data && res.data.length > 0) {
-        setBrands(sortBrands(res.data));
+        const enriched = res.data.map(b => {
+          const match = SMARTWATCH_BRANDS.find(sb => sb.name.toLowerCase() === (b.brand || '').toLowerCase());
+          return {
+            ...b,
+            logo: b.logo || match?.logo || '',
+            color: b.color || match?.color || '#000000',
+          };
+        });
+        setBrands(sortBrands(enriched));
       } else {
         const fallback = SMARTWATCH_BRANDS.map(b => ({
           brand: b.name,

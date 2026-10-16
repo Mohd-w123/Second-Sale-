@@ -33,10 +33,18 @@ export default function GamingBrandSelectionPage() {
   const [failedLogos, setFailedLogos] = useState({});
 
   useEffect(() => {
-    // Both 'console' and 'gaming' alias to fetch brands
-    deviceService.getBrands("console").then(res => {
+    // Fetch gaming console brands
+    deviceService.getBrands("gaming").then(res => {
       if (res.data && res.data.length > 0) {
-        setBrands(sortBrands(res.data));
+        const enriched = res.data.map(b => {
+          const match = GAMING_BRANDS.find(gb => gb.name.toLowerCase() === (b.brand || '').toLowerCase());
+          return {
+            ...b,
+            logo: b.logo || match?.logo || '',
+            color: b.color || match?.color || '#000000',
+          };
+        });
+        setBrands(sortBrands(enriched));
       } else {
         const fallback = GAMING_BRANDS.map(b => ({
           brand: b.name,

@@ -16,7 +16,14 @@ import {
   WatchStrapIcon,
   MagneticChargerIcon,
   BoxPackagingIcon,
-  BillDocumentIcon
+  BillDocumentIcon,
+  BatteryWarningIcon,
+  WifiSignalIcon,
+  SpeakerIcon,
+  WatchCrownIcon,
+  PowerButtonIcon,
+  HeartSensorIcon,
+  BluetoothIcon
 } from "../components/quiz/QuizIcons";
 import {
   ArrowRight, ArrowLeft, RotateCcw, Sparkles, AlertTriangle,
@@ -41,10 +48,11 @@ export default function SmartwatchConditionQuizPage() {
   // Exact Cashify live answers
   const [answers, setAnswers] = useState({
     powerOn: "yes",            // "yes" | "no"
+    functionalIssues: [],       // multi-select of Cashify defects
     screenCondition: "flawless", // "flawless" | "good" | "average" | "damaged"
     bodyCondition: "flawless",   // "flawless" | "good" | "average" | "below_average"
     accessories: ["acc_charger", "acc_strap", "acc_box", "acc_bill"],
-    age: "Below 6 Months"       // "Below 6 Months" | "6 to 11 Months" | "Above 11 Months"
+    age: "Below 3 Months"       // "Below 3 Months" | "3 to 6 Months" | "6 to 11 Months" | "Above 11 Months"
   });
 
   const [showResult, setShowResult] = useState(false);
@@ -96,7 +104,7 @@ export default function SmartwatchConditionQuizPage() {
     });
   }, [basePrice, answers, device, quizConfig]);
 
-  // Exact 5 Cashify Steps
+  // Exact 6 Cashify Steps
   const STEPS = [
     {
       id: "powerOn",
@@ -110,8 +118,25 @@ export default function SmartwatchConditionQuizPage() {
       ]
     },
     {
-      id: "screenCondition",
+      id: "functionalIssues",
       stepNum: 2,
+      title: "Functional or Physical Problems",
+      subtitle: "Please select faults (if any) present in your smartwatch. If none, click Continue.",
+      type: "functional",
+      options: [
+        { id: "battery", label: "Battery Health < 80% / Service", icon: BatteryWarningIcon },
+        { id: "wifi", label: "Wi-Fi is Faulty", icon: WifiSignalIcon },
+        { id: "speakers", label: "Speaker is Faulty", icon: SpeakerIcon },
+        { id: "charging", label: "Magnetic Charging Port Faulty", icon: MagneticChargerIcon },
+        { id: "crown", label: "Digital Crown Faulty", icon: WatchCrownIcon },
+        { id: "side_button", label: "Side Button Faulty", icon: PowerButtonIcon },
+        { id: "heart_rate", label: "Optical Heart Sensor Faulty", icon: HeartSensorIcon },
+        { id: "bluetooth", label: "Bluetooth is Faulty", icon: BluetoothIcon }
+      ]
+    },
+    {
+      id: "screenCondition",
+      stepNum: 3,
       title: "Screen Condition",
       subtitle: "Please select your device screen condition",
       type: "cards",
@@ -152,7 +177,7 @@ export default function SmartwatchConditionQuizPage() {
     },
     {
       id: "bodyCondition",
-      stepNum: 3,
+      stepNum: 4,
       title: "Physical Condition",
       subtitle: "Please select your device physical condition",
       type: "cards",
@@ -193,7 +218,7 @@ export default function SmartwatchConditionQuizPage() {
     },
     {
       id: "accessories",
-      stepNum: 4,
+      stepNum: 5,
       title: "Do you have the following?",
       subtitle: "Please select accessories which are available",
       type: "accessories",
@@ -206,14 +231,21 @@ export default function SmartwatchConditionQuizPage() {
     },
     {
       id: "age",
-      stepNum: 5,
+      stepNum: 6,
       title: "Age of your device",
       subtitle: "Let us know how old is your device. Valid bill is needed for devices less than 11 months.",
       type: "age",
       options: [
         {
-          id: "Below 6 Months",
-          label: "Below 6 Months",
+          id: "Below 3 Months",
+          label: "Below 3 Months",
+          badge: "Brand Warranty",
+          badgeColor: "bg-emerald-100 text-emerald-700",
+          desc: "Under official brand warranty with invoice"
+        },
+        {
+          id: "3 to 6 Months",
+          label: "3 to 6 Months",
           badge: "Brand Warranty",
           badgeColor: "bg-emerald-100 text-emerald-700",
           desc: "Under official brand warranty with invoice"
@@ -238,6 +270,16 @@ export default function SmartwatchConditionQuizPage() {
 
   const currentStep = STEPS[stepIndex];
 
+  const handleToggleFunctionalIssue = (issueId) => {
+    setAnswers(prev => {
+      const current = Array.isArray(prev.functionalIssues) ? prev.functionalIssues : [];
+      const updated = current.includes(issueId)
+        ? current.filter(x => x !== issueId)
+        : [...current, issueId];
+      return { ...prev, functionalIssues: updated };
+    });
+  };
+
   const handleToggleAccessory = (accId) => {
     setAnswers(prev => {
       const current = Array.isArray(prev.accessories) ? prev.accessories : [];
@@ -260,6 +302,7 @@ export default function SmartwatchConditionQuizPage() {
         quizAnswers: answers,
         answerSummary: [
           { question: "Does the watch Switch On ?", answer: answers.powerOn === "yes" ? "Yes" : "No" },
+          { question: "Functional Problems", answer: answers.functionalIssues.length > 0 ? answers.functionalIssues.join(", ") : "None" },
           { question: "Screen Condition", answer: answers.screenCondition },
           { question: "Physical Condition", answer: answers.bodyCondition },
           { question: "Accessories Available", answer: answers.accessories.join(", ") },
@@ -315,6 +358,7 @@ export default function SmartwatchConditionQuizPage() {
         quizAnswers: answers,
         answerSummary: [
           { question: "Does the watch Switch On ?", answer: answers.powerOn === "yes" ? "Yes" : "No" },
+          { question: "Functional Problems", answer: answers.functionalIssues.length > 0 ? answers.functionalIssues.join(", ") : "None" },
           { question: "Screen Condition", answer: answers.screenCondition },
           { question: "Physical Condition", answer: answers.bodyCondition },
           { question: "Accessories Available", answer: answers.accessories.join(", ") },
@@ -575,7 +619,48 @@ export default function SmartwatchConditionQuizPage() {
                 </div>
               )}
 
-              {/* Step 2 & 3: Screen Condition & Physical Condition Cards */}
+              {/* Step 2: Functional or Physical Problems (Multi-select) */}
+              {currentStep.type === "functional" && (
+                <div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    {currentStep.options.map(opt => {
+                      const IconComp = opt.icon;
+                      const isSelected = Array.isArray(answers.functionalIssues) && answers.functionalIssues.includes(opt.id);
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => handleToggleFunctionalIssue(opt.id)}
+                          className={`rounded-2xl border-2 p-4 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[135px] ${
+                            isSelected
+                              ? "border-red-500 bg-red-50/60 shadow-xs ring-2 ring-red-100"
+                              : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 ${
+                            isSelected ? "bg-red-500 text-white" : "bg-slate-100 text-slate-600"
+                          }`}>
+                            <IconComp className="w-5 h-5" />
+                          </div>
+                          <span className={`text-xs font-bold leading-tight ${isSelected ? "text-red-700 font-black" : "text-slate-800"}`}>
+                            {opt.label}
+                          </span>
+                          <div className={`mt-2 w-5 h-5 rounded-md flex items-center justify-center border-2 transition-all ${
+                            isSelected ? "border-red-500 bg-red-500 text-white" : "border-slate-300 bg-white"
+                          }`}>
+                            {isSelected && <Check size={12} className="stroke-[3]" />}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-slate-400 italic text-center">
+                    Note: If all components work normally, leave unselected and click Continue.
+                  </p>
+                </div>
+              )}
+
+              {/* Screen Condition & Physical Condition Cards */}
               {currentStep.type === "cards" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {currentStep.options.map(opt => {
