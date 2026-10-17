@@ -68,7 +68,9 @@ export default function SmartwatchBrandSelectionPage() {
 
   const getBrandLogo = (name) => {
     const b = SMARTWATCH_BRANDS.find(br => br.name.toLowerCase() === name.toLowerCase());
-    return b?.logo || null;
+    if (b?.logo) return b.logo;
+    const slug = (name || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+    return `/brands/${slug}.svg`;
   };
 
   const handleLogoError = (brandName) => {
