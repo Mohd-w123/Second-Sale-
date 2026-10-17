@@ -201,9 +201,8 @@ export default function AdminHomepage() {
     <div className="admin-content-inner p-4 sm:p-6 max-w-[1200px] mx-auto">
       {/* Toast Feedback */}
       {feedback && (
-        <div className={`fixed top-5 right-5 z-[3000] px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm font-semibold transition-all ${
-          feedback.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
-        }`}>
+        <div className={`fixed top-5 right-5 z-[3000] px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 text-sm font-semibold transition-all ${feedback.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+          }`}>
           {feedback.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
           <span>{feedback.text}</span>
         </div>
@@ -267,13 +266,12 @@ export default function AdminHomepage() {
             return (
               <div
                 key={sec._id || sec.type + index}
-                className={`bg-white rounded-2xl border transition-all ${
-                  isExpanded
+                className={`bg-white rounded-2xl border transition-all ${isExpanded
                     ? 'border-[#087F8C] shadow-md ring-2 ring-[#087F8C]/10'
                     : sec.isEnabled
-                    ? 'border-slate-200 shadow-xs hover:border-slate-300'
-                    : 'border-slate-200 bg-slate-50/60 opacity-60'
-                }`}
+                      ? 'border-slate-200 shadow-xs hover:border-slate-300'
+                      : 'border-slate-200 bg-slate-50/60 opacity-60'
+                  }`}
               >
                 {/* Section Row Header */}
                 <div className="p-4 flex items-center justify-between gap-3">
@@ -332,11 +330,10 @@ export default function AdminHomepage() {
                     <button
                       type="button"
                       onClick={() => toggleSection(index)}
-                      className={`p-1.5 rounded-lg border-none cursor-pointer transition-colors ${
-                        sec.isEnabled
+                      className={`p-1.5 rounded-lg border-none cursor-pointer transition-colors ${sec.isEnabled
                           ? 'text-emerald-600 hover:bg-emerald-50'
                           : 'text-slate-400 hover:bg-slate-200'
-                      }`}
+                        }`}
                       title={sec.isEnabled ? 'Section is visible (Click to hide)' : 'Section is hidden (Click to show)'}
                     >
                       {sec.isEnabled ? <Eye size={18} /> : <EyeOff size={18} />}
@@ -346,11 +343,10 @@ export default function AdminHomepage() {
                     <button
                       type="button"
                       onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
-                        isExpanded
+                      className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${isExpanded
                           ? 'bg-[#087F8C] text-white border-[#087F8C]'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                      }`}
+                        }`}
                     >
                       {isExpanded ? 'Collapse' : 'Customize'}
                     </button>
@@ -429,7 +425,7 @@ export default function AdminHomepage() {
                           <label className="block text-xs font-extrabold text-slate-900 uppercase tracking-wider">
                             Hero Graphic & Banner Image (Right-Hand Side)
                           </label>
-                          
+
                           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <div className="w-40 h-28 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                               <img
@@ -1218,12 +1214,12 @@ export default function AdminHomepage() {
                               const curr = Array.isArray(sec.content?.items)
                                 ? [...sec.content.items]
                                 : [
-                                    "100% Secure Transactions",
-                                    "Data Wipe Protection",
-                                    "7 Days Easy Return",
-                                    "Warranty on All Devices",
-                                    "Doorstep Pickup",
-                                  ];
+                                  "100% Secure Transactions",
+                                  "Data Wipe Protection",
+                                  "7 Days Easy Return",
+                                  "Warranty on All Devices",
+                                  "Doorstep Pickup",
+                                ];
                               curr.push("New Feature Highlight");
                               updateContentField(index, "items", curr);
                             }}
@@ -2537,7 +2533,7 @@ export default function AdminHomepage() {
                             <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Summary Text</label>
                             <textarea
                               rows={3}
-                              value={sec.content?.aboutText ?? "SecondSale is an Indian online platform where consumers sell used smartphones, tablets, laptops, and iMacs. Users receive an instant quote, schedule free doorstep pickup, and get paid via UPI, bank transfer, or cash after device verification. SecondSale operates across 2,000+ Indian cities and is operated by Swastika Innovation Private Limited."}
+                              value={sec.content?.aboutText ?? "SecondSale is an Indian online platform where consumers sell used smartphones, tablets, laptops, and iMacs. Users receive an instant quote, schedule free doorstep pickup, and get paid via UPI, bank transfer, or cash after device verification. SecondSale operates across 2,000+ Indian cities and is operated by  Techplanet Pvt. Ltd."}
                               onChange={(e) => updateContentField(index, 'aboutText', e.target.value)}
                               className="w-full px-3 py-2 text-xs font-medium text-slate-700 border border-slate-200 rounded-lg bg-white"
                               placeholder="Company summary text..."

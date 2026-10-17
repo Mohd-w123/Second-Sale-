@@ -643,7 +643,7 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
           <img
             src={siteLogo || logo}
             alt="SecondSale"
-            className="h-10 sm:h-11 w-auto object-contain"
+            className="h-12 sm:h-14 lg:h-[54px] w-auto object-contain transition-all"
           />
         </Link>
 
@@ -668,15 +668,17 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                 className={`relative ${visibilityClass}`}
                 ref={itemRef}
                 onMouseEnter={() => {
+                  if (item.isComingSoon) return;
                   if (isSell) openSellDropdown();
                   if (isBuy) openBuyDropdown();
                 }}
                 onMouseLeave={() => {
+                  if (item.isComingSoon) return;
                   if (isSell) closeSellDropdownWithDelay(220);
                   if (isBuy) closeBuyDropdownWithDelay(220);
                 }}
               >
-                {item.hasDropdown ? (
+                {item.hasDropdown && !item.isComingSoon ? (
                   <button
                     className={`flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent
                       ${isOpen ? "text-[#087F8C] bg-[#E8F6F7]" : "text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50"}`}
@@ -700,7 +702,7 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                       }
                     }}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
                     <span className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
                       <ChevronDown />
                     </span>
@@ -710,27 +712,37 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                     href={item.to}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50 transition-colors whitespace-nowrap no-underline"
+                    className="flex items-center gap-1.5 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50 transition-colors whitespace-nowrap no-underline"
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    {item.isComingSoon && (
+                      <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
+                        Soon
+                      </span>
+                    )}
                   </a>
                 ) : (
                   <button
-                    className="flex items-center gap-1 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50 transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent"
+                    className="flex items-center gap-1.5 px-2.5 xl:px-3.5 py-2 rounded-lg text-xs xl:text-sm font-semibold text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50 transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent"
                     onClick={() => {
-                      if (item.to?.startsWith("/#")) {
+                      if (item.to?.startsWith("/#") && !item.isComingSoon) {
                         const el = document.getElementById(item.to.replace("/#", ""));
                         if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
                       }
                       if (item.to) navigate(item.to);
                     }}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    {item.isComingSoon && (
+                      <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
+                        Soon
+                      </span>
+                    )}
                   </button>
                 )}
 
                 {/* Buy Refurbished Clean Dropdown Menu (Matches Reference) */}
-                {isBuy && buyDropdownOpen && (
+                {isBuy && !item.isComingSoon && buyDropdownOpen && (
                   <div
                     className="absolute top-full left-0 mt-1 bg-white border border-slate-100 rounded-2xl shadow-[0_12px_36px_rgba(0,0,0,0.12)] z-[2000] p-2 w-60 dropdown-animate overflow-hidden flex flex-col gap-0.5 before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:bg-transparent"
                     onMouseEnter={openBuyDropdown}
@@ -767,7 +779,7 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                 )}
 
                 {/* Sell Device Dynamic Mega Menu */}
-                {isSell && sellDropdownOpen && (
+                {isSell && !item.isComingSoon && sellDropdownOpen && (
                 <div 
                   className="absolute top-full left-0 mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[2000] flex overflow-hidden dropdown-animate w-[520px] min-h-[380px] before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:bg-transparent"
                   onMouseEnter={openSellDropdown}
@@ -932,7 +944,14 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                             onClick={() => setMoreDropdownOpen(false)}
                             className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] no-underline font-semibold text-xs xl:text-sm"
                           >
-                            <span>{item.label}</span>
+                            <span className="flex items-center gap-1.5">
+                              {item.label}
+                              {item.isComingSoon && (
+                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
+                                  Soon
+                                </span>
+                              )}
+                            </span>
                             <ChevronRight size={13} className="text-slate-300" />
                           </a>
                         ) : (
@@ -941,14 +960,21 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                             className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] font-semibold text-xs xl:text-sm text-left border-none bg-transparent cursor-pointer"
                             onClick={() => {
                               setMoreDropdownOpen(false);
-                              if (item.to?.startsWith("/#")) {
+                              if (item.to?.startsWith("/#") && !item.isComingSoon) {
                                 const el = document.getElementById(item.to.replace("/#", ""));
                                 if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
                               }
                               if (item.to) navigate(item.to);
                             }}
                           >
-                            <span>{item.label}</span>
+                            <span className="flex items-center gap-1.5">
+                              {item.label}
+                              {item.isComingSoon && (
+                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
+                                  Soon
+                                </span>
+                              )}
+                            </span>
                             <ChevronRight size={13} className="text-slate-300" />
                           </button>
                         )}
@@ -1040,6 +1066,11 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                   className={`flex items-center justify-between w-full px-5 py-4 text-left font-semibold rounded-xl transition-colors
                     ${mobileExpanded === item.label ? "text-[#087F8C] bg-[#E8F6F7]" : "text-[#0F2D5B] hover:bg-[#F7FAFF]"}`}
                   onClick={() => {
+                    if (item.isComingSoon) {
+                      setMobileMenuOpen(false);
+                      if (item.to) navigate(item.to);
+                      return;
+                    }
                     if (!item.hasDropdown) {
                       setMobileMenuOpen(false);
                       if (item.isExternal) {
@@ -1057,8 +1088,15 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                     }
                   }}
                 >
-                  {item.label}
-                  {item.hasDropdown && (
+                  <span className="flex items-center gap-2">
+                    {item.label}
+                    {item.isComingSoon && (
+                      <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
+                        Soon
+                      </span>
+                    )}
+                  </span>
+                  {item.hasDropdown && !item.isComingSoon && (
                     <span className={`transition-transform duration-200 ${mobileExpanded === item.label ? "rotate-180" : ""}`}>
                       <ChevronDown />
                     </span>

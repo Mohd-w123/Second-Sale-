@@ -17,7 +17,7 @@ export default function HelpCenterPage() {
       .then((res) => {
         if (res.data) setDbPage(res.data);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const schema = buildSchemaGraph([organizationSchema(), websiteSchema()]);
@@ -52,11 +52,11 @@ export default function HelpCenterPage() {
 
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2">
-            
+
             {/* Contact Info */}
             <div className="bg-gradient-to-br from-[#116466] to-[#087F8C] p-10 text-white">
               <h2 className="text-2xl font-bold mb-8">Contact Information</h2>
-              
+
               <div className="space-y-8">
                 <div className="flex items-start gap-4">
                   <Phone className="w-6 h-6 mt-1 text-blue-200" />
@@ -80,7 +80,7 @@ export default function HelpCenterPage() {
                   <MapPin className="w-6 h-6 mt-1 text-blue-200" />
                   <div>
                     <h3 className="font-semibold text-lg mb-1">Service Area</h3>
-                    <p className="text-blue-100">Pan-India — 2,000+ cities<br />Operated by Swastika Innovation Pvt. Ltd.</p>
+                    <p className="text-blue-100">Pan-India — 2,000+ cities<br />Operated by  Techplanet Pvt. Ltd.</p>
                   </div>
                 </div>
               </div>

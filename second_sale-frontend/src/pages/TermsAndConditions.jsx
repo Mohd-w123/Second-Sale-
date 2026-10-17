@@ -15,7 +15,7 @@ export default function TermsAndConditionsPage() {
       .then((res) => {
         if (res.data) setDbPage(res.data);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const schema = buildSchemaGraph([organizationSchema(), websiteSchema()]);
@@ -26,7 +26,7 @@ export default function TermsAndConditionsPage() {
         title={dbPage?.metaTitle || "Terms & Conditions — SecondSale"}
         description={
           dbPage?.metaDescription ||
-          "SecondSale terms and conditions for selling old devices online in India. Operated by Swastika Innovation Private Limited."
+          "SecondSale terms and conditions for selling old devices online in India. Operated by  Techplanet Pvt. Ltd."
         }
         path="/terms-and-conditions"
         schema={schema}

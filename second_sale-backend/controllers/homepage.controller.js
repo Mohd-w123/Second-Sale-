@@ -3,7 +3,7 @@ import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
@@ -464,7 +464,7 @@ export const DEFAULT_HOMEPAGE_SECTIONS = [
       ],
       showAboutBox: true,
       aboutTitle: "About SecondSale in 30 seconds",
-      aboutText: "SecondSale is an Indian online platform where consumers sell used smartphones, tablets, laptops, and iMacs. Users receive an instant quote, schedule free doorstep pickup, and get paid via UPI, bank transfer, or cash after device verification. SecondSale operates across 2,000+ Indian cities and is operated by Swastika Innovation Private Limited."
+      aboutText: "SecondSale is an Indian online platform where consumers sell used smartphones, tablets, laptops, and iMacs. Users receive an instant quote, schedule free doorstep pickup, and get paid via UPI, bank transfer, or cash after device verification. SecondSale operates across 2,000+ Indian cities and is operated by  Techplanet Pvt. Ltd."
     },
   },
 ];

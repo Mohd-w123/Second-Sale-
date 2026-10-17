@@ -5,6 +5,8 @@ const navLinkSchema = new mongoose.Schema({
   to: { type: String, default: '/' },
   hasDropdown: { type: Boolean, default: false },
   isExternal: { type: Boolean, default: false },
+  isComingSoon: { type: Boolean, default: false },
+  comingSoonMessage: { type: String, default: '' },
   order: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true },
 }, { _id: true });
