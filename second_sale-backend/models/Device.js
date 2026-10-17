@@ -37,6 +37,9 @@ const deviceSchema = new mongoose.Schema({
     default: '',
   },
 
+  // Series field (e.g. "Series 4", "Series Ultra", "PlayStation 5 Series")
+  series: { type: String, default: '', index: true },
+
   // Laptop-specific fields
   processorFamily: { type: String, default: '' },    // "Intel Core i5", "Apple M3", "AMD Ryzen 7"
   generation: { type: String, default: '' },         // "12th Gen", "M3", etc.

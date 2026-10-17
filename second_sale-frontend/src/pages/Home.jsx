@@ -816,7 +816,7 @@ export default function HomePage() {
 
             {/* Right Column: Hero Banner Image */}
             <div className="hidden lg:flex items-center justify-center relative">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-100/20 max-w-[560px]">
+              <div className="relative rounded-3xl overflow-hidden max-w-[560px]">
                 <img
                   src={heroImage}
                   alt={heroImageAlt}

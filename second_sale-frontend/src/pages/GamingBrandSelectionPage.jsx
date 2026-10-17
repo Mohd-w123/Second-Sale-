@@ -7,7 +7,7 @@ import SEOHead from "../components/seo/SEOHead";
 import { GAMING_BRANDS } from "../constants/devices";
 import { Gamepad2, Search, ShieldCheck, Zap, Truck } from "lucide-react";
 
-const GAMING_BRAND_ORDER = ["Sony", "Microsoft"];
+const GAMING_BRAND_ORDER = ["Sony", "Microsoft", "Nintendo"];
 
 const sortBrands = (brandsList) => {
   return [...brandsList].sort((a, b) => {
