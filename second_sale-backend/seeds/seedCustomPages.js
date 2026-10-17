@@ -9,7 +9,7 @@ const customPagesData = [
     title: 'About Us',
     slug: 'about-us',
     metaTitle: "About SecondSale — India's Trusted Device Buyback Platform",
-    metaDescription: "Learn about SecondSale, operated by Swastika Innovation Private Limited. India's trusted platform to sell old phones, laptops, tablets, smartwatches, and iMac online.",
+    metaDescription: "Learn about SecondSale, operated by  Techplanet Pvt. Ltd. India's trusted platform to sell old phones, laptops, tablets, smartwatches, and iMac online.",
     isPublished: true,
     showInFooter: true,
     footerColumn: 'Company',
@@ -20,10 +20,10 @@ const customPagesData = [
           <span>✨</span> Trusted Tech Buyback Partner
         </div>
         <h1 class="text-3xl sm:text-5xl font-black text-gray-900 leading-tight tracking-tight mb-6">
-          About <span class="text-[#2563EB]">Swastika Innovation</span>
+          About <span class="text-[#2563EB]"> Techplanet Pvt. Ltd.</span>
         </h1>
         <p class="text-base sm:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto font-medium mb-8">
-          Welcome to <strong class="text-gray-950 font-black">Swastika Innovation Private Limited</strong>, your trusted partner in the premium second-hand electronics market. We specialize in the sale and purchase of high-quality, pre-owned IT products, ensuring that premium technology is accessible, sustainable, and reliable.
+          Welcome to <strong class="text-gray-950 font-black"> Techplanet Pvt. Ltd. Private Limited</strong>, your trusted partner in the premium second-hand electronics market. We specialize in the sale and purchase of high-quality, pre-owned IT products, ensuring that premium technology is accessible, sustainable, and reliable.
         </p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
           <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
@@ -55,7 +55,7 @@ const customPagesData = [
             What We Do
           </h2>
           <p class="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            At Swastika Innovation, we breathe new life into consumer electronics. We provide a seamless, trustworthy platform for buying and selling a wide range of second-hand tech.
+            At  Techplanet Pvt. Ltd., we breathe new life into consumer electronics. We provide a seamless, trustworthy platform for buying and selling a wide range of second-hand tech.
           </p>
         </div>
 
@@ -123,7 +123,7 @@ const customPagesData = [
             Meet Our Leadership
           </h2>
           <p class="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            The strength of Swastika Innovation Private Limited lies in the unparalleled expertise and visionary leadership of our founding partners.
+            The strength of  Techplanet Pvt. Ltd. Private Limited lies in the unparalleled expertise and visionary leadership of our founding partners.
           </p>
         </div>
 
@@ -216,7 +216,7 @@ const customPagesData = [
           Our Commitment to Excellence
         </h2>
         <p class="text-base sm:text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto mb-8">
-          By combining cutting-edge global business strategies with decades of grassroots industry experience, Swastika Innovation Private Limited is uniquely positioned to revolutionize the second-hand IT market. Whether you are upgrading your smartphone or liquidating enterprise hardware, we guarantee a transparent, profitable, and secure experience.
+          By combining cutting-edge global business strategies with decades of grassroots industry experience,  Techplanet Pvt. Ltd. Private Limited is uniquely positioned to revolutionize the second-hand IT market. Whether you are upgrading your smartphone or liquidating enterprise hardware, we guarantee a transparent, profitable, and secure experience.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
           <div class="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#2563EB] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#2563EB]/10 shadow-sm">
@@ -235,7 +235,7 @@ const customPagesData = [
       <section class="py-10 bg-[#F7FAFF] rounded-3xl border border-gray-100 text-center px-4">
         <h2 class="text-lg font-black text-gray-900 mb-2">About SecondSale in 30 seconds</h2>
         <p class="text-sm text-gray-600 leading-relaxed max-w-2xl mx-auto">
-          SecondSale, operated by Swastika Innovation Private Limited, is India's leading re-commerce platform offering doorstep device buyback across 2,000+ cities with instant on-the-spot payment and military-grade data sanitization.
+          SecondSale, operated by  Techplanet Pvt. Ltd. Private Limited, is India's leading re-commerce platform offering doorstep device buyback across 2,000+ cities with instant on-the-spot payment and military-grade data sanitization.
         </p>
       </section>
     `
@@ -675,7 +675,7 @@ const customPagesData = [
           <div class="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 hover:border-[#2563EB]/30 hover:shadow-xl transition-all">
             <div class="w-12 h-12 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center mb-6 text-2xl font-bold">📍</div>
             <h3 class="text-lg font-bold text-gray-900 mb-2">Pan-India Reach</h3>
-            <p class="text-xs text-gray-400 mb-3">Operated by Swastika Innovation Pvt Ltd</p>
+            <p class="text-xs text-gray-400 mb-3">Operated by  Techplanet Pvt. Ltd. Pvt Ltd</p>
             <span class="text-sm font-bold text-gray-700">2,000+ Pin Codes</span>
           </div>
         </div>
@@ -914,7 +914,7 @@ const customPagesData = [
     title: 'Privacy Policy',
     slug: 'privacy-policy',
     metaTitle: 'Privacy Policy — SecondSale',
-    metaDescription: 'SecondSale privacy policy. Learn how Swastika Innovation Private Limited collects, uses, and protects your personal information.',
+    metaDescription: 'SecondSale privacy policy. Learn how  Techplanet Pvt. Ltd. Private Limited collects, uses, and protects your personal information.',
     isPublished: true,
     showInFooter: true,
     footerColumn: 'Legal & Trust',
@@ -928,7 +928,7 @@ const customPagesData = [
           SecondSale <span class="text-[#2563EB]">Privacy Policy</span>
         </h1>
         <p class="text-base sm:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto font-medium mb-8">
-          We value your trust above all else. Learn how Swastika Innovation Private Limited collects, utilizes, and protects your personal information and electronic data under industry-standard encryption.
+          We value your trust above all else. Learn how  Techplanet Pvt. Ltd. Private Limited collects, utilizes, and protects your personal information and electronic data under industry-standard encryption.
         </p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
           <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
@@ -1027,7 +1027,7 @@ const customPagesData = [
           Safe, Compliant & Accountable
         </h2>
         <p class="text-base sm:text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto mb-8">
-          Operated by Swastika Innovation Private Limited, SecondSale upholds absolute confidentiality and adheres to the Information Technology Act, 2000 and the Digital Personal Data Protection Act.
+          Operated by  Techplanet Pvt. Ltd. Private Limited, SecondSale upholds absolute confidentiality and adheres to the Information Technology Act, 2000 and the Digital Personal Data Protection Act.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
           <div class="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#2563EB] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#2563EB]/10 shadow-sm">
@@ -1057,7 +1057,7 @@ const customPagesData = [
     title: 'Terms & Conditions',
     slug: 'terms-and-conditions',
     metaTitle: 'Terms & Conditions — SecondSale',
-    metaDescription: 'SecondSale terms and conditions for selling old devices online in India. Operated by Swastika Innovation Private Limited.',
+    metaDescription: 'SecondSale terms and conditions for selling old devices online in India. Operated by  Techplanet Pvt. Ltd.',
     isPublished: true,
     showInFooter: true,
     footerColumn: 'Legal & Trust',
@@ -1071,7 +1071,7 @@ const customPagesData = [
           SecondSale <span class="text-[#2563EB]">Terms & Conditions</span>
         </h1>
         <p class="text-base sm:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto font-medium mb-8">
-          Clear, fair, and straightforward terms governing the sale and buyback of pre-owned electronic devices on SecondSale, operated by Swastika Innovation Private Limited.
+          Clear, fair, and straightforward terms governing the sale and buyback of pre-owned electronic devices on SecondSale, operated by  Techplanet Pvt. Ltd.
         </p>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
           <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
@@ -1135,7 +1135,7 @@ const customPagesData = [
           <div>
             <h4 class="text-lg font-bold text-gray-900 mb-1.5">Legal Title Transfer & Sales Receipt</h4>
             <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-              Upon successful payment transfer, the title of the hardware permanently passes to Swastika Innovation Private Limited, and a digital bill of sale is issued to the seller.
+              Upon successful payment transfer, the title of the hardware permanently passes to  Techplanet Pvt. Ltd. Private Limited, and a digital bill of sale is issued to the seller.
             </p>
           </div>
         </div>
@@ -1153,9 +1153,9 @@ const customPagesData = [
           </div>
           <div class="bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-md relative overflow-hidden">
             <div class="w-12 h-12 bg-[#E6F4FF] rounded-xl flex items-center justify-center text-[#2563EB] mb-6 text-2xl font-bold">🏢</div>
-            <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-4">Swastika Innovation Operational Scope</h3>
+            <h3 class="text-xl sm:text-2xl font-black text-gray-900 mb-4"> Techplanet Pvt. Ltd. Operational Scope</h3>
             <p class="text-sm sm:text-base text-gray-600 leading-relaxed">
-              SecondSale is an operating brand of Swastika Innovation Private Limited. All legal disputes, arbitration, and jurisdiction are governed exclusively by the courts of New Delhi, India.
+              SecondSale is an operating brand of  Techplanet Pvt. Ltd. All legal disputes, arbitration, and jurisdiction are governed exclusively by the courts of New Delhi, India.
             </p>
           </div>
         </div>
@@ -1180,7 +1180,7 @@ const customPagesData = [
             <span>🤝</span> 100% Ethical Trading
           </div>
           <div class="inline-flex items-center gap-2 bg-[#E6F4FF] text-[#2563EB] font-bold text-xs sm:text-sm px-5 py-3 rounded-xl border border-[#2563EB]/10 shadow-sm">
-            <span>💼</span> Swastika Innovation Backed
+            <span>💼</span>  Techplanet Pvt. Ltd. Backed
           </div>
         </div>
       </section>

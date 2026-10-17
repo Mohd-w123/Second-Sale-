@@ -175,6 +175,8 @@ export default function AdminSiteSettings() {
   const [newNavTo, setNewNavTo] = useState('/');
   const [newNavDropdown, setNewNavDropdown] = useState(false);
   const [newNavExternal, setNewNavExternal] = useState(false);
+  const [newNavComingSoon, setNewNavComingSoon] = useState(false);
+  const [newNavComingSoonMessage, setNewNavComingSoonMessage] = useState('');
   const [savingNav, setSavingNav] = useState(false);
   const [editingNavId, setEditingNavId] = useState(null);
   const [savingNavId, setSavingNavId] = useState(null);
@@ -184,6 +186,8 @@ export default function AdminSiteSettings() {
   const [editNavTo, setEditNavTo] = useState('');
   const [editNavDropdown, setEditNavDropdown] = useState(false);
   const [editNavExternal, setEditNavExternal] = useState(false);
+  const [editNavComingSoon, setEditNavComingSoon] = useState(false);
+  const [editNavComingSoonMessage, setEditNavComingSoonMessage] = useState('');
 
   const bannerInputRef = useRef();
   const logoInputRef = useRef();
@@ -646,6 +650,8 @@ export default function AdminSiteSettings() {
           to: newNavTo.trim(),
           hasDropdown: newNavDropdown,
           isExternal: newNavExternal,
+          isComingSoon: newNavComingSoon,
+          comingSoonMessage: newNavComingSoonMessage.trim(),
           order: settings?.navLinks?.length || 0,
         }),
       });
@@ -656,6 +662,8 @@ export default function AdminSiteSettings() {
       setNewNavTo('/');
       setNewNavDropdown(false);
       setNewNavExternal(false);
+      setNewNavComingSoon(false);
+      setNewNavComingSoonMessage('');
       flash('success', `Navigation item "${newNavLabel.trim()}" added & published!`);
     } catch (err) {
       flash('error', err.message);
@@ -716,6 +724,8 @@ export default function AdminSiteSettings() {
           to: editNavTo.trim(),
           hasDropdown: editNavDropdown,
           isExternal: editNavExternal,
+          isComingSoon: editNavComingSoon,
+          comingSoonMessage: editNavComingSoonMessage.trim(),
         }),
       });
       const data = await res.json();
@@ -1483,7 +1493,7 @@ export default function AdminSiteSettings() {
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                <div className="flex items-center gap-4 text-xs font-semibold text-slate-600">
+                <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-600">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="checkbox"
@@ -1502,6 +1512,15 @@ export default function AdminSiteSettings() {
                     />
                     <span>Open in new tab</span>
                   </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">
+                    <input
+                      type="checkbox"
+                      checked={newNavComingSoon}
+                      onChange={(e) => setNewNavComingSoon(e.target.checked)}
+                      className="rounded text-amber-600 focus:ring-amber-500"
+                    />
+                    <span>Coming Soon Page</span>
+                  </label>
                 </div>
 
                 <button
@@ -1513,6 +1532,18 @@ export default function AdminSiteSettings() {
                   <span>{savingNav ? 'Saving…' : 'Add Item'}</span>
                 </button>
               </div>
+
+              {newNavComingSoon && (
+                <div className="pt-2 border-t border-slate-100">
+                  <input
+                    type="text"
+                    value={newNavComingSoonMessage}
+                    onChange={(e) => setNewNavComingSoonMessage(e.target.value)}
+                    className="w-full text-xs px-3 py-1.5 border border-amber-300 rounded-lg outline-none text-slate-700 bg-amber-50/50"
+                    placeholder="Custom Coming Soon Notice (Optional, e.g. Launching soon with doorstep convenience)"
+                  />
+                </div>
+              )}
             </form>
 
             {/* Current Navigation Items List */}
@@ -1558,7 +1589,7 @@ export default function AdminSiteSettings() {
                             />
                           </div>
                           <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#087F8C]/20">
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                               <label className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer font-medium">
                                 <input
                                   type="checkbox"
@@ -1576,6 +1607,15 @@ export default function AdminSiteSettings() {
                                   className="rounded text-[#087F8C] focus:ring-0"
                                 />
                                 Open in New Tab
+                              </label>
+                              <label className="flex items-center gap-1.5 text-xs text-amber-800 cursor-pointer font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                <input
+                                  type="checkbox"
+                                  checked={editNavComingSoon}
+                                  onChange={(e) => setEditNavComingSoon(e.target.checked)}
+                                  className="rounded text-amber-600 focus:ring-amber-500"
+                                />
+                                <span>Coming Soon</span>
                               </label>
                             </div>
                             <div className="flex items-center gap-1.5">
@@ -1606,13 +1646,29 @@ export default function AdminSiteSettings() {
                               </button>
                             </div>
                           </div>
+                          {editNavComingSoon && (
+                            <div className="pt-1.5">
+                              <input
+                                type="text"
+                                value={editNavComingSoonMessage}
+                                onChange={(e) => setEditNavComingSoonMessage(e.target.value)}
+                                className="text-xs px-2.5 py-1 border border-amber-300 bg-white rounded-lg outline-none w-full text-slate-700"
+                                placeholder="Custom message (e.g. Launching this month with certified gadgets)"
+                              />
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-sm text-slate-900 truncate">
                               {item.label}
                             </span>
+                            {item.isComingSoon && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shadow-2xs">
+                                ⏱️ Coming Soon
+                              </span>
+                            )}
                             {item.hasDropdown && (
                               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
                                 Mega Menu
@@ -1632,6 +1688,8 @@ export default function AdminSiteSettings() {
                               setEditNavTo(item.to);
                               setEditNavDropdown(Boolean(item.hasDropdown));
                               setEditNavExternal(Boolean(item.isExternal));
+                              setEditNavComingSoon(Boolean(item.isComingSoon));
+                              setEditNavComingSoonMessage(item.comingSoonMessage || '');
                             }}
                             className="text-xs text-[#087F8C] hover:underline flex items-center gap-1 mt-0.5"
                           >

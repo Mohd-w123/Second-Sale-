@@ -1,11 +1,11 @@
 export const SITE_URL = 'https://secondsale.in';
 export const SITE_NAME = 'SecondSale';
-export const LEGAL_NAME = 'Swastika Innovation Private Limited';
+export const LEGAL_NAME = ' Techplanet Pvt. Ltd. Private Limited';
 export const DEFAULT_TITLE = 'SecondSale — Sell Old Devices for Instant Cash in India';
 export const DEFAULT_DESCRIPTION =
   "SecondSale is India's trusted device buyback platform. Sell old mobile phones, tablets, laptops and iMac online with free doorstep pickup and instant payment across 2,000+ cities.";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.svg`;
-export const PHONE = '+91-8310732405';
+export const PHONE = '+91-9820455509';
 export const WHATSAPP = '917045180009';
 export const SUPPORT_EMAIL = 'support@secondsale.in';
 
@@ -19,7 +19,7 @@ export const SOCIAL_LINKS = {
 export const SAME_AS = Object.values(SOCIAL_LINKS);
 
 export const ENTITY_SUMMARY =
-  'SecondSale is an Indian online platform where consumers sell used smartphones, tablets, laptops, and iMacs. Users receive an instant quote, schedule free doorstep pickup, and get paid via UPI, bank transfer, or cash after device verification. SecondSale operates across 2,000+ Indian cities and is operated by Swastika Innovation Private Limited.';
+  'SecondSale is an Indian online platform where consumers sell used smartphones, tablets, laptops, and iMacs. Users receive an instant quote, schedule free doorstep pickup, and get paid via UPI, bank transfer, or cash after device verification. SecondSale operates across 2,000+ Indian cities and is operated by  Techplanet Pvt. Ltd.';
 
 export function absoluteUrl(path = '/') {
   if (path.startsWith('http')) return path;

@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from './components/navbar.jsx';
 import Footer from './components/footer.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -9,6 +9,7 @@ import './index.css';
 // Pages
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
+import ComingSoonPage from './pages/ComingSoonPage.jsx';
 import BrandSelectionPage from './pages/BrandSelectionPage.jsx';
 import ModelSelectionPage from './pages/ModelSelectionPage.jsx';
 import VariantSelectionPage from './pages/VariantSelectionPage.jsx';
@@ -133,23 +134,39 @@ function App() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.faviconUrl) applyFavicon(data.faviconUrl);
+        if (Array.isArray(data?.navLinks)) setNavLinks(data.navLinks);
       })
       .catch(() => {});
 
     const onSettingsUpdate = (e) => {
       if (e?.detail?.faviconUrl) applyFavicon(e.detail.faviconUrl);
+      if (Array.isArray(e?.detail?.navLinks)) setNavLinks(e.detail.navLinks);
     };
     window.addEventListener("site-settings-updated", onSettingsUpdate);
     return () => window.removeEventListener("site-settings-updated", onSettingsUpdate);
   }, []);
 
+  const [navLinks, setNavLinks] = useState([]);
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  // Check if current route matches any active navigation link flagged as 'isComingSoon'
+  const currentComingSoonItem = !isAdminRoute && navLinks.find((link) => {
+    if (!link.isActive || !link.isComingSoon) return false;
+    const linkPath = (link.to || '').split('#')[0].replace(/\/+$/, '') || '/';
+    const currentPath = location.pathname.replace(/\/+$/, '') || '/';
+    if (linkPath === currentPath) return true;
+    if (linkPath !== '/' && currentPath.startsWith(linkPath + '/')) return true;
+    return false;
+  });
 
   return (
     <>
       {!isAdminRoute && <Navbar />}
       <main>
-        <Routes>
+        {currentComingSoonItem ? (
+          <ComingSoonPage navItem={currentComingSoonItem} />
+        ) : (
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Login />} />
@@ -294,6 +311,7 @@ function App() {
           <Route path="/:slug" element={<CustomPageView />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        )}
       </main>
       {!isAdminRoute && <Footer />}
       {!isAdminRoute && <WhatsAppButton />}

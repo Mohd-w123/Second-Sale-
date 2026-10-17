@@ -182,7 +182,7 @@ export const reorderBanners = async (req, res) => {
 // ── ADD nav link ───────────────────────────────────────────────
 export const addNavLink = async (req, res) => {
   try {
-    const { label, to, hasDropdown, isExternal, order } = req.body;
+    const { label, to, hasDropdown, isExternal, isComingSoon, comingSoonMessage, order } = req.body;
     if (!label) return res.status(400).json({ message: 'Label is required' });
     let settings = await SiteSettings.findOne({ singleton: 'main' });
     if (!settings) settings = new SiteSettings({ singleton: 'main' });
@@ -192,6 +192,8 @@ export const addNavLink = async (req, res) => {
       to: to || '/',
       hasDropdown: Boolean(hasDropdown),
       isExternal: Boolean(isExternal),
+      isComingSoon: Boolean(isComingSoon),
+      comingSoonMessage: comingSoonMessage ? String(comingSoonMessage).trim() : '',
       order: Number(order) || settings.navLinks.length,
       isActive: true,
     });
@@ -207,7 +209,7 @@ export const addNavLink = async (req, res) => {
 export const updateNavLink = async (req, res) => {
   try {
     const { linkId } = req.params;
-    const { label, to, hasDropdown, isExternal, order, isActive } = req.body;
+    const { label, to, hasDropdown, isExternal, isComingSoon, comingSoonMessage, order, isActive } = req.body;
     const settings = await SiteSettings.findOne({ singleton: 'main' });
     if (!settings) return res.status(404).json({ message: 'Settings not found' });
     const item = settings.navLinks.id(linkId);
@@ -216,6 +218,8 @@ export const updateNavLink = async (req, res) => {
     if (to !== undefined) item.to = to;
     if (hasDropdown !== undefined) item.hasDropdown = Boolean(hasDropdown);
     if (isExternal !== undefined) item.isExternal = Boolean(isExternal);
+    if (isComingSoon !== undefined) item.isComingSoon = Boolean(isComingSoon);
+    if (comingSoonMessage !== undefined) item.comingSoonMessage = String(comingSoonMessage).trim();
     if (order !== undefined) item.order = Number(order);
     if (isActive !== undefined) item.isActive = Boolean(isActive);
     settings.navLinks.sort((a, b) => a.order - b.order);

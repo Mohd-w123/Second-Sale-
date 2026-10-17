@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
       .then((res) => {
         if (res.data) setDbPage(res.data);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const schema = buildSchemaGraph([organizationSchema(), websiteSchema()]);
@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
         title={dbPage?.metaTitle || "Privacy Policy — SecondSale"}
         description={
           dbPage?.metaDescription ||
-          "SecondSale privacy policy. Learn how Swastika Innovation Private Limited collects, uses, and protects your personal information."
+          "SecondSale privacy policy. Learn how  Techplanet Pvt. Ltd. Private Limited collects, uses, and protects your personal information."
         }
         path="/privacy-policy"
         schema={schema}
