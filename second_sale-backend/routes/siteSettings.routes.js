@@ -16,6 +16,8 @@ import {
   updateTopBar,
   updateFooter,
   updateWhatsApp,
+  updateOtpConfig,
+  getOtpBalance,
   upload,
 } from '../controllers/siteSettings.controller.js';
 
@@ -31,6 +33,8 @@ router.post('/favicon', upload.single('favicon'), uploadFavicon);
 router.put('/top-bar', updateTopBar);
 router.put('/footer', updateFooter);
 router.put('/whatsapp', updateWhatsApp);
+router.put('/otp-config', updateOtpConfig);
+router.get('/otp-balance', getOtpBalance);
 router.post('/banners', upload.single('banner'), addBanner);
 router.patch('/banners/:bannerId', upload.single('banner'), updateBanner);
 router.delete('/banners/:bannerId', deleteBanner);

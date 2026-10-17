@@ -352,3 +352,77 @@ export const updateWhatsApp = async (req, res) => {
   }
 };
 
+// ── UPDATE OTP & 2Factor Service Configuration ─────────────────
+export const updateOtpConfig = async (req, res) => {
+  try {
+    const { isEnabled, provider, apiKey, senderId, dummyOtpEnabled, dummyOtpCode } = req.body;
+    let settings = await SiteSettings.findOne({ singleton: 'main' });
+    if (!settings) settings = new SiteSettings({ singleton: 'main' });
+
+    if (!settings.otpConfig) {
+      settings.otpConfig = {};
+    }
+
+    if (isEnabled !== undefined) settings.otpConfig.isEnabled = Boolean(isEnabled);
+    if (provider !== undefined) settings.otpConfig.provider = String(provider).trim();
+    if (apiKey !== undefined) settings.otpConfig.apiKey = String(apiKey).trim();
+    if (senderId !== undefined) settings.otpConfig.senderId = String(senderId).trim();
+    if (dummyOtpEnabled !== undefined) settings.otpConfig.dummyOtpEnabled = Boolean(dummyOtpEnabled);
+    if (dummyOtpCode !== undefined) settings.otpConfig.dummyOtpCode = String(dummyOtpCode).trim();
+
+    // Check balance if 2Factor apiKey is present
+    const keyToTest = settings.otpConfig.apiKey || process.env.TWOFACTOR_API_KEY;
+    if (keyToTest) {
+      try {
+        const balRes = await fetch(`https://2factor.in/API/V1/${keyToTest}/BAL/SMS`);
+        const balData = await balRes.json();
+        if (balData.Status === 'Success') {
+          settings.otpConfig.lastBalance = String(balData.Details);
+        }
+      } catch (e) {
+        // ignore balance fetch error
+      }
+    }
+
+    settings.markModified('otpConfig');
+    await settings.save();
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── GET Live OTP SMS Balance ────────────────────────────────────
+export const getOtpBalance = async (req, res) => {
+  try {
+    let settings = await SiteSettings.findOne({ singleton: 'main' });
+    const apiKey = settings?.otpConfig?.apiKey || process.env.TWOFACTOR_API_KEY;
+
+    if (!apiKey) {
+      return res.status(400).json({ message: '2Factor API key is not configured' });
+    }
+
+    const balRes = await fetch(`https://2factor.in/API/V1/${apiKey}/BAL/SMS`);
+    const balData = await balRes.json();
+
+    if (balData.Status === 'Success') {
+      if (settings && settings.otpConfig) {
+        settings.otpConfig.lastBalance = String(balData.Details);
+        await settings.save();
+      }
+      return res.json({
+        status: 'Success',
+        balance: balData.Details,
+        apiKeyMasked: apiKey.substring(0, 8) + '...' + apiKey.slice(-4),
+      });
+    }
+
+    res.status(400).json({
+      status: 'Error',
+      message: balData.Details || 'Failed to fetch balance from 2Factor',
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+

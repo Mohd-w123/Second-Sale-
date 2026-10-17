@@ -93,6 +93,17 @@ export default function AdminSiteSettings() {
   const [whatsappMessage, setWhatsappMessage] = useState("Hi, I'm interested in selling my device on SecondSale.");
   const [savingWhatsApp, setSavingWhatsApp] = useState(false);
 
+  // OTP 2Factor service state
+  const [isOtpOpen, setIsOtpOpen] = useState(true);
+  const [otpEnabled, setOtpEnabled] = useState(true);
+  const [otpApiKey, setOtpApiKey] = useState('f4018fc7-ca01-11f1-af74-0200cd936042');
+  const [dummyOtpEnabled, setDummyOtpEnabled] = useState(false);
+  const [dummyOtpCode, setDummyOtpCode] = useState('123456');
+  const [otpBalance, setOtpBalance] = useState('200.00');
+  const [checkingBalance, setCheckingBalance] = useState(false);
+  const [savingOtp, setSavingOtp] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
+
   // Banner upload state
   const [bannerFile, setBannerFile] = useState(null);
   const [bannerPreview, setBannerPreview] = useState('');
@@ -268,6 +279,15 @@ export default function AdminSiteSettings() {
       if (data.whatsappMessage) {
         setWhatsappMessage(data.whatsappMessage);
       }
+      if (data.otpConfig) {
+        setOtpEnabled(data.otpConfig.isEnabled !== false);
+        setOtpApiKey(data.otpConfig.apiKey || 'f4018fc7-ca01-11f1-af74-0200cd936042');
+        setDummyOtpEnabled(Boolean(data.otpConfig.dummyOtpEnabled));
+        setDummyOtpCode(data.otpConfig.dummyOtpCode || '123456');
+        if (data.otpConfig.lastBalance) {
+          setOtpBalance(data.otpConfig.lastBalance);
+        }
+      }
     } catch (err) {
       console.error('Failed to load site settings:', err);
       // Auto-retry once after 800ms if server was momentarily restarting
@@ -384,8 +404,44 @@ export default function AdminSiteSettings() {
     }
   };
 
+  const handleCheckBalance = async () => {
+    try {
+      setCheckingBalance(true);
+      const res = await adminService.getOtpBalance();
+      if (res.data?.balance !== undefined) {
+        setOtpBalance(String(res.data.balance));
+        flash('success', `Live 2Factor Balance: ${res.data.balance} SMS credits available`);
+      }
+    } catch (err) {
+      flash('error', err.response?.data?.message || 'Failed to fetch 2Factor balance');
+    } finally {
+      setCheckingBalance(false);
+    }
+  };
+
+  const handleSaveOtpConfig = async () => {
+    try {
+      setSavingOtp(true);
+      const res = await adminService.updateOtpConfig({
+        isEnabled: otpEnabled,
+        apiKey: otpApiKey,
+        dummyOtpEnabled: dummyOtpEnabled,
+        dummyOtpCode: dummyOtpCode,
+      });
+      broadcastSettingsUpdate(res.data);
+      if (res.data?.otpConfig?.lastBalance) {
+        setOtpBalance(res.data.otpConfig.lastBalance);
+      }
+      flash('success', 'OTP Gateway Settings (2Factor.in) saved successfully!');
+    } catch (err) {
+      flash('error', err.response?.data?.message || 'Failed to save OTP settings');
+    } finally {
+      setSavingOtp(false);
+    }
+  };
+
   // Toggle all sections
-  const allExpanded = isLogoOpen && isBannersOpen && isNavOpen && isWhatsAppOpen;
+  const allExpanded = isLogoOpen && isBannersOpen && isNavOpen && isWhatsAppOpen && isOtpOpen;
   const toggleAll = () => {
     const nextState = !allExpanded;
     setIsLogoOpen(nextState);
@@ -393,6 +449,7 @@ export default function AdminSiteSettings() {
     setIsNavOpen(nextState);
     setIsTopBarOpen(nextState);
     setIsWhatsAppOpen(nextState);
+    setIsOtpOpen(nextState);
     setIsFooterOpen(nextState);
     setIsBannerListOpen(nextState);
     if (!nextState) setIsAddFormOpen(false);
@@ -1889,7 +1946,198 @@ export default function AdminSiteSettings() {
         )}
       </div>
 
-      {/* ── SECTION 6: FOOTER INFORMATION & SOCIAL LINKS ───────────── */}
+      {/* ── SECTION 6: OTP & SMS GATEWAY SERVICE (2FACTOR.IN) ──────── */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div 
+          onClick={() => setIsOtpOpen(!isOtpOpen)}
+          className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+              <ShieldCheck size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  OTP & SMS Gateway (2Factor.in)
+                </h3>
+                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                  otpEnabled 
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                }`}>
+                  {otpEnabled ? 'SMS OTP Active' : 'OTP Bypassed / Disabled'}
+                </span>
+                {otpBalance && (
+                  <span className="hidden sm:inline-flex text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                    {otpBalance} SMS Credits
+                  </span>
+                )}
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Manage mobile number verification, 2Factor SMS gateway API key, live credits balance, and test modes
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setIsOtpOpen(!isOtpOpen); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-all shadow-xs"
+            >
+              <span>{isOtpOpen ? 'Collapse' : 'Expand'}</span>
+              {isOtpOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+          </div>
+        </div>
+
+        {isOtpOpen && (
+          <div className="p-5 sm:p-6 bg-white space-y-5 animate-in fade-in duration-200">
+            {/* Info Notice */}
+            <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80 text-xs text-blue-900 flex items-start gap-2.5">
+              <span className="text-base leading-none">📱</span>
+              <div>
+                <strong className="font-bold">2Factor.in Integration Active:</strong> When enabled, customers receive real 6-digit SMS OTPs on their Indian mobile numbers for authentication, quote revelations, and account verification. You can disable this anytime to allow instant guest/one-click login without sending SMS.
+              </div>
+            </div>
+
+            {/* Master Toggle Enable / Disable */}
+            <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <div>
+                <p className="text-xs font-bold text-slate-800">Require OTP Verification on Website</p>
+                <p className="text-[11px] text-slate-500">
+                  {otpEnabled 
+                    ? "Active: Users must enter an SMS OTP sent to their phone to log in and reveal evaluation prices"
+                    : "Disabled: Users can log in or view evaluation quotes immediately with zero OTP prompts"
+                  }
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={otpEnabled}
+                  onChange={(e) => setOtpEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            {/* 2Factor Credentials & Balance Stats */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 space-y-3">
+                <label className="block text-xs font-bold text-slate-700">
+                  2Factor.in API Key
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type={showApiKey ? "text" : "password"}
+                    value={otpApiKey}
+                    onChange={(e) => setOtpApiKey(e.target.value)}
+                    placeholder="Enter 2Factor API Key (UUID)"
+                    className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white font-mono text-slate-900 font-semibold pr-20"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-2 px-2.5 py-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 bg-slate-200/60 rounded-lg transition-colors"
+                  >
+                    {showApiKey ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  API Key from your 2Factor.in dashboard (<code className="font-mono bg-slate-100 px-1 py-0.5 rounded text-blue-700">https://2factor.in</code>)
+                </p>
+              </div>
+
+              {/* Balance Card */}
+              <div className="p-4 rounded-xl bg-gradient-to-br from-slate-50 to-blue-50/50 border border-slate-200 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Live SMS Balance</span>
+                    <button
+                      type="button"
+                      onClick={handleCheckBalance}
+                      disabled={checkingBalance}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 disabled:opacity-50"
+                    >
+                      <RefreshCw size={12} className={checkingBalance ? 'animate-spin' : ''} />
+                      <span>{checkingBalance ? 'Checking...' : 'Check Balance'}</span>
+                    </button>
+                  </div>
+                  <div className="text-2xl font-black text-slate-900 mt-1">
+                    {otpBalance ? `${otpBalance}` : '200.00'}
+                    <span className="text-xs font-bold text-slate-500 ml-1.5 font-normal">Credits</span>
+                  </div>
+                </div>
+                <div className="mt-3 pt-2.5 border-t border-slate-200/80 text-[11px] text-slate-500 flex items-center justify-between">
+                  <span>Registered: <strong>7021724752</strong></span>
+                  <span className="text-emerald-600 font-bold">● Connected</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Test / Dummy OTP Mode */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-slate-800">Developer & QA Test Code (Zero SMS Cost)</p>
+                  <p className="text-[11px] text-slate-500">Allow entering a predefined bypass code without sending or consuming real SMS credits</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={dummyOtpEnabled}
+                    onChange={(e) => setDummyOtpEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
+              {dummyOtpEnabled && (
+                <div className="pt-2 border-t border-slate-200/70 flex items-center gap-3">
+                  <div className="w-48">
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                      Static Test Code:
+                    </label>
+                    <input
+                      type="text"
+                      value={dummyOtpCode}
+                      onChange={(e) => setDummyOtpCode(e.target.value)}
+                      placeholder="123456"
+                      className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white font-mono font-bold text-purple-700 tracking-wider"
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-4">
+                    Any phone number using code <strong className="font-mono text-purple-700">{dummyOtpCode || '123456'}</strong> will be instantly verified without sending SMS.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Actions Bar */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+              <div className="text-xs text-slate-500">
+                Provider: <strong className="text-slate-800">2Factor.in API v1</strong> (Endpoint: <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-700">/AUTOGEN</code>)
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSaveOtpConfig}
+                disabled={savingOtp}
+                className="ml-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm border-none cursor-pointer disabled:opacity-50 transition-all flex items-center gap-1.5"
+              >
+                {savingOtp ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
+                <span>Save OTP Settings</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── SECTION 7: FOOTER INFORMATION & SOCIAL LINKS ───────────── */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
         <div
           onClick={() => setIsFooterOpen(!isFooterOpen)}

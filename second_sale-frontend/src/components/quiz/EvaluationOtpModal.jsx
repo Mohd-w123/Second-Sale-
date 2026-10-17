@@ -42,6 +42,20 @@ export default function EvaluationOtpModal({
     setOtpError("");
     try {
       const data = await sendOtp(cleanPhone);
+      if (data?.isBypassed) {
+        const result = await verifyOtp({
+          phone: cleanPhone,
+          code: "123456",
+          sessionId: data.sessionId,
+        });
+        if (onSuccess) {
+          onSuccess({ phone: cleanPhone, user: result?.user || user });
+        }
+        if (onClose) {
+          onClose();
+        }
+        return;
+      }
       setOtpSessionId(data?.sessionId || `session-${Date.now()}`);
       setOtpStep("otp");
     } catch (err) {

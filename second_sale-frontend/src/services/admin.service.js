@@ -89,12 +89,14 @@ export const adminService = {
   updatePage: (id, data) => adminApi.put(`/pages/admin/${id}`, data),
   deletePage: (id) => adminApi.delete(`/pages/admin/${id}`),
 
-  // Site Settings (Favicon, Top Bar, Footer, WhatsApp)
+  // Site Settings (Favicon, Top Bar, Footer, WhatsApp, OTP Gateway)
   getSiteSettings: () => adminApi.get('/site-settings'),
   uploadFavicon: (formData) => adminApi.post('/site-settings/favicon', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   updateTopBar: (data) => adminApi.put('/site-settings/top-bar', data),
   updateFooter: (data) => adminApi.put('/site-settings/footer', data),
   updateWhatsApp: (data) => adminApi.put('/site-settings/whatsapp', data),
+  updateOtpConfig: (data) => adminApi.put('/site-settings/otp-config', data),
+  getOtpBalance: () => adminApi.get('/site-settings/otp-balance'),
 
   // Sales Users / Staff Team Management
   getSalesUsers: () => adminApi.get('/admin/sales-users'),

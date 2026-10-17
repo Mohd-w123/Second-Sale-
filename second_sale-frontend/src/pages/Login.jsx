@@ -258,6 +258,13 @@ export default function LoginPage() {
     setError("");
     try {
       const data = await sendOtp(phoneNumber);
+      if (data?.isBypassed) {
+        await verifyOtp(phoneNumber, "123456", data.sessionId);
+        const params = new URLSearchParams(location.search);
+        const returnUrl = params.get("returnUrl") || "/dashboard";
+        navigate(returnUrl);
+        return;
+      }
       setSessionId(data.sessionId);
       setPhone(phoneNumber);
       setStep("otp");
