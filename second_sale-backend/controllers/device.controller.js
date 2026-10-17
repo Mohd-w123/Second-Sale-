@@ -36,9 +36,11 @@ export const getBrands = async (req, res, next) => {
     const enrichedBrands = brands.map((b) => {
       const bName = (b.brand || '').toLowerCase().trim();
       const bDoc = brandMap.get(bName);
+      const cleanSlug = (bDoc?.slug || bName).replace(/[^a-z0-9]/g, '');
+      const defaultLogo = cleanSlug === 'mi' ? '/brands/xiaomi.svg' : `/brands/${cleanSlug}.svg`;
       return {
         ...b,
-        logo: bDoc?.logo || '',
+        logo: bDoc?.logo || defaultLogo,
         color: bDoc?.color || '',
         order: bDoc?.order ?? 999,
       };

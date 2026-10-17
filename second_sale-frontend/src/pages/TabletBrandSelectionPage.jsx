@@ -63,7 +63,9 @@ export default function TabletBrandSelectionPage() {
 
   const getBrandLogo = (name) => {
     const b = TABLET_BRANDS.find(br => br.name.toLowerCase() === name.toLowerCase());
-    return b?.logo || null;
+    if (b?.logo) return b.logo;
+    const slug = (name || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+    return `/brands/${slug}.svg`;
   };
 
   const handleLogoError = (brandName) => {
@@ -104,19 +106,18 @@ export default function TabletBrandSelectionPage() {
             to={`/sell-tablet/${b.brand.toLowerCase()}`}
             className="group flex flex-col items-center gap-3 bg-white rounded-2xl border border-border p-5 sm:p-6 transition-all duration-200 hover:border-primary hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(8,127,140,0.15)] no-underline"
           >
-            <div
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold transition-transform duration-200 group-hover:scale-110 overflow-hidden"
-              style={{ backgroundColor: b.color || getBrandColor(b.brand) }}
-            >
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 p-2.5 transition-transform duration-200 group-hover:scale-110 overflow-hidden">
               {(b.logo || getBrandLogo(b.brand)) && !failedLogos[b.brand] ? (
                 <img
                   src={b.logo || getBrandLogo(b.brand)}
                   alt={b.brand}
-                  className="w-full h-full object-contain p-2"
+                  className="w-full h-full object-contain"
                   onError={() => handleLogoError(b.brand)}
                 />
               ) : (
-                b.brand.substring(0, 2).toUpperCase()
+                <span className="text-slate-800 font-extrabold text-sm sm:text-base">
+                  {b.brand.slice(0, 2).toUpperCase()}
+                </span>
               )}
             </div>
             <div className="text-center">

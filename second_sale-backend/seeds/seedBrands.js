@@ -14,7 +14,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Apple',
     slug: 'apple',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png',
+    logo: '/brands/apple.svg',
     categories: ['mobile', 'tablet', 'laptop', 'mac', 'earbuds', 'smartwatch'],
     color: '#000000',
     order: 1,
@@ -23,7 +23,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Samsung',
     slug: 'samsung',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png',
+    logo: '/brands/samsung.svg',
     categories: ['mobile', 'tablet', 'laptop', 'earbuds', 'smartwatch', 'tv'],
     color: '#1428A0',
     order: 2,
@@ -32,7 +32,7 @@ const INITIAL_BRANDS = [
   {
     name: 'OnePlus',
     slug: 'oneplus',
-    logo: 'https://cdn.worldvectorlogo.com/logos/oneplus-wordmark-4.svg',
+    logo: '/brands/oneplus.svg',
     categories: ['mobile', 'earbuds', 'smartwatch'],
     color: '#EB0028',
     order: 3,
@@ -41,7 +41,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Google',
     slug: 'google',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/960px-Google_Favicon_2025.svg.png',
+    logo: '/brands/google.svg',
     categories: ['mobile', 'earbuds', 'smartwatch'],
     color: '#4285F4',
     order: 4,
@@ -50,7 +50,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Nothing',
     slug: 'nothing',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Nothing.svg/960px-Nothing.svg.png',
+    logo: '/brands/nothing.svg',
     categories: ['mobile', 'earbuds'],
     color: '#000000',
     order: 5,
@@ -59,7 +59,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Bose',
     slug: 'bose',
-    logo: 'https://cdn.worldvectorlogo.com/logos/bose.svg',
+    logo: '/brands/bose.svg',
     categories: ['earbuds'],
     color: '#000000',
     order: 6,
@@ -68,7 +68,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Xiaomi',
     slug: 'xiaomi',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Xiaomi_logo_%282021-%29.svg/1280px-Xiaomi_logo_%282021-%29.svg.png',
+    logo: '/brands/xiaomi.svg',
     categories: ['mobile', 'tablet', 'laptop', 'tv'],
     color: '#FF6900',
     order: 7,
@@ -76,7 +76,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Realme',
     slug: 'realme',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Realme_logo.png/960px-Realme_logo.png',
+    logo: '/brands/realme.svg',
     categories: ['mobile'],
     color: '#FFC915',
     order: 8,
@@ -84,7 +84,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Vivo',
     slug: 'vivo',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Vivo-Cambodia.jpg/960px-Vivo-Cambodia.jpg',
+    logo: '/brands/vivo.svg',
     categories: ['mobile'],
     color: '#415FFF',
     order: 9,
@@ -92,7 +92,7 @@ const INITIAL_BRANDS = [
   {
     name: 'OPPO',
     slug: 'oppo',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/OPPO_LOGO.jpg/960px-OPPO_LOGO.jpg',
+    logo: '/brands/oppo.svg',
     categories: ['mobile'],
     color: '#048A5E',
     order: 10,
@@ -100,7 +100,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Motorola',
     slug: 'motorola',
-    logo: 'https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/motorola-logo-icon.png',
+    logo: '/brands/motorola.svg',
     categories: ['mobile'],
     color: '#00142E',
     order: 11,
@@ -108,7 +108,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Poco',
     slug: 'poco',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/POCO_Logo.svg/1280px-POCO_Logo.svg.png',
+    logo: '/brands/poco.svg',
     categories: ['mobile'],
     color: '#FFD700',
     order: 12,
@@ -118,7 +118,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Dell',
     slug: 'dell',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Dell_Logo.svg/1024px-Dell_Logo.svg.png',
+    logo: '/brands/dell.svg',
     categories: ['laptop'],
     color: '#007DB8',
     order: 13,
@@ -126,7 +126,7 @@ const INITIAL_BRANDS = [
   {
     name: 'HP',
     slug: 'hp',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/HP_logo_2012.svg/1024px-HP_logo_2012.svg.png',
+    logo: '/brands/hp.svg',
     categories: ['laptop'],
     color: '#0096D6',
     order: 14,
@@ -134,7 +134,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Lenovo',
     slug: 'lenovo',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Lenovo_logo_2015.svg/1280px-Lenovo_logo_2015.svg.png',
+    logo: '/brands/lenovo.svg',
     categories: ['laptop', 'tablet'],
     color: '#E2231A',
     order: 15,
@@ -142,7 +142,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Asus',
     slug: 'asus',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/ASUS_Logo.svg/1280px-ASUS_Logo.svg.png',
+    logo: '/brands/asus.svg',
     categories: ['laptop'],
     color: '#00539B',
     order: 16,
@@ -150,7 +150,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Acer',
     slug: 'acer',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Acer_2011.svg/1280px-Acer_2011.svg.png',
+    logo: '/brands/acer.svg',
     categories: ['laptop'],
     color: '#83B81A',
     order: 17,
@@ -158,7 +158,7 @@ const INITIAL_BRANDS = [
   {
     name: 'MSI',
     slug: 'msi',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/MSI_Logo.svg/1280px-MSI_Logo.svg.png',
+    logo: '/brands/msi.svg',
     categories: ['laptop'],
     color: '#ED1C24',
     order: 18,
@@ -168,7 +168,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Sony',
     slug: 'sony',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png',
+    logo: '/brands/sony.svg',
     categories: ['gaming', 'console', 'tv'],
     color: '#000000',
     order: 19,
@@ -177,7 +177,7 @@ const INITIAL_BRANDS = [
   {
     name: 'Microsoft',
     slug: 'microsoft',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Microsoft_logo_%282012%29.svg/1280px-Microsoft_logo_%282012%29.svg.png',
+    logo: '/brands/microsoft.svg',
     categories: ['gaming', 'console', 'laptop'],
     color: '#737373',
     order: 20,
@@ -188,7 +188,7 @@ const INITIAL_BRANDS = [
   {
     name: 'LG',
     slug: 'lg',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/LG_logo_%282015%29.svg/1024px-LG_logo_%282015%29.svg.png',
+    logo: '/brands/lg.svg',
     categories: ['tv'],
     color: '#A50034',
     order: 21,
@@ -196,7 +196,7 @@ const INITIAL_BRANDS = [
   {
     name: 'TCL',
     slug: 'tcl',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/TCL_Logo.svg/1280px-TCL_Logo.svg.png',
+    logo: '/brands/tcl.svg',
     categories: ['tv'],
     color: '#E2001A',
     order: 22,
