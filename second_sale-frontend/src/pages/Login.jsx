@@ -86,7 +86,7 @@ function PhoneStep({ onNext, loading, error }) {
 
 // ─── Step 2: OTP Entry ────────────────────────────────────────────────────────
 
-function OtpStep({ phone, onVerify, onBack, loading, error, onResend }) {
+function OtpStep({ phone, onVerify, onBack, loading, error, onResend, isDummy, dummyCode }) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
   const handleChange = (index, value) => {
@@ -147,10 +147,12 @@ function OtpStep({ phone, onVerify, onBack, loading, error, onResend }) {
         </button>
       </div>
 
-      <div className="bg-[#E8F6F7] border border-[#087F8C]/20 text-[#087F8C] px-3.5 py-2 rounded-xl text-xs font-semibold mb-6 flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-[#087F8C]"></span>
-        <span>Test Mode Active: Enter any 6-digit OTP (e.g. <strong>123456</strong>)</span>
-      </div>
+      {isDummy && (
+        <div className="bg-[#E8F6F7] border border-[#087F8C]/20 text-[#087F8C] px-3.5 py-2 rounded-xl text-xs font-semibold mb-6 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#087F8C]"></span>
+          <span>Test Mode Active: Enter code (<strong>{dummyCode || '123456'}</strong>)</span>
+        </div>
+      )}
 
       {error && (
         <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-xs font-bold mb-6 animate-in slide-in-from-top-2">
@@ -247,6 +249,8 @@ export default function LoginPage() {
   const [step, setStep] = useState("phone"); // "phone" | "otp"
   const [phone, setPhone] = useState("");
   const [sessionId, setSessionId] = useState("");
+  const [isDummy, setIsDummy] = useState(false);
+  const [dummyCode, setDummyCode] = useState("123456");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { sendOtp, verifyOtp } = useAuth();
@@ -266,6 +270,8 @@ export default function LoginPage() {
         return;
       }
       setSessionId(data.sessionId);
+      setIsDummy(Boolean(data?.isDummy));
+      setDummyCode(data?.dummyCode || "123456");
       setPhone(phoneNumber);
       setStep("otp");
     } catch (err) {
@@ -340,6 +346,8 @@ export default function LoginPage() {
             onResend={() => handleSendOtp(phone)}
             loading={loading}
             error={error}
+            isDummy={isDummy}
+            dummyCode={dummyCode}
           />
         )}
 
