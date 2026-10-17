@@ -98,6 +98,15 @@ const siteSettingsSchema = new mongoose.Schema({
   whatsappNumber: { type: String, default: '7045180009' },
   whatsappEnabled: { type: Boolean, default: true },
   whatsappMessage: { type: String, default: "Hi, I'm interested in selling my device on SecondSale." },
+  otpConfig: {
+    isEnabled: { type: Boolean, default: true },
+    provider: { type: String, default: '2factor' },
+    apiKey: { type: String, default: 'f4018fc7-ca01-11f1-af74-0200cd936042' },
+    senderId: { type: String, default: '' },
+    dummyOtpEnabled: { type: Boolean, default: false },
+    dummyOtpCode: { type: String, default: '123456' },
+    lastBalance: { type: String, default: '' },
+  },
 }, { timestamps: true });
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);

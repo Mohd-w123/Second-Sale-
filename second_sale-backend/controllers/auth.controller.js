@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
+import SiteSettings from '../models/SiteSettings.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../config/jwt.js';
 import { validationResult } from 'express-validator';
 
@@ -149,10 +150,76 @@ export const sendOtp = async (req, res, next) => {
       return res.status(400).json({ message: 'Please provide a valid 10-digit mobile number' });
     }
 
-    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    // Fetch dynamic OTP configuration from SiteSettings
+    const settings = await SiteSettings.findOne({ singleton: 'main' });
+    const otpConfig = settings?.otpConfig || {
+      isEnabled: true,
+      provider: '2factor',
+      apiKey: process.env.TWOFACTOR_API_KEY || 'f4018fc7-ca01-11f1-af74-0200cd936042',
+      dummyOtpEnabled: false,
+      dummyOtpCode: '123456',
+    };
 
+    // If OTP service is disabled in Admin Panel -> bypass verification
+    if (otpConfig.isEnabled === false) {
+      return res.json({
+        message: 'OTP verification is currently bypassed by admin',
+        isBypassed: true,
+        sessionId: `bypassed-${Date.now()}`,
+        phone: cleanPhone,
+      });
+    }
+
+    const apiKey = otpConfig.apiKey || process.env.TWOFACTOR_API_KEY;
+
+    // Send real OTP via 2Factor.in API
+    if (apiKey) {
+      try {
+        const tfUrl = `https://2factor.in/API/V1/${apiKey}/SMS/+91${cleanPhone}/AUTOGEN`;
+        const tfRes = await fetch(tfUrl);
+        const tfData = await tfRes.json();
+
+        if (tfData.Status === 'Success') {
+          return res.json({
+            message: `OTP sent successfully to +91 ${cleanPhone}`,
+            sessionId: tfData.Details, // SessionId returned by 2Factor
+            phone: cleanPhone,
+            isBypassed: false,
+          });
+        } else {
+          // If 2Factor returned an error (e.g. low balance), check if dummy OTP fallback is enabled
+          if (otpConfig.dummyOtpEnabled) {
+            const fallbackSessionId = `dummy-${Date.now()}`;
+            return res.json({
+              message: `OTP alert: ${tfData.Details}. Test OTP active: ${otpConfig.dummyOtpCode || '123456'}`,
+              sessionId: fallbackSessionId,
+              phone: cleanPhone,
+              isBypassed: false,
+              isDummy: true,
+            });
+          }
+          return res.status(400).json({
+            message: tfData.Details || 'Failed to send OTP via SMS gateway. Please try again.',
+          });
+        }
+      } catch (apiErr) {
+        console.error('2Factor API error:', apiErr);
+        if (otpConfig.dummyOtpEnabled) {
+          return res.json({
+            message: `Gateway unreachable. Test OTP active: ${otpConfig.dummyOtpCode || '123456'}`,
+            sessionId: `dummy-${Date.now()}`,
+            phone: cleanPhone,
+            isDummy: true,
+          });
+        }
+        return res.status(500).json({ message: 'SMS gateway service error. Please try again later.' });
+      }
+    }
+
+    // Default fallback if no API key configured
+    const sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     res.json({
-      message: 'OTP sent successfully (Dummy OTP enabled: enter 123456)',
+      message: 'OTP sent (enter 123456 to verify)',
       sessionId,
       phone: cleanPhone,
     });
@@ -176,13 +243,54 @@ export const verifyOtp = async (req, res, next) => {
     if (!cleanPhone) {
       return res.status(400).json({ message: 'Phone number is required' });
     }
-    if (!finalOtp) {
-      return res.status(400).json({ message: 'OTP verification code is required' });
-    }
 
-    // Dummy OTP support: accept 123456, 1234, 000000, or any 4-to-6 digit code in development/testing
-    if (!/^\d{4,6}$/.test(finalOtp)) {
-      return res.status(400).json({ message: 'Invalid OTP format. Please enter a 4 or 6-digit OTP (e.g. 123456)' });
+    // Fetch dynamic OTP configuration from SiteSettings
+    const settings = await SiteSettings.findOne({ singleton: 'main' });
+    const otpConfig = settings?.otpConfig || {
+      isEnabled: true,
+      apiKey: process.env.TWOFACTOR_API_KEY || 'f4018fc7-ca01-11f1-af74-0200cd936042',
+      dummyOtpEnabled: false,
+      dummyOtpCode: '123456',
+    };
+
+    // If OTP service is disabled in Admin Panel or sessionId was bypassed -> auto-verify
+    const isBypassed = otpConfig.isEnabled === false || (sessionId && String(sessionId).startsWith('bypassed-'));
+    if (!isBypassed) {
+      if (!finalOtp) {
+        return res.status(400).json({ message: 'OTP verification code is required' });
+      }
+
+      // Check dummy OTP code if enabled or dummy session
+      const isDummyCode = (otpConfig.dummyOtpEnabled && finalOtp === (otpConfig.dummyOtpCode || '123456'))
+        || (sessionId && String(sessionId).startsWith('dummy-') && finalOtp === (otpConfig.dummyOtpCode || '123456'));
+
+      if (!isDummyCode) {
+        // Verify via 2Factor API
+        const apiKey = otpConfig.apiKey || process.env.TWOFACTOR_API_KEY;
+        if (apiKey && sessionId && !sessionId.startsWith('session-') && !sessionId.startsWith('dummy-')) {
+          try {
+            const verifyUrl = `https://2factor.in/API/V1/${apiKey}/SMS/VERIFY/${sessionId}/${finalOtp}`;
+            const tfRes = await fetch(verifyUrl);
+            const tfData = await tfRes.json();
+
+            if (tfData.Status !== 'Success' || tfData.Details !== 'OTP Matched') {
+              return res.status(400).json({
+                message: tfData.Details === 'OTP Mismatch' 
+                  ? 'Incorrect OTP entered. Please check and try again.' 
+                  : (tfData.Details || 'Invalid or expired OTP. Please try again.')
+              });
+            }
+          } catch (apiErr) {
+            console.error('2Factor verification error:', apiErr);
+            return res.status(500).json({ message: 'Failed to verify OTP with SMS gateway. Please try again.' });
+          }
+        } else {
+          // Fallback if no valid 2Factor session
+          if (!/^\d{4,6}$/.test(finalOtp)) {
+            return res.status(400).json({ message: 'Invalid OTP format. Please enter a valid 6-digit OTP' });
+          }
+        }
+      }
     }
 
     // Find or create user by original phone number
