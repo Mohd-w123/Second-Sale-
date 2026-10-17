@@ -60,13 +60,14 @@ export const getModels = async (req, res, next) => {
 
     const models = await Device.find(
       { brand: new RegExp(`^${brand}$`, 'i'), category: (category === 'console' || category === 'gaming') ? { $in: ['console', 'gaming'] } : category, isActive: true },
-      { modelName: 1, slug: 1, imageUrl: 1, variants: 1, processorFamily: 1, gpuType: 1, isGamingLaptop: 1, tier: 1 }
+      { modelName: 1, slug: 1, imageUrl: 1, variants: 1, series: 1, processorFamily: 1, gpuType: 1, isGamingLaptop: 1, tier: 1 }
     ).sort({ 'variants.0.basePrice': -1 });
 
     const result = models.map(m => ({
       modelName: m.modelName,
       slug: m.slug,
       imageUrl: m.imageUrl,
+      series: m.series || '',
       maxPrice: Math.max(...m.variants.map(v => v.basePrice)),
       minPrice: Math.min(...m.variants.map(v => v.basePrice)),
       variantCount: m.variants.length,

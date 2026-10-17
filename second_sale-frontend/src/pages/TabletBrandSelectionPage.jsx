@@ -13,7 +13,7 @@ const TabletIcon = () => (
   </svg>
 );
 
-const TABLET_BRAND_ORDER = ["Apple", "Samsung"];
+const TABLET_BRAND_ORDER = ["Apple", "Samsung", "Lenovo", "Xiaomi", "OnePlus", "Realme", "Motorola", "Honor", "OPPO", "Nokia", "Poco"];
 
 const sortTabletBrands = (brandsList) => {
   return [...brandsList].sort((a, b) => {

@@ -6,10 +6,10 @@ import logo from "../assets/logo-secondsale.png";
 
 const DEFAULT_MEGA_MENU_CATEGORIES = [
   { id: "mobile", label: "Phone", to: "/sell-old-mobile-phones/brand" },
-  { id: "tablet", label: "Tablet", to: "/sell-tablet/brand" },
   { id: "laptop", label: "Laptop", to: "/sell-old-laptops/brand" },
+  { id: "tablet", label: "Tablet", to: "/sell-tablet/brand" },
   { id: "mac", label: "iMac", to: "/sell-imac/brand" },
-  { id: "tv", label: "TV", to: "/sell-tv" },
+  { id: "tv", label: "Television", to: "/sell-tv" },
   { id: "earbuds", label: "Earbuds", to: "/sell-earbuds/brand" },
   { id: "smartwatch", label: "Smartwatch", to: "/sell-smartwatch/brand" },
   { id: "console", label: "Gaming Console", to: "/sell-gaming/brand" },
@@ -90,7 +90,7 @@ const Sparkles = ({ size = 20 }) => (
 );
 
 const SearchIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
@@ -136,43 +136,76 @@ export default function Navbar() {
   const [categories, setCategories] = useState(DEFAULT_MEGA_MENU_CATEGORIES);
   const [hoveredCategory, setHoveredCategory] = useState("mobile");
   const [brandsData, setBrandsData] = useState({
-    mobile: ["Apple", "Google", "Motorola", "Nothing", "OnePlus", "Oppo", "Poco", "Realme", "Samsung", "Vivo", "Xiaomi"],
-    tablet: ["Apple", "Samsung"],
-    laptop: ["Acer", "Apple", "Asus", "Dell", "HP", "Lenovo", "Samsung", "MSI"],
+    mobile: ["Apple", "Samsung", "Xiaomi", "OnePlus", "Vivo", "Oppo", "Realme", "Motorola", "Google", "Poco", "Nothing"],
+    tablet: ["Apple", "Samsung", "Lenovo", "Xiaomi", "OnePlus", "Realme", "Motorola", "Honor", "OPPO", "Nokia", "Poco"],
+    laptop: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "Samsung", "MSI", "Microsoft"],
     mac: ["Apple"],
-    earbuds: ["Apple", "Bose", "Google", "Samsung", "OnePlus", "Nothing"],
-    smartwatch: ["Apple", "OnePlus", "Samsung", "Google"],
-    console: ["Sony", "Microsoft"],
-    gaming: ["Sony", "Microsoft"],
-    tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
+    earbuds: ["Apple", "Samsung", "boAt", "Bose", "OnePlus", "Sony", "Nothing", "Google", "Sennheiser"],
+    smartwatch: ["Apple", "Samsung", "OnePlus", "Google"],
+    console: ["Sony", "Microsoft", "Nintendo"],
+    gaming: ["Sony", "Microsoft", "Nintendo"],
+    tv: ["Samsung", "LG", "Sony", "Xiaomi", "TCL", "OnePlus", "Panasonic", "Hisense"],
   });
+
+const BRAND_PRIORITY_MAP = {
+  mobile: ["Apple", "Samsung", "Xiaomi", "OnePlus", "Vivo", "Oppo", "Realme", "Motorola", "Google", "Poco", "Nothing", "iQOO"],
+  tablet: ["Apple", "Samsung", "Lenovo", "Xiaomi", "OnePlus", "Realme", "Motorola", "Honor", "OPPO", "Nokia", "Poco"],
+  laptop: ["Apple", "Dell", "HP", "Lenovo", "Asus", "Acer", "Samsung", "MSI", "Microsoft"],
+  mac: ["Apple"],
+  earbuds: ["Apple", "Samsung", "boAt", "Bose", "OnePlus", "Sony", "Nothing", "Google", "Sennheiser"],
+  smartwatch: ["Apple", "Samsung", "OnePlus", "Google", "Noise", "boAt", "Fire-Boltt"],
+  gaming: ["Sony", "Microsoft", "Nintendo"],
+  console: ["Sony", "Microsoft", "Nintendo"],
+  tv: ["Samsung", "LG", "Sony", "Xiaomi", "TCL", "OnePlus", "Panasonic", "Hisense"],
+};
+
+const sortBrandsList = (categoryKey, brandsList = []) => {
+  const priority = BRAND_PRIORITY_MAP[categoryKey] || [];
+  return [...brandsList].sort((a, b) => {
+    const aName = typeof a === "string" ? a : (a.brand || "");
+    const bName = typeof b === "string" ? b : (b.brand || "");
+    const aIndex = priority.findIndex((p) => p.toLowerCase() === aName.toLowerCase());
+    const bIndex = priority.findIndex((p) => p.toLowerCase() === bName.toLowerCase());
+    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+    return aName.localeCompare(bName);
+  });
+};
 
   // Fetch dynamic brands from API
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        const [mob, tab, lap, mac, ear, sw, gam] = await Promise.all([
+        const [mob, tab, lap, mac, ear, sw, gam, tv] = await Promise.all([
           deviceService.getBrands("mobile"),
           deviceService.getBrands("tablet"),
           deviceService.getBrands("laptop"),
           deviceService.getBrands("mac"),
           deviceService.getBrands("earbuds"),
           deviceService.getBrands("smartwatch"),
-          deviceService.getBrands("console"),
+          deviceService.getBrands("gaming"),
+          deviceService.getBrands("tv"),
         ]);
-        const earBrands = (ear.data || []).map((b) => b.brand);
-        const swBrands = (sw.data || []).map((b) => b.brand);
-        const gamBrands = (gam.data || []).map((b) => b.brand);
+        const mobBrands = sortBrandsList("mobile", (mob.data || []).map((b) => b.brand));
+        const tabBrands = sortBrandsList("tablet", (tab.data || []).map((b) => b.brand));
+        const lapBrands = sortBrandsList("laptop", (lap.data || []).map((b) => b.brand));
+        const macBrands = sortBrandsList("mac", (mac.data || []).map((b) => b.brand));
+        const earBrands = sortBrandsList("earbuds", (ear.data || []).map((b) => b.brand));
+        const swBrands = sortBrandsList("smartwatch", (sw.data || []).map((b) => b.brand));
+        const gamBrands = sortBrandsList("gaming", (gam.data || []).map((b) => b.brand));
+        const tvBrands = sortBrandsList("tv", (tv.data || []).map((b) => b.brand));
+
         setBrandsData({
-          mobile: (mob.data || []).map((b) => b.brand),
-          tablet: (tab.data || []).map((b) => b.brand),
-          laptop: (lap.data || []).map((b) => b.brand),
-          mac: (mac.data || []).map((b) => b.brand),
-          earbuds: earBrands.length > 0 ? earBrands : ["Apple", "Bose", "Google", "Samsung", "OnePlus", "Nothing"],
-          smartwatch: swBrands.length > 0 ? swBrands : ["Apple", "OnePlus", "Samsung", "Google"],
-          console: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft"],
-          gaming: gamBrands.length > 0 ? gamBrands : ["Sony", "Microsoft"],
-          tv: ["Samsung", "LG", "Sony", "Mi", "TCL"],
+          mobile: mobBrands.length > 0 ? mobBrands : BRAND_PRIORITY_MAP.mobile,
+          tablet: tabBrands.length > 0 ? tabBrands : BRAND_PRIORITY_MAP.tablet,
+          laptop: lapBrands.length > 0 ? lapBrands : BRAND_PRIORITY_MAP.laptop,
+          mac: macBrands.length > 0 ? macBrands : BRAND_PRIORITY_MAP.mac,
+          earbuds: earBrands.length > 0 ? earBrands : BRAND_PRIORITY_MAP.earbuds,
+          smartwatch: swBrands.length > 0 ? swBrands : BRAND_PRIORITY_MAP.smartwatch,
+          console: gamBrands.length > 0 ? gamBrands : BRAND_PRIORITY_MAP.gaming,
+          gaming: gamBrands.length > 0 ? gamBrands : BRAND_PRIORITY_MAP.gaming,
+          tv: tvBrands.length > 0 ? tvBrands : BRAND_PRIORITY_MAP.tv,
         });
       } catch (err) {
         console.error("Failed to load navbar dynamic brands:", err);
@@ -188,13 +221,15 @@ export default function Navbar() {
       if (!res.ok) return;
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        const mapped = data.map((c) => ({
+        const sorted = [...data].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        const mapped = sorted.map((c) => ({
           id: c.slug,
           label: c.name,
           to: c.route || (c.isComingSoon ? "" : "/sell-" + c.slug + "/brand"),
           comingSoon: Boolean(c.isComingSoon),
         }));
         setCategories(mapped);
+        setHoveredCategory((prev) => (mapped.some((c) => c.id === prev) ? prev : (mapped[0]?.id || "mobile")));
       }
     } catch (err) {
       console.error("Failed to load dynamic categories in navbar:", err);
@@ -734,7 +769,7 @@ export default function Navbar() {
                 {/* Sell Device Dynamic Mega Menu */}
                 {isSell && sellDropdownOpen && (
                 <div 
-                  className="absolute top-full left-0 mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[2000] flex overflow-hidden dropdown-animate w-[490px] min-h-[380px] before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:bg-transparent"
+                  className="absolute top-full left-0 mt-1 bg-white border border-slate-200/90 rounded-2xl shadow-2xl z-[2000] flex overflow-hidden dropdown-animate w-[520px] min-h-[380px] before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3 before:bg-transparent"
                   onMouseEnter={openSellDropdown}
                   onMouseLeave={() => closeSellDropdownWithDelay(220)}
                 >
@@ -770,7 +805,8 @@ export default function Navbar() {
                   {/* Right Column: Dynamic Brands or Coming Soon */}
                   {(() => {
                     const currentCategoryObj = categories.find((c) => c.id === hoveredCategory);
-                    const displayedBrands = brandsData[hoveredCategory] || [];
+                    const displayedBrands = brandsData[hoveredCategory] || brandsData[hoveredCategory === "console" ? "gaming" : hoveredCategory] || [];
+                    const isTwoCols = displayedBrands.length > 5;
                     return (
                       <div className="flex-1 p-5 flex flex-col justify-between bg-white min-w-0">
                         {currentCategoryObj?.comingSoon ? (
@@ -799,11 +835,9 @@ export default function Navbar() {
                               </h4>
 
                               {/* Dynamic Brands List */}
-                              <div className="grid grid-cols-1 gap-1">
-                                {displayedBrands.slice(0, 7).map((brandName) => {
-                                  const brandUrl = hoveredCategory === "tv" 
-  ? "/sell-tv" 
-  : `${CATEGORY_ROUTE_MAP[hoveredCategory] || "/sell-old-mobile-phones"}/${encodeURIComponent(brandName.toLowerCase())}`;
+                              <div className={isTwoCols ? "grid grid-cols-2 gap-x-2.5 gap-y-1" : "grid grid-cols-1 gap-1"}>
+                                {displayedBrands.slice(0, 12).map((brandName) => {
+                                  const brandUrl = `${CATEGORY_ROUTE_MAP[hoveredCategory] || "/sell-old-mobile-phones"}/${encodeURIComponent(brandName.toLowerCase())}`;
                                   return (
                                     <Link
                                       key={brandName}
@@ -814,7 +848,7 @@ export default function Navbar() {
                                       }}
                                       className="group flex items-center justify-between py-1.5 px-2 rounded-lg text-sm text-slate-600 hover:text-[#087F8C] hover:bg-[#E8F6F7]/60 font-medium transition-all no-underline"
                                     >
-                                      <span className="group-hover:translate-x-1 transition-transform truncate">
+                                      <span className="group-hover:translate-x-0.5 transition-transform truncate">
                                         {brandName}
                                       </span>
                                       <span className="text-slate-300 group-hover:text-[#087F8C] text-xs transition-colors shrink-0">

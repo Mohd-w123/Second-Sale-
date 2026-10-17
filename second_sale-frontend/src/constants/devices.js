@@ -95,31 +95,40 @@ export const IMAC_BRANDS = [
 ];
 
 export const TABLET_BRANDS = [
-  { name: 'Apple', color: 'white', models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20250629104141" },
-  { name: 'Samsung', color: 'white', models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20211020072635" }
+  { name: 'Apple', color: 'white', models: 81, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png" },
+  { name: 'Samsung', color: 'white', models: 79, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
+  { name: 'Lenovo', color: 'white', models: 12, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Lenovo_logo_2015.svg/1280px-Lenovo_logo_2015.svg.png" },
+  { name: 'Xiaomi', color: 'white', models: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Xiaomi_logo_%282021-%29.svg/1280px-Xiaomi_logo_%282021-%29.svg.png" },
+  { name: 'OnePlus', color: 'white', models: 3, logo: "https://cdn.worldvectorlogo.com/logos/oneplus-wordmark-4.svg" },
+  { name: 'Realme', color: 'white', models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Realme_logo.png/960px-Realme_logo.png" },
+  { name: 'Motorola', color: 'white', models: 4, logo: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/motorola-logo-icon.png" },
+  { name: 'Honor', color: 'white', models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Honor_Logo_2022.svg/1280px-Honor_Logo_2022.svg.png" },
+  { name: 'OPPO', color: 'white', models: 2, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/OPPO_LOGO.jpg/960px-OPPO_LOGO.jpg" },
+  { name: 'Nokia', color: 'white', models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Nokia_wordmark.svg/1280px-Nokia_wordmark.svg.png" },
+  { name: 'Poco', color: 'white', models: 1, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/POCO_logo.svg/250px-POCO_logo.svg.png" },
 ];
-
-
 
 export const EARBUDS_BRANDS = [
   { name: "Apple", color: "white", models: 7, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png" },
   { name: "Samsung", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
   { name: "Sony", color: "white", models: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png" },
   { name: "Bose", color: "white", models: 5, logo: "https://cdn.worldvectorlogo.com/logos/bose.svg" },
-  { name: "Google", color: "white", models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/960px-Google_Favicon_2025.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail" },
+  { name: "Google", color: "white", models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/960px-Google_Favicon_2025.svg.png" },
   { name: "OnePlus", color: "white", models: 5, logo: "https://cdn.worldvectorlogo.com/logos/oneplus-wordmark-4.svg" },
   { name: "Sennheiser", color: "white", models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Sennheiser_Logo.svg/1280px-Sennheiser_Logo.svg.png" },
-  { name: "Nothing", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Nothing.svg/960px-Nothing.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220722094956" }
+  { name: "Nothing", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Nothing.svg/960px-Nothing.svg.png" },
+  { name: "boAt", color: "white", models: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Boat_logo.svg/1280px-Boat_logo.svg.png" }
 ];
 
 export const SMARTWATCH_BRANDS = [
-  { name: "Apple", color: "white", models: 7, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png" },
+  { name: "Apple", color: "white", models: 42, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1280px-Apple_logo_black.svg.png" },
+  { name: "Samsung", color: "white", models: 27, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
   { name: "OnePlus", color: "white", models: 4, logo: "https://cdn.worldvectorlogo.com/logos/oneplus-wordmark-4.svg" },
-  { name: "Samsung", color: "white", models: 7, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Samsung_wordmark.svg/1920px-Samsung_wordmark.svg.png" },
-  { name: "Google", color: "white", models: 3, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/960px-Google_Favicon_2025.svg.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail" }
+  { name: "Google", color: "white", models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/960px-Google_Favicon_2025.svg.png" }
 ];
 
 export const GAMING_BRANDS = [
-  { name: "Sony", color: "white", models: 6, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png" },
-  { name: "Microsoft", color: "white", models: 4, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Microsoft_logo_%282012%29.svg/1280px-Microsoft_logo_%282012%29.svg.png" }
+  { name: "Sony", color: "white", models: 28, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png" },
+  { name: "Microsoft", color: "white", models: 17, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Microsoft_logo_%282012%29.svg/1280px-Microsoft_logo_%282012%29.svg.png" },
+  { name: "Nintendo", color: "white", models: 5, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Nintendo.svg/1280px-Nintendo.svg.png" }
 ];
