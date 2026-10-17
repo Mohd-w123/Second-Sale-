@@ -16,6 +16,8 @@ export default function EvaluationOtpModal({
   const [otpStep, setOtpStep] = useState("phone"); // 'phone' | 'otp'
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const [isDummyMode, setIsDummyMode] = useState(false);
+  const [dummyCode, setDummyCode] = useState("");
 
   // Sync user phone when modal opens
   useEffect(() => {
@@ -26,6 +28,7 @@ export default function EvaluationOtpModal({
       setOtpCode("");
       setOtpError("");
       setOtpStep("phone");
+      setIsDummyMode(false);
     }
   }, [isOpen, user]);
 
@@ -57,6 +60,8 @@ export default function EvaluationOtpModal({
         return;
       }
       setOtpSessionId(data?.sessionId || `session-${Date.now()}`);
+      setIsDummyMode(Boolean(data?.isDummy));
+      setDummyCode(data?.dummyCode || "123456");
       setOtpStep("otp");
     } catch (err) {
       setOtpError(err?.response?.data?.message || "Failed to send OTP. Please try again.");
@@ -88,7 +93,7 @@ export default function EvaluationOtpModal({
       }
     } catch (err) {
       setOtpError(
-        err?.response?.data?.message || "Invalid OTP code. Testing mode: enter 123456."
+        err?.response?.data?.message || "Invalid OTP code. Please check and try again."
       );
     } finally {
       setOtpLoading(false);
@@ -104,7 +109,7 @@ export default function EvaluationOtpModal({
           aria-label="Close modal"
           className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center transition cursor-pointer"
         >
-          <X size={16} />
+          <X size={18} />
         </button>
 
         <div className="text-center mb-6">
@@ -134,16 +139,6 @@ export default function EvaluationOtpModal({
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="block text-xs font-bold text-slate-700">Mobile Number</label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOtpPhone("9876543210");
-                    setOtpError("");
-                  }}
-                  className="text-[11px] font-bold text-[#087F8C] hover:underline cursor-pointer"
-                >
-                  Fill demo number
-                </button>
               </div>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-xs text-slate-400">
@@ -183,16 +178,18 @@ export default function EvaluationOtpModal({
                 <label className="block text-xs font-bold text-slate-700">
                   Enter Verification Code (OTP)
                 </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOtpCode("123456");
-                    setOtpError("");
-                  }}
-                  className="text-[11px] font-bold text-[#087F8C] hover:underline cursor-pointer"
-                >
-                  Auto-fill 123456
-                </button>
+                {isDummyMode && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOtpCode(dummyCode || "123456");
+                      setOtpError("");
+                    }}
+                    className="text-[11px] font-bold text-[#087F8C] hover:underline cursor-pointer"
+                  >
+                    Auto-fill {dummyCode || "123456"}
+                  </button>
+                )}
               </div>
               <input
                 type="text"
@@ -203,19 +200,21 @@ export default function EvaluationOtpModal({
                 autoFocus
                 className="w-full text-center tracking-widest text-2xl py-3 rounded-xl border border-slate-200 font-black text-slate-900 focus:border-[#087F8C] focus:ring-2 focus:ring-[#087F8C]/15 outline-none transition"
               />
-              <div className="mt-2 py-1.5 px-3 bg-[#E8F6F7] border border-[#087F8C]/25 rounded-lg text-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOtpCode("123456");
-                    setOtpError("");
-                  }}
-                  className="w-full text-[11px] font-bold text-[#116466] flex items-center justify-center gap-1 cursor-pointer hover:underline"
-                >
-                  <CheckCircle2 size={13} className="text-[#087F8C] shrink-0" />
-                  <span>Testing mode: <u>Click to use dummy OTP 123456</u></span>
-                </button>
-              </div>
+              {isDummyMode && (
+                <div className="mt-2 py-1.5 px-3 bg-[#E8F6F7] border border-[#087F8C]/25 rounded-lg text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOtpCode(dummyCode || "123456");
+                      setOtpError("");
+                    }}
+                    className="w-full text-[11px] font-bold text-[#116466] flex items-center justify-center gap-1 cursor-pointer hover:underline"
+                  >
+                    <CheckCircle2 size={13} className="text-[#087F8C] shrink-0" />
+                    <span>Testing mode: <u>Click to use dummy OTP {dummyCode || "123456"}</u></span>
+                  </button>
+                </div>
+              )}
             </div>
 
             <button

@@ -170,6 +170,18 @@ export const sendOtp = async (req, res, next) => {
       });
     }
 
+    // If Admin enabled developer / testing dummy OTP mode -> return test code without consuming SMS credits
+    if (otpConfig.dummyOtpEnabled) {
+      return res.json({
+        message: `Testing mode active. Use code: ${otpConfig.dummyOtpCode || '123456'}`,
+        sessionId: `dummy-${Date.now()}`,
+        phone: cleanPhone,
+        isBypassed: false,
+        isDummy: true,
+        dummyCode: otpConfig.dummyOtpCode || '123456',
+      });
+    }
+
     const apiKey = otpConfig.apiKey || process.env.TWOFACTOR_API_KEY;
 
     // Send real OTP via 2Factor.in API
