@@ -22,7 +22,7 @@ export const adminLogin = async (req, res, next) => {
 
     // 1. Check Super Admin credentials from environment variables
     const adminEmail = (process.env.ADMIN_EMAIL || 'admin@secondsale.com').trim().toLowerCase();
-    const adminPassword = (process.env.ADMIN_PASSWORD || 'admin@123').trim();
+    const adminPassword = (process.env.ADMIN_PASSWORD || 'W9H1%85sT0]e').trim();
 
     if (trimmedEmail === adminEmail && trimmedPassword === adminPassword) {
       const token = jwt.sign(
