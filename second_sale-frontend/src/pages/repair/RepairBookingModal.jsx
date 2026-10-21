@@ -32,13 +32,13 @@ function CreateAddressModal({ onClose }) {
     setPincodeChecking(true);
     setPincodeError('');
     try {
-      const res = await fetch(`${API_BASE}/pincodes/check/${code}`);
+      const res = await fetch(`${API_BASE}/pincodes/check/${code}?service=repair`);
       const data = await res.json();
       if (res.ok && data.isServiceable) {
         setPincodeError('');
         setForm(f => ({ ...f, city: data.city || f.city, state: data.state || f.state }));
       } else {
-        setPincodeError('Pincode not serviceable — we do not cover this area yet.');
+        setPincodeError(data.message || 'Repair service is not available in this pincode yet.');
       }
     } catch {
       setPincodeError('Could not verify pincode. Please try again.');

@@ -17,6 +17,8 @@ import {
   getAllPincodes,
   createPincode,
   updatePincode,
+  togglePincodeService,
+  bulkUpdatePincodeServices,
   deletePincode,
   getAllSalesUsers,
   createSalesUser,
@@ -62,6 +64,8 @@ router.patch('/orders/:id/status', requirePermission('orders'), updateOrderStatu
 router.get('/pincodes', requirePermission('pincodes'), getAllPincodes);
 router.post('/pincodes', requirePermission('pincodes'), createPincode);
 router.put('/pincodes/:id', requirePermission('pincodes'), updatePincode);
+router.patch('/pincodes/:id/services', requirePermission('pincodes'), togglePincodeService);
+router.post('/pincodes/bulk-services', requirePermission('pincodes'), bulkUpdatePincodeServices);
 router.delete('/pincodes/:id', requirePermission('pincodes'), deletePincode);
 
 // Sales Users & Staff Management (Superadmin only or users with sales-users permission)

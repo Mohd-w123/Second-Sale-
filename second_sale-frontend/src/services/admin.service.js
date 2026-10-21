@@ -61,6 +61,8 @@ export const adminService = {
   getPincodes: (params) => adminApi.get('/admin/pincodes', { params }),
   createPincode: (data) => adminApi.post('/admin/pincodes', data),
   updatePincode: (id, data) => adminApi.put(`/admin/pincodes/${id}`, data),
+  togglePincodeService: (id, service, enabled) => adminApi.patch(`/admin/pincodes/${id}/services`, { service, enabled }),
+  bulkUpdatePincodeServices: (ids, service, enabled) => adminApi.post('/admin/pincodes/bulk-services', { ids, service, enabled }),
   deletePincode: (id) => adminApi.delete(`/admin/pincodes/${id}`),
 
   // TV Leads

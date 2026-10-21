@@ -19,6 +19,20 @@ const pincodeSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  services: {
+    sell: {
+      type: Boolean,
+      default: true,
+    },
+    buy: {
+      type: Boolean,
+      default: true,
+    },
+    repair: {
+      type: Boolean,
+      default: false,
+    },
+  },
 }, { timestamps: true });
 
 const Pincode = mongoose.model('Pincode', pincodeSchema);
