@@ -644,14 +644,14 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
           )}
         </div>
       )}
-      <div className="w-full max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-6 h-[70px] gap-3 lg:gap-4 xl:gap-5">
+      <div className="w-full max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-6 h-[72px] sm:h-[76px] gap-3 lg:gap-4 xl:gap-5">
 
         {/* Logo */}
         <Link to="/" className="flex items-center no-underline shrink-0">
           <img
             src={siteLogo || logo}
             alt="SecondSale"
-            className="h-11 sm:h-12 lg:h-[48px] w-auto object-contain transition-all"
+            className="h-12 sm:h-14 lg:h-[56px] w-auto object-contain transition-all"
           />
         </Link>
 
@@ -1036,7 +1036,7 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[70px] bg-white z-[999] overflow-y-auto dropdown-animate p-4">
+        <div className="lg:hidden fixed inset-0 top-[72px] sm:top-[76px] bg-white z-[999] overflow-y-auto dropdown-animate p-4">
           <div className="mb-6 relative" ref={mobileSearchRef}>
             <input
               type="text"
