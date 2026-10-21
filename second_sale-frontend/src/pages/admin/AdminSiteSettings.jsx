@@ -1548,9 +1548,14 @@ export default function AdminSiteSettings() {
 
             {/* Current Navigation Items List */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                Current Navigation Menu ({settings?.navLinks?.length || 0})
-              </label>
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+                  Current Navigation Menu ({settings?.navLinks?.length || 0})
+                </label>
+                <span className="text-[11px] text-slate-500 font-medium">
+                  Top 4 active links appear in Main Bar · Remaining links automatically appear in &quot;More ▾&quot;
+                </span>
+              </div>
 
               {!settings?.navLinks?.length ? (
                 <div className="text-center py-6 border border-dashed border-slate-200 rounded-xl text-slate-400 text-xs">
@@ -1558,128 +1563,146 @@ export default function AdminSiteSettings() {
                 </div>
               ) : (
                 settings.navLinks.map((item, index) => (
-                  <div
-                    key={item._id}
-                    className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${item.isActive
-                      ? 'border-slate-200 bg-white hover:border-[#087F8C]/40'
-                      : 'border-slate-200 bg-slate-50 opacity-60'
-                      }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold shrink-0">
-                        {index + 1}
-                      </span>
+                  <React.Fragment key={item._id || index}>
+                    {index === 4 && (
+                      <div className="my-3 py-2.5 px-4 bg-gradient-to-r from-[#E8F6F7] to-slate-50 border border-[#087F8C]/25 rounded-xl flex items-center justify-between text-xs font-bold text-[#087F8C]">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-[#087F8C] animate-pulse"></span>
+                          <span>Items below appear in the &quot;More ▾&quot; dropdown menu</span>
+                        </div>
+                        <span className="text-[11px] text-slate-500 font-normal hidden sm:inline">Use ↑ arrow to move items into Main Bar</span>
+                      </div>
+                    )}
+                    <div
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${item.isActive
+                        ? 'border-slate-200 bg-white hover:border-[#087F8C]/40'
+                        : 'border-slate-200 bg-slate-50 opacity-60'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <span className="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[10px] font-bold shrink-0">
+                          {index + 1}
+                        </span>
 
-                      {editingNavId === item._id ? (
-                        <div className="flex-1 flex flex-col gap-2 p-2.5 bg-[#E8F6F7]/60 rounded-xl border border-[#087F8C]/25">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <input
-                              type="text"
-                              value={editNavLabel}
-                              onChange={(e) => setEditNavLabel(e.target.value)}
-                              className="text-xs px-2.5 py-1.5 border border-[#087F8C]/40 bg-white rounded-lg outline-none flex-1 min-w-[120px] font-semibold text-slate-900"
-                              placeholder="Label"
-                            />
-                            <input
-                              type="text"
-                              value={editNavTo}
-                              onChange={(e) => setEditNavTo(e.target.value)}
-                              className="text-xs px-2.5 py-1.5 border border-[#087F8C]/40 bg-white rounded-lg outline-none flex-1 min-w-[140px] text-slate-700"
-                              placeholder="Path (/page or https://)"
-                            />
-                          </div>
-                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#087F8C]/20">
-                            <div className="flex flex-wrap items-center gap-3">
-                              <label className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer font-medium">
-                                <input
-                                  type="checkbox"
-                                  checked={editNavDropdown}
-                                  onChange={(e) => setEditNavDropdown(e.target.checked)}
-                                  className="rounded text-[#087F8C] focus:ring-0"
-                                />
-                                Mega Menu
-                              </label>
-                              <label className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer font-medium">
-                                <input
-                                  type="checkbox"
-                                  checked={editNavExternal}
-                                  onChange={(e) => setEditNavExternal(e.target.checked)}
-                                  className="rounded text-[#087F8C] focus:ring-0"
-                                />
-                                Open in New Tab
-                              </label>
-                              <label className="flex items-center gap-1.5 text-xs text-amber-800 cursor-pointer font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                                <input
-                                  type="checkbox"
-                                  checked={editNavComingSoon}
-                                  onChange={(e) => setEditNavComingSoon(e.target.checked)}
-                                  className="rounded text-amber-600 focus:ring-amber-500"
-                                />
-                                <span>Coming Soon</span>
-                              </label>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                disabled={savingNavId === item._id}
-                                onClick={() => saveEditedNavLink(item._id)}
-                                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#087F8C] hover:bg-[#066772] disabled:bg-[#087F8C]/40 text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
-                              >
-                                {savingNavId === item._id ? (
-                                  <>
-                                    <RefreshCw size={12} className="animate-spin" />
-                                    <span>Saving...</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Check size={13} />
-                                    <span>Save</span>
-                                  </>
-                                )}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setEditingNavId(null)}
-                                className="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg cursor-pointer transition-colors"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                          {editNavComingSoon && (
-                            <div className="pt-1.5">
+                        {editingNavId === item._id ? (
+                          <div className="flex-1 flex flex-col gap-2 p-2.5 bg-[#E8F6F7]/60 rounded-xl border border-[#087F8C]/25">
+                            <div className="flex flex-wrap items-center gap-2">
                               <input
                                 type="text"
-                                value={editNavComingSoonMessage}
-                                onChange={(e) => setEditNavComingSoonMessage(e.target.value)}
-                                className="text-xs px-2.5 py-1 border border-amber-300 bg-white rounded-lg outline-none w-full text-slate-700"
-                                placeholder="Custom message (e.g. Launching this month with certified gadgets)"
+                                value={editNavLabel}
+                                onChange={(e) => setEditNavLabel(e.target.value)}
+                                className="text-xs px-2.5 py-1.5 border border-[#087F8C]/40 bg-white rounded-lg outline-none flex-1 min-w-[120px] font-semibold text-slate-900"
+                                placeholder="Label"
+                              />
+                              <input
+                                type="text"
+                                value={editNavTo}
+                                onChange={(e) => setEditNavTo(e.target.value)}
+                                className="text-xs px-2.5 py-1.5 border border-[#087F8C]/40 bg-white rounded-lg outline-none flex-1 min-w-[140px] text-slate-700"
+                                placeholder="Path (/page or https://)"
                               />
                             </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-bold text-sm text-slate-900 truncate">
-                              {item.label}
-                            </span>
-                            {item.isComingSoon && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shadow-2xs">
-                                ⏱️ Coming Soon
-                              </span>
-                            )}
-                            {item.hasDropdown && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
-                                Mega Menu
-                              </span>
-                            )}
-                            {item.isExternal && (
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                                External
-                              </span>
+                            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#087F8C]/20">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <label className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer font-medium">
+                                  <input
+                                    type="checkbox"
+                                    checked={editNavDropdown}
+                                    onChange={(e) => setEditNavDropdown(e.target.checked)}
+                                    className="rounded text-[#087F8C] focus:ring-0"
+                                  />
+                                  Mega Menu
+                                </label>
+                                <label className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer font-medium">
+                                  <input
+                                    type="checkbox"
+                                    checked={editNavExternal}
+                                    onChange={(e) => setEditNavExternal(e.target.checked)}
+                                    className="rounded text-[#087F8C] focus:ring-0"
+                                  />
+                                  Open in New Tab
+                                </label>
+                                <label className="flex items-center gap-1.5 text-xs text-amber-800 cursor-pointer font-bold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                                  <input
+                                    type="checkbox"
+                                    checked={editNavComingSoon}
+                                    onChange={(e) => setEditNavComingSoon(e.target.checked)}
+                                    className="rounded text-amber-600 focus:ring-amber-500"
+                                  />
+                                  <span>Coming Soon</span>
+                                </label>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  disabled={savingNavId === item._id}
+                                  onClick={() => saveEditedNavLink(item._id)}
+                                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#087F8C] hover:bg-[#066772] disabled:bg-[#087F8C]/40 text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
+                                >
+                                  {savingNavId === item._id ? (
+                                    <>
+                                      <RefreshCw size={12} className="animate-spin" />
+                                      <span>Saving...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Check size={13} />
+                                      <span>Save</span>
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingNavId(null)}
+                                  className="px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg cursor-pointer transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                            {editNavComingSoon && (
+                              <div className="pt-1.5">
+                                <input
+                                  type="text"
+                                  value={editNavComingSoonMessage}
+                                  onChange={(e) => setEditNavComingSoonMessage(e.target.value)}
+                                  className="text-xs px-2.5 py-1 border border-amber-300 bg-white rounded-lg outline-none w-full text-slate-700"
+                                  placeholder="Custom message (e.g. Launching this month with certified gadgets)"
+                                />
+                              </div>
                             )}
                           </div>
+                        ) : (
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-sm text-slate-900 truncate">
+                                {item.label}
+                              </span>
+                              {index < 4 ? (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 text-[#087F8C] border border-[#087F8C]/30 flex items-center gap-1 shadow-2xs">
+                                  🌐 Main Bar
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1 shadow-2xs">
+                                  📂 In &apos;More&apos;
+                                </span>
+                              )}
+                              {item.isComingSoon && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shadow-2xs">
+                                  ⏱️ Coming Soon
+                                </span>
+                              )}
+                              {item.hasDropdown && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                                  Mega Menu
+                                </span>
+                              )}
+                              {item.isExternal && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                                  External
+                                </span>
+                              )}
+                            </div>
                           <button
                             type="button"
                             onClick={() => {
@@ -1745,6 +1768,7 @@ export default function AdminSiteSettings() {
                       </button>
                     </div>
                   </div>
+                </React.Fragment>
                 ))
               )}
             </div>

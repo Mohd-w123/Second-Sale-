@@ -36,11 +36,13 @@ const uploadToCloudinary = (buffer, folder) => {
 };
 
 const DEFAULT_NAV_LINKS = [
-  { label: "Sell Device", hasDropdown: true, to: "/sell-old-mobile-phones/brand", order: 0, isActive: true },
-  { label: "How It Works", hasDropdown: false, to: "/#how-it-works", order: 1, isActive: true },
-  { label: "Corporate", hasDropdown: false, to: "/corporate", order: 2, isActive: true },
-  { label: "About Us", hasDropdown: false, to: "/about-us", order: 3, isActive: true },
-  { label: "Become a Partner", hasDropdown: false, to: "/partner", order: 4, isActive: true },
+  { label: "Sell Devices", hasDropdown: true, to: "/sell-old-mobile-phones/brand", order: 0, isActive: true },
+  { label: "Buy Refurbished", hasDropdown: false, to: "/buy-refurbished", isComingSoon: true, order: 1, isActive: true },
+  { label: "Repair", hasDropdown: false, to: "/repair", order: 2, isActive: true },
+  { label: "Become a Partner", hasDropdown: false, to: "/partner", order: 3, isActive: true },
+  { label: "Corporate", hasDropdown: false, to: "/corporate", order: 4, isActive: true },
+  { label: "How It Works", hasDropdown: false, to: "/#how-it-works", order: 5, isActive: true },
+  { label: "About Us", hasDropdown: false, to: "/about-us", order: 6, isActive: true },
 ];
 
 // ── GET settings (public) ───────────────────────────────────────
