@@ -28,10 +28,10 @@ const DEFAULT_NAV_ITEMS = [
   { label: "Sell Device", hasDropdown: true },
   { label: "Buy Refurbished", hasDropdown: true, to: "/buy-refurbished" },
   { label: "Repair", to: "/repair#brand-section" },
-  { label: "How It Works", to: "/#how-it-works" },
-  { label: "Corporate", to: "/corporate" },
-  { label: "About Us", to: "/about-us" },
   { label: "Become a Partner", to: "/partner" },
+  { label: "Corporate", to: "/corporate" },
+  { label: "How It Works", to: "/#how-it-works" },
+  { label: "About Us", to: "/about-us" },
 ];
 
 const CATEGORY_ROUTE_MAP = {
@@ -621,6 +621,14 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
     );
   };
 
+  // Dynamic navigation links:
+  // First 4 active items from Admin Panel go to desktop top bar:
+  // (e.g. 1. Sell Devices, 2. Buy Refurbished, 3. Repair, 4. Become a Partner)
+  // Any subsequent items automatically populate the 'More' dropdown
+  const activeNavItems = navItems.filter((item) => item.isActive !== false);
+  const desktopTopBarItems = activeNavItems.slice(0, 4);
+  const moreDropdownItems = activeNavItems.slice(4);
+
   return (
     <nav className={`sticky top-0 z-[1000] bg-white transition-shadow duration-300 ${scrolled ? "shadow-md" : "shadow-sm"}`}>
       {topBar?.isEnabled && topBar?.text && (
@@ -636,36 +644,29 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
           )}
         </div>
       )}
-      <div className="w-full max-w-[1440px] mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-[68px] gap-2 lg:gap-3 xl:gap-4">
+      <div className="w-full max-w-[1280px] mx-auto flex items-center justify-between px-4 sm:px-6 h-[70px] gap-3 lg:gap-4 xl:gap-5">
 
         {/* Logo */}
         <Link to="/" className="flex items-center no-underline shrink-0">
           <img
             src={siteLogo || logo}
             alt="SecondSale"
-            className="h-12 sm:h-14 lg:h-[54px] w-auto object-contain transition-all"
+            className="h-11 sm:h-12 lg:h-[48px] w-auto object-contain transition-all"
           />
         </Link>
 
         {/* Desktop Nav Items */}
-        <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 shrink-0">
-          {navItems.map((item, idx) => {
+        <div className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0">
+          {desktopTopBarItems.map((item) => {
             const isSell = item.label === "Sell Device" || (item.hasDropdown && item.label !== "Buy Refurbished" && item.to !== "/buy-refurbished");
             const isBuy = item.label === "Buy Refurbished" || item.to === "/buy-refurbished";
             const isOpen = isSell ? sellDropdownOpen : isBuy ? buyDropdownOpen : false;
             const itemRef = isSell ? dropdownRef : isBuy ? buyDropdownRef : undefined;
 
-            let visibilityClass = "block";
-            if (idx === 3 || idx === 4) {
-              visibilityClass = "hidden xl:block";
-            } else if (idx >= 5) {
-              visibilityClass = "hidden 2xl:block";
-            }
-
             return (
               <div
                 key={item._id || item.label}
-                className={`relative ${visibilityClass}`}
+                className="relative block"
                 ref={itemRef}
                 onMouseEnter={() => {
                   if (item.isComingSoon) return;
@@ -897,17 +898,17 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
             );
           })}
 
-          {/* "More" Dropdown for items hidden on lg and xl screens */}
-          {navItems.length > 3 && (
+          {/* "More" Dropdown for items beyond primary services */}
+          {moreDropdownItems.length > 0 && (
             <div
-              className="relative hidden lg:block 2xl:hidden"
+              className="relative hidden lg:block"
               ref={moreDropdownRef}
               onMouseEnter={openMoreDropdown}
               onMouseLeave={() => closeMoreDropdownWithDelay(220)}
             >
               <button
                 type="button"
-                className={`flex items-center gap-1 px-2 xl:px-3 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent ${
+                className={`flex items-center gap-1 px-2.5 xl:px-3 py-2 rounded-lg text-xs xl:text-sm font-semibold transition-colors whitespace-nowrap cursor-pointer border-none bg-transparent ${
                   moreDropdownOpen
                     ? "text-[#087F8C] bg-[#E8F6F7]"
                     : "text-[#0F2D5B] hover:text-[#087F8C] hover:bg-[#E8F6F7]/50"
@@ -929,58 +930,55 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
                   onMouseEnter={openMoreDropdown}
                   onMouseLeave={() => closeMoreDropdownWithDelay(220)}
                 >
-                  {navItems.slice(3).map((item, sliceIdx) => {
-                    const isShownOnXl = sliceIdx < 2; // Items at index 3 & 4 (e.g. How It Works, Corporate) are shown in top bar on xl+
-                    return (
-                      <div
-                        key={item._id || item.label}
-                        className={isShownOnXl ? "xl:hidden" : "block"}
-                      >
-                        {item.isExternal ? (
-                          <a
-                            href={item.to}
-                            target="_blank"
-                            rel="noreferrer"
-                            onClick={() => setMoreDropdownOpen(false)}
-                            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] no-underline font-semibold text-xs xl:text-sm"
-                          >
-                            <span className="flex items-center gap-1.5">
-                              {item.label}
-                              {item.isComingSoon && (
-                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
-                                  Soon
-                                </span>
-                              )}
-                            </span>
-                            <ChevronRight size={13} className="text-slate-300" />
-                          </a>
-                        ) : (
-                          <button
-                            type="button"
-                            className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] font-semibold text-xs xl:text-sm text-left border-none bg-transparent cursor-pointer"
-                            onClick={() => {
-                              setMoreDropdownOpen(false);
-                              if (item.to?.startsWith("/#") && !item.isComingSoon) {
-                                const el = document.getElementById(item.to.replace("/#", ""));
-                                if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
-                              }
-                              if (item.to) navigate(item.to);
-                            }}
-                          >
-                            <span className="flex items-center gap-1.5">
-                              {item.label}
-                              {item.isComingSoon && (
-                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
-                                  Soon
-                                </span>
-                              )}
-                            </span>
-                            <ChevronRight size={13} className="text-slate-300" />
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {moreDropdownItems.map((item) => (
+                    <div
+                      key={item._id || item.label}
+                      className="block"
+                    >
+                      {item.isExternal ? (
+                        <a
+                          href={item.to}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={() => setMoreDropdownOpen(false)}
+                          className="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] no-underline font-semibold text-xs xl:text-sm"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            {item.label}
+                            {item.isComingSoon && (
+                              <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
+                                Soon
+                              </span>
+                            )}
+                          </span>
+                          <ChevronRight size={13} className="text-slate-300" />
+                        </a>
+                      ) : (
+                        <button
+                          type="button"
+                          className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-slate-800 hover:text-[#087F8C] font-semibold text-xs xl:text-sm text-left border-none bg-transparent cursor-pointer"
+                          onClick={() => {
+                            setMoreDropdownOpen(false);
+                            if (item.to?.startsWith("/#") && !item.isComingSoon) {
+                              const el = document.getElementById(item.to.replace("/#", ""));
+                              if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
+                            }
+                            if (item.to) navigate(item.to);
+                          }}
+                        >
+                          <span className="flex items-center gap-1.5">
+                            {item.label}
+                            {item.isComingSoon && (
+                              <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs leading-none">
+                                Soon
+                              </span>
+                            )}
+                          </span>
+                          <ChevronRight size={13} className="text-slate-300" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -988,46 +986,40 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
         </div>
 
         {/* Search (Desktop) */}
-        <div className="hidden md:block flex-1 min-w-[140px] sm:min-w-[170px] max-w-[220px] xl:max-w-[280px] relative shrink" ref={searchRef}>
+        <div className="hidden md:block flex-1 min-w-[180px] sm:min-w-[200px] max-w-[260px] xl:max-w-[320px] relative shrink" ref={searchRef}>
           <input
             type="text"
-            placeholder="Search device (e.g. iPhone 15)"
-            className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-sans text-[#0F2D5B] outline-none bg-[#F7FAFF] focus:border-[#087F8C] focus:bg-white focus:ring-2 focus:ring-[#087F8C]/20 transition-all"
+            placeholder="Search devices (e.g. iPhone 15)"
+            className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-xl text-sm font-sans text-[#0F2D5B] outline-none bg-[#F7FAFF] focus:border-[#087F8C] focus:bg-white focus:ring-2 focus:ring-[#087F8C]/20 transition-all"
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => {
               if (searchResults.length > 0 || searchQuery.length >= 2) setShowResults(true);
             }}
           />
-          <button className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#087F8C] rounded-lg flex items-center justify-center text-white hover:bg-[#066772] transition-colors">
+          <button className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 bg-[#087F8C] rounded-lg flex items-center justify-center text-white hover:bg-[#066772] transition-colors">
             <SearchIcon />
           </button>
           {renderSearchResults(false)}
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2 sm:gap-2.5 xl:gap-3 shrink-0">
-          {/* Secure & Trusted badge - shown on wide screens */}
-          <div className="hidden 2xl:flex items-center gap-1.5 text-xs font-semibold text-[#087F8C] whitespace-nowrap">
-            <ShieldCheck />
-            <span>Secure & Trusted</span>
-          </div>
-
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           {isLoggedIn ? (
-            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors shrink-0">
-              <div className="w-8 h-8 rounded-full bg-[#087F8C] text-white flex items-center justify-center text-xs font-bold">
+            <Link to="/dashboard" className="hidden sm:flex items-center gap-2 p-1.5 rounded-xl hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[#087F8C] text-white flex items-center justify-center text-xs font-bold shadow-xs">
                 {userName?.[0]?.toUpperCase() || "U"}
               </div>
             </Link>
           ) : (
-            <Link to="/login" className="hidden sm:flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-[#E8F6F7] text-[#0F2D5B] font-medium text-sm no-underline transition-colors shrink-0">
+            <Link to="/login" className="hidden sm:flex items-center justify-center w-9 h-9 rounded-xl hover:bg-[#E8F6F7] text-[#0F2D5B] no-underline transition-colors shrink-0">
               <UserIcon />
             </Link>
           )}
 
           <Link
             to="/sell-old-mobile-phones/brand"
-            className="hidden sm:inline-flex btn-gradient font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl no-underline hover:-translate-y-px active:translate-y-0 whitespace-nowrap shrink-0 shadow-sm"
+            className="hidden sm:inline-flex btn-gradient font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-xl no-underline hover:-translate-y-px active:translate-y-0 whitespace-nowrap shrink-0 shadow-sm"
           >
             Sell Now
           </Link>
@@ -1044,7 +1036,7 @@ const sortBrandsList = (categoryKey, brandsList = []) => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[68px] bg-white z-[999] overflow-y-auto dropdown-animate p-4">
+        <div className="lg:hidden fixed inset-0 top-[70px] bg-white z-[999] overflow-y-auto dropdown-animate p-4">
           <div className="mb-6 relative" ref={mobileSearchRef}>
             <input
               type="text"
