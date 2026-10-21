@@ -408,7 +408,7 @@ export const updateOrderStatus = async (req, res, next) => {
 
 export const getAllPincodes = async (req, res, next) => {
   try {
-    const { search, page = 1, limit = 50 } = req.query;
+    const { search, service, page = 1, limit = 50 } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const filter = {};
@@ -416,19 +416,48 @@ export const getAllPincodes = async (req, res, next) => {
       filter.$or = [
         { code: new RegExp(search, 'i') },
         { city: new RegExp(search, 'i') },
+        { state: new RegExp(search, 'i') },
       ];
     }
 
-    const [pincodes, total] = await Promise.all([
+    if (service === 'repair') {
+      filter['services.repair'] = true;
+    } else if (service === 'sell') {
+      filter['services.sell'] = { $ne: false };
+    } else if (service === 'buy') {
+      filter['services.buy'] = { $ne: false };
+    }
+
+    const [pincodesRaw, total, totalAll, repairCount, sellCount] = await Promise.all([
       Pincode.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit))
         .lean(),
       Pincode.countDocuments(filter),
+      Pincode.countDocuments(),
+      Pincode.countDocuments({ 'services.repair': true }),
+      Pincode.countDocuments({ 'services.sell': { $ne: false } }),
     ]);
 
-    res.json({ pincodes, total, page: parseInt(page), totalPages: Math.ceil(total / parseInt(limit)) });
+    const pincodes = pincodesRaw.map((p) => ({
+      ...p,
+      services: {
+        sell: p.services?.sell !== undefined ? Boolean(p.services.sell) : true,
+        buy: p.services?.buy !== undefined ? Boolean(p.services.buy) : true,
+        repair: Boolean(p.services?.repair),
+      },
+    }));
+
+    res.json({
+      pincodes,
+      total,
+      totalAll,
+      repairCount,
+      sellCount,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit)),
+    });
   } catch (error) {
     next(error);
   }
@@ -436,7 +465,18 @@ export const getAllPincodes = async (req, res, next) => {
 
 export const createPincode = async (req, res, next) => {
   try {
-    const pincode = await Pincode.create(req.body);
+    const { code, city, state, isActive, services } = req.body;
+    const pincode = await Pincode.create({
+      code,
+      city,
+      state,
+      isActive: isActive !== undefined ? isActive : true,
+      services: {
+        sell: services?.sell !== undefined ? Boolean(services.sell) : true,
+        buy: services?.buy !== undefined ? Boolean(services.buy) : true,
+        repair: Boolean(services?.repair),
+      },
+    });
     res.status(201).json(pincode);
   } catch (error) {
     if (error.code === 11000) {
@@ -448,9 +488,17 @@ export const createPincode = async (req, res, next) => {
 
 export const updatePincode = async (req, res, next) => {
   try {
+    const updateData = { ...req.body };
+    if (updateData.services) {
+      updateData.services = {
+        sell: updateData.services.sell !== undefined ? Boolean(updateData.services.sell) : true,
+        buy: updateData.services.buy !== undefined ? Boolean(updateData.services.buy) : true,
+        repair: Boolean(updateData.services.repair),
+      };
+    }
     const pincode = await Pincode.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -463,6 +511,53 @@ export const updatePincode = async (req, res, next) => {
     if (error.code === 11000) {
       return res.status(409).json({ message: 'Pincode already exists' });
     }
+    next(error);
+  }
+};
+
+export const togglePincodeService = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { service, enabled } = req.body;
+    if (!['sell', 'buy', 'repair'].includes(service)) {
+      return res.status(400).json({ message: 'Invalid service type' });
+    }
+
+    const pincode = await Pincode.findById(id);
+    if (!pincode) {
+      return res.status(404).json({ message: 'Pincode not found' });
+    }
+
+    if (!pincode.services) {
+      pincode.services = { sell: true, buy: true, repair: false };
+    }
+    pincode.services[service] = Boolean(enabled);
+    pincode.markModified('services');
+    await pincode.save();
+
+    res.json(pincode);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const bulkUpdatePincodeServices = async (req, res, next) => {
+  try {
+    const { ids, service, enabled } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: 'No pincodes selected' });
+    }
+    if (!['sell', 'buy', 'repair'].includes(service)) {
+      return res.status(400).json({ message: 'Invalid service type' });
+    }
+
+    await Pincode.updateMany(
+      { _id: { $in: ids } },
+      { $set: { [`services.${service}`]: Boolean(enabled) } }
+    );
+
+    res.json({ message: `Updated ${ids.length} pincodes successfully` });
+  } catch (error) {
     next(error);
   }
 };
