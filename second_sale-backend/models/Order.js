@@ -49,8 +49,15 @@ const orderSchema = new mongoose.Schema({
     storageType: String,
     yearOfPurchase: String,
     screenCondition: String,
-    // Shared
+    // Shared & Quiz Evaluation Details
     functionalIssues: [String],
+    functionalProblems: [String],
+    screenBodyDefects: [String],
+    subDefectAnswers: mongoose.Schema.Types.Mixed,
+    answerSummary: mongoose.Schema.Types.Mixed,
+    quizAnswers: mongoose.Schema.Types.Mixed,
+    powerStatus: String,
+    evaluationDetails: mongoose.Schema.Types.Mixed,
     accessories: mongoose.Schema.Types.Mixed, // String for laptop, [String] for mobile
   },
   priceBreakdown: {
@@ -91,6 +98,7 @@ const orderSchema = new mongoose.Schema({
   },
 }, {
   timestamps: true,
+  strict: false,
 });
 
 orderSchema.index({ userId: 1, createdAt: -1 });

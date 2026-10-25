@@ -473,6 +473,33 @@ export default function ConditionQuizPage() {
 
   const finalizeAndShowResult = () => {
     const variant = device.variants.find(v => v.storage === storage) || device.variants[0];
+    const accList = [
+      hasBox ? 'Original Box' : null,
+      bundlesCharger(device.brand, device.modelName) && hasCharger ? 'Original Charger' : null,
+    ].filter(Boolean);
+
+    const activeSubDefectLabels = [];
+    screenBodyDefects.forEach(defectId => {
+      const config = getSubDefectConfig(defectId, isFoldOrFlip);
+      if (config) {
+        config.sections.forEach(sec => {
+          const val = subDefectAnswers[sec.id];
+          const selectedIds = Array.isArray(val) ? val : (val ? [val] : []);
+          selectedIds.forEach(chosenOptId => {
+            const opt = sec.options.find(o => o.id === chosenOptId);
+            if (opt && opt.deductionKey) {
+              activeSubDefectLabels.push(`${sec.title}: ${opt.label}`);
+            }
+          });
+        });
+      } else {
+        const primary = CASHIFY_SCREEN_BODY_DEFECTS.find(d => d.id === defectId);
+        if (primary) activeSubDefectLabels.push(primary.label);
+      }
+    });
+
+    const functionalLabels = functionalProblems.map(f => FUNCTIONAL_PROBLEMS.find(p => p.id === f)?.label || f);
+
     updateQuote({
       device: {
         brand: device.brand,
@@ -481,6 +508,7 @@ export default function ConditionQuizPage() {
         category: 'mobile',
         imageUrl: device.imageUrl || '',
         storage: variant.storage,
+        deviceAge: effectiveAgeLabel,
         ableToMakeCalls,
         isTouchScreenWorking,
         isScreenOriginal,
@@ -491,10 +519,33 @@ export default function ConditionQuizPage() {
         screenBodyDefects,
         subDefectAnswers,
         functionalProblems,
-        accessories: [
-          hasBox ? 'Original Box' : null,
-          bundlesCharger(device.brand, device.modelName) && hasCharger ? 'Original Charger' : null,
-        ].filter(Boolean),
+        physicalIssues: activeSubDefectDeductionKeys.length > 0 ? activeSubDefectDeductionKeys : activeSubDefectLabels,
+        functionalIssues: functionalProblems,
+        technicalIssues: functionalProblems,
+        accessories: accList,
+        quizAnswers: {
+          ableToMakeCalls,
+          isTouchScreenWorking,
+          isScreenOriginal,
+          underWarranty: (isWarrantyEligible && !hasScreenOrPanelDamage) ? underWarranty : false,
+          hasGSTBill: (isWarrantyEligible && !hasScreenOrPanelDamage) ? hasGSTBill : false,
+          screenBodyDefects,
+          subDefectAnswers,
+          functionalProblems,
+          accessories: accList,
+          deviceAge: effectiveAgeLabel,
+        },
+        answerSummary: [
+          { question: "Able to make & receive calls?", answer: ableToMakeCalls ? "Yes" : "No" },
+          { question: "Touchscreen fully working?", answer: isTouchScreenWorking ? "Yes" : "No" },
+          { question: "Screen is Original?", answer: isScreenOriginal ? "Yes" : "No" },
+          { question: "Screen & Body Physical Condition", answer: activeSubDefectLabels.length > 0 ? activeSubDefectLabels.join(" | ") : "Flawless (No Scratches or Dents)" },
+          { question: "Functional & Hardware Faults", answer: functionalLabels.length > 0 ? functionalLabels.join(", ") : "None (All Working)" },
+          { question: "Device Age", answer: effectiveAgeLabel },
+          { question: "Under Official Brand Warranty?", answer: (isWarrantyEligible && !hasScreenOrPanelDamage && underWarranty) ? "Yes" : "No" },
+          { question: "Valid GST Bill Available?", answer: (isWarrantyEligible && !hasScreenOrPanelDamage && hasGSTBill) ? "Yes" : "No" },
+          { question: "Accessories Available", answer: accList.length > 0 ? accList.join(", ") : "None" },
+        ],
       },
       priceBreakdown: breakdown,
     });

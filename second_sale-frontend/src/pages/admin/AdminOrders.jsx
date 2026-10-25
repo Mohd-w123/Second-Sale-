@@ -5,7 +5,7 @@ import {
   Search, ChevronLeft, ChevronRight, X, MapPin, Smartphone, User,
   Calendar, CreditCard, Tv, Phone, CheckCircle2, AlertCircle,
   Trash2, ExternalLink, Eye, Image as ImageIcon, Sparkles, Filter,
-  Copy, Check, Share2
+  Copy, Check, Share2, ClipboardList
 } from "lucide-react";
 import "./admin.css";
 
@@ -113,6 +113,16 @@ const formatOrderWhatsAppMessage = (order) => {
   if (d.accessories) {
     const acc = Array.isArray(d.accessories) ? d.accessories.map(s => s.replace(/_/g, " ")).join(", ") : d.accessories;
     if (acc) lines.push(`• *Accessories:* ${acc}`);
+  }
+
+  if (Array.isArray(d.answerSummary) && d.answerSummary.length > 0) {
+    lines.push(``);
+    lines.push(`📋 *EVALUATION QUIZ SUMMARY*`);
+    d.answerSummary.forEach(item => {
+      const q = item.question || item.key;
+      const a = item.answer || item.value;
+      if (q && a) lines.push(`• *${q}:* ${a}`);
+    });
   }
   lines.push(``);
 
@@ -280,7 +290,7 @@ function OrderDetailModal({ order, onClose }) {
           </Section>
 
           {/* Device / Product Details */}
-          <Section icon={Smartphone} title="Product Details">
+          <Section icon={Smartphone} title="Product Specifications">
             <InfoRow label="Category" value={d.category} />
             <InfoRow label="Brand" value={d.brand} />
             <InfoRow label="Model" value={d.modelName} />
@@ -292,25 +302,75 @@ function OrderDetailModal({ order, onClose }) {
             {d.screenSize && <InfoRow label="Screen Size" value={d.screenSize} />}
             {d.storageType && <InfoRow label="Storage Type" value={d.storageType} />}
             {d.yearOfPurchase && <InfoRow label="Year of Purchase" value={d.yearOfPurchase} />}
-            {d.deviceAge && <InfoRow label="Device Age" value={d.deviceAge} />}
-            {d.batteryHealth && <InfoRow label="Battery Health" value={d.batteryHealth} />}
-            {d.screenCondition && <InfoRow label="Screen Condition" value={d.screenCondition} />}
-            {d.bodyCondition && <InfoRow label="Body Condition" value={d.bodyCondition} />}
-            <InfoRow label="Touchscreen Working" value={d.isTouchScreenWorking === true ? "Yes" : d.isTouchScreenWorking === false ? "No" : null} />
-            <InfoRow label="Screen Original" value={d.isScreenOriginal === true ? "Yes" : d.isScreenOriginal === false ? "No" : null} />
-            <InfoRow label="Under Warranty" value={d.underWarranty === true ? "Yes" : d.underWarranty === false ? "No" : null} />
-            {d.category === 'tablet' ? (
-              <>
-                <InfoRow label="Tablet Switches On" value={d.doesTabletSwitchOn === true ? "Yes" : d.doesTabletSwitchOn === false ? "No" : (d.ableToMakeCalls === true ? "Yes" : d.ableToMakeCalls === false ? "No" : null)} />
-                <InfoRow label="Cellular Network Working" value={d.isCellularNetworkWorking === true ? "Yes" : d.isCellularNetworkWorking === false ? "No" : null} />
-              </>
+            {d.eSIMSupport && <InfoRow label="eSIM Support" value={d.eSIMSupport} />}
+          </Section>
+
+          {/* Device Evaluation & Condition Report */}
+          <Section icon={ClipboardList} title="Device Evaluation & Condition Report">
+            {Array.isArray(d.answerSummary) && d.answerSummary.length > 0 ? (
+              <div className="divide-y divide-slate-100 py-1">
+                {d.answerSummary.map((item, idx) => {
+                  const q = item.question || item.key || `Question ${idx + 1}`;
+                  const a = String(item.answer ?? item.value ?? "");
+                  const lowerA = a.toLowerCase().trim();
+                  const isPositive = /^(yes|good|flawless|original|none\b|all working)/i.test(a.trim());
+                  const isNegative = /(fault|dead|crack|broken|defect|heavy|service|spots|lines|no\b)/i.test(a.trim()) && !lowerA.includes("no spots") && !lowerA.includes("no line") && !lowerA.includes("no scratches");
+                  const badgeColor = isPositive 
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                    : isNegative 
+                    ? "bg-rose-50 text-rose-700 border-rose-200" 
+                    : "bg-slate-100 text-slate-700 border-slate-200";
+
+                  return (
+                    <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 py-2.5">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                        {q}
+                      </span>
+                      <span className={`text-[12px] font-bold px-2.5 py-1 rounded-lg border max-w-sm text-right leading-tight self-start sm:self-auto ${badgeColor}`}>
+                        {a}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
-              <InfoRow label="Able to Make Calls" value={d.ableToMakeCalls === true ? "Yes" : d.ableToMakeCalls === false ? "No" : null} />
+              <div className="py-1">
+                {d.deviceAge && <InfoRow label="Device Age" value={d.deviceAge} />}
+                {d.batteryHealth && <InfoRow label="Battery Health" value={d.batteryHealth} />}
+                {d.screenCondition && <InfoRow label="Screen Condition" value={d.screenCondition} />}
+                {d.bodyCondition && <InfoRow label="Body Condition" value={d.bodyCondition} />}
+                <InfoRow label="Touchscreen Working" value={d.isTouchScreenWorking === true ? "Yes" : d.isTouchScreenWorking === false ? "No" : null} />
+                <InfoRow label="Screen Original" value={d.isScreenOriginal === true ? "Yes" : d.isScreenOriginal === false ? "No" : null} />
+                <InfoRow label="Under Warranty" value={d.underWarranty === true ? "Yes" : d.underWarranty === false ? "No" : null} />
+                <InfoRow label="Valid GST Bill" value={d.hasGSTBill === true ? "Yes" : d.hasGSTBill === false ? "No" : null} />
+                {d.category === 'tablet' ? (
+                  <>
+                    <InfoRow label="Tablet Switches On" value={d.doesTabletSwitchOn === true ? "Yes" : d.doesTabletSwitchOn === false ? "No" : (d.ableToMakeCalls === true ? "Yes" : d.ableToMakeCalls === false ? "No" : null)} />
+                    <InfoRow label="Cellular Network Working" value={d.isCellularNetworkWorking === true ? "Yes" : d.isCellularNetworkWorking === false ? "No" : null} />
+                  </>
+                ) : (
+                  <InfoRow label="Able to Make Calls" value={d.ableToMakeCalls === true ? "Yes" : d.ableToMakeCalls === false ? "No" : null} />
+                )}
+                <InfoRow label="Physical Issues / Defects" value={formatList(d.physicalIssues || d.screenBodyDefects)} />
+                <InfoRow label="Technical / Functional Faults" value={formatList(d.functionalIssues || d.functionalProblems || d.technicalIssues)} />
+              </div>
             )}
-            <InfoRow label="Physical Issues" value={formatList(d.physicalIssues)} />
-            <InfoRow label="Technical Issues" value={formatList(d.technicalIssues)} />
-            <InfoRow label="Functional Issues" value={formatList(d.functionalIssues)} />
-            <InfoRow label="Accessories" value={Array.isArray(d.accessories) ? formatList(d.accessories) : d.accessories} />
+          </Section>
+
+          {/* Accessories Submitted */}
+          <Section icon={CheckCircle2} title="Accessories Submitted">
+            {((Array.isArray(d.accessories) && d.accessories.length > 0) || (typeof d.accessories === "string" && d.accessories)) ? (
+              <div className="py-2.5 flex flex-wrap gap-2">
+                {(Array.isArray(d.accessories) ? d.accessories : [d.accessories]).map((acc, i) => (
+                  <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/30 shadow-2xs">
+                    <Check size={13} className="text-[#087F8C] stroke-[3]" />
+                    <span>{String(acc).replace(/_/g, " ")}</span>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic py-2">No accessories included with this device</p>
+            )}
           </Section>
 
           {/* Pricing */}
