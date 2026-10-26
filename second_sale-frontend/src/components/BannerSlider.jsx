@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { getApiBaseUrl } from "../utils/apiUrl";
 
-const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = getApiBaseUrl();
 
 const BANNERS_CACHE_KEY = "secondsale_cached_banners";
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo-secondsale.png";
+import { getApiBaseUrl } from "../utils/apiUrl";
 import { SOCIAL_LINKS as SOCIAL_URLS } from "../config/seo";
 import {
   Smartphone,
@@ -128,10 +129,7 @@ export default function Footer() {
   const [customPages, setCustomPages] = useState([]);
 
   const loadData = () => {
-    const API =
-      import.meta.env.VITE_API_BASE_URL ||
-      import.meta.env.VITE_API_URL ||
-      "http://localhost:5000/api";
+    const API = getApiBaseUrl();
 
     // Fetch site settings
     fetch(API + "/site-settings")

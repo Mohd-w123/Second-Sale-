@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { deviceService } from "../services/device.service";
+import { getApiBaseUrl } from "../utils/apiUrl";
 import logo from "../assets/logo-secondsale.png";
 
 const DEFAULT_MEGA_MENU_CATEGORIES = [
@@ -125,7 +126,7 @@ const ShieldCheck = () => (
   </svg>
 );
 
-const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API = getApiBaseUrl();
 
 /* ── Navbar Component ──────────────────────────────────────── */
 

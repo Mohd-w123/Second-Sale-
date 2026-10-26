@@ -2,6 +2,7 @@ import BannerSlider from "../components/BannerSlider";
 import { deviceService } from "../services/device.service";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getApiBaseUrl } from "../utils/apiUrl";
 import {
   Smartphone, Tablet, Laptop, Monitor,
   Shield, Tag, Zap, Truck, ArrowRight,
@@ -492,10 +493,7 @@ export default function HomePage() {
   });
 
   const fetchHomepage = () => {
-    const API =
-      import.meta.env.VITE_API_BASE_URL ||
-      import.meta.env.VITE_API_URL ||
-      "http://localhost:5000/api";
+    const API = getApiBaseUrl();
     fetch(API + "/homepage")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

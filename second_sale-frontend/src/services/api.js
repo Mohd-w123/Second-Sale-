@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { getCacheKey, saveToCache, readFromCache } from '../utils/offlineCache';
+import { getApiBaseUrl } from '../utils/apiUrl';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  baseURL: getApiBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
 });
 

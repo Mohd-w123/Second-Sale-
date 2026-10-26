@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { getApiBaseUrl } from './utils/apiUrl';
 import Navbar from './components/navbar.jsx';
 import Footer from './components/footer.jsx';
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -106,7 +107,7 @@ import AdminSalesUsers from './pages/admin/AdminSalesUsers.jsx';
 import AdminQuizConfig from './pages/admin/AdminQuizConfig.jsx';
 import CustomPageView from './pages/CustomPageView.jsx';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE = getApiBaseUrl();
 
 function App() {
   const location = useLocation();
