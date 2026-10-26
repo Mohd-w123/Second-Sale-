@@ -20,21 +20,71 @@ const WhatsAppIcon = ({ size = 16, className = "" }) => (
   </svg>
 );
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 export default function OrderConfirmationPage() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activePayment, setActivePayment] = useState('cash');
+  const [activePayment, setActivePayment] = useState('upi');
+  const [sellPayouts, setSellPayouts] = useState({ cash: false, upi: true, bank: true });
+  const [upiInput, setUpiInput] = useState('');
+  const [savingPayment, setSavingPayment] = useState(false);
+  const [paymentSuccessMsg, setPaymentSuccessMsg] = useState('');
 
   useEffect(() => {
     orderService.getOrder(orderId).then(res => {
       setOrder(res.data);
       setLoading(false);
-      if (res.data.pickup?.paymentMethod) {
-        setActivePayment(res.data.pickup.paymentMethod);
-      }
+      const pm = (res.data.pickup?.paymentMethod || '').toLowerCase();
+      if (pm.includes('bank')) setActivePayment('bank');
+      else if (pm.includes('cash')) setActivePayment('cash');
+      else setActivePayment('upi');
     }).catch(() => setLoading(false));
+
+    fetch(`${API_BASE}/site-settings`)
+      .then(res => res.json())
+      .then(data => {
+        if (data?.paymentConfig) {
+          const isCodEnabled = data.paymentConfig?.cod?.isEnabled !== false;
+          const isSellCashEnabled = data.paymentConfig?.sellPayouts?.cash !== false;
+          const isCashActive = Boolean(isCodEnabled && isSellCashEnabled);
+          const payouts = {
+            upi: data.paymentConfig?.sellPayouts?.upi !== false,
+            bank: data.paymentConfig?.sellPayouts?.bank !== false,
+            cash: isCashActive,
+          };
+          setSellPayouts(payouts);
+          setActivePayment(prev => {
+            if (prev === 'cash' && !isCashActive) {
+              return payouts.upi ? 'upi' : (payouts.bank ? 'bank' : '');
+            }
+            return prev;
+          });
+        }
+      })
+      .catch(() => {});
   }, [orderId]);
+
+  const handleSaveUpi = async () => {
+    if (!upiInput.trim()) return;
+    setSavingPayment(true);
+    try {
+      const paymentStr = `UPI - ${upiInput.trim()}`;
+      await orderService.updatePaymentMethod(order.orderId || orderId, paymentStr);
+      setOrder(prev => ({
+        ...prev,
+        pickup: { ...prev.pickup, paymentMethod: paymentStr }
+      }));
+      setPaymentSuccessMsg('Payment method updated successfully!');
+      setTimeout(() => setPaymentSuccessMsg(''), 3000);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update payment method. Please try again.');
+    } finally {
+      setSavingPayment(false);
+    }
+  };
 
   if (loading) return <Loader />;
   if (!order) return <div className="text-center py-20 font-bold text-gray-500">Order not found.</div>;
@@ -159,7 +209,16 @@ export default function OrderConfirmationPage() {
             {/* Update Payment Method */}
             <div className="bg-white rounded-[40px] border border-gray-100 p-8 sm:p-10 shadow-sm">
               <h3 className="text-xl font-black text-[#111827]">Update Payment Method</h3>
-              <p className="text-xs font-bold text-gray-400 mt-1 mb-8">Order was placed with <span className="capitalize">{order.pickup?.paymentMethod}</span>. You can switch to UPI or Bank and save now.</p>
+              <p className="text-xs font-bold text-gray-400 mt-1 mb-8">
+                Order was placed with <span className="capitalize">{order.pickup?.paymentMethod}</span>. You can switch to UPI or Bank and save now.
+              </p>
+
+              {paymentSuccessMsg && (
+                <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-2xl flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  {paymentSuccessMsg}
+                </div>
+              )}
               
               <div className="space-y-4">
                 <div className="flex items-center gap-4 text-xs font-black text-gray-400 uppercase tracking-widest mb-6">
@@ -168,41 +227,57 @@ export default function OrderConfirmationPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <PaymentCard 
-                    label="UPI" 
-                    desc="Add UPI ID" 
-                    icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>}
-                    active={activePayment === 'upi'}
-                    onClick={() => setActivePayment('upi')}
-                    expanded={activePayment === 'upi'}
-                  >
-                    <div className="mt-6 flex flex-col gap-2">
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">UPI ID</p>
-                       <div className="flex gap-2">
-                         <input type="text" placeholder="Enter your UPI ID (e.g., name@upi)" className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#087F8C]" />
-                         <button className="bg-[#087F8C] text-white px-6 py-3 rounded-xl font-black text-xs flex items-center gap-2">
-                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
-                           Accept
-                         </button>
-                       </div>
-                    </div>
-                  </PaymentCard>
+                  {sellPayouts?.upi !== false && (
+                    <PaymentCard 
+                      label="UPI" 
+                      desc="Add UPI ID" 
+                      icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>}
+                      active={activePayment === 'upi'}
+                      onClick={() => setActivePayment('upi')}
+                      expanded={activePayment === 'upi'}
+                    >
+                      <div className="mt-6 flex flex-col gap-2">
+                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">UPI ID</p>
+                         <div className="flex gap-2">
+                           <input 
+                             type="text" 
+                             value={upiInput}
+                             onChange={(e) => setUpiInput(e.target.value)}
+                             placeholder="Enter your UPI ID (e.g., name@upi)" 
+                             className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#087F8C]" 
+                           />
+                           <button 
+                             onClick={handleSaveUpi}
+                             disabled={savingPayment || !upiInput.trim()}
+                             className="bg-[#087F8C] text-white px-6 py-3 rounded-xl font-black text-xs flex items-center gap-2 hover:bg-[#066772] transition-colors disabled:opacity-50"
+                           >
+                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12"/></svg>
+                             {savingPayment ? 'Saving...' : 'Accept'}
+                           </button>
+                         </div>
+                      </div>
+                    </PaymentCard>
+                  )}
 
-                  <PaymentCard 
-                    label="Bank" 
-                    desc="Add Bank Details" 
-                    icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M2 10l10-8 10 8"/></svg>}
-                    active={activePayment === 'bank'}
-                    onClick={() => setActivePayment('bank')}
-                  />
+                  {sellPayouts?.bank !== false && (
+                    <PaymentCard 
+                      label="Bank" 
+                      desc="Add Bank Details" 
+                      icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M15 10v11M19 10v11M2 10l10-8 10 8"/></svg>}
+                      active={activePayment === 'bank'}
+                      onClick={() => setActivePayment('bank')}
+                    />
+                  )}
 
-                  <PaymentCard 
-                    label="Cash" 
-                    desc="Cash Payment" 
-                    icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>}
-                    active={activePayment === 'cash'}
-                    onClick={() => setActivePayment('cash')}
-                  />
+                  {Boolean(sellPayouts?.cash) && (
+                    <PaymentCard 
+                      label="Cash" 
+                      desc="Cash Payment" 
+                      icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>}
+                      active={activePayment === 'cash'}
+                      onClick={() => setActivePayment('cash')}
+                    />
+                  )}
                 </div>
               </div>
             </div>
