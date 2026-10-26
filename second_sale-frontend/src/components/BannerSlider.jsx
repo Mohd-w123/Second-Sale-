@@ -3,15 +3,28 @@ import { Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+const BANNERS_CACHE_KEY = "secondsale_cached_banners";
+
 export default function BannerSlider({ onBannersChange, autoPlaySpeed = 4000 }) {
-  const [banners, setBanners] = useState([]);
+  const [banners, setBanners] = useState(() => {
+    try {
+      const cached = localStorage.getItem(BANNERS_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.filter(b => b.isActive !== false);
+        }
+      }
+    } catch {}
+    return [];
+  });
   const [active, setActive] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
   const timerRef = useRef(null);
 
   const updateBanners = useCallback((rawBanners) => {
-    const live = Array.isArray(rawBanners) ? rawBanners.filter(b => b.isActive) : [];
+    const live = Array.isArray(rawBanners) ? rawBanners.filter(b => b.isActive !== false) : [];
     setBanners(live);
     if (onBannersChange) {
       onBannersChange(live.length > 0);
@@ -20,17 +33,38 @@ export default function BannerSlider({ onBannersChange, autoPlaySpeed = 4000 }) 
 
   useEffect(() => {
     fetch(`${API}/site-settings`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to load banners");
+        return r.json();
+      })
       .then(data => {
-        updateBanners(data?.banners);
+        if (Array.isArray(data?.banners)) {
+          updateBanners(data.banners);
+          try {
+            localStorage.setItem(BANNERS_CACHE_KEY, JSON.stringify(data.banners));
+          } catch {}
+        }
       })
       .catch(() => {
+        try {
+          const cached = localStorage.getItem(BANNERS_CACHE_KEY);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              updateBanners(parsed);
+              return;
+            }
+          }
+        } catch {}
         updateBanners([]);
       });
 
     const handleSettingsUpdated = (e) => {
       if (e.detail?.banners) {
         updateBanners(e.detail.banners);
+        try {
+          localStorage.setItem(BANNERS_CACHE_KEY, JSON.stringify(e.detail.banners));
+        } catch {}
       }
     };
     window.addEventListener('site-settings-updated', handleSettingsUpdated);

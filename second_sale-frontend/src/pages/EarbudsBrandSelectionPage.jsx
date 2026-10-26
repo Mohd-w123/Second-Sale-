@@ -32,38 +32,23 @@ export default function EarbudsBrandSelectionPage() {
   const [loading, setLoading] = useState(true);
   const [failedLogos, setFailedLogos] = useState({});
 
-  useEffect(() => {
+  const fetchBrands = () => {
+    setLoading(true);
     deviceService.getBrands("earbuds").then(res => {
       if (res.data && res.data.length > 0) {
-        const enriched = res.data.map(b => {
-          const match = EARBUDS_BRANDS.find(eb => eb.name.toLowerCase() === (b.brand || '').toLowerCase());
-          return {
-            ...b,
-            logo: b.logo || match?.logo || '',
-            color: b.color || match?.color || '#000000',
-          };
-        });
-        setBrands(sortEarbudsBrands(enriched));
+        setBrands(sortEarbudsBrands(res.data));
       } else {
-        const fallback = EARBUDS_BRANDS.map(b => ({
-          brand: b.name,
-          modelCount: b.models,
-          logo: b.logo,
-          color: b.color
-        }));
-        setBrands(sortEarbudsBrands(fallback));
+        setBrands([]);
       }
       setLoading(false);
     }).catch(() => {
-      const fallback = EARBUDS_BRANDS.map(b => ({
-        brand: b.name,
-        modelCount: b.models,
-        logo: b.logo,
-        color: b.color
-      }));
-      setBrands(sortEarbudsBrands(fallback));
+      setBrands([]);
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    fetchBrands();
   }, []);
 
   const getBrandLogo = (name) => {
@@ -120,57 +105,72 @@ export default function EarbudsBrandSelectionPage() {
         </div>
       </div>
 
-      {/* Brands Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-        {filteredBrands.map((b) => {
-          const brandName = b.brand || b.name;
-          const logoUrl = b.logo || getBrandLogo(brandName);
-          const hasFailed = failedLogos[brandName];
-
-          return (
-            <Link
-              key={brandName}
-              to={`/sell-earbuds/${encodeURIComponent(brandName.toLowerCase())}`}
-              className="group bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 hover:border-blue-500/30 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-between text-center relative overflow-hidden"
-            >
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-50 flex items-center justify-center p-3 sm:p-4 mb-4 group-hover:scale-105 transition-transform">
-                {logoUrl && !hasFailed ? (
-                  <img
-                    src={logoUrl}
-                    alt={brandName}
-                    onError={() => handleLogoError(brandName)}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-xs"
-                  />
-                ) : (
-                  <span className="text-xl font-black text-slate-700">
-                    {brandName}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-                  {brandName}
-                </h3>
-                <p className="text-xs text-slate-400 font-medium mt-0.5">
-                  {b.modelCount !== undefined ? `${b.modelCount} Models` : "Sell Now"}
-                </p>
-              </div>
-
-              {b.maxPrice > 0 && (
-                <div className="mt-3 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
-                  Up to ₹{b.maxPrice.toLocaleString("en-IN")}
-                </div>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-
-      {filteredBrands.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200">
-          <p className="text-slate-500 font-bold">No brands found matching &quot;{search}&quot;</p>
+      {/* Brands Grid or Retry */}
+      {brands.length === 0 ? (
+        <div className="text-center py-12 px-4 bg-white rounded-2xl border border-slate-100 max-w-md mx-auto my-8 shadow-sm">
+          <p className="text-sm font-bold text-slate-700 mb-1">Unable to connect to server</p>
+          <p className="text-xs text-slate-400 mb-5">Please check your internet connection or retry.</p>
+          <button
+            onClick={fetchBrands}
+            className="btn-gradient text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md cursor-pointer active:scale-95 transition-transform"
+          >
+            Retry Connection
+          </button>
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+            {filteredBrands.map((b) => {
+              const brandName = b.brand || b.name;
+              const logoUrl = b.logo || getBrandLogo(brandName);
+              const hasFailed = failedLogos[brandName];
+
+              return (
+                <Link
+                  key={brandName}
+                  to={`/sell-earbuds/${encodeURIComponent(brandName.toLowerCase())}`}
+                  className="group bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 hover:border-blue-500/30 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-between text-center relative overflow-hidden"
+                >
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-slate-50 flex items-center justify-center p-3 sm:p-4 mb-4 group-hover:scale-105 transition-transform">
+                    {logoUrl && !hasFailed ? (
+                      <img
+                        src={logoUrl}
+                        alt={brandName}
+                        onError={() => handleLogoError(brandName)}
+                        className="max-h-full max-w-full object-contain filter drop-shadow-xs"
+                      />
+                    ) : (
+                      <span className="text-xl font-black text-slate-700">
+                        {brandName}
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                      {brandName}
+                    </h3>
+                    <p className="text-xs text-slate-400 font-medium mt-0.5">
+                      {b.modelCount !== undefined ? `${b.modelCount} Models` : "Sell Now"}
+                    </p>
+                  </div>
+
+                  {b.maxPrice > 0 && (
+                    <div className="mt-3 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                      Up to ₹{b.maxPrice.toLocaleString("en-IN")}
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          {filteredBrands.length === 0 && (
+            <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200">
+              <p className="text-slate-500 font-bold">No brands found matching &quot;{search}&quot;</p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Trust Badges */}

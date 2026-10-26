@@ -39,21 +39,19 @@ export default function TabletBrandSelectionPage() {
   const [loading, setLoading] = useState(true);
   const [failedLogos, setFailedLogos] = useState({});
 
-  useEffect(() => {
+  const fetchBrands = () => {
+    setLoading(true);
     deviceService.getBrands('tablet').then(res => {
-      setBrands(sortTabletBrands(res.data));
+      setBrands(sortTabletBrands(res.data || []));
       setLoading(false);
     }).catch(() => {
-      // Fallback to constants
-      const fallback = TABLET_BRANDS.map(b => ({ 
-        brand: b.name, 
-        modelCount: b.models,
-        logo: b.logo,
-        color: b.color
-      }));
-      setBrands(sortTabletBrands(fallback));
+      setBrands([]);
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    fetchBrands();
   }, []);
 
   const getBrandColor = (name) => {
@@ -98,37 +96,50 @@ export default function TabletBrandSelectionPage() {
         </p>
       </div>
 
-      {/* Brand Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
-        {brands.map(b => (
-          <Link
-            key={b.brand}
-            to={`/sell-tablet/${b.brand.toLowerCase()}`}
-            className="group flex flex-col items-center gap-3 bg-white rounded-2xl border border-border p-5 sm:p-6 transition-all duration-200 hover:border-primary hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(8,127,140,0.15)] no-underline"
+      {/* Brand Grid or Retry */}
+      {brands.length === 0 ? (
+        <div className="text-center py-12 px-4 bg-white rounded-2xl border border-slate-100 max-w-md mx-auto my-8 shadow-sm">
+          <p className="text-sm font-bold text-slate-700 mb-1">Unable to connect to server</p>
+          <p className="text-xs text-slate-400 mb-5">Please check your internet connection or retry.</p>
+          <button
+            onClick={fetchBrands}
+            className="btn-gradient text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md cursor-pointer active:scale-95 transition-transform"
           >
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 p-2.5 transition-transform duration-200 group-hover:scale-110 overflow-hidden">
-              {(b.logo || getBrandLogo(b.brand)) && !failedLogos[b.brand] ? (
-                <img
-                  src={b.logo || getBrandLogo(b.brand)}
-                  alt={b.brand}
-                  className="w-full h-full object-contain"
-                  onError={() => handleLogoError(b.brand)}
-                />
-              ) : (
-                <span className="text-slate-800 font-extrabold text-sm sm:text-base">
-                  {b.brand.slice(0, 2).toUpperCase()}
-                </span>
-              )}
-            </div>
-            <div className="text-center">
-              <h3 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-primary transition-colors mb-0.5">
-                {b.brand}
-              </h3>
-              <p className="text-xs text-text-muted">{b.modelCount || 0} Models</p>
-            </div>
-          </Link>
-        ))}
-      </div>
+            Retry Connection
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+          {brands.map(b => (
+            <Link
+              key={b.brand}
+              to={`/sell-tablet/${b.brand.toLowerCase()}`}
+              className="group flex flex-col items-center gap-3 bg-white rounded-2xl border border-border p-5 sm:p-6 transition-all duration-200 hover:border-primary hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(8,127,140,0.15)] no-underline"
+            >
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center bg-slate-50 border border-slate-100 p-2.5 transition-transform duration-200 group-hover:scale-110 overflow-hidden">
+                {(b.logo || getBrandLogo(b.brand)) && !failedLogos[b.brand] ? (
+                  <img
+                    src={b.logo || getBrandLogo(b.brand)}
+                    alt={b.brand}
+                    className="w-full h-full object-contain"
+                    onError={() => handleLogoError(b.brand)}
+                  />
+                ) : (
+                  <span className="text-slate-800 font-extrabold text-sm sm:text-base">
+                    {b.brand.slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="text-center">
+                <h3 className="text-sm sm:text-base font-bold text-text-primary group-hover:text-primary transition-colors mb-0.5">
+                  {b.brand}
+                </h3>
+                <p className="text-xs text-text-muted">{b.modelCount || 0} Models</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -10,10 +10,6 @@ import {
   Tv, Camera, Speaker
 } from "lucide-react";
 import heroBannerImage from "../assets/hero-banner.jpg";
-import mobileDeviceImg from "../assets/devices/mobile.png";
-import tabletDeviceImg from "../assets/devices/tablet.png";
-import laptopDeviceImg from "../assets/devices/laptop.png";
-import macDeviceImg from "../assets/devices/mac.png";
 import SEOHead from "../components/seo/SEOHead";
 import PageLoader from "../components/ui/PageLoader";
 import { ENTITY_SUMMARY } from "../config/seo";
@@ -22,65 +18,6 @@ import { CITIES as CITY_DATA } from "../data/cities";
 import { buildSchemaGraph, faqPageSchema, howToSchema, organizationSchema, websiteSchema } from "../utils/schema";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-
-const DEVICE_CATEGORIES = [
-  {
-    label: "Mobile Phones",
-    desc: "Sell old smartphones",
-    to: "/sell-old-mobile-phones/brand",
-    img: mobileDeviceImg,
-    color: "#E8F6F7",
-  },
-  {
-    label: "Tablets",
-    desc: "Sell old tablets",
-    to: "/sell-tablet/brand",
-    img: tabletDeviceImg,
-    color: "#E0F0FF",
-  },
-  {
-    label: "Laptops",
-    desc: "Sell old laptops",
-    to: "/sell-old-laptops/brand",
-    img: laptopDeviceImg,
-    color: "#FFF3E0",
-  },
-  {
-    label: "iMac",
-    desc: "Sell old iMac / Mac",
-    to: "/sell-imac/brand",
-    img: macDeviceImg,
-    color: "#F3E8FF",
-  },
-  {
-    label: "Earbuds",
-    desc: "Sell AirPods & Earbuds",
-    to: "/sell-earbuds/brand",
-    icon: "headphones",
-    color: "#ECFDF5",
-  },
-  {
-    label: "Smartwatch",
-    desc: "Sell Apple & smartwatches",
-    to: "/sell-smartwatch/brand",
-    icon: "smartwatch",
-    color: "#FEF3C7",
-  },
-  {
-    label: "Gaming Console",
-    desc: "Sell PS5, Xbox & Switch",
-    to: "/sell-gaming/brand",
-    icon: "console",
-    color: "#EDE9FE",
-  },
-  {
-    label: "Television",
-    desc: "Sell your old TV",
-    to: "/sell-tv/brand",
-    icon: "tv",
-    color: "#E0F2FE",
-  },
-];
 
 const POPULAR_SEARCHES = ["iPhone 15", "Samsung S24", "OnePlus 12", "MacBook Air", "iPad Pro"];
 
@@ -530,8 +467,29 @@ export default function HomePage() {
     };
   }, []);
 
-  const [sectionsConfig, setSectionsConfig] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const HOMEPAGE_CACHE_KEY = "secondsale_cached_homepage";
+
+  const [sectionsConfig, setSectionsConfig] = useState(() => {
+    try {
+      const cached = localStorage.getItem(HOMEPAGE_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return null;
+  });
+
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cached = localStorage.getItem(HOMEPAGE_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return false;
+      }
+    } catch {}
+    return true;
+  });
 
   const fetchHomepage = () => {
     const API =
@@ -539,13 +497,32 @@ export default function HomePage() {
       import.meta.env.VITE_API_URL ||
       "http://localhost:5000/api";
     fetch(API + "/homepage")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
-        if (data?.sections && Array.isArray(data.sections)) {
+        if (data?.sections && Array.isArray(data.sections) && data.sections.length > 0) {
           setSectionsConfig(data.sections);
+          try {
+            localStorage.setItem(HOMEPAGE_CACHE_KEY, JSON.stringify(data.sections));
+          } catch (e) {
+            console.warn("Failed to cache homepage:", e);
+          }
         }
       })
-      .catch((err) => console.warn("Failed to load dynamic homepage config:", err))
+      .catch((err) => {
+        console.warn("Failed to load dynamic homepage config, using cached version:", err);
+        try {
+          const cached = localStorage.getItem(HOMEPAGE_CACHE_KEY);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setSectionsConfig(parsed);
+            }
+          }
+        } catch {}
+      })
       .finally(() => {
         setLoading(false);
       });
@@ -845,7 +822,9 @@ function DeviceCategorySlider({ sec }) {
   const categories =
     Array.isArray(sec?.content?.categories) && sec.content.categories.length > 0
       ? sec.content.categories
-      : DEVICE_CATEGORIES;
+      : [];
+
+  if (categories.length === 0) return null;
 
   const updateScrollState = () => {
     const el = scrollRef.current;
@@ -978,20 +957,9 @@ function DeviceCategorySlider({ sec }) {
             }}
           >
             {categories.map((cat, idx) => {
-              const defaultCat = DEVICE_CATEGORIES[idx % DEVICE_CATEGORIES.length] || DEVICE_CATEGORIES[0];
-              const color = cat.color || defaultCat.color || "#E8F6F7";
-
-              // Determine image / icon dynamically
-              let img = cat.img || null;
-              if (!img) {
-                if (cat.icon === "mobile") img = mobileDeviceImg;
-                else if (cat.icon === "tablet") img = tabletDeviceImg;
-                else if (cat.icon === "laptop") img = laptopDeviceImg;
-                else if (cat.icon === "imac") img = macDeviceImg;
-                else if (!cat.icon && defaultCat.img) img = defaultCat.img;
-              }
-
-              const iconType = cat.icon || (!img ? defaultCat.icon : null);
+              const color = cat.color || "#E8F6F7";
+              const img = cat.img || null;
+              const iconType = (cat.icon || "").toLowerCase();
 
               return (
                 <Link
@@ -1012,11 +980,11 @@ function DeviceCategorySlider({ sec }) {
                       <div className="w-14 h-14 rounded-2xl bg-amber-100/90 text-amber-600 flex items-center justify-center shadow-xs border border-amber-200/50">
                         <Watch size={28} />
                       </div>
-                    ) : iconType === "console" ? (
+                    ) : iconType === "console" || iconType === "gaming" ? (
                       <div className="w-14 h-14 rounded-2xl bg-purple-100/90 text-purple-600 flex items-center justify-center shadow-xs border border-purple-200/50">
                         <Gamepad2 size={28} />
                       </div>
-                    ) : iconType === "tv" ? (
+                    ) : iconType === "tv" || iconType === "television" ? (
                       <div className="w-14 h-14 rounded-2xl bg-teal-100/90 text-[#087F8C] flex items-center justify-center shadow-xs border border-teal-200/50">
                         <Tv size={28} />
                       </div>
@@ -1028,13 +996,25 @@ function DeviceCategorySlider({ sec }) {
                       <div className="w-14 h-14 rounded-2xl bg-indigo-100/90 text-indigo-600 flex items-center justify-center shadow-xs border border-indigo-200/50">
                         <Speaker size={28} />
                       </div>
-                    ) : iconType === "monitor" ? (
-                      <div className="w-14 h-14 rounded-2xl bg-cyan-100/90 text-cyan-600 flex items-center justify-center shadow-xs border border-cyan-200/50">
+                    ) : iconType === "monitor" || iconType === "imac" || iconType === "mac" ? (
+                      <div className="w-14 h-14 rounded-2xl bg-purple-100/90 text-purple-600 flex items-center justify-center shadow-xs border border-purple-200/50">
                         <Monitor size={28} />
                       </div>
-                    ) : (
+                    ) : iconType === "laptop" ? (
+                      <div className="w-14 h-14 rounded-2xl bg-amber-100/90 text-amber-700 flex items-center justify-center shadow-xs border border-amber-200/50">
+                        <Laptop size={28} />
+                      </div>
+                    ) : iconType === "tablet" ? (
+                      <div className="w-14 h-14 rounded-2xl bg-blue-100/90 text-blue-600 flex items-center justify-center shadow-xs border border-blue-200/50">
+                        <Tablet size={28} />
+                      </div>
+                    ) : iconType === "earbuds" || iconType === "headphones" ? (
                       <div className="w-14 h-14 rounded-2xl bg-emerald-100/90 text-emerald-600 flex items-center justify-center shadow-xs border border-emerald-200/50">
                         <Headphones size={28} />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl bg-teal-100/90 text-[#087F8C] flex items-center justify-center shadow-xs border border-teal-200/50">
+                        <Smartphone size={28} />
                       </div>
                     )}
                   </div>
@@ -1687,24 +1667,9 @@ function DeviceCategorySlider({ sec }) {
     cityLinks: renderCityLinks,
   };
 
-  const DEFAULT_ORDER = [
-    { type: "slider", isEnabled: true },
-    { type: "hero", isEnabled: true },
-    { type: "deviceCategories", isEnabled: true },
-    { type: "stats", isEnabled: true },
-    { type: "featuresStrip", isEnabled: true },
-    { type: "services", isEnabled: true },
-    { type: "buyRefurbished", isEnabled: true },
-    { type: "howItWorks", isEnabled: true },
-    { type: "reviews", isEnabled: true },
-    { type: "whyUs", isEnabled: true },
-    { type: "faqs", isEnabled: true },
-    { type: "cityLinks", isEnabled: true },
-  ];
-
   // If dynamic sections are loaded but lack 'slider', ensure slider is included
   const sectionsToRender = (() => {
-    if (!sectionsConfig || sectionsConfig.length === 0) return DEFAULT_ORDER;
+    if (!sectionsConfig || sectionsConfig.length === 0) return [];
     const hasSlider = sectionsConfig.some((s) => s.type === "slider");
     const list = hasSlider ? [...sectionsConfig] : [{ type: "slider", isEnabled: true, order: 0 }, ...sectionsConfig];
     return list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -1712,6 +1677,28 @@ function DeviceCategorySlider({ sec }) {
 
   if (loading) {
     return <PageLoader text="Loading marketplace..." />;
+  }
+
+  if (sectionsToRender.length === 0) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-4 py-20 bg-[#F9FAFB]">
+        <div className="bg-white p-8 sm:p-12 rounded-[32px] border border-gray-100 shadow-xl max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-[#E8F6F7] text-[#087F8C] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-sm">
+            <Zap size={30} />
+          </div>
+          <h2 className="text-xl font-black text-[#0F2D5B] mb-2">Connecting to SecondSale...</h2>
+          <p className="text-xs font-bold text-gray-400 mb-6 leading-relaxed">
+            We are having trouble reaching the server. Please check your connection or retry.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="w-full btn-gradient text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg transition-transform active:scale-95 cursor-pointer"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

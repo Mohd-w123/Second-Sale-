@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCacheKey, saveToCache, readFromCache } from '../utils/offlineCache';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
@@ -23,12 +24,35 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor — auto-refresh on 401 (for customer routes only)
+// Response interceptor — cache successful GET requests, serve from cache when server is down, & auto-refresh on 401
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Cache consumer GET requests
+    if (response.config?.method?.toLowerCase() === 'get' && !response.config.url?.includes('/admin')) {
+      const cacheKey = getCacheKey('AXIOS', response.config.url);
+      saveToCache(cacheKey, response.data);
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     
+    // Fallback to cache for GET requests if server is down (Network Error or >= 500)
+    if (originalRequest?.method?.toLowerCase() === 'get' && (!error.response || error.response.status >= 500) && !originalRequest.url?.includes('/admin')) {
+      const cacheKey = getCacheKey('AXIOS', originalRequest.url);
+      const cached = readFromCache(cacheKey);
+      if (cached) {
+        console.info(`[OfflineCache] Serving cached Axios data for ${originalRequest.url}`);
+        return Promise.resolve({
+          data: cached,
+          status: 200,
+          statusText: 'OK (Offline Cache)',
+          headers: {},
+          config: originalRequest,
+        });
+      }
+    }
+
     // Never run consumer refresh/redirect logic on admin endpoints
     if (originalRequest?.url?.includes('/admin')) {
       return Promise.reject(error);
