@@ -32,7 +32,13 @@ import {
   Zap,
   Sparkles,
   Edit2,
-  Camera
+  Camera,
+  CreditCard,
+  Wallet,
+  Building2,
+  CheckCircle2,
+  Lock,
+  Banknote
 } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || "http://localhost:5000/api";
@@ -103,6 +109,47 @@ export default function AdminSiteSettings() {
   const [checkingBalance, setCheckingBalance] = useState(false);
   const [savingOtp, setSavingOtp] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
+
+  // Payment Gateways & Options state
+  const [isPaymentOpen, setIsPaymentOpen] = useState(true);
+  const [savingPayment, setSavingPayment] = useState(false);
+  const [showGatewaySecret, setShowGatewaySecret] = useState(false);
+  const [paymentConfig, setPaymentConfig] = useState({
+    cod: {
+      isEnabled: false,
+      label: 'Cash on Delivery / Pay on Delivery',
+      description: 'Inspect package upon delivery and pay via Cash or UPI to courier agent.',
+    },
+    upi: {
+      isEnabled: true,
+      label: 'Direct UPI (PhonePe / GPay / Paytm)',
+      description: 'Pay instantly using your preferred UPI app or scan QR code.',
+      upiId: 'secondsale@upi',
+    },
+    netbanking: {
+      isEnabled: true,
+      label: 'Net Banking / Direct Bank Transfer',
+      description: 'Transfer securely via NEFT/IMPS to SecondSale verified escrow account.',
+      accountName: 'SecondSale Technologies Pvt Ltd',
+      accountNumber: '',
+      ifscCode: '',
+      bankName: '',
+    },
+    gateway: {
+      isEnabled: false,
+      provider: 'razorpay',
+      label: 'Online Payment (Cards, Netbanking, UPI, Wallets)',
+      description: 'Instant and secure payment gateway powered by Razorpay',
+      keyId: '',
+      keySecret: '',
+      merchantId: '',
+    },
+    sellPayouts: {
+      cash: true,
+      upi: true,
+      bank: true,
+    },
+  });
 
   // Banner upload state
   const [bannerFile, setBannerFile] = useState(null);
@@ -292,6 +339,17 @@ export default function AdminSiteSettings() {
           setOtpBalance(data.otpConfig.lastBalance);
         }
       }
+      if (data.paymentConfig) {
+        setPaymentConfig(prev => ({
+          ...prev,
+          ...data.paymentConfig,
+          cod: { ...prev.cod, ...(data.paymentConfig.cod || {}) },
+          upi: { ...prev.upi, ...(data.paymentConfig.upi || {}) },
+          netbanking: { ...prev.netbanking, ...(data.paymentConfig.netbanking || {}) },
+          gateway: { ...prev.gateway, ...(data.paymentConfig.gateway || {}) },
+          sellPayouts: { ...prev.sellPayouts, ...(data.paymentConfig.sellPayouts || {}) },
+        }));
+      }
     } catch (err) {
       console.error('Failed to load site settings:', err);
       // Auto-retry once after 800ms if server was momentarily restarting
@@ -444,8 +502,21 @@ export default function AdminSiteSettings() {
     }
   };
 
+  const handleSavePaymentConfig = async () => {
+    try {
+      setSavingPayment(true);
+      const res = await adminService.updatePaymentConfig({ paymentConfig });
+      broadcastSettingsUpdate(res.data);
+      flash('success', 'Payment gateways and checkout configuration updated successfully!');
+    } catch (err) {
+      flash('error', err.response?.data?.message || 'Failed to update payment settings');
+    } finally {
+      setSavingPayment(false);
+    }
+  };
+
   // Toggle all sections
-  const allExpanded = isLogoOpen && isBannersOpen && isNavOpen && isWhatsAppOpen && isOtpOpen;
+  const allExpanded = isLogoOpen && isBannersOpen && isNavOpen && isWhatsAppOpen && isOtpOpen && isPaymentOpen;
   const toggleAll = () => {
     const nextState = !allExpanded;
     setIsLogoOpen(nextState);
@@ -454,6 +525,7 @@ export default function AdminSiteSettings() {
     setIsTopBarOpen(nextState);
     setIsWhatsAppOpen(nextState);
     setIsOtpOpen(nextState);
+    setIsPaymentOpen(nextState);
     setIsFooterOpen(nextState);
     setIsBannerListOpen(nextState);
     if (!nextState) setIsAddFormOpen(false);
@@ -2665,6 +2737,572 @@ export default function AdminSiteSettings() {
               >
                 {savingFooter ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
                 <span>Save Footer Information</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── SECTION 8: PAYMENT GATEWAYS & CHECKOUT OPTIONS (Collapsible Card) ─ */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div 
+          onClick={() => setIsPaymentOpen(!isPaymentOpen)}
+          className="p-5 sm:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-50/70 select-none transition-colors border-b border-slate-100"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-[#087F8C] flex items-center justify-center shrink-0">
+              <CreditCard size={20} />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                  Payment Gateways & Checkout Options
+                </h3>
+                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                  paymentConfig.cod.isEnabled 
+                    ? 'bg-amber-50 text-amber-700 border-amber-200' 
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                }`}>
+                  {paymentConfig.cod.isEnabled ? 'COD Enabled' : 'COD Disabled'}
+                </span>
+                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                  paymentConfig.upi.isEnabled 
+                    ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                    : 'bg-slate-100 text-slate-600 border-slate-200'
+                }`}>
+                  UPI {paymentConfig.upi.isEnabled ? 'Active' : 'Off'}
+                </span>
+                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                  paymentConfig.gateway.isEnabled 
+                    ? 'bg-purple-50 text-purple-700 border-purple-200' 
+                    : 'bg-slate-100 text-slate-600 border-slate-200'
+                }`}>
+                  Gateway {paymentConfig.gateway.isEnabled ? (paymentConfig.gateway.provider?.toUpperCase() || 'ON') : 'Off'}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Enable or disable Cash on Delivery (COD), configure direct UPI & bank accounts, or activate Online Payment Gateways (Razorpay/PhonePe)
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setIsPaymentOpen(!isPaymentOpen); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-all shadow-xs"
+            >
+              <span>{isPaymentOpen ? 'Collapse' : 'Expand'}</span>
+              {isPaymentOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </button>
+          </div>
+        </div>
+
+        {isPaymentOpen && (
+          <div className="p-5 sm:p-6 bg-white space-y-6 animate-in fade-in duration-200">
+            {/* Informational Banner */}
+            <div className="p-4 rounded-xl bg-teal-50/70 border border-teal-200/80 text-xs text-teal-900 flex items-start gap-3">
+              <span className="text-lg leading-none">💳</span>
+              <div className="space-y-1">
+                <p className="font-bold">Backend Payment Controller & Gateway Configuration</p>
+                <p className="text-teal-800 leading-relaxed">
+                  Toggle checkout payment methods in real-time. Disabling <strong>Cash on Delivery (COD)</strong> instantly hides it from customer checkout, preventing unverified or non-serious orders. Enable online gateways (Razorpay, PhonePe, Cashfree) or direct UPI whenever you are ready to collect upfront digital payments.
+                </p>
+              </div>
+            </div>
+
+            {/* PART 1: BUY REFURBISHED PAYMENT METHODS */}
+            <div>
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <div>
+                  <h4 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <span>1. Buy Refurbished Devices — Customer Payment Options</span>
+                  </h4>
+                  <p className="text-xs text-slate-500">Configure which payment methods appear on the device checkout page</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Method 1: Cash on Delivery (COD) */}
+                <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                  paymentConfig.cod.isEnabled 
+                    ? 'border-amber-300 bg-amber-50/30' 
+                    : 'border-slate-200 bg-slate-50/50'
+                }`}>
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          paymentConfig.cod.isEnabled ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600'
+                        }`}>
+                          <Banknote size={18} />
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-bold text-slate-900">Cash on Delivery (COD)</h5>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                            paymentConfig.cod.isEnabled ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            {paymentConfig.cod.isEnabled ? 'Active on Checkout' : 'Disabled (Hidden from Customer)'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={paymentConfig.cod.isEnabled}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            cod: { ...paymentConfig.cod, isEnabled: e.target.checked }
+                          })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#087F8C]"></div>
+                      </label>
+                    </div>
+
+                    <p className="text-xs text-slate-600 mb-3">
+                      {paymentConfig.cod.isEnabled
+                        ? 'Customers can place orders without paying upfront and settle cash/UPI with the courier.'
+                        : '🔒 COD is disabled. Buyers cannot place unpaid orders and must use UPI or Bank Transfer.'}
+                    </p>
+
+                    <div className="space-y-2.5 pt-2 border-t border-slate-200/60">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Display Title</label>
+                        <input
+                          type="text"
+                          value={paymentConfig.cod.label}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            cod: { ...paymentConfig.cod, label: e.target.value }
+                          })}
+                          placeholder="Cash on Delivery / Pay on Delivery"
+                          className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white focus:border-[#087F8C] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Customer Instructions</label>
+                        <input
+                          type="text"
+                          value={paymentConfig.cod.description}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            cod: { ...paymentConfig.cod, description: e.target.value }
+                          })}
+                          placeholder="Inspect package upon delivery and pay via Cash or UPI"
+                          className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white focus:border-[#087F8C] outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Method 2: Direct UPI */}
+                <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                  paymentConfig.upi.isEnabled 
+                    ? 'border-blue-300 bg-blue-50/30' 
+                    : 'border-slate-200 bg-slate-50/50'
+                }`}>
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          paymentConfig.upi.isEnabled ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'
+                        }`}>
+                          <Wallet size={18} />
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-bold text-slate-900">Direct UPI (PhonePe / GPay / Paytm)</h5>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                            paymentConfig.upi.isEnabled ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            {paymentConfig.upi.isEnabled ? 'Active on Checkout' : 'Disabled'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={paymentConfig.upi.isEnabled}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            upi: { ...paymentConfig.upi, isEnabled: e.target.checked }
+                          })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#087F8C]"></div>
+                      </label>
+                    </div>
+
+                    <p className="text-xs text-slate-600 mb-3">
+                      Direct UPI payment with instant confirmation. Buyers pay straight to your business UPI ID or VPA.
+                    </p>
+
+                    <div className="space-y-2.5 pt-2 border-t border-slate-200/60">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Business UPI ID (VPA) <span className="text-rose-500">*</span></label>
+                        <input
+                          type="text"
+                          value={paymentConfig.upi.upiId}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            upi: { ...paymentConfig.upi, upiId: e.target.value }
+                          })}
+                          placeholder="e.g. secondsale@upi or 7045180009@okbizaxis"
+                          className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-mono focus:border-[#087F8C] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Display Title</label>
+                        <input
+                          type="text"
+                          value={paymentConfig.upi.label}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            upi: { ...paymentConfig.upi, label: e.target.value }
+                          })}
+                          placeholder="Direct UPI (PhonePe / GPay / Paytm)"
+                          className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white focus:border-[#087F8C] outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Method 3: Net Banking / Direct Escrow */}
+                <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                  paymentConfig.netbanking.isEnabled 
+                    ? 'border-emerald-300 bg-emerald-50/30' 
+                    : 'border-slate-200 bg-slate-50/50'
+                }`}>
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          paymentConfig.netbanking.isEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                        }`}>
+                          <Building2 size={18} />
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-bold text-slate-900">Net Banking / Direct Bank Transfer</h5>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                            paymentConfig.netbanking.isEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            {paymentConfig.netbanking.isEnabled ? 'Active on Checkout' : 'Disabled'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={paymentConfig.netbanking.isEnabled}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            netbanking: { ...paymentConfig.netbanking, isEnabled: e.target.checked }
+                          })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#087F8C]"></div>
+                      </label>
+                    </div>
+
+                    <p className="text-xs text-slate-600 mb-3">
+                      Direct NEFT / IMPS / RTGS to verified corporate or escrow bank account with zero gateway fee deductions.
+                    </p>
+
+                    <div className="space-y-2.5 pt-2 border-t border-slate-200/60">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Account Holder Name</label>
+                          <input
+                            type="text"
+                            value={paymentConfig.netbanking.accountName}
+                            onChange={(e) => setPaymentConfig({
+                              ...paymentConfig,
+                              netbanking: { ...paymentConfig.netbanking, accountName: e.target.value }
+                            })}
+                            placeholder="e.g. SecondSale Technologies"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white focus:border-[#087F8C] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Bank Name</label>
+                          <input
+                            type="text"
+                            value={paymentConfig.netbanking.bankName}
+                            onChange={(e) => setPaymentConfig({
+                              ...paymentConfig,
+                              netbanking: { ...paymentConfig.netbanking, bankName: e.target.value }
+                            })}
+                            placeholder="e.g. HDFC Bank / ICICI"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white focus:border-[#087F8C] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Account Number</label>
+                          <input
+                            type="text"
+                            value={paymentConfig.netbanking.accountNumber}
+                            onChange={(e) => setPaymentConfig({
+                              ...paymentConfig,
+                              netbanking: { ...paymentConfig.netbanking, accountNumber: e.target.value }
+                            })}
+                            placeholder="e.g. 50200012345678"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-mono focus:border-[#087F8C] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">IFSC Code</label>
+                          <input
+                            type="text"
+                            value={paymentConfig.netbanking.ifscCode}
+                            onChange={(e) => setPaymentConfig({
+                              ...paymentConfig,
+                              netbanking: { ...paymentConfig.netbanking, ifscCode: e.target.value.toUpperCase() }
+                            })}
+                            placeholder="e.g. HDFC0001234"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-mono focus:border-[#087F8C] outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Method 4: Online Payment Gateway */}
+                <div className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between ${
+                  paymentConfig.gateway.isEnabled 
+                    ? 'border-purple-300 bg-purple-50/30' 
+                    : 'border-slate-200 bg-slate-50/50'
+                }`}>
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          paymentConfig.gateway.isEnabled ? 'bg-purple-100 text-purple-800' : 'bg-slate-200 text-slate-600'
+                        }`}>
+                          <CreditCard size={18} />
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-bold text-slate-900">Online Payment Gateway</h5>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                            paymentConfig.gateway.isEnabled ? 'bg-purple-100 text-purple-800' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            {paymentConfig.gateway.isEnabled ? `Active (${paymentConfig.gateway.provider.toUpperCase()})` : 'Disabled'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Switch */}
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={paymentConfig.gateway.isEnabled}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            gateway: { ...paymentConfig.gateway, isEnabled: e.target.checked }
+                          })}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#087F8C]"></div>
+                      </label>
+                    </div>
+
+                    <p className="text-xs text-slate-600 mb-3">
+                      Collect credit cards, debit cards, net banking, and EMI through an integrated payment aggregator.
+                    </p>
+
+                    <div className="space-y-2.5 pt-2 border-t border-slate-200/60">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Gateway Provider</label>
+                        <select
+                          value={paymentConfig.gateway.provider}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            gateway: { ...paymentConfig.gateway, provider: e.target.value }
+                          })}
+                          className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-semibold focus:border-[#087F8C] outline-none"
+                        >
+                          <option value="razorpay">Razorpay (Cards, UPI, Netbanking, Wallets)</option>
+                          <option value="phonepe">PhonePe Payment Gateway</option>
+                          <option value="cashfree">Cashfree Payments</option>
+                        </select>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Key ID / App ID</label>
+                          <input
+                            type="text"
+                            value={paymentConfig.gateway.keyId}
+                            onChange={(e) => setPaymentConfig({
+                              ...paymentConfig,
+                              gateway: { ...paymentConfig.gateway, keyId: e.target.value }
+                            })}
+                            placeholder="rzp_live_xxxxxxxx"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-mono focus:border-[#087F8C] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[11px] font-bold text-slate-600">Key Secret</label>
+                            <button
+                              type="button"
+                              onClick={() => setShowGatewaySecret(!showGatewaySecret)}
+                              className="text-[10px] text-[#087F8C] hover:underline"
+                            >
+                              {showGatewaySecret ? 'Hide' : 'Show'}
+                            </button>
+                          </div>
+                          <input
+                            type={showGatewaySecret ? 'text' : 'password'}
+                            value={paymentConfig.gateway.keySecret}
+                            onChange={(e) => setPaymentConfig({
+                              ...paymentConfig,
+                              gateway: { ...paymentConfig.gateway, keySecret: e.target.value }
+                            })}
+                            placeholder="Secret key"
+                            className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-mono focus:border-[#087F8C] outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Merchant ID (Optional)</label>
+                        <input
+                          type="text"
+                          value={paymentConfig.gateway.merchantId}
+                          onChange={(e) => setPaymentConfig({
+                            ...paymentConfig,
+                            gateway: { ...paymentConfig.gateway, merchantId: e.target.value }
+                          })}
+                          placeholder="e.g. M12345678"
+                          className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white font-mono focus:border-[#087F8C] outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* PART 2: SELL DEVICE DOORSTEP PAYOUT OPTIONS */}
+            <div className="pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between pb-3 mb-3">
+                <div>
+                  <h4 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                    2. Sell Device Pickup — Doorstep Payout Options
+                  </h4>
+                  <p className="text-xs text-slate-500">Configure which payout methods customers can select when scheduling a device pickup</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {/* Cash Payout */}
+                <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <Banknote size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">Doorstep Cash</p>
+                      <p className="text-[10px] text-slate-500">Cash in hand by agent</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={paymentConfig.sellPayouts?.cash !== false}
+                      onChange={(e) => setPaymentConfig({
+                        ...paymentConfig,
+                        sellPayouts: { ...(paymentConfig.sellPayouts || {}), cash: e.target.checked }
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#087F8C]"></div>
+                  </label>
+                </div>
+
+                {/* Instant UPI */}
+                <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center shrink-0">
+                      <Wallet size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">Instant UPI</p>
+                      <p className="text-[10px] text-slate-500">GPay / PhonePe / Paytm</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={paymentConfig.sellPayouts?.upi !== false}
+                      onChange={(e) => setPaymentConfig({
+                        ...paymentConfig,
+                        sellPayouts: { ...(paymentConfig.sellPayouts || {}), upi: e.target.checked }
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#087F8C]"></div>
+                  </label>
+                </div>
+
+                {/* Bank Transfer */}
+                <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center shrink-0">
+                      <Building2 size={16} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">Bank Transfer (IMPS)</p>
+                      <p className="text-[10px] text-slate-500">Direct account credit</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={paymentConfig.sellPayouts?.bank !== false}
+                      onChange={(e) => setPaymentConfig({
+                        ...paymentConfig,
+                        sellPayouts: { ...(paymentConfig.sellPayouts || {}), bank: e.target.checked }
+                      })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#087F8C]"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Save Action Bar */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-xs text-slate-500">
+                Changes apply immediately across all checkout pages & order validations.
+              </span>
+              <button
+                type="button"
+                onClick={handleSavePaymentConfig}
+                disabled={savingPayment}
+                className="flex items-center gap-2 px-6 py-2.5 bg-[#087F8C] hover:bg-[#066772] text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md shadow-[#087F8C]/20 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-none"
+              >
+                {savingPayment ? (
+                  <>
+                    <RefreshCw size={15} className="animate-spin" />
+                    <span>Saving Payment Settings…</span>
+                  </>
+                ) : (
+                  <>
+                    <Save size={15} />
+                    <span>Save Payment Configuration</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

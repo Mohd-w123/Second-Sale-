@@ -14,6 +14,7 @@ import {
   updatePartnerStatus,
   getAllOrders,
   updateOrderStatus,
+  updateOrderCustomerInfo,
   getAllPincodes,
   createPincode,
   updatePincode,
@@ -59,6 +60,7 @@ router.patch('/partners/:id/status', requirePermission('partners'), updatePartne
 // Orders
 router.get('/orders', requirePermission('orders'), getAllOrders);
 router.patch('/orders/:id/status', requirePermission('orders'), updateOrderStatus);
+router.patch('/orders/:id/customer-info', requirePermission('orders'), updateOrderCustomerInfo);
 
 // Pincodes
 router.get('/pincodes', requirePermission('pincodes'), getAllPincodes);

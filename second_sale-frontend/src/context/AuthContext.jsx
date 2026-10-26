@@ -50,11 +50,13 @@ export function AuthProvider({ children }) {
         phone: phoneOrPayload.phone,
         otp: phoneOrPayload.otp || phoneOrPayload.code,
         sessionId: phoneOrPayload.sessionId,
+        name: phoneOrPayload.name,
+        email: phoneOrPayload.email,
       };
     } else {
       payload = { phone: phoneOrPayload, otp, sessionId };
     }
-    const { data } = await authService.verifyOtp(payload.phone, payload.otp, payload.sessionId);
+    const { data } = await authService.verifyOtp(payload.phone, payload.otp, payload.sessionId, payload.name, payload.email);
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     localStorage.setItem('user', JSON.stringify(data.user));

@@ -1,6 +1,7 @@
 import RefurbishedDevice from '../models/RefurbishedDevice.js';
 import BuyOrder from '../models/BuyOrder.js';
 import User from '../models/User.js';
+import SiteSettings from '../models/SiteSettings.js';
 
 
 // ─── PUBLIC: List / filter refurbished devices ───────────────────────────────
@@ -95,9 +96,32 @@ export const placeBuyOrder = async (req, res, next) => {
       return res.status(400).json({ message: 'customer, item, and payment are required' });
     }
 
-    // Validate payment method
-    if (!['cod', 'upi', 'netbanking'].includes(payment.method)) {
+    // Validate payment method against site configuration
+    const allowedMethods = ['cod', 'upi', 'netbanking', 'gateway'];
+    if (!allowedMethods.includes(payment.method)) {
       return res.status(400).json({ message: 'Invalid payment method' });
+    }
+
+    const settings = await SiteSettings.findOne({ singleton: 'main' }).lean();
+    const paymentConfig = settings?.paymentConfig;
+
+    if (payment.method === 'cod') {
+      // If COD is disabled in SiteSettings, reject
+      if (paymentConfig?.cod?.isEnabled === false) {
+        return res.status(400).json({ message: 'Cash on Delivery (COD) is currently disabled by administrator.' });
+      }
+    } else if (payment.method === 'upi') {
+      if (paymentConfig?.upi && paymentConfig.upi.isEnabled === false) {
+        return res.status(400).json({ message: 'UPI payment is currently disabled.' });
+      }
+    } else if (payment.method === 'netbanking') {
+      if (paymentConfig?.netbanking && paymentConfig.netbanking.isEnabled === false) {
+        return res.status(400).json({ message: 'Net Banking payment is currently disabled.' });
+      }
+    } else if (payment.method === 'gateway') {
+      if (!paymentConfig?.gateway || paymentConfig.gateway.isEnabled === false) {
+        return res.status(400).json({ message: 'Online Payment Gateway is currently disabled.' });
+      }
     }
 
     // Check product & stock

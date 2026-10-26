@@ -18,6 +18,7 @@ import {
   updateWhatsApp,
   updateOtpConfig,
   getOtpBalance,
+  updatePaymentConfig,
   upload,
 } from '../controllers/siteSettings.controller.js';
 
@@ -35,6 +36,7 @@ router.put('/footer', updateFooter);
 router.put('/whatsapp', updateWhatsApp);
 router.put('/otp-config', updateOtpConfig);
 router.get('/otp-balance', getOtpBalance);
+router.put('/payment-config', updatePaymentConfig);
 router.post('/banners', upload.single('banner'), addBanner);
 router.patch('/banners/:bannerId', upload.single('banner'), updateBanner);
 router.delete('/banners/:bannerId', deleteBanner);

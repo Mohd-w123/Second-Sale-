@@ -21,27 +21,74 @@ const API =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000/api";
 
-const PAYMENT_METHODS = [
-  {
-    id: "cod",
-    title: "Cash on Delivery / Pay on Delivery",
-    desc: "Inspect package upon delivery and pay via Cash or UPI to courier agent.",
-    icon: Banknote,
-  },
-  {
-    id: "upi",
-    title: "Direct UPI (PhonePe / GPay / Paytm)",
-    desc: "Pay instantly using your preferred UPI app or scan QR code.",
-    icon: QrCode,
-    badge: "Instant Confirmation",
-  },
-  {
-    id: "netbanking",
-    title: "Net Banking / Direct Bank Transfer",
-    desc: "Transfer securely via NEFT/IMPS to SecondSale verified escrow account.",
-    icon: Building2,
-  },
-];
+function buildPaymentMethodsList(config) {
+  const methods = [];
+
+  // UPI is enabled by default
+  if (config?.upi?.isEnabled !== false) {
+    methods.push({
+      id: "upi",
+      title: config?.upi?.label || "Direct UPI (PhonePe / GPay / Paytm)",
+      desc: config?.upi?.description || "Pay instantly using your preferred UPI app or scan QR code.",
+      icon: QrCode,
+      badge: "Instant Confirmation",
+      upiId: config?.upi?.upiId || "secondsale@upi",
+    });
+  }
+
+  // Netbanking is enabled by default
+  if (config?.netbanking?.isEnabled !== false) {
+    methods.push({
+      id: "netbanking",
+      title: config?.netbanking?.label || "Net Banking / Direct Bank Transfer",
+      desc: config?.netbanking?.description || "Transfer securely via NEFT/IMPS to SecondSale verified escrow account.",
+      icon: Building2,
+      bankDetails: {
+        accountName: config?.netbanking?.accountName || "SecondSale Technologies Pvt Ltd",
+        accountNumber: config?.netbanking?.accountNumber || "",
+        ifscCode: config?.netbanking?.ifscCode || "",
+        bankName: config?.netbanking?.bankName || "",
+      },
+    });
+  }
+
+  // Online Payment Gateway (Razorpay/PhonePe)
+  if (config?.gateway?.isEnabled) {
+    const providerName = config?.gateway?.provider === 'phonepe' ? 'PhonePe' : config?.gateway?.provider === 'cashfree' ? 'Cashfree' : 'Razorpay';
+    methods.push({
+      id: "gateway",
+      title: config?.gateway?.label || `Online Payment (${providerName} - Cards/UPI/NetBanking)`,
+      desc: config?.gateway?.description || `Instant and secure payment checkout powered by ${providerName}`,
+      icon: CreditCard,
+      badge: "Fast & Secure",
+      provider: config?.gateway?.provider || 'razorpay',
+    });
+  }
+
+  // Cash on Delivery (COD) - ONLY IF EXPLICITLY ENABLED IN SETTINGS (Default: false)
+  if (config?.cod?.isEnabled === true) {
+    methods.push({
+      id: "cod",
+      title: config?.cod?.label || "Cash on Delivery / Pay on Delivery",
+      desc: config?.cod?.description || "Inspect package upon delivery and pay via Cash or UPI to courier agent.",
+      icon: Banknote,
+    });
+  }
+
+  // Fallback so checkout always has a payment option
+  if (methods.length === 0) {
+    methods.push({
+      id: "upi",
+      title: "Direct UPI (PhonePe / GPay / Paytm)",
+      desc: "Pay instantly using your preferred UPI app or scan QR code.",
+      icon: QrCode,
+      badge: "Instant Confirmation",
+      upiId: "secondsale@upi",
+    });
+  }
+
+  return methods;
+}
 
 export default function RefurbishedCheckoutPage() {
   const location = useLocation();
@@ -61,7 +108,8 @@ export default function RefurbishedCheckoutPage() {
     state: "",
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [paymentMethods, setPaymentMethods] = useState(() => buildPaymentMethodsList(null));
+  const [paymentMethod, setPaymentMethod] = useState("upi");
   const [upiId, setUpiId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -72,6 +120,26 @@ export default function RefurbishedCheckoutPage() {
     if (initialPin && initialPin.length === 6) {
       lookupPincode(initialPin);
     }
+
+    // Fetch site settings for active payment gateways and methods
+    fetch(`${API}/site-settings`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.paymentConfig) {
+          const list = buildPaymentMethodsList(data.paymentConfig);
+          setPaymentMethods(list);
+          // Set to first enabled method if current selection is not available
+          if (list.length > 0) {
+            setPaymentMethod((prev) => {
+              const stillExists = list.some((m) => m.id === prev);
+              return stillExists ? prev : list[0].id;
+            });
+          }
+        }
+      })
+      .catch(() => {
+        // Graceful fallback to default UPI/Netbanking
+      });
   }, []);
 
   if (!item) {
@@ -182,8 +250,8 @@ export default function RefurbishedCheckoutPage() {
       return setError("Please provide city and state.");
     }
 
-    if (paymentMethod === "upi" && !upiId.trim()) {
-      return setError("Please enter your UPI ID (e.g. mobile@upi).");
+    if (paymentMethod === "upi" && upiId.trim() && !upiId.includes("@")) {
+      return setError("Please enter a valid UPI ID (e.g. mobile@upi).");
     }
 
     try {
@@ -202,7 +270,7 @@ export default function RefurbishedCheckoutPage() {
         },
         payment: {
           method: paymentMethod,
-          upiId: paymentMethod === "upi" ? upiId.trim() : undefined,
+          upiId: paymentMethod === "upi" && upiId.trim() ? upiId.trim() : undefined,
         },
       };
 
@@ -435,7 +503,7 @@ export default function RefurbishedCheckoutPage() {
               </div>
 
               <div className="space-y-3">
-                {PAYMENT_METHODS.map((pm) => {
+                {paymentMethods.map((pm) => {
                   const Icon = pm.icon;
                   const isSelected = paymentMethod === pm.id;
                   return (
@@ -453,7 +521,7 @@ export default function RefurbishedCheckoutPage() {
                         name="paymentMethod"
                         checked={isSelected}
                         onChange={() => setPaymentMethod(pm.id)}
-                        className="mt-1 h-4 w-4 text-[#087F8C] focus:ring-blue-500"
+                        className="mt-1 h-4 w-4 text-[#087F8C] focus:ring-blue-500 cursor-pointer"
                       />
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
@@ -472,7 +540,13 @@ export default function RefurbishedCheckoutPage() {
                         {/* Extra input for UPI */}
                         {isSelected && pm.id === "upi" && (
                           <div className="mt-3 pt-3 border-t border-blue-100 flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-700">Enter Your UPI ID</label>
+                            {pm.upiId && (
+                              <div className="inline-flex items-center gap-2 p-2 px-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-950 text-xs max-w-sm">
+                                <span className="text-slate-500">Official UPI ID:</span>
+                                <strong className="font-mono text-blue-700">{pm.upiId}</strong>
+                              </div>
+                            )}
+                            <label className="text-xs font-bold text-slate-700">Enter Your UPI ID (Optional)</label>
                             <input
                               type="text"
                               value={upiId}
@@ -488,12 +562,33 @@ export default function RefurbishedCheckoutPage() {
 
                         {/* Extra instructions for Netbanking */}
                         {isSelected && pm.id === "netbanking" && (
-                          <div className="mt-3 pt-3 border-t border-blue-100 text-xs text-slate-600 space-y-1">
+                          <div className="mt-3 pt-3 border-t border-blue-100 text-xs text-slate-600 space-y-2">
                             <p className="font-semibold text-slate-800">
                               Direct Bank Transfer / IMPS / NEFT
                             </p>
+                            {pm.bankDetails?.accountNumber ? (
+                              <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-1 text-xs">
+                                <p><span className="text-slate-500">Bank:</span> <strong>{pm.bankDetails.bankName || "Verified Bank"}</strong></p>
+                                <p><span className="text-slate-500">Account Name:</span> <strong>{pm.bankDetails.accountName}</strong></p>
+                                <p><span className="text-slate-500">Account No:</span> <strong className="font-mono text-slate-900">{pm.bankDetails.accountNumber}</strong></p>
+                                <p><span className="text-slate-500">IFSC Code:</span> <strong className="font-mono text-slate-900">{pm.bankDetails.ifscCode}</strong></p>
+                              </div>
+                            ) : (
+                              <p className="text-[11px] text-slate-500">
+                                Escrow bank account and reference number will be provided on order confirmation.
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Extra instructions for Online Gateway */}
+                        {isSelected && pm.id === "gateway" && (
+                          <div className="mt-3 pt-3 border-t border-purple-100 text-xs text-slate-600 space-y-1">
+                            <p className="font-semibold text-slate-800">
+                              Instant Payment via {pm.provider ? pm.provider.toUpperCase() : 'Secure Payment Gateway'}
+                            </p>
                             <p className="text-[11px] text-slate-500">
-                              Bank account and reference details will be generated upon placing the order.
+                              You will be prompted to complete payment securely via UPI, Credit/Debit Cards, or Netbanking.
                             </p>
                           </div>
                         )}

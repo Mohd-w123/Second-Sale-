@@ -56,6 +56,7 @@ export const adminService = {
   // Orders
   getOrders: (params) => adminApi.get('/admin/orders', { params }),
   updateOrderStatus: (id, status) => adminApi.patch(`/admin/orders/${id}/status`, { status }),
+  updateOrderCustomerInfo: (id, data) => adminApi.patch(`/admin/orders/${id}/customer-info`, data),
 
   // Pincodes
   getPincodes: (params) => adminApi.get('/admin/pincodes', { params }),
@@ -99,6 +100,7 @@ export const adminService = {
   updateWhatsApp: (data) => adminApi.put('/site-settings/whatsapp', data),
   updateOtpConfig: (data) => adminApi.put('/site-settings/otp-config', data),
   getOtpBalance: () => adminApi.get('/site-settings/otp-balance'),
+  updatePaymentConfig: (data) => adminApi.put('/site-settings/payment-config', data),
 
   // Sales Users / Staff Team Management
   getSalesUsers: () => adminApi.get('/admin/sales-users'),

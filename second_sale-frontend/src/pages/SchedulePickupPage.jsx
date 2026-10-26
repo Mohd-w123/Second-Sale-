@@ -24,12 +24,38 @@ export default function SchedulePickupPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
   
-  const [paymentType, setPaymentType] = useState('cash'); // 'cash', 'upi', 'bank'
+  const [paymentType, setPaymentType] = useState('upi'); // 'upi', 'bank', 'cash'
+  const [sellPayouts, setSellPayouts] = useState({ cash: true, upi: true, bank: true });
   const [selectedPaymentId, setSelectedPaymentId] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(null); // 'upi' or 'bank'
 
   useEffect(() => {
     refreshUser();
+    fetch(`${API_BASE}/site-settings`)
+      .then(res => res.json())
+      .then(data => {
+        if (data?.paymentConfig) {
+          const isCodEnabled = data.paymentConfig?.cod?.isEnabled !== false;
+          const isSellCashEnabled = data.paymentConfig?.sellPayouts?.cash !== false;
+          const isCashActive = Boolean(isCodEnabled && isSellCashEnabled);
+          const payouts = {
+            upi: data.paymentConfig?.sellPayouts?.upi !== false,
+            bank: data.paymentConfig?.sellPayouts?.bank !== false,
+            cash: isCashActive,
+          };
+          setSellPayouts(payouts);
+          if (payouts.upi) {
+            setPaymentType('upi');
+          } else if (payouts.bank) {
+            setPaymentType('bank');
+          } else if (payouts.cash) {
+            setPaymentType('cash');
+          } else {
+            setPaymentType('upi');
+          }
+        }
+      })
+      .catch(() => {});
   }, [refreshUser]);
 
   // Sync selectedAddressId when user changes or first load
@@ -104,6 +130,9 @@ export default function SchedulePickupPage() {
         priceBreakdown: effectivePriceBreakdown,
         pickup: { 
           ...selectedAddr, 
+          name: (selectedAddr?.name && selectedAddr.name !== 'User') ? selectedAddr.name : (user?.name && user.name !== 'User' ? user.name : 'User'),
+          phone: selectedAddr?.phone || user?.phone || '',
+          email: selectedAddr?.email || user?.email || '',
           date: formatDateISO(selectedDate), 
           timeSlot: selectedSlot, 
           paymentMethod: finalPaymentMethodStr 
@@ -267,108 +296,114 @@ export default function SchedulePickupPage() {
 
               <div className="space-y-4">
                 {/* UPI */}
-                <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'upi' ? 'border-[#087F8C] bg-[#E8F6F7]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
-                  <div className="flex items-center gap-6" onClick={() => setPaymentType('upi')}>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'upi' ? 'bg-[#087F8C] text-white border-[#087F8C]' : 'bg-white text-gray-500 border-gray-100'}`}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-black text-[#111827] text-lg">UPI</p>
-                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Add UPI ID</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'upi' ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'}`}>
-                      {paymentType === 'upi' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-                    </div>
-                  </div>
-                  
-                  {paymentType === 'upi' && (
-                    <div className="mt-6 pt-6 border-t border-[#087F8C]/20">
-                      <div className="space-y-3 mb-4">
-                        {user?.paymentMethods?.filter(pm => pm.type === 'upi').map(pm => (
-                          <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#087F8C]/5 transition-colors">
-                            <input 
-                              type="radio" 
-                              name="upiId" 
-                              checked={selectedPaymentId === pm._id}
-                              onChange={() => setSelectedPaymentId(pm._id)}
-                              className="w-4 h-4 text-[#087F8C] focus:ring-[#087F8C] cursor-pointer"
-                            />
-                            <span className="font-bold text-[#111827] text-sm">{pm.upiId}</span>
-                          </label>
-                        ))}
+                {sellPayouts?.upi !== false && (
+                  <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'upi' ? 'border-[#087F8C] bg-[#E8F6F7]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
+                    <div className="flex items-center gap-6" onClick={() => setPaymentType('upi')}>
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'upi' ? 'bg-[#087F8C] text-white border-[#087F8C]' : 'bg-white text-gray-500 border-gray-100'}`}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                       </div>
-                      <button 
-                        onClick={() => setShowPaymentModal('upi')}
-                        className="text-sm font-black text-[#087F8C] hover:text-[#066772] flex items-center gap-2"
-                      >
-                        <span className="text-lg">+</span> Add New UPI ID
-                      </button>
+                      <div className="flex-1">
+                        <p className="font-black text-[#111827] text-lg">UPI</p>
+                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Add UPI ID</p>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'upi' ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'}`}>
+                        {paymentType === 'upi' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                      </div>
                     </div>
-                  )}
-                </div>
+                    
+                    {paymentType === 'upi' && (
+                      <div className="mt-6 pt-6 border-t border-[#087F8C]/20">
+                        <div className="space-y-3 mb-4">
+                          {user?.paymentMethods?.filter(pm => pm.type === 'upi').map(pm => (
+                            <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#087F8C]/5 transition-colors">
+                              <input 
+                                type="radio" 
+                                name="upiId" 
+                                checked={selectedPaymentId === pm._id}
+                                onChange={() => setSelectedPaymentId(pm._id)}
+                                className="w-4 h-4 text-[#087F8C] focus:ring-[#087F8C] cursor-pointer"
+                              />
+                              <span className="font-bold text-[#111827] text-sm">{pm.upiId}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <button 
+                          onClick={() => setShowPaymentModal('upi')}
+                          className="text-sm font-black text-[#087F8C] hover:text-[#066772] flex items-center gap-2"
+                        >
+                          <span className="text-lg">+</span> Add New UPI ID
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Bank */}
-                <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'bank' ? 'border-[#087F8C] bg-[#E8F6F7]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
-                  <div className="flex items-center gap-6" onClick={() => setPaymentType('bank')}>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'bank' ? 'bg-[#087F8C] text-white border-[#087F8C]' : 'bg-white text-gray-500 border-gray-100'}`}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-black text-[#111827] text-lg">Bank</p>
-                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Add Bank Details</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'bank' ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'}`}>
-                      {paymentType === 'bank' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-                    </div>
-                  </div>
-
-                  {paymentType === 'bank' && (
-                    <div className="mt-6 pt-6 border-t border-[#087F8C]/20">
-                      <div className="space-y-3 mb-4">
-                        {user?.paymentMethods?.filter(pm => pm.type === 'bank').map(pm => (
-                          <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#087F8C]/5 transition-colors">
-                            <input 
-                              type="radio" 
-                              name="bankId" 
-                              checked={selectedPaymentId === pm._id}
-                              onChange={() => setSelectedPaymentId(pm._id)}
-                              className="w-4 h-4 text-[#087F8C] focus:ring-[#087F8C] cursor-pointer"
-                            />
-                            <div className="flex flex-col">
-                              <span className="font-bold text-[#111827] text-sm">{pm.bankName} - {pm.accountNumber.slice(-4)}</span>
-                              <span className="text-xs font-bold text-gray-500">{pm.accountName}</span>
-                            </div>
-                          </label>
-                        ))}
+                {sellPayouts?.bank !== false && (
+                  <div className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'bank' ? 'border-[#087F8C] bg-[#E8F6F7]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}>
+                    <div className="flex items-center gap-6" onClick={() => setPaymentType('bank')}>
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'bank' ? 'bg-[#087F8C] text-white border-[#087F8C]' : 'bg-white text-gray-500 border-gray-100'}`}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
                       </div>
-                      <button 
-                        onClick={() => setShowPaymentModal('bank')}
-                        className="text-sm font-black text-[#087F8C] hover:text-[#066772] flex items-center gap-2"
-                      >
-                        <span className="text-lg">+</span> Add New Bank Account
-                      </button>
+                      <div className="flex-1">
+                        <p className="font-black text-[#111827] text-lg">Bank</p>
+                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Add Bank Details</p>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'bank' ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'}`}>
+                        {paymentType === 'bank' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                      </div>
                     </div>
-                  )}
-                </div>
+
+                    {paymentType === 'bank' && (
+                      <div className="mt-6 pt-6 border-t border-[#087F8C]/20">
+                        <div className="space-y-3 mb-4">
+                          {user?.paymentMethods?.filter(pm => pm.type === 'bank').map(pm => (
+                            <label key={pm._id} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[#087F8C]/5 transition-colors">
+                              <input 
+                                type="radio" 
+                                name="bankId" 
+                                checked={selectedPaymentId === pm._id}
+                                onChange={() => setSelectedPaymentId(pm._id)}
+                                className="w-4 h-4 text-[#087F8C] focus:ring-[#087F8C] cursor-pointer"
+                              />
+                              <div className="flex flex-col">
+                                <span className="font-bold text-[#111827] text-sm">{pm.bankName} - {pm.accountNumber.slice(-4)}</span>
+                                <span className="text-xs font-bold text-gray-500">{pm.accountName}</span>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                        <button 
+                          onClick={() => setShowPaymentModal('bank')}
+                          className="text-sm font-black text-[#087F8C] hover:text-[#066772] flex items-center gap-2"
+                        >
+                          <span className="text-lg">+</span> Add New Bank Account
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Cash */}
-                <div 
-                  className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'cash' ? 'border-[#087F8C] bg-[#E8F6F7]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}
-                  onClick={() => setPaymentType('cash')}
-                >
-                  <div className="flex items-center gap-6">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'cash' ? 'bg-[#087F8C] text-white border-[#087F8C]' : 'bg-white text-gray-500 border-gray-100'}`}>
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-black text-[#111827] text-lg">Cash</p>
-                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Cash Payment</p>
-                    </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'cash' ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'}`}>
-                      {paymentType === 'cash' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                {Boolean(sellPayouts?.cash) && (
+                  <div 
+                    className={`rounded-[32px] border-2 p-6 transition-all ${paymentType === 'cash' ? 'border-[#087F8C] bg-[#E8F6F7]' : 'border-gray-50 bg-white hover:border-gray-200 cursor-pointer'}`}
+                    onClick={() => setPaymentType('cash')}
+                  >
+                    <div className="flex items-center gap-6">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm shrink-0 border ${paymentType === 'cash' ? 'bg-[#087F8C] text-white border-[#087F8C]' : 'bg-white text-gray-500 border-gray-100'}`}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-black text-[#111827] text-lg">Cash</p>
+                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mt-1">Cash Payment</p>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${paymentType === 'cash' ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-300'}`}>
+                        {paymentType === 'cash' && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
             {/* End Step 3 */}
@@ -447,8 +482,9 @@ function CreateAddressModal({ onClose }) {
     pincode: '',
     city: '',
     state: '',
-    name: user?.name || '',
+    name: (user?.name && user.name !== 'User') ? user.name : '',
     phone: user?.phone || '',
+    email: user?.email || '',
   });
 
   const checkPincode = async (code) => {
@@ -505,8 +541,20 @@ function CreateAddressModal({ onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.name || !form.name.trim()) {
+      alert('Please enter your full name');
+      return;
+    }
+    if (!form.phone || form.phone.replace(/\D/g, '').length < 10) {
+      alert('Please enter a valid 10-digit phone number');
+      return;
+    }
+    if (!form.email || !form.email.includes('@')) {
+      alert('Please enter a valid email address');
+      return;
+    }
     if (!form.address || !form.pincode || !form.city) {
-      alert('Please fill all required fields');
+      alert('Please fill all required address fields');
       return;
     }
     if (pincodeError) {
@@ -516,6 +564,15 @@ function CreateAddressModal({ onClose }) {
     setLoading(true);
     try {
       await userService.addAddress(form);
+      try {
+        await userService.updateMe({
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+        });
+      } catch (err) {
+        console.warn('Could not auto-update user profile:', err);
+      }
       await refreshUser();
       onClose();
     } catch (err) {
@@ -560,6 +617,54 @@ function CreateAddressModal({ onClose }) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Customer Name & Phone */}
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Full Name
+              </label>
+              <input 
+                type="text" 
+                placeholder="Enter your full name" 
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#087F8C] transition-all"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                Mobile Phone Number
+              </label>
+              <input 
+                type="tel" 
+                placeholder="10-digit mobile number" 
+                maxLength={10}
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
+                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#087F8C] transition-all"
+                required
+              />
+            </div>
+
+            {/* Email Address */}
+            <div className="md:col-span-2">
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email Address
+              </label>
+              <input 
+                type="email" 
+                placeholder="Enter email address (e.g. name@example.com)" 
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full bg-white border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-[#087F8C] transition-all"
+                required
+              />
             </div>
 
             <div className="md:col-span-2">

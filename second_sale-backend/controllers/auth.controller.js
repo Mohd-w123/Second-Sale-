@@ -309,12 +309,37 @@ export const verifyOtp = async (req, res, next) => {
     let user = await User.findOne({ phone: cleanPhone });
     let isNewUser = false;
 
+    const candidateName = req.body.name && req.body.name.trim() && req.body.name.trim().toLowerCase() !== 'user'
+      ? req.body.name.trim()
+      : undefined;
+    const candidateEmail = req.body.email && req.body.email.trim() && req.body.email.includes('@')
+      ? req.body.email.trim().toLowerCase()
+      : undefined;
+
     if (!user) {
       user = await User.create({
         phone: cleanPhone,
-        name: 'User',
+        name: candidateName || 'User',
+        ...(candidateEmail ? { email: candidateEmail } : {}),
       });
       isNewUser = true;
+    } else {
+      let shouldSave = false;
+      if (candidateName && (!user.name || user.name === 'User')) {
+        user.name = candidateName;
+        shouldSave = true;
+      }
+      if (candidateEmail && !user.email) {
+        user.email = candidateEmail;
+        shouldSave = true;
+      }
+      if (shouldSave) {
+        try {
+          await user.save();
+        } catch (err) {
+          console.warn('Could not save user email (possibly duplicate):', err.message);
+        }
+      }
     }
 
     const accessToken = signAccessToken(user._id);

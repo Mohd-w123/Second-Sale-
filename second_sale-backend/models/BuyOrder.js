@@ -39,7 +39,7 @@ const buyOrderSchema = new mongoose.Schema({
     warrantyMonths: { type: Number, default: 6 },
   },
   payment: {
-    method: { type: String, enum: ['cod', 'upi', 'netbanking'], required: true },
+    method: { type: String, enum: ['cod', 'upi', 'netbanking', 'gateway'], required: true },
     status: { type: String, enum: ['pending', 'confirmed', 'failed', 'refunded'], default: 'pending' },
     upiId: String,
     transactionId: String,

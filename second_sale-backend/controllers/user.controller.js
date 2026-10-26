@@ -26,10 +26,11 @@ export const getMe = async (req, res, next) => {
 
 export const updateMe = async (req, res, next) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, email } = req.body;
     const updates = {};
-    if (name) updates.name = name;
-    if (phone) updates.phone = phone;
+    if (name && name.trim()) updates.name = name.trim();
+    if (phone && phone.trim()) updates.phone = phone.trim();
+    if (email && email.trim() && email.includes('@')) updates.email = email.trim().toLowerCase();
 
     const user = await User.findByIdAndUpdate(req.user.id, updates, {
       new: true,
@@ -76,6 +77,17 @@ export const addAddress = async (req, res, next) => {
       user.addresses.forEach(addr => addr.isDefault = false);
     } else if (user.addresses.length === 0) {
       newAddress.isDefault = true;
+    }
+
+    // Auto-update user name & email if currently generic or missing
+    if (newAddress.name && newAddress.name.trim() && newAddress.name.trim().toLowerCase() !== 'user' && (!user.name || user.name === 'User')) {
+      user.name = newAddress.name.trim();
+    }
+    if (newAddress.email && newAddress.email.trim() && newAddress.email.includes('@') && !user.email) {
+      user.email = newAddress.email.trim().toLowerCase();
+    }
+    if (newAddress.phone && newAddress.phone.trim() && !user.phone) {
+      user.phone = newAddress.phone.trim();
     }
 
     user.addresses.push(newAddress);

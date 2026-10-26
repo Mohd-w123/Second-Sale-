@@ -109,6 +109,42 @@ const siteSettingsSchema = new mongoose.Schema({
     dummyOtpCode: { type: String, default: '123456' },
     lastBalance: { type: String, default: '' },
   },
+  paymentConfig: {
+    cod: {
+      isEnabled: { type: Boolean, default: false }, // COD disabled by default per user request
+      label: { type: String, default: 'Cash on Delivery / Pay on Delivery' },
+      description: { type: String, default: 'Inspect package upon delivery and pay via Cash or UPI to courier agent.' },
+    },
+    upi: {
+      isEnabled: { type: Boolean, default: true },
+      label: { type: String, default: 'Direct UPI (PhonePe / GPay / Paytm)' },
+      description: { type: String, default: 'Pay instantly using your preferred UPI app or scan QR code.' },
+      upiId: { type: String, default: 'secondsale@upi' },
+    },
+    netbanking: {
+      isEnabled: { type: Boolean, default: true },
+      label: { type: String, default: 'Net Banking / Direct Bank Transfer' },
+      description: { type: String, default: 'Transfer securely via NEFT/IMPS to SecondSale verified escrow account.' },
+      accountName: { type: String, default: 'SecondSale Technologies Pvt Ltd' },
+      accountNumber: { type: String, default: '' },
+      ifscCode: { type: String, default: '' },
+      bankName: { type: String, default: '' },
+    },
+    gateway: {
+      isEnabled: { type: Boolean, default: false },
+      provider: { type: String, default: 'razorpay' }, // 'razorpay' | 'phonepe' | 'cashfree'
+      label: { type: String, default: 'Online Payment (Cards, Netbanking, UPI, Wallets)' },
+      description: { type: String, default: 'Instant and secure payment gateway powered by Razorpay' },
+      keyId: { type: String, default: '' },
+      keySecret: { type: String, default: '' },
+      merchantId: { type: String, default: '' },
+    },
+    sellPayouts: {
+      cash: { type: Boolean, default: true },
+      upi: { type: Boolean, default: true },
+      bank: { type: Boolean, default: true },
+    },
+  },
 }, { timestamps: true });
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);

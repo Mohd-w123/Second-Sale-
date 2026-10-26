@@ -33,6 +33,24 @@ export const createOrder = async (req, res, next) => {
       partnerPhone: "+91 7045180009",
     });
 
+    // Auto-update user's name & email if pickup has valid customer information
+    if (pickup) {
+      const userUpdates = {};
+      if (pickup.name && pickup.name.trim() && pickup.name.trim().toLowerCase() !== 'user') {
+        userUpdates.name = pickup.name.trim();
+      }
+      if (pickup.email && pickup.email.trim() && pickup.email.includes('@')) {
+        userUpdates.email = pickup.email.trim().toLowerCase();
+      }
+      if (Object.keys(userUpdates).length > 0) {
+        try {
+          await User.findByIdAndUpdate(req.user.id, { $set: userUpdates });
+        } catch (err) {
+          console.warn('Could not auto-sync user profile info:', err.message);
+        }
+      }
+    }
+
     res.status(201).json({
       orderId: order.orderId,
       message: "Order created successfully",

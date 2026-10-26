@@ -5,7 +5,7 @@ import {
   Search, ChevronLeft, ChevronRight, X, MapPin, Smartphone, User,
   Calendar, CreditCard, Tv, Phone, CheckCircle2, AlertCircle,
   Trash2, ExternalLink, Eye, Image as ImageIcon, Sparkles, Filter,
-  Copy, Check, Share2, ClipboardList
+  Copy, Check, Share2, ClipboardList, Edit2
 } from "lucide-react";
 import "./admin.css";
 
@@ -38,9 +38,13 @@ const formatOrderWhatsAppMessage = (order) => {
   const d = order.device || {};
   const p = order.pickup || {};
   const pb = order.priceBreakdown || {};
-  const customerName = order.userId?.name || p.name || "Customer";
-  const customerPhone = order.userId?.phone || p.phone || "N/A";
-  const customerEmail = order.userId?.email || p.email || "";
+  const customerName = (p.name && p.name !== "User")
+    ? p.name
+    : (order.userId?.name && order.userId.name !== "User")
+      ? order.userId.name
+      : (p.name || order.userId?.name || "Customer");
+  const customerPhone = p.phone || order.userId?.phone || "N/A";
+  const customerEmail = p.email || order.userId?.email || "";
 
   const lines = [];
   lines.push(`📦 *SECOND SALE - ORDER DETAILS*`);
@@ -197,8 +201,7 @@ const TV_STATUSES = [
   "cancelled"
 ];
 
-/* ── Order Detail Modal (Device Orders) ──────────────────────────────── */
-function OrderDetailModal({ order, onClose }) {
+function OrderDetailModal({ order, onClose, onOrderUpdated }) {
   if (!order) return null;
   const [copied, setCopied] = useState(false);
   const [customPhone, setCustomPhone] = useState("");
@@ -206,7 +209,24 @@ function OrderDetailModal({ order, onClose }) {
   const p = order.pickup || {};
   const pb = order.priceBreakdown || {};
 
-  const rawPhone = order.userId?.phone || p.phone || "";
+  const displayCustomerName = (p.name && p.name !== "User")
+    ? p.name
+    : (order.userId?.name && order.userId.name !== "User")
+      ? order.userId.name
+      : (p.name || order.userId?.name || "User");
+  const displayCustomerPhone = p.phone || order.userId?.phone || "";
+  const displayCustomerEmail = p.email || order.userId?.email || "";
+
+  const [isEditingCustomer, setIsEditingCustomer] = useState(false);
+  const [customerForm, setCustomerForm] = useState({
+    name: displayCustomerName === "User" ? "" : displayCustomerName,
+    phone: displayCustomerPhone,
+    email: displayCustomerEmail,
+  });
+  const [savingCustomer, setSavingCustomer] = useState(false);
+  const [customerSuccess, setCustomerSuccess] = useState(false);
+
+  const rawPhone = displayCustomerPhone;
   const cleanPhone = formatPhoneForWhatsApp(rawPhone);
   const whatsappMsg = formatOrderWhatsAppMessage(order);
   const genericWhatsAppLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappMsg)}`;
@@ -215,6 +235,27 @@ function OrderDetailModal({ order, onClose }) {
     navigator.clipboard.writeText(whatsappMsg);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleSaveCustomer = async () => {
+    setSavingCustomer(true);
+    try {
+      const res = await adminService.updateOrderCustomerInfo(order._id, {
+        name: customerForm.name.trim(),
+        phone: customerForm.phone.trim(),
+        email: customerForm.email.trim(),
+      });
+      if (onOrderUpdated) {
+        onOrderUpdated(res.data);
+      }
+      setIsEditingCustomer(false);
+      setCustomerSuccess(true);
+      setTimeout(() => setCustomerSuccess(false), 3000);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update customer info");
+    } finally {
+      setSavingCustomer(false);
+    }
   };
 
   const InfoRow = ({ label, value }) =>
@@ -271,11 +312,101 @@ function OrderDetailModal({ order, onClose }) {
         <div className="admin-modal-body">
 
           {/* Customer Info */}
-          <Section icon={User} title="Customer Information">
-            <InfoRow label="Name" value={order.userId?.name || p.name || "N/A"} />
-            <InfoRow label="Phone" value={order.userId?.phone || p.phone || "N/A"} />
-            <InfoRow label="Email" value={order.userId?.email || p.email || "N/A"} />
-          </Section>
+          {!isEditingCustomer ? (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#E8F6F7] flex items-center justify-center">
+                    <User size={14} className="text-[#087F8C]" />
+                  </div>
+                  <span className="text-[12px] font-800 text-slate-500 uppercase tracking-wider">Customer Information</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCustomerForm({
+                      name: displayCustomerName === "User" ? "" : displayCustomerName,
+                      phone: displayCustomerPhone,
+                      email: displayCustomerEmail,
+                    });
+                    setIsEditingCustomer(true);
+                  }}
+                  className="text-[11px] font-bold text-[#087F8C] hover:text-[#065A63] bg-[#E8F6F7] hover:bg-[#d5eff1] px-2.5 py-1 rounded-lg border border-[#087F8C]/20 transition flex items-center gap-1 cursor-pointer"
+                >
+                  <Edit2 size={11} /> Edit Info
+                </button>
+              </div>
+
+              {customerSuccess && (
+                <div className="mb-2 p-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">
+                  Customer information updated successfully!
+                </div>
+              )}
+
+              <div className="bg-slate-50 rounded-xl px-4 py-1">
+                <InfoRow label="Name" value={displayCustomerName} />
+                <InfoRow label="Phone" value={displayCustomerPhone || "N/A"} />
+                <InfoRow label="Email" value={displayCustomerEmail || "N/A"} />
+              </div>
+            </div>
+          ) : (
+            <div className="mb-6 bg-slate-50 border border-[#087F8C]/30 rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                  <User size={13} className="text-[#087F8C]" /> Edit Customer Information
+                </span>
+              </div>
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Customer Full Name</label>
+                  <input
+                    type="text"
+                    value={customerForm.name}
+                    onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })}
+                    placeholder="Enter customer name"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#087F8C]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={customerForm.phone}
+                    onChange={(e) => setCustomerForm({ ...customerForm, phone: e.target.value })}
+                    placeholder="Enter phone number"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#087F8C]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={customerForm.email}
+                    onChange={(e) => setCustomerForm({ ...customerForm, email: e.target.value })}
+                    placeholder="Enter email address"
+                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#087F8C]"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingCustomer(false)}
+                  className="text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={savingCustomer}
+                  onClick={handleSaveCustomer}
+                  className="text-xs font-bold px-4 py-1.5 rounded-lg bg-[#087F8C] text-white hover:bg-[#065A63] shadow-sm cursor-pointer disabled:opacity-50"
+                >
+                  {savingCustomer ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Pickup Address */}
           <Section icon={MapPin} title="Pickup Address">
@@ -1036,11 +1167,23 @@ export default function AdminOrders() {
                           <span className="font-mono text-xs text-[#087F8C] font-bold">{order.orderId}</span>
                         </td>
                         <td>
-                          {order.userId ? (
+                          {order.userId || order.pickup?.name ? (
                             <div>
-                              <div className="font-bold text-slate-900">{order.userId.name}</div>
-                              <div className="text-[10px] text-slate-400 font-mono">{order.userId.phone}</div>
-                              <div className="text-[10px] text-slate-400">{order.userId.email}</div>
+                              <div className="font-bold text-slate-900">
+                                {(order.pickup?.name && order.pickup.name !== "User")
+                                  ? order.pickup.name
+                                  : (order.userId?.name && order.userId.name !== "User")
+                                    ? order.userId.name
+                                    : (order.pickup?.name || order.userId?.name || "User")}
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-mono">
+                                {order.pickup?.phone || order.userId?.phone || "N/A"}
+                              </div>
+                              {(order.pickup?.email || order.userId?.email) && (
+                                <div className="text-[10px] text-slate-400">
+                                  {order.pickup?.email || order.userId?.email}
+                                </div>
+                              )}
                             </div>
                           ) : (
                             <span className="text-slate-400 italic">Guest / Deleted User</span>
@@ -1385,7 +1528,14 @@ export default function AdminOrders() {
 
       {/* Device Order Detail Modal */}
       {selectedOrder && (
-        <OrderDetailModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+        <OrderDetailModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          onOrderUpdated={(updated) => {
+            setSelectedOrder(updated);
+            setOrders(prev => prev.map(o => o._id === updated._id ? { ...o, ...updated } : o));
+          }}
+        />
       )}
 
       {/* TV Lead Detail Modal */}

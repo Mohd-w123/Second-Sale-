@@ -71,6 +71,16 @@ export const getSettings = async (req, res) => {
         settings.whatsappEnabled = true;
         changed = true;
       }
+      if (!settings.paymentConfig) {
+        settings.paymentConfig = {
+          cod: { isEnabled: false, label: 'Cash on Delivery / Pay on Delivery', description: 'Inspect package upon delivery and pay via Cash or UPI to courier agent.' },
+          upi: { isEnabled: true, label: 'Direct UPI (PhonePe / GPay / Paytm)', description: 'Pay instantly using your preferred UPI app or scan QR code.', upiId: 'secondsale@upi' },
+          netbanking: { isEnabled: true, label: 'Net Banking / Direct Bank Transfer', description: 'Transfer securely via NEFT/IMPS to SecondSale verified escrow account.' },
+          gateway: { isEnabled: false, provider: 'razorpay', label: 'Online Payment (Cards, Netbanking, UPI, Wallets)', description: 'Instant and secure payment gateway powered by Razorpay' },
+          sellPayouts: { cash: true, upi: true, bank: true },
+        };
+        changed = true;
+      }
       if (changed) await settings.save();
     }
     res.json(settings);
@@ -427,6 +437,25 @@ export const getOtpBalance = async (req, res) => {
       status: 'Error',
       message: balData.Details || 'Failed to fetch balance from 2Factor',
     });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ── UPDATE Payment Gateways & Methods Config ───────────────────
+export const updatePaymentConfig = async (req, res) => {
+  try {
+    const { paymentConfig } = req.body;
+    let settings = await SiteSettings.findOne({ singleton: 'main' });
+    if (!settings) settings = new SiteSettings({ singleton: 'main' });
+
+    settings.paymentConfig = {
+      ...(settings.paymentConfig ? (settings.paymentConfig.toObject ? settings.paymentConfig.toObject() : settings.paymentConfig) : {}),
+      ...paymentConfig,
+    };
+    settings.markModified('paymentConfig');
+    await settings.save();
+    res.json(settings);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
