@@ -381,23 +381,37 @@ export const getAllOrders = async (req, res, next) => {
 
 export const updateOrderStatus = async (req, res, next) => {
   try {
-    const { status } = req.body;
+    const { status, remark } = req.body;
     const validStatuses = ['placed', 'scheduled', 'assigned', 'picked', 'verified', 'payment_initiated', 'completed', 'cancelled'];
 
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
-    }
-
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-
+    const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
+    if (status) {
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+      }
+      order.status = status;
+    }
+
+    if (remark !== undefined) {
+      const cleanRemark = typeof remark === 'string' ? remark.trim() : '';
+      order.remark = cleanRemark;
+      if (!Array.isArray(order.remarks)) {
+        order.remarks = [];
+      }
+      if (cleanRemark) {
+        order.remarks.push({
+          status: order.status,
+          remark: cleanRemark,
+          updatedAt: new Date(),
+        });
+      }
+    }
+
+    await order.save();
     res.json(order);
   } catch (error) {
     next(error);

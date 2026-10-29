@@ -96,6 +96,20 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  remark: {
+    type: String,
+    default: '',
+  },
+  remarks: [
+    {
+      status: String,
+      remark: String,
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 }, {
   timestamps: true,
   strict: false,

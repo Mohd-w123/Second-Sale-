@@ -68,7 +68,13 @@ export default function OrderTrackingPage() {
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </div>
           <h2 className="text-2xl font-black text-[#111827] mb-2">Order Cancelled</h2>
-          <p className="text-sm font-bold text-gray-400 mb-8">This order has been cancelled successfully.</p>
+          <p className="text-sm font-bold text-gray-400 mb-3">This order has been cancelled.</p>
+          {order.remark && (
+            <div className="bg-red-50/70 border border-red-100 rounded-2xl p-3.5 text-xs text-red-700 font-semibold mb-6 max-w-sm mx-auto text-left">
+              <span className="font-bold block text-[11px] uppercase tracking-wider text-red-500 mb-0.5">Cancellation Reason / Remark</span>
+              {order.remark}
+            </div>
+          )}
           <button onClick={() => navigate('/dashboard')} className="w-full bg-[#111827] text-white font-black py-4 rounded-2xl hover:bg-black transition-all">Go to Dashboard</button>
         </div>
       </div>
@@ -151,7 +157,22 @@ export default function OrderTrackingPage() {
           </div>
 
           <div className="border-t border-gray-50 pt-10">
-            <h3 className="text-lg font-black text-[#111827] mb-10">Order Status: <span className="text-[#087F8C]">Generated</span></h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-8">
+              <h3 className="text-lg font-black text-[#111827]">
+                Order Status: <span className="text-[#087F8C] uppercase">
+                  {order.status === 'scheduled' ? 'Pickup Scheduled' :
+                   order.status === 'assigned' ? 'Partner Assigned' :
+                   order.status === 'picked' ? 'Out For Pickup' :
+                   order.status === 'verified' ? 'Device Verified' :
+                   order.status === 'payment_initiated' ? 'Payment Initiated' :
+                   order.status === 'completed' ? 'Completed' :
+                   order.status === 'cancelled' ? 'Cancelled' : 'Order Placed'}
+                </span>
+              </h3>
+              <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full w-max">
+                Status: {order.status}
+              </span>
+            </div>
 
             {/* Progress Bar */}
             <div className="relative pt-12 pb-8">
@@ -177,7 +198,33 @@ export default function OrderTrackingPage() {
                 })}
               </div>
             </div>
-            <p className="text-sm font-bold text-gray-500 text-center mt-6">Your order has been confirmed and ready for pickup.</p>
+
+            <p className="text-sm font-bold text-gray-500 text-center mt-6">
+              {order.status === 'scheduled' ? 'Inspection team has been scheduled for your device pickup.' :
+               order.status === 'assigned' ? 'A pickup executive has been assigned and will contact you shortly.' :
+               order.status === 'picked' ? 'Your device is on its way to inspection.' :
+               order.status === 'verified' ? 'Inspection completed successfully.' :
+               order.status === 'completed' ? 'Order completed and payment sent.' :
+               order.status === 'cancelled' ? 'This order has been cancelled.' :
+               'Your order has been confirmed and is being processed.'}
+            </p>
+
+            {/* Optional Remark from Admin / Staff */}
+            {order.remark && (
+              <div className="mt-6 bg-amber-50/90 border border-amber-200/90 rounded-2xl p-4 flex items-start gap-3 text-left shadow-xs">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div className="flex-1">
+                  <span className="text-[11px] font-extrabold text-amber-800 uppercase tracking-wider block">
+                    Update Note / Remark from SecondSale:
+                  </span>
+                  <p className="text-sm font-semibold text-slate-800 mt-0.5 leading-relaxed">
+                    {order.remark}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Device Item */}

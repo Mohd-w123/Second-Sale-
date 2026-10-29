@@ -231,6 +231,12 @@ export const cancelOrder = async (req, res, next) => {
     }
 
     order.status = "cancelled";
+    const remark = req.body?.reason || req.body?.remark;
+    if (remark) {
+      order.remark = String(remark).trim();
+      if (!Array.isArray(order.remarks)) order.remarks = [];
+      order.remarks.push({ status: "cancelled", remark: String(remark).trim(), updatedAt: new Date() });
+    }
     await order.save();
 
     res.json({ message: "Order cancelled successfully", orderId: order.orderId });

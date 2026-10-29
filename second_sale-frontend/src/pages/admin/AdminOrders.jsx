@@ -5,7 +5,7 @@ import {
   Search, ChevronLeft, ChevronRight, X, MapPin, Smartphone, User,
   Calendar, CreditCard, Tv, Phone, CheckCircle2, AlertCircle,
   Trash2, ExternalLink, Eye, Image as ImageIcon, Sparkles, Filter,
-  Copy, Check, Share2, ClipboardList, Edit2
+  Copy, Check, Share2, ClipboardList, Edit2, MessageSquare
 } from "lucide-react";
 import "./admin.css";
 
@@ -201,7 +201,213 @@ const TV_STATUSES = [
   "cancelled"
 ];
 
-function OrderDetailModal({ order, onClose, onOrderUpdated }) {
+const getStatusBadgeClass = (s) => {
+  switch (s) {
+    case "completed": return "admin-badge admin-badge-green";
+    case "cancelled": return "admin-badge admin-badge-red";
+    case "placed": return "admin-badge admin-badge-blue";
+    case "scheduled": return "admin-badge admin-badge-purple";
+    case "verified": return "admin-badge admin-badge-blue";
+    case "payment_initiated": return "admin-badge admin-badge-yellow";
+    default: return "admin-badge admin-badge-gray";
+  }
+};
+
+/* ── Order Status & Remark Modal ────────────────────────────────────── */
+function OrderStatusRemarkModal({ order, targetStatus, onClose, onConfirm, isUpdating }) {
+  if (!order) return null;
+
+  const [status, setStatus] = useState(targetStatus || order.status || "placed");
+  const [remark, setRemark] = useState(order.remark || "");
+
+  const quickRemarks = {
+    cancelled: [
+      "Customer cancelled request",
+      "Customer not reachable / wrong phone",
+      "Price mismatch / rejected offer",
+      "Device sold elsewhere",
+      "Duplicate / test order",
+      "Customer not at address"
+    ],
+    scheduled: [
+      "Customer requested rescheduling",
+      "Rescheduled for tomorrow",
+      "Customer unavailable at current slot",
+      "Pending address clarification",
+      "Vendor rescheduled pickup"
+    ],
+    assigned: [
+      "Assigned to pickup partner",
+      "Partner contacted customer"
+    ],
+    picked: [
+      "Device picked up successfully",
+      "Physical device collected"
+    ],
+    verified: [
+      "Device diagnostics verified",
+      "Inspection completed at hub"
+    ],
+    completed: [
+      "Payment sent and order closed",
+      "Order successfully fulfilled"
+    ]
+  };
+
+  const currentQuickRemarks = quickRemarks[status] || [];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onConfirm(order._id, status, remark);
+  };
+
+  return (
+    <div className="admin-modal-backdrop" onClick={onClose}>
+      <div 
+        className="admin-modal" 
+        style={{ maxWidth: 520 }} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="admin-modal-header">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#E8F6F7] text-[#087F8C] flex items-center justify-center">
+              <MessageSquare size={18} />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-slate-900">Change Status & Remark</h3>
+              <p className="text-xs font-mono font-bold text-[#087F8C] mt-0.5">
+                {order.orderId} • {order.device?.brand} {order.device?.modelName}
+              </p>
+            </div>
+          </div>
+          <button className="admin-modal-close" onClick={onClose}>
+            <X size={16} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="admin-modal-body space-y-4">
+            {/* Status Selection */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                Select Status
+              </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-bold text-slate-800 outline-none focus:border-[#087F8C] focus:ring-2 focus:ring-[#087F8C]/10"
+              >
+                {ORDER_STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Remark Textarea */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Remark / Reason <span className="text-slate-400 font-normal lowercase">(optional)</span>
+                </label>
+                {remark && (
+                  <button
+                    type="button"
+                    onClick={() => setRemark("")}
+                    className="text-[11px] text-slate-400 hover:text-rose-500 font-medium cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              <textarea
+                rows={3}
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+                placeholder={
+                  status === "cancelled"
+                    ? "Reason for cancelling (optional, e.g. Customer cancelled, Price rejected)..."
+                    : status === "scheduled"
+                    ? "Rescheduling details (optional, e.g. Customer requested tomorrow 2 PM)..."
+                    : "Add any optional notes or remarks for this status update..."
+                }
+                className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs font-medium text-slate-800 outline-none focus:border-[#087F8C] focus:ring-2 focus:ring-[#087F8C]/10 placeholder:text-slate-400"
+              />
+            </div>
+
+            {/* Quick Suggestion Pills */}
+            {currentQuickRemarks.length > 0 && (
+              <div>
+                <span className="block text-[11px] font-bold text-slate-400 mb-1.5">
+                  Quick Remarks:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {currentQuickRemarks.map((qr) => (
+                    <button
+                      key={qr}
+                      type="button"
+                      onClick={() => setRemark(qr)}
+                      className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all text-left cursor-pointer ${
+                        remark === qr
+                          ? "bg-[#087F8C] text-white border-[#087F8C] font-bold shadow-2xs"
+                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {qr}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Existing Remarks History if any */}
+            {Array.isArray(order.remarks) && order.remarks.length > 0 && (
+              <div className="pt-2 border-t border-slate-100">
+                <span className="block text-[11px] font-bold text-slate-400 mb-1.5">
+                  Previous Remarks History:
+                </span>
+                <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
+                  {order.remarks.map((r, idx) => (
+                    <div key={idx} className="bg-slate-50 rounded-lg p-2 text-[11px] border border-slate-100">
+                      <div className="flex items-center justify-between text-slate-500 font-bold mb-0.5">
+                        <span className="uppercase text-[10px] text-[#087F8C]">{r.status}</span>
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}
+                        </span>
+                      </div>
+                      <p className="text-slate-700">{r.remark}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="admin-modal-footer flex items-center justify-end gap-2 bg-slate-50/90 border-t border-slate-100 p-4 rounded-b-2xl">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isUpdating}
+              className="px-4 py-2 text-xs font-bold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isUpdating}
+              className="px-5 py-2 text-xs font-bold text-white bg-[#087F8C] hover:bg-[#066873] rounded-xl transition shadow-sm cursor-pointer flex items-center gap-1.5"
+            >
+              {isUpdating ? "Saving..." : "Update Status"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function OrderDetailModal({ order, onClose, onOrderUpdated, onEditStatus }) {
   if (!order) return null;
   const [copied, setCopied] = useState(false);
   const [customPhone, setCustomPhone] = useState("");
@@ -310,6 +516,57 @@ function OrderDetailModal({ order, onClose, onOrderUpdated }) {
 
         {/* Body */}
         <div className="admin-modal-body">
+
+          {/* Status & Remarks Overview */}
+          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-slate-50 to-slate-100/60 border border-slate-200/80">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[12px] font-800 text-slate-500 uppercase tracking-wider">Order Status</span>
+                <span className={getStatusBadgeClass(order.status)}>{order.status}</span>
+              </div>
+              {onEditStatus && (
+                <button
+                  type="button"
+                  onClick={() => onEditStatus(order, order.status)}
+                  className="text-[11px] font-bold text-[#087F8C] hover:text-[#065A63] bg-white hover:bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 transition flex items-center gap-1 cursor-pointer shadow-2xs"
+                >
+                  <Edit2 size={11} /> Change Status / Remark
+                </button>
+              )}
+            </div>
+            {order.remark ? (
+              <div className="mt-2.5 p-3 bg-amber-50/90 rounded-xl border border-amber-200/80 text-xs">
+                <div className="font-bold text-amber-800 text-[11px] flex items-center gap-1 mb-1">
+                  <MessageSquare size={13} /> Status Remark:
+                </div>
+                <p className="text-slate-800 font-medium leading-relaxed">{order.remark}</p>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic">No remarks recorded for this order.</p>
+            )}
+
+            {/* Remarks History if present */}
+            {Array.isArray(order.remarks) && order.remarks.length > 1 && (
+              <div className="mt-3 pt-3 border-t border-slate-200/60">
+                <span className="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Remarks History
+                </span>
+                <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                  {order.remarks.map((r, idx) => (
+                    <div key={idx} className="bg-white/80 rounded-lg p-2 text-[11px] border border-slate-200/60">
+                      <div className="flex items-center justify-between text-slate-500 font-bold mb-0.5">
+                        <span className="uppercase text-[10px] text-[#087F8C]">{r.status}</span>
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}
+                        </span>
+                      </div>
+                      <p className="text-slate-700">{r.remark}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Customer Info */}
           {!isEditingCustomer ? (
@@ -900,6 +1157,8 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [statusModalOrder, setStatusModalOrder] = useState(null);
+  const [targetStatus, setTargetStatus] = useState(null);
 
   // Sync status if search params change
   useEffect(() => {
@@ -1002,11 +1261,32 @@ export default function AdminOrders() {
       .catch(() => {});
   }, []);
 
-  const handleStatusChange = async (orderId, newStatus) => {
+  const handleInitiateStatusChange = (order, newStatus) => {
+    setStatusModalOrder(order);
+    setTargetStatus(newStatus || order.status || "placed");
+  };
+
+  const handleStatusChange = async (orderId, newStatus, remark = "") => {
     setUpdatingId(orderId);
     try {
-      await adminService.updateOrderStatus(orderId, newStatus);
-      setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
+      const res = await adminService.updateOrderStatus(orderId, newStatus, remark);
+      const updatedOrder = res.data;
+      setOrders(prev => prev.map(o => o._id === orderId ? {
+        ...o,
+        status: newStatus,
+        remark: updatedOrder.remark !== undefined ? updatedOrder.remark : remark,
+        remarks: updatedOrder.remarks || o.remarks,
+      } : o));
+      if (selectedOrder && selectedOrder._id === orderId) {
+        setSelectedOrder(prev => ({
+          ...prev,
+          status: newStatus,
+          remark: updatedOrder.remark !== undefined ? updatedOrder.remark : remark,
+          remarks: updatedOrder.remarks || prev.remarks,
+        }));
+      }
+      setStatusModalOrder(null);
+      setTargetStatus(null);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to update order status");
     } finally {
@@ -1026,18 +1306,6 @@ export default function AdminOrders() {
       setTvTotal(prev => Math.max(0, prev - 1));
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete lead");
-    }
-  };
-
-  const getStatusBadgeClass = (s) => {
-    switch (s) {
-      case "completed": return "admin-badge admin-badge-green";
-      case "cancelled": return "admin-badge admin-badge-red";
-      case "placed": return "admin-badge admin-badge-blue";
-      case "scheduled": return "admin-badge admin-badge-purple";
-      case "verified": return "admin-badge admin-badge-blue";
-      case "payment_initiated": return "admin-badge admin-badge-yellow";
-      default: return "admin-badge admin-badge-gray";
     }
   };
 
@@ -1211,6 +1479,16 @@ export default function AdminOrders() {
                           <span className={getStatusBadgeClass(order.status)}>
                             {order.status}
                           </span>
+                          {order.remark && (
+                            <div 
+                              className="text-[11px] text-amber-800 bg-amber-50/90 border border-amber-200/80 rounded-md px-1.5 py-0.5 mt-1 max-w-[170px] truncate cursor-pointer hover:bg-amber-100 transition flex items-center gap-1"
+                              title={`Remark: ${order.remark} (Click to view/edit)`}
+                              onClick={() => handleInitiateStatusChange(order, order.status)}
+                            >
+                              <MessageSquare size={10} className="shrink-0 text-amber-600" />
+                              <span className="truncate">{order.remark}</span>
+                            </div>
+                          )}
                         </td>
                         <td>
                           <div className="flex items-center gap-1.5">
@@ -1266,16 +1544,31 @@ export default function AdminOrders() {
                           </div>
                         </td>
                         <td className="text-right">
-                          <select
-                            className="admin-select text-xs py-1 px-2.5"
-                            disabled={updatingId === order._id}
-                            value={order.status}
-                            onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                          >
-                            {ORDER_STATUSES.map(s => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
-                          </select>
+                          <div className="inline-flex items-center gap-1.5 justify-end">
+                            <select
+                              className="admin-select text-xs py-1 px-2.5"
+                              disabled={updatingId === order._id}
+                              value={order.status}
+                              onChange={(e) => handleInitiateStatusChange(order, e.target.value)}
+                            >
+                              {ORDER_STATUSES.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => handleInitiateStatusChange(order, order.status)}
+                              title={order.remark ? `Remark: "${order.remark}" (Click to view/edit)` : "Add remark"}
+                              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-all text-xs cursor-pointer border shadow-2xs hover:scale-105 active:scale-95"
+                              style={{
+                                background: order.remark ? "#FEF3C7" : "#F8FAFC",
+                                borderColor: order.remark ? "#F59E0B" : "#CBD5E1",
+                                color: order.remark ? "#B45309" : "#64748B",
+                              }}
+                            >
+                              <MessageSquare size={13} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1531,9 +1824,29 @@ export default function AdminOrders() {
         <OrderDetailModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
+          onEditStatus={(order, currentStatus) => {
+            setStatusModalOrder(order);
+            setTargetStatus(currentStatus);
+          }}
           onOrderUpdated={(updated) => {
             setSelectedOrder(updated);
             setOrders(prev => prev.map(o => o._id === updated._id ? { ...o, ...updated } : o));
+          }}
+        />
+      )}
+
+      {/* Order Status & Remark Modal */}
+      {statusModalOrder && (
+        <OrderStatusRemarkModal
+          order={statusModalOrder}
+          targetStatus={targetStatus}
+          isUpdating={updatingId === statusModalOrder._id}
+          onClose={() => {
+            setStatusModalOrder(null);
+            setTargetStatus(null);
+          }}
+          onConfirm={(orderId, newStatus, remark) => {
+            handleStatusChange(orderId, newStatus, remark);
           }}
         />
       )}

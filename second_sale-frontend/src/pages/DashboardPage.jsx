@@ -644,8 +644,20 @@ function OrdersTab({ orders = [], refurbishedOrders = [], setSelectedReportOrder
                           <p className="text-sm font-bold text-gray-400">
                             {order.leadStatus === 'pickup_scheduled' || order.status === 'scheduled' ? 'Inspection team has been scheduled for your device.' :
                               order.leadStatus === 'quote_sent' ? 'Check your offered price below or wait for pickup.' :
-                                'Your device order has been placed and is being processed.'}
+                              order.status === 'assigned' ? 'Pickup executive assigned.' :
+                              order.status === 'picked' ? 'Device collected and out for inspection.' :
+                              order.status === 'verified' ? 'Device inspected and verified.' :
+                              order.status === 'completed' ? 'Order completed and payment sent.' :
+                              order.status === 'cancelled' ? 'This order has been cancelled.' :
+                              'Your device order has been placed and is being processed.'}
                           </p>
+                          {order.remark && (
+                            <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-semibold">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                              <span className="font-bold text-amber-800">Note:</span>
+                              <span className="truncate max-w-xs">{order.remark}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <button
