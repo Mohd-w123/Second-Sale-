@@ -275,12 +275,20 @@ const FUNCTIONAL_PROBLEMS = [
 const supportsESIM = (modelName) => {
   if (!modelName) return false;
   const name = modelName.toLowerCase();
+  const numMatch = name.match(/iphone\s*(\d+)/i);
+  if (numMatch) {
+    const seriesNum = parseInt(numMatch[1], 10);
+    if (seriesNum >= 14) return true;
+    if (seriesNum === 13 && (name.includes('pro') || name.includes('max'))) return true;
+  }
   const allowed = [
     'iphone 13 pro', 'iphone 13 pro max',
     'iphone 14', 'iphone 14 plus', 'iphone 14 pro', 'iphone 14 pro max',
     'iphone 15', 'iphone 15 plus', 'iphone 15 pro', 'iphone 15 pro max',
     'iphone 16', 'iphone 16 plus', 'iphone 16e', 'iphone 16 pro', 'iphone 16 pro max',
     'iphone 17', 'iphone 17 air', 'iphone 17e', 'iphone 17 pro', 'iphone 17 pro max',
+    'iphone 18', 'iphone 18 pro', 'iphone 18 pro max',
+    'iphone 19', 'iphone 20',
   ];
   return allowed.some(pattern => name.includes(pattern));
 };
@@ -290,8 +298,13 @@ const bundlesCharger = (brand, modelName) => {
   const name = modelName.toLowerCase();
   const b = brand?.toLowerCase() || '';
   if (b === 'apple' || name.includes('iphone')) {
+    const numMatch = name.match(/iphone\s*(\d+)/i);
+    if (numMatch) {
+      const seriesNum = parseInt(numMatch[1], 10);
+      if (seriesNum >= 12) return false;
+    }
     const noChargerPatterns = [
-      'iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone se 2022'
+      'iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 2022'
     ];
     return !noChargerPatterns.some(p => name.includes(p));
   }
@@ -412,11 +425,11 @@ export default function ConditionQuizPage() {
 
   const computedDeviceAge = (isWarrantyEligible && !hasScreenOrPanelDamage)
     ? (underWarranty
-        ? (mobileAge === '3_to_6_months' ? '3 months - 6 months'
-           : mobileAge === '6_to_11_months' ? '6 months - 11 months'
-           : mobileAge === 'above_11_months' ? 'Above 11 months'
-           : 'Below 3 months')
-        : 'Above 11 months')
+      ? (mobileAge === '3_to_6_months' ? '3 months - 6 months'
+        : mobileAge === '6_to_11_months' ? '6 months - 11 months'
+          : mobileAge === 'above_11_months' ? 'Above 11 months'
+            : 'Below 3 months')
+      : 'Above 11 months')
     : 'Above 11 months';
 
   // Extract all active sub-defect deduction keys
@@ -979,11 +992,10 @@ export default function ConditionQuizPage() {
                 <div
                   className="h-full bg-gradient-to-r from-[#116466] via-[#087F8C] to-[#0EA5E9] transition-all duration-500"
                   style={{
-                    width: `${
-                      STEPS[currentStepIndex]?.id === 'screen_body_defects' && isSubDefectView
-                        ? ((currentStepIndex + 0.5) / STEPS.length) * 100
-                        : ((currentStepIndex + 1) / STEPS.length) * 100
-                    }%`
+                    width: `${STEPS[currentStepIndex]?.id === 'screen_body_defects' && isSubDefectView
+                      ? ((currentStepIndex + 0.5) / STEPS.length) * 100
+                      : ((currentStepIndex + 1) / STEPS.length) * 100
+                      }%`
                   }}
                 />
               </div>
@@ -1012,22 +1024,20 @@ export default function ConditionQuizPage() {
                         <button
                           type="button"
                           onClick={() => setAbleToMakeCalls(true)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            ableToMakeCalls === true
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
+                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${ableToMakeCalls === true
+                            ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                            : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
                         >
                           Yes
                         </button>
                         <button
                           type="button"
                           onClick={() => setAbleToMakeCalls(false)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            ableToMakeCalls === false
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
+                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${ableToMakeCalls === false
+                            ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                            : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
                         >
                           No
                         </button>
@@ -1044,22 +1054,20 @@ export default function ConditionQuizPage() {
                         <button
                           type="button"
                           onClick={() => setIsTouchScreenWorking(true)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            isTouchScreenWorking === true
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
+                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${isTouchScreenWorking === true
+                            ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                            : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
                         >
                           Yes
                         </button>
                         <button
                           type="button"
                           onClick={() => setIsTouchScreenWorking(false)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            isTouchScreenWorking === false
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
+                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${isTouchScreenWorking === false
+                            ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                            : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
                         >
                           No
                         </button>
@@ -1078,22 +1086,20 @@ export default function ConditionQuizPage() {
                         <button
                           type="button"
                           onClick={() => setIsScreenOriginal(true)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            isScreenOriginal === true
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
+                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${isScreenOriginal === true
+                            ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                            : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
                         >
                           Yes
                         </button>
                         <button
                           type="button"
                           onClick={() => setIsScreenOriginal(false)}
-                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                            isScreenOriginal === false
-                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                          }`}
+                          className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${isScreenOriginal === false
+                            ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                            : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                            }`}
                         >
                           No
                         </button>
@@ -1118,11 +1124,10 @@ export default function ConditionQuizPage() {
                                 setMobileAge('below_3_months');
                               }
                             }}
-                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                              underWarranty === true
-                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                            }`}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${underWarranty === true
+                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                              }`}
                           >
                             Yes
                           </button>
@@ -1132,11 +1137,10 @@ export default function ConditionQuizPage() {
                               setUnderWarranty(false);
                               setMobileAge('above_11_months');
                             }}
-                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                              underWarranty === false
-                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                            }`}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${underWarranty === false
+                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                              }`}
                           >
                             No
                           </button>
@@ -1155,22 +1159,20 @@ export default function ConditionQuizPage() {
                           <button
                             type="button"
                             onClick={() => setHasGSTBill(true)}
-                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                              hasGSTBill === true
-                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                            }`}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${hasGSTBill === true
+                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                              }`}
                           >
                             Yes
                           </button>
                           <button
                             type="button"
                             onClick={() => setHasGSTBill(false)}
-                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                              hasGSTBill === false
-                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                            }`}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${hasGSTBill === false
+                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                              }`}
                           >
                             No
                           </button>
@@ -1191,22 +1193,20 @@ export default function ConditionQuizPage() {
                           <button
                             type="button"
                             onClick={() => seteSIMSupport('single_esim')}
-                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                              eSIMSupport === 'single_esim'
-                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                            }`}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${eSIMSupport === 'single_esim'
+                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                              }`}
                           >
                             Single eSIM
                           </button>
                           <button
                             type="button"
                             onClick={() => seteSIMSupport('dual_esim')}
-                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${
-                              eSIMSupport === 'dual_esim'
-                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
-                                : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
-                            }`}
+                            className={`py-3.5 px-6 rounded-xl border-2 font-bold text-sm transition-all cursor-pointer ${eSIMSupport === 'dual_esim'
+                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C]'
+                              : 'border-gray-100 bg-white text-gray-600 hover:border-gray-200'
+                              }`}
                           >
                             Dual eSIM
                           </button>
@@ -1255,11 +1255,10 @@ export default function ConditionQuizPage() {
                                 }
                               });
                             }}
-                            className={`p-6 rounded-2xl border-2 text-left transition-all flex items-center gap-5 cursor-pointer ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
-                                : 'border-gray-100 bg-white hover:border-gray-200'
-                            }`}
+                            className={`p-6 rounded-2xl border-2 text-left transition-all flex items-center gap-5 cursor-pointer ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
+                              : 'border-gray-100 bg-white hover:border-gray-200'
+                              }`}
                           >
                             <div className="shrink-0">
                               <IconComponent className="w-12 h-16" />
@@ -1271,9 +1270,8 @@ export default function ConditionQuizPage() {
                               <p className="text-xs text-gray-500 mt-1">{defect.desc}</p>
                             </div>
                             <div
-                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                                isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
-                              }`}
+                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
+                                }`}
                             >
                               {isSelected && <Check size={14} className="text-white" strokeWidth={3} />}
                             </div>
@@ -1365,11 +1363,10 @@ export default function ConditionQuizPage() {
                                               return { ...prev, [section.id]: updated };
                                             });
                                           }}
-                                          className={`p-5 rounded-2xl border-2 text-left transition-all flex items-center gap-4 cursor-pointer ${
-                                            isSelected
-                                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
-                                              : 'border-gray-100 bg-white hover:border-gray-200'
-                                          }`}
+                                          className={`p-5 rounded-2xl border-2 text-left transition-all flex items-center gap-4 cursor-pointer ${isSelected
+                                            ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
+                                            : 'border-gray-100 bg-white hover:border-gray-200'
+                                            }`}
                                         >
                                           <div className="w-12 h-14 shrink-0 flex items-center justify-center">
                                             {IconComponent && <IconComponent className="w-12 h-14" />}
@@ -1380,9 +1377,8 @@ export default function ConditionQuizPage() {
                                             </p>
                                           </div>
                                           <div
-                                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                                              isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
-                                            }`}
+                                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
+                                              }`}
                                           >
                                             {isSelected && <Check size={14} className="text-white" strokeWidth={3} />}
                                           </div>
@@ -1425,11 +1421,10 @@ export default function ConditionQuizPage() {
                                   : [...prev, prob.id]
                               );
                             }}
-                            className={`p-4 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-2.5 min-h-[110px] cursor-pointer ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
-                                : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'
-                            }`}
+                            className={`p-4 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-2.5 min-h-[110px] cursor-pointer ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] text-[#087F8C] shadow-xs'
+                              : 'border-gray-100 bg-white text-gray-700 hover:border-gray-200'
+                              }`}
                           >
                             <div className={`p-2 rounded-xl ${isSelected ? 'bg-[#087F8C]/15 text-[#087F8C]' : 'bg-gray-50 text-gray-700'}`}>
                               <IconComponent className="w-6 h-6" />
@@ -1472,11 +1467,10 @@ export default function ConditionQuizPage() {
                       <button
                         type="button"
                         onClick={() => setHasBox(prev => !prev)}
-                        className={`p-6 rounded-2xl border-2 text-left transition-all flex items-center justify-between cursor-pointer ${
-                          hasBox
-                            ? 'border-[#087F8C] bg-[#E8F6F7]'
-                            : 'border-gray-100 bg-white hover:border-gray-200'
-                        }`}
+                        className={`p-6 rounded-2xl border-2 text-left transition-all flex items-center justify-between cursor-pointer ${hasBox
+                          ? 'border-[#087F8C] bg-[#E8F6F7]'
+                          : 'border-gray-100 bg-white hover:border-gray-200'
+                          }`}
                       >
                         <div className="flex items-center gap-4">
                           <div className="p-3 bg-[#E8F6F7] text-[#087F8C] rounded-2xl">
@@ -1488,9 +1482,8 @@ export default function ConditionQuizPage() {
                           </div>
                         </div>
                         <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                            hasBox ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
-                          }`}
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${hasBox ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
+                            }`}
                         >
                           {hasBox && <Check size={14} className="text-white" strokeWidth={3} />}
                         </div>
@@ -1501,11 +1494,10 @@ export default function ConditionQuizPage() {
                         <button
                           type="button"
                           onClick={() => setHasCharger(prev => !prev)}
-                          className={`p-6 rounded-2xl border-2 text-left transition-all flex items-center justify-between cursor-pointer ${
-                            hasCharger
-                              ? 'border-[#087F8C] bg-[#E8F6F7]'
-                              : 'border-gray-100 bg-white hover:border-gray-200'
-                          }`}
+                          className={`p-6 rounded-2xl border-2 text-left transition-all flex items-center justify-between cursor-pointer ${hasCharger
+                            ? 'border-[#087F8C] bg-[#E8F6F7]'
+                            : 'border-gray-100 bg-white hover:border-gray-200'
+                            }`}
                         >
                           <div className="flex items-center gap-4">
                             <div className="p-3 bg-[#E8F6F7] text-[#087F8C] rounded-2xl">
@@ -1517,9 +1509,8 @@ export default function ConditionQuizPage() {
                             </div>
                           </div>
                           <div
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                              hasCharger ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
-                            }`}
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${hasCharger ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
+                              }`}
                           >
                             {hasCharger && <Check size={14} className="text-white" strokeWidth={3} />}
                           </div>
@@ -1553,15 +1544,13 @@ export default function ConditionQuizPage() {
                               onClick={() => {
                                 setMobileAge(opt.id);
                               }}
-                              className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center gap-3.5 ${
-                                isSelected
-                                  ? 'border-[#087F8C] bg-[#E8F6F7]/50 shadow-sm'
-                                  : 'border-gray-100 bg-white hover:border-gray-200'
-                              }`}
+                              className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center gap-3.5 ${isSelected
+                                ? 'border-[#087F8C] bg-[#E8F6F7]/50 shadow-sm'
+                                : 'border-gray-100 bg-white hover:border-gray-200'
+                                }`}
                             >
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                                isSelected ? 'border-[#087F8C]' : 'border-gray-300'
-                              }`}>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSelected ? 'border-[#087F8C]' : 'border-gray-300'
+                                }`}>
                                 {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-[#087F8C]" />}
                               </div>
                               <div className="flex-1">
@@ -1590,15 +1579,13 @@ export default function ConditionQuizPage() {
                               onClick={() => {
                                 setMobileAge(opt.id);
                               }}
-                              className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center gap-3.5 ${
-                                isSelected
-                                  ? 'border-[#087F8C] bg-[#E8F6F7]/50 shadow-sm'
-                                  : 'border-gray-100 bg-white hover:border-gray-200'
-                              }`}
+                              className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex items-center gap-3.5 ${isSelected
+                                ? 'border-[#087F8C] bg-[#E8F6F7]/50 shadow-sm'
+                                : 'border-gray-100 bg-white hover:border-gray-200'
+                                }`}
                             >
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                                isSelected ? 'border-[#087F8C]' : 'border-gray-300'
-                              }`}>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${isSelected ? 'border-[#087F8C]' : 'border-gray-300'
+                                }`}>
                                 {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-[#087F8C]" />}
                               </div>
                               <div className="flex-1">

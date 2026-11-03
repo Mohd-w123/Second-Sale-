@@ -1176,12 +1176,20 @@ function ReferralTab({ referral, copyCode, copied }) {
 const supportsESIM = (modelName) => {
   if (!modelName) return false;
   const name = modelName.toLowerCase();
+  const numMatch = name.match(/iphone\s*(\d+)/i);
+  if (numMatch) {
+    const seriesNum = parseInt(numMatch[1], 10);
+    if (seriesNum >= 14) return true;
+    if (seriesNum === 13 && (name.includes('pro') || name.includes('max'))) return true;
+  }
   const allowed = [
     'iphone 13 pro', 'iphone 13 pro max',
     'iphone 14 pro', 'iphone 14 pro max',
     'iphone 15 pro', 'iphone 15 pro max',
     'iphone 16 pro', 'iphone 16 pro max',
-    'iphone 17', 'iphone 17 air', 'iphone 17 pro', 'iphone 17 pro max'
+    'iphone 17', 'iphone 17 air', 'iphone 17 pro', 'iphone 17 pro max',
+    'iphone 18', 'iphone 18 pro', 'iphone 18 pro max',
+    'iphone 19', 'iphone 20'
   ];
   return allowed.some(pattern => name.includes(pattern));
 };

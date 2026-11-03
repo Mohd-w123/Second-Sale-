@@ -145,9 +145,15 @@ export function isDeviceWarrantyEligible(device) {
     return year >= minEligibleYear;
   }
 
-  // 3. Apple iPhones: iPhone 14, 15, 16, 17, iPhone SE (2022/3rd gen) are within 3-year window
+  // 3. Apple iPhones: iPhone 14 and newer (14, 15, 16, 17, 18, 19, 20...), iPhone SE (2022/3rd gen) are within 3-year window
   if (brand.includes('apple') || slug.includes('iphone') || name.includes('iphone')) {
-    const activeIphones = ['iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone se 3', 'iphone se 2022'];
+    const numMatch = text.match(/iphone\s*(\d+)/i) || slug.match(/iphone-(\d+)/i);
+    if (numMatch) {
+      const seriesNum = parseInt(numMatch[1], 10);
+      if (seriesNum >= 14) return true;
+      if (seriesNum < 14) return false;
+    }
+    const activeIphones = ['iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 3', 'iphone se 2022'];
     return activeIphones.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')));
   }
 
@@ -314,7 +320,12 @@ export function bundlesCharger(brand, modelName) {
   const name = modelName.toLowerCase();
   const b = brand?.toLowerCase() || '';
   if (b === 'apple' || name.includes('iphone')) {
-    const noChargerPatterns = ['iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone se 2022'];
+    const numMatch = name.match(/iphone\s*(\d+)/i);
+    if (numMatch) {
+      const seriesNum = parseInt(numMatch[1], 10);
+      if (seriesNum >= 12) return false;
+    }
+    const noChargerPatterns = ['iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 2022'];
     return !noChargerPatterns.some(p => name.includes(p));
   }
   if (b === 'samsung') {
