@@ -1,9 +1,9 @@
 /**
  * Earbuds Buyback Price Calculator
- * 100% exact match with DeviceKart (zv algorithm & deduction weights)
+ * Standardized valuation model (deduction weights)
  */
 
-export const DEVICEKART_EARBUDS_QUIZ = {
+export const SECONDSALE_EARBUDS_QUIZ = {
   windows: [
     {
       id: "power",

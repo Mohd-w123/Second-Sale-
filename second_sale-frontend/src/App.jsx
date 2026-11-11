@@ -211,7 +211,7 @@ function App() {
           <Route path="/sell-earbuds/:brand" element={<EarbudsModelSelectionPage />} />
           <Route path="/sell-earbuds/:brand/:slug" element={<EarbudsModelDetailsPage />} />
           <Route path="/sell-earbuds/:brand/:slug/quiz" element={<EarbudsConditionQuizPage />} />
-          {/* DeviceKart URL compatibility aliases */}
+          {/* Secondary URL compatibility aliases */}
           <Route path="/sell/earbuds/brand" element={<EarbudsBrandSelectionPage />} />
           <Route path="/sell/earbuds/:brand" element={<EarbudsModelSelectionPage />} />
           <Route path="/sell/earbuds/:brand/:slug" element={<EarbudsModelDetailsPage />} />

@@ -1762,7 +1762,7 @@ export default function AdminDevices() {
                       <Info className="w-5 h-5 text-[#087F8C] shrink-0 mt-0.5" />
                       <div>
                         <strong className="block text-white font-bold mb-1">Standard Dynamic Valuation Active</strong>
-                        This category uses DeviceKart's standardized percentage valuation model. All condition, screen, body, and functional deductions are computed dynamically starting from each variant's <strong>Base Price</strong> configured in the Variants tab.
+                        This category uses SecondSale's standardized percentage valuation model. All condition, screen, body, and functional deductions are computed dynamically starting from each variant's <strong>Base Price</strong> configured in the Variants tab.
                       </div>
                     </div>
                   )}
