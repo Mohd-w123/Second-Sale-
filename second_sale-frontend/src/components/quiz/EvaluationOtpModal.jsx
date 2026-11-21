@@ -8,7 +8,7 @@ export default function EvaluationOtpModal({
   onSuccess,
   deviceName = "your device",
 }) {
-  const { user, sendOtp, verifyOtp } = useAuth();
+  const { user, isAuthenticated, sendOtp, verifyOtp } = useAuth();
 
   const [otpPhone, setOtpPhone] = useState(user?.phone || "");
   const [otpCode, setOtpCode] = useState("");
@@ -20,9 +20,21 @@ export default function EvaluationOtpModal({
   const [dummyCode, setDummyCode] = useState("");
   const [resendCountdown, setResendCountdown] = useState(30);
 
+  // If user is already logged in, bypass OTP modal entirely and trigger onSuccess immediately
+  useEffect(() => {
+    if (isOpen && (isAuthenticated || user?.phone || localStorage.getItem("accessToken"))) {
+      if (onSuccess) {
+        onSuccess({ phone: user?.phone, user });
+      }
+      if (onClose) {
+        onClose();
+      }
+    }
+  }, [isOpen, isAuthenticated, user, onSuccess, onClose]);
+
   // Sync user phone when modal opens
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isAuthenticated && !localStorage.getItem("accessToken")) {
       if (user?.phone) {
         setOtpPhone(user.phone.replace(/\D/g, "").slice(-10));
       }
@@ -32,7 +44,7 @@ export default function EvaluationOtpModal({
       setIsDummyMode(false);
       setResendCountdown(30);
     }
-  }, [isOpen, user]);
+  }, [isOpen, user, isAuthenticated]);
 
   // Resend countdown timer when on OTP step
   useEffect(() => {
@@ -47,7 +59,7 @@ export default function EvaluationOtpModal({
     };
   }, [otpStep, resendCountdown]);
 
-  if (!isOpen) return null;
+  if (!isOpen || isAuthenticated || user?.phone || localStorage.getItem("accessToken")) return null;
 
   const handleSendOtp = async (e) => {
     if (e) e.preventDefault();

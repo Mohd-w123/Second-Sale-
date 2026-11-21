@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import SEOHead from "../components/seo/SEOHead";
@@ -253,9 +253,17 @@ export default function LoginPage() {
   const [dummyCode, setDummyCode] = useState("123456");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { sendOtp, verifyOtp } = useAuth();
+  const { user, isAuthenticated, sendOtp, verifyOtp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+      const params = new URLSearchParams(location.search);
+      const returnUrl = params.get("returnUrl") || "/dashboard";
+      navigate(returnUrl, { replace: true });
+    }
+  }, [isAuthenticated, user, location.search, navigate]);
 
   const handleSendOtp = async (phoneNumber) => {
     setLoading(true);

@@ -347,6 +347,10 @@ export default function LaptopConditionQuizPage() {
 
   const handleGetBestPrice = () => {
     if (!age) setAge('twoToThree');
+    if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+      finalizeAndShowResult();
+      return;
+    }
     setShowOtpModal(true);
   };
 

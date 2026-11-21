@@ -27,7 +27,7 @@ export default function EarbudsConditionQuizPage() {
   const storage = searchParams.get("storage") || "Standard";
 
   const { updateQuote } = useQuote();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -228,6 +228,10 @@ export default function EarbudsConditionQuizPage() {
       setStepIndex(1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
+      if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+        finalizeAndShowResult();
+        return;
+      }
       setShowOtpModal(true);
     }
   };

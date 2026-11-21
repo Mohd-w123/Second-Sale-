@@ -268,10 +268,10 @@ export default function TabletConditionQuizPage() {
         technicalIssues,
         accessories: selectedAccessories,
         answerSummary: [
-          { question: "Does Tablet Switch On?", answer: doesTabletSwitchOn ? "Yes" : "No" },
+          { question: "Able to make & receive calls?", answer: ableToMakeCalls ? "Yes" : "No" },
           { question: "Touchscreen working?", answer: isTouchScreenWorking ? "Yes" : "No" },
           { question: "Screen is Original?", answer: isScreenOriginal ? "Yes" : "No" },
-          { question: "Cellular Network Working?", answer: isCellularNetworkWorking === true ? "Yes" : isCellularNetworkWorking === false ? "No" : "N/A (WiFi Only)" },
+          { question: "Cellular / eSIM Support", answer: eSIMSupport || "N/A" },
           { question: "Physical Issues", answer: physicalIssues.length > 0 ? physicalIssues.join(", ") : "None (Flawless)" },
           { question: "Technical / Functional Faults", answer: technicalIssues.length > 0 ? technicalIssues.join(", ") : "None (All Working)" },
           { question: "Device Age", answer: deviceAge || "N/A" },
@@ -287,6 +287,10 @@ export default function TabletConditionQuizPage() {
 
   const handleGetBestPrice = () => {
     if (underWarranty === null) setUnderWarranty(false);
+    if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+      finalizeAndShowResult();
+      return;
+    }
     setShowOtpModal(true);
   };
 

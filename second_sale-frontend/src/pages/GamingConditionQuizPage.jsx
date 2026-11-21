@@ -35,7 +35,7 @@ export default function GamingConditionQuizPage() {
   const variant = searchParams.get("variant") || searchParams.get("storage") || "";
 
   const { updateQuote } = useQuote();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -282,6 +282,10 @@ export default function GamingConditionQuizPage() {
       setStepIndex(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
+      if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+        finalizeAndShowResult();
+        return;
+      }
       setShowOtpModal(true);
     }
   };

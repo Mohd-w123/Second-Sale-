@@ -573,6 +573,10 @@ export default function ConditionQuizPage() {
   };
 
   const handleGetBestPrice = () => {
+    if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+      finalizeAndShowResult();
+      return;
+    }
     setShowOtpModal(true);
   };
 

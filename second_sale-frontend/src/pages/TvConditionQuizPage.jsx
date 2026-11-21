@@ -194,12 +194,17 @@ export default function TvConditionQuizPage() {
 
   const handleFinalizeQuote = () => {
     buildAndSaveQuote();
+    if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+      setShowResult(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     setShowOtpModal(true);
   };
 
   const proceedToSchedule = () => {
     buildAndSaveQuote();
-    if (isAuthenticated) {
+    if (isAuthenticated || user || localStorage.getItem('accessToken')) {
       navigate('/schedule-pickup');
     } else {
       setShowOtpModal(true);

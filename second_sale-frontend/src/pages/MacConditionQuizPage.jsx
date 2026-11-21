@@ -236,6 +236,10 @@ export default function MacConditionQuizPage() {
   };
 
   const handleGetBestPrice = () => {
+    if (isAuthenticated || user || localStorage.getItem('accessToken')) {
+      finalizeAndShowResult();
+      return;
+    }
     setShowOtpModal(true);
   };
 
