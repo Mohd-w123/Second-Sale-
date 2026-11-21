@@ -371,7 +371,7 @@ export const updateWhatsApp = async (req, res) => {
 // ── UPDATE OTP & 2Factor Service Configuration ─────────────────
 export const updateOtpConfig = async (req, res) => {
   try {
-    const { isEnabled, provider, apiKey, senderId, dummyOtpEnabled, dummyOtpCode } = req.body;
+    const { isEnabled, provider, apiKey, senderId, dummyOtpEnabled, dummyOtpCode, templateName } = req.body;
     let settings = await SiteSettings.findOne({ singleton: 'main' });
     if (!settings) settings = new SiteSettings({ singleton: 'main' });
 
@@ -382,6 +382,7 @@ export const updateOtpConfig = async (req, res) => {
     if (isEnabled !== undefined) settings.otpConfig.isEnabled = Boolean(isEnabled);
     if (provider !== undefined) settings.otpConfig.provider = String(provider).trim();
     if (apiKey !== undefined) settings.otpConfig.apiKey = String(apiKey).trim();
+    if (templateName !== undefined) settings.otpConfig.templateName = String(templateName).trim();
     if (senderId !== undefined) settings.otpConfig.senderId = String(senderId).trim();
     if (dummyOtpEnabled !== undefined) settings.otpConfig.dummyOtpEnabled = Boolean(dummyOtpEnabled);
     if (dummyOtpCode !== undefined) settings.otpConfig.dummyOtpCode = String(dummyOtpCode).trim();

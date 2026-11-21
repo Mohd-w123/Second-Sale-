@@ -104,6 +104,7 @@ const siteSettingsSchema = new mongoose.Schema({
     isEnabled: { type: Boolean, default: true },
     provider: { type: String, default: '2factor' },
     apiKey: { type: String, default: 'f4018fc7-ca01-11f1-af74-0200cd936042' },
+    templateName: { type: String, default: 'SecondSale_Login_OTP' },
     senderId: { type: String, default: '' },
     dummyOtpEnabled: { type: Boolean, default: false },
     dummyOtpCode: { type: String, default: '123456' },

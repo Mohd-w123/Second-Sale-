@@ -18,6 +18,7 @@ export default function EvaluationOtpModal({
   const [otpError, setOtpError] = useState("");
   const [isDummyMode, setIsDummyMode] = useState(false);
   const [dummyCode, setDummyCode] = useState("");
+  const [resendCountdown, setResendCountdown] = useState(30);
 
   // Sync user phone when modal opens
   useEffect(() => {
@@ -29,8 +30,22 @@ export default function EvaluationOtpModal({
       setOtpError("");
       setOtpStep("phone");
       setIsDummyMode(false);
+      setResendCountdown(30);
     }
   }, [isOpen, user]);
+
+  // Resend countdown timer when on OTP step
+  useEffect(() => {
+    let timer;
+    if (otpStep === "otp" && resendCountdown > 0) {
+      timer = setInterval(() => {
+        setResendCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [otpStep, resendCountdown]);
 
   if (!isOpen) return null;
 
@@ -43,6 +58,7 @@ export default function EvaluationOtpModal({
     }
     setOtpLoading(true);
     setOtpError("");
+    setOtpCode("");
     try {
       const data = await sendOtp(cleanPhone);
       if (data?.isBypassed) {
@@ -63,6 +79,7 @@ export default function EvaluationOtpModal({
       setIsDummyMode(Boolean(data?.isDummy));
       setDummyCode(data?.dummyCode || "123456");
       setOtpStep("otp");
+      setResendCountdown(30);
     } catch (err) {
       setOtpError(err?.response?.data?.message || "Failed to send OTP. Please try again.");
     } finally {
@@ -236,14 +253,20 @@ export default function EvaluationOtpModal({
               >
                 ← Change Number
               </button>
-              <button
-                type="button"
-                onClick={handleSendOtp}
-                disabled={otpLoading}
-                className="text-[#087F8C] font-bold hover:underline cursor-pointer"
-              >
-                Resend Code
-              </button>
+              {resendCountdown > 0 ? (
+                <span className="text-slate-400 font-medium">
+                  Resend code in <strong className="text-slate-600 font-bold">{resendCountdown}s</strong>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={otpLoading}
+                  className="text-[#087F8C] font-bold hover:underline cursor-pointer"
+                >
+                  Resend Code
+                </button>
+              )}
             </div>
           </form>
         )}

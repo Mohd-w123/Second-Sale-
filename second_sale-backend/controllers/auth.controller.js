@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import SiteSettings from '../models/SiteSettings.js';
+import OtpSession from '../models/OtpSession.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../config/jwt.js';
 import { validationResult } from 'express-validator';
 
@@ -156,6 +157,7 @@ export const sendOtp = async (req, res, next) => {
       isEnabled: true,
       provider: '2factor',
       apiKey: process.env.TWOFACTOR_API_KEY || 'f4018fc7-ca01-11f1-af74-0200cd936042',
+      templateName: process.env.TWOFACTOR_OTP_TEMPLATE || 'SecondSale_Login_OTP',
       dummyOtpEnabled: false,
       dummyOtpCode: '123456',
     };
@@ -182,16 +184,32 @@ export const sendOtp = async (req, res, next) => {
       });
     }
 
-    const apiKey = otpConfig.apiKey || process.env.TWOFACTOR_API_KEY;
+    const apiKey = otpConfig.apiKey || process.env.TWOFACTOR_API_KEY || 'f4018fc7-ca01-11f1-af74-0200cd936042';
+    const templateName = otpConfig.templateName || process.env.TWOFACTOR_OTP_TEMPLATE || 'SecondSale_Login_OTP';
 
-    // Send real OTP via 2Factor.in API
+    // Send real OTP via 2Factor.in API using AUTOGEN2 endpoint with SecondSale_Login_OTP template
     if (apiKey) {
       try {
-        const tfUrl = `https://2factor.in/API/V1/${apiKey}/SMS/+91${cleanPhone}/AUTOGEN`;
+        const tfUrl = `https://2factor.in/API/V1/${apiKey}/SMS/${cleanPhone}/AUTOGEN2/${templateName}`;
         const tfRes = await fetch(tfUrl);
         const tfData = await tfRes.json();
 
         if (tfData.Status === 'Success') {
+          // Persist OTP session with a 10-minute validity window
+          if (tfData.OTP) {
+            try {
+              await OtpSession.deleteMany({ phone: cleanPhone });
+              await OtpSession.create({
+                phone: cleanPhone,
+                sessionId: tfData.Details,
+                otp: String(tfData.OTP),
+                expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+              });
+            } catch (saveErr) {
+              console.warn('Could not cache OtpSession in DB:', saveErr.message);
+            }
+          }
+
           return res.json({
             message: `OTP sent successfully to +91 ${cleanPhone}`,
             sessionId: tfData.Details, // SessionId returned by 2Factor
@@ -278,26 +296,77 @@ export const verifyOtp = async (req, res, next) => {
 
       if (!isDummyCode) {
         // Verify via 2Factor API
-        const apiKey = otpConfig.apiKey || process.env.TWOFACTOR_API_KEY;
-        if (apiKey && sessionId && !sessionId.startsWith('session-') && !sessionId.startsWith('dummy-')) {
-          try {
-            const verifyUrl = `https://2factor.in/API/V1/${apiKey}/SMS/VERIFY/${sessionId}/${finalOtp}`;
-            const tfRes = await fetch(verifyUrl);
-            const tfData = await tfRes.json();
+        const apiKey = otpConfig.apiKey || process.env.TWOFACTOR_API_KEY || 'f4018fc7-ca01-11f1-af74-0200cd936042';
+        if (apiKey) {
+          let isVerified = false;
+          let failureMessage = 'Invalid or expired OTP. Please try again.';
 
-            if (tfData.Status !== 'Success' || tfData.Details !== 'OTP Matched') {
-              return res.status(400).json({
-                message: tfData.Details === 'OTP Mismatch' 
+          // 1. First attempt: Verify using sessionId if available and valid
+          if (sessionId && !sessionId.startsWith('session-') && !sessionId.startsWith('dummy-')) {
+            try {
+              const verifyUrl = `https://2factor.in/API/V1/${apiKey}/SMS/VERIFY/${sessionId}/${finalOtp}`;
+              const tfRes = await fetch(verifyUrl);
+              const tfData = await tfRes.json();
+
+              if (tfData.Status === 'Success' && tfData.Details === 'OTP Matched') {
+                isVerified = true;
+              } else {
+                failureMessage = tfData.Details === 'OTP Mismatch' 
                   ? 'Incorrect OTP entered. Please check and try again.' 
-                  : (tfData.Details || 'Invalid or expired OTP. Please try again.')
-              });
+                  : (tfData.Details || failureMessage);
+              }
+            } catch (apiErr) {
+              console.error('2Factor session verification error:', apiErr);
             }
-          } catch (apiErr) {
-            console.error('2Factor verification error:', apiErr);
-            return res.status(500).json({ message: 'Failed to verify OTP with SMS gateway. Please try again.' });
           }
+
+          // 2. Fallback attempt: Verify using phone number (VERIFY3) to prevent stale/mismatched session issues
+          if (!isVerified && cleanPhone) {
+            try {
+              const verify3Url = `https://2factor.in/API/V1/${apiKey}/SMS/VERIFY3/${cleanPhone}/${finalOtp}`;
+              const tfRes3 = await fetch(verify3Url);
+              const tfData3 = await tfRes3.json();
+
+              if (tfData3.Status === 'Success' && tfData3.Details === 'OTP Matched') {
+                isVerified = true;
+              } else {
+                if (tfData3.Details === 'OTP Mismatch') {
+                  failureMessage = 'Incorrect OTP entered. Please check and try again.';
+                } else if (tfData3.Details) {
+                  failureMessage = tfData3.Details;
+                }
+              }
+            } catch (apiErr3) {
+              console.error('2Factor VERIFY3 verification error:', apiErr3);
+            }
+          }
+
+          // 3. Resilient fallback: Database-cached session match (protects against premature provider timeout)
+          if (!isVerified && cleanPhone && finalOtp) {
+            try {
+              const activeSession = await OtpSession.findOne({
+                phone: cleanPhone,
+                otp: finalOtp,
+                expiresAt: { $gt: new Date() },
+              });
+              if (activeSession) {
+                isVerified = true;
+              }
+            } catch (dbErr) {
+              console.error('Db OTP verification check error:', dbErr);
+            }
+          }
+
+          if (!isVerified) {
+            return res.status(400).json({ message: failureMessage });
+          }
+
+          // Clean up used OTP session
+          try {
+            await OtpSession.deleteMany({ phone: cleanPhone });
+          } catch {}
         } else {
-          // Fallback if no valid 2Factor session
+          // Fallback if no valid 2Factor API key configured
           if (!/^\d{4,6}$/.test(finalOtp)) {
             return res.status(400).json({ message: 'Invalid OTP format. Please enter a valid 6-digit OTP' });
           }
