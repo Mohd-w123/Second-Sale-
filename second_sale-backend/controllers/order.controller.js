@@ -63,7 +63,7 @@ export const createOrder = async (req, res, next) => {
 export const getUserOrders = async (req, res, next) => {
   try {
     // 1. Fetch standard orders
-    const orders = await Order.find({ userId: req.user.id })
+    const orders = await Order.find({ userId: req.user.id, isDeleted: { $ne: true } })
       .sort({ createdAt: -1 })
       .lean();
 
@@ -138,7 +138,7 @@ export const getOrderById = async (req, res, next) => {
   try {
     const { orderId } = req.params;
 
-    let order = await Order.findOne({ orderId }).lean();
+    let order = await Order.findOne({ orderId, isDeleted: { $ne: true } }).lean();
 
     if (!order) {
       // Check if it is a TV Lead
@@ -205,7 +205,7 @@ export const cancelOrder = async (req, res, next) => {
   try {
     const { orderId } = req.params;
 
-    const order = await Order.findOne({ orderId });
+    const order = await Order.findOne({ orderId, isDeleted: { $ne: true } });
 
     if (!order) {
       // Check TvLead
@@ -250,7 +250,7 @@ export const rescheduleOrder = async (req, res, next) => {
     const { orderId } = req.params;
     const { date, timeSlot } = req.body;
 
-    const order = await Order.findOne({ orderId });
+    const order = await Order.findOne({ orderId, isDeleted: { $ne: true } });
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -276,7 +276,7 @@ export const updateOrderPaymentMethod = async (req, res, next) => {
     const { orderId } = req.params;
     const { paymentMethod } = req.body;
 
-    const order = await Order.findOne({ orderId });
+    const order = await Order.findOne({ orderId, isDeleted: { $ne: true } });
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });

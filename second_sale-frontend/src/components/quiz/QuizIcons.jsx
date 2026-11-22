@@ -1185,6 +1185,35 @@ export const FoldOuterScreenCleanIcon = ({ className = "w-12 h-16" }) => (
   </svg>
 );
 
+// ─── Fold / Flip Hinge Condition Icons (Cashify Benchmark) ───
+export const FoldHingeDefectIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Unfolding phone with central hinge problem / not opening flat */}
+    <rect x="7" y="10" width="16" height="44" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <path d="M25 12L39 16L39 52L25 48Z" stroke="#DC2626" strokeWidth="2" fill="#FEF2F2" strokeLinejoin="round" />
+    {/* Central Hinge Joint */}
+    <rect x="22" y="10" width="4" height="44" rx="1" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.5" />
+    {/* Hinge crack / damage zigzag */}
+    <path d="M22 26L26 29L22 32L26 35" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    {/* Angle resistance / warning arc */}
+    <path d="M30 8A14 14 0 0 1 42 20" stroke="#DC2626" strokeWidth="1.5" strokeDasharray="2 2" strokeLinecap="round" />
+  </svg>
+);
+
+export const FoldHingeCleanIcon = ({ className = "w-12 h-16" }) => (
+  <svg viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Unfolded phone lying flat 180° with smooth central hinge */}
+    <rect x="7" y="10" width="16" height="44" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    <rect x="25" y="10" width="16" height="44" rx="2" stroke="#1E293B" strokeWidth="2" fill="#FFFFFF" />
+    {/* Central Hinge Joint */}
+    <rect x="22" y="10" width="4" height="44" rx="1" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.5" />
+    {/* Smooth alignment indicator */}
+    <line x1="12" y1="32" x2="36" y2="32" stroke="#10B981" strokeWidth="1.5" strokeDasharray="2 2" />
+    {/* Green sparkle */}
+    <path d="M38 5L39.5 8.5L43 10L39.5 11.5L38 15L36.5 11.5L33 10L36.5 8.5L38 5Z" fill="#10B981" />
+  </svg>
+);
+
 
 
 

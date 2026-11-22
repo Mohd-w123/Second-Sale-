@@ -174,6 +174,7 @@ const MOBILE_DEFECT_GROUPS = [
       { key: 'panel_cracked', label: 'Cracked Side / Back Panel', target: 'bodyDeductions', default: 12 },
       { key: 'panel_missing', label: 'Missing Side / Back Panel', target: 'bodyDeductions', default: 18 },
       { key: 'loose_screen', label: 'Loose Screen / Frame Gap', target: 'bodyDeductions', default: 10 },
+      { key: 'hinge_damaged', label: 'Hinge Damaged / Loose / Not Opening Flat (Fold/Flip)', target: 'bodyDeductions', default: 20 },
     ]
   },
 ];
@@ -214,6 +215,7 @@ const BODY_DEDUCTION_LABELS = {
   panel_cracked: 'Cracked Side / Back Panel (%)',
   panel_missing: 'Missing Side / Back Panel (%)',
   loose_screen: 'Loose Screen / Frame Gap (%)',
+  hinge_damaged: 'Hinge Damaged / Loose / Not Opening Flat (Fold/Flip %)',
   minorDentTop: 'Minor Dent Top Panel (%)',
   minorDentBase: 'Minor Dent Base Panel (%)',
   majorDentTop: 'Major Dent Top Panel (%)',
@@ -445,6 +447,8 @@ export default function AdminDevices() {
       modelName: '',
       slug: '',
       imageUrl: '',
+      isWarrantyEligible: null,
+      releaseYear: '',
       processorFamily: '',
       generation: '',
       gpuType: '',
@@ -468,6 +472,8 @@ export default function AdminDevices() {
     const merged = {
       ...JSON.parse(JSON.stringify(DEFAULT_MULTIPLIERS)),
       ...cloned,
+      isWarrantyEligible: cloned.isWarrantyEligible !== undefined ? cloned.isWarrantyEligible : null,
+      releaseYear: cloned.releaseYear || '',
       hasCustomQuiz: Boolean(cloned.hasCustomQuiz),
       customQuiz: cloned.customQuiz || null,
       screenDeductions: {
@@ -1199,6 +1205,39 @@ export default function AdminDevices() {
                     </div>
                   </div>
 
+                  <div className="admin-field-row">
+                    <div className="admin-field">
+                      <label>Brand Warranty Eligibility</label>
+                      <select
+                        value={formData.isWarrantyEligible === null || formData.isWarrantyEligible === undefined ? 'auto' : formData.isWarrantyEligible ? 'eligible' : 'expired'}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          handleInputChange('isWarrantyEligible', val === 'auto' ? null : val === 'eligible');
+                        }}
+                      >
+                        <option value="auto">Auto-detect (Active if launched within 3 years)</option>
+                        <option value="eligible">Eligible (Always show Warranty & GST Bill questions)</option>
+                        <option value="expired">Expired (Hide Warranty, GST Bill & Mobile Age questions)</option>
+                      </select>
+                      <span className="text-[11px] text-slate-400 mt-1 block">
+                        Select "Expired" to completely remove Warranty & Age questions for devices out of warranty.
+                      </span>
+                    </div>
+
+                    <div className="admin-field">
+                      <label>Release / Launch Year (Optional)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 2024, 2023, 2021"
+                        value={formData.releaseYear || ''}
+                        onChange={(e) => handleInputChange('releaseYear', e.target.value ? parseInt(e.target.value, 10) : '')}
+                      />
+                      <span className="text-[11px] text-slate-400 mt-1 block">
+                        Devices older than 3 years automatically have warranty questions removed.
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Laptop-specific configurations */}
                   {(formData.category === 'laptop' || formData.category === 'mac') && (
                     <div className="border border-slate-800 p-4 rounded-xl space-y-4">
@@ -1208,10 +1247,39 @@ export default function AdminDevices() {
                           <label>Processor Family</label>
                           <input
                             type="text"
-                            placeholder="e.g. Core i7, M2 Max"
+                            placeholder="e.g. Apple M2, Core i7, M2 Max"
                             value={formData.processorFamily || ''}
                             onChange={(e) => handleInputChange('processorFamily', e.target.value)}
+                            list="admin-processor-family-suggestions"
                           />
+                          <datalist id="admin-processor-family-suggestions">
+                            <option value="Apple M1" />
+                            <option value="Apple M1 Pro" />
+                            <option value="Apple M1 Max" />
+                            <option value="Apple M1 Ultra" />
+                            <option value="Apple M2" />
+                            <option value="Apple M2 Pro" />
+                            <option value="Apple M2 Max" />
+                            <option value="Apple M2 Ultra" />
+                            <option value="Apple M3" />
+                            <option value="Apple M3 Pro" />
+                            <option value="Apple M3 Max" />
+                            <option value="Apple M4" />
+                            <option value="Apple M4 Pro" />
+                            <option value="Apple M4 Max" />
+                            <option value="Apple M5" />
+                            <option value="Apple M5 Pro" />
+                            <option value="Apple M5 Max" />
+                            <option value="Apple A18 Pro" />
+                            <option value="Intel Core i3" />
+                            <option value="Intel Core i5" />
+                            <option value="Intel Core i7" />
+                            <option value="Intel Core i9" />
+                            <option value="Intel Core Ultra 5" />
+                            <option value="Intel Core Ultra 7" />
+                            <option value="AMD Ryzen 5" />
+                            <option value="AMD Ryzen 7" />
+                          </datalist>
                         </div>
                         <div className="admin-field">
                           <label>Generation</label>
@@ -1686,9 +1754,10 @@ export default function AdminDevices() {
                                 <label className="text-[9px] mb-0.5">Processor</label>
                                 <input
                                   type="text"
-                                  placeholder="Intel Core i5"
+                                  placeholder="Apple M2 / Core i5"
                                   value={v.processor || ''}
                                   onChange={(e) => handleVariantChange(idx, 'processor', e.target.value)}
+                                  list="admin-processor-family-suggestions"
                                 />
                               </div>
                               <div className="w-[80px] admin-field mb-0">

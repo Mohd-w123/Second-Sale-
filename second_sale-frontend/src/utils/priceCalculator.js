@@ -48,6 +48,12 @@ export const ISSUE_DEDUCTIONS = {
   outer_screen_damaged: 20,        // outer screen damaged / line / broken or spot
   outer_screen_defect: 20,
 
+  // ─── Hinge Condition (Fold & Flip devices) ──────────────────────────────────────────
+  hinge_damaged: 20,               // hinge loose / damaged / not opening flat (180°)
+  hinge_loose: 20,
+  hinge_issue: 20,
+  hinge: 20,
+
   // ─── Body scratches ──────────────────────────────────────────────────────────────────
   body_scratches_minor: 3,         // 1-2 scratches on body
   body_scratches_dents: 5,         // 1-2 minor dents on body
@@ -145,15 +151,16 @@ export function isDeviceWarrantyEligible(device) {
     return year >= minEligibleYear;
   }
 
-  // 3. Apple iPhones: iPhone 14 and newer (14, 15, 16, 17, 18, 19, 20...), iPhone SE (2022/3rd gen) are within 3-year window
+  // 3. Apple iPhones: iPhone 14 and newer (14, 15, 16, 17, 18, 19, 20...), iPhone SE (2022/3rd gen), Apple Duo are within 3-year window
   if (brand.includes('apple') || slug.includes('iphone') || name.includes('iphone')) {
+    if (text.includes('duo') || slug.includes('duo')) return true;
     const numMatch = text.match(/iphone\s*(\d+)/i) || slug.match(/iphone-(\d+)/i);
     if (numMatch) {
       const seriesNum = parseInt(numMatch[1], 10);
       if (seriesNum >= 14) return true;
       if (seriesNum < 14) return false;
     }
-    const activeIphones = ['iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 3', 'iphone se 2022'];
+    const activeIphones = ['iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 3', 'iphone se 2022', 'iphone duo', 'apple duo'];
     return activeIphones.some(p => name.includes(p) || slug.includes(p.replace(/ /g, '-')));
   }
 
@@ -320,12 +327,13 @@ export function bundlesCharger(brand, modelName) {
   const name = modelName.toLowerCase();
   const b = brand?.toLowerCase() || '';
   if (b === 'apple' || name.includes('iphone')) {
+    if (name.includes('duo')) return false;
     const numMatch = name.match(/iphone\s*(\d+)/i);
     if (numMatch) {
       const seriesNum = parseInt(numMatch[1], 10);
       if (seriesNum >= 12) return false;
     }
-    const noChargerPatterns = ['iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 2022'];
+    const noChargerPatterns = ['iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 2022', 'iphone duo', 'apple duo'];
     return !noChargerPatterns.some(p => name.includes(p));
   }
   if (b === 'samsung') {
@@ -652,7 +660,8 @@ export function calculatePrice({
   const BODY_DEFECT_KEYS = new Set([
     'body_scratches_minor', 'scratches', 'body_scratches_dents', 'body_dents_major',
     'bent_curved', 'panel_cracked', 'panel_missing', 'panel_loose_screen', 'loose_screen',
-    'camera_glass_broken', 'defect_body_scratch_dent', 'defect_panel_missing_broken'
+    'camera_glass_broken', 'defect_body_scratch_dent', 'defect_panel_missing_broken',
+    'hinge_damaged', 'hinge_loose', 'hinge_issue', 'hinge'
   ]);
 
   let screenDeductionSum = 0;

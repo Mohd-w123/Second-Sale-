@@ -174,10 +174,12 @@ function App() {
           {/* Mobile flow */}
           <Route path="/sell-old-mobile-phones/brand" element={<BrandSelectionPage />} />
           <Route path="/sell-old-mobile-phones/:brand" element={<ModelSelectionPage />} />
+          <Route path="/sell-old-mobile-phones/:brand/series/:seriesSlug" element={<ModelSelectionPage />} />
           <Route path="/sell-old-mobile-phones/:brand/:slug" element={<VariantSelectionPage />} />
           <Route path="/sell-old-mobile-phones/:brand/:slug/quiz" element={<ConditionQuizPage />} />
           <Route path="/sell-old-mobile-phone/brand" element={<BrandSelectionPage />} />
           <Route path="/sell-old-mobile-phone/:brand" element={<ModelSelectionPage />} />
+          <Route path="/sell-old-mobile-phone/:brand/series/:seriesSlug" element={<ModelSelectionPage />} />
           <Route path="/sell-old-mobile-phone/:brand/:slug" element={<VariantSelectionPage />} />
           <Route path="/sell-old-mobile-phone/:brand/:slug/quiz" element={<ConditionQuizPage />} />
           {/* Laptop flow */}

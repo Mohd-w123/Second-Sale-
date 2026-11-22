@@ -68,6 +68,8 @@ import {
   PanelStraightIcon,
   FoldOuterScreenDefectIcon,
   FoldOuterScreenCleanIcon,
+  FoldHingeDefectIcon,
+  FoldHingeCleanIcon,
 } from '../components/quiz/QuizIcons';
 
 
@@ -238,13 +240,60 @@ const FOLD_OUTER_SCREEN_SECTION = {
   ],
 };
 
-const getSubDefectConfig = (defectId, isFoldOrFlip = false) => {
+// ─── 5. Hinge Condition (For Fold & Flip Devices - Cashify Flow) ───────────────
+const FOLD_HINGE_SECTION = {
+  id: 'hinge_condition',
+  title: '3. Hinge Condition',
+  subtitle: 'Check if the folding hinge is loose, damaged, noisy, or not opening completely flat (180°).',
+  options: [
+    {
+      id: 'hinge_damaged',
+      label: 'Hinge loose / damaged / not opening flat (180°)',
+      icon: FoldHingeDefectIcon,
+      deductionKey: 'hinge_damaged',
+    },
+    {
+      id: 'hinge_none',
+      label: 'No issue with hinge (Opens smoothly & holds position)',
+      icon: FoldHingeCleanIcon,
+      deductionKey: null,
+    },
+  ],
+};
+
+const getSubDefectConfig = (defectId, isFoldOrFlip = false, allSelectedDefects = []) => {
   const base = SUB_DEFECT_CONFIGS[defectId];
   if (!base) return null;
-  if (defectId === 'defect_screen_spots_lines' && isFoldOrFlip) {
+  if (isFoldOrFlip) {
+    let sections = [...base.sections];
+
+    // 1. Outer Screen Section (belongs to screen defects)
+    const hasSpotsLines = allSelectedDefects.includes('defect_screen_spots_lines');
+    if (defectId === 'defect_screen_spots_lines') {
+      sections.push(FOLD_OUTER_SCREEN_SECTION);
+    } else if (defectId === 'defect_screen_broken_scratch' && !hasSpotsLines) {
+      sections.push(FOLD_OUTER_SCREEN_SECTION);
+    }
+
+    // 2. Hinge Condition Section (belongs to body/hinge defects, or screen fallback)
+    const hasPanelMissing = allSelectedDefects.includes('defect_panel_missing_broken');
+    const hasBodyScratch = allSelectedDefects.includes('defect_body_scratch_dent');
+    const hasAnyBodyDefect = hasPanelMissing || hasBodyScratch;
+
+    if (defectId === 'defect_panel_missing_broken') {
+      sections.push(FOLD_HINGE_SECTION);
+    } else if (defectId === 'defect_body_scratch_dent' && !hasPanelMissing) {
+      sections.push(FOLD_HINGE_SECTION);
+    } else if (!hasAnyBodyDefect) {
+      // If only screen defects were selected, append hinge condition so it is always evaluated on foldables
+      if (defectId === 'defect_screen_spots_lines' || (defectId === 'defect_screen_broken_scratch' && !hasSpotsLines)) {
+        sections.push(FOLD_HINGE_SECTION);
+      }
+    }
+
     return {
       ...base,
-      sections: [...base.sections, FOLD_OUTER_SCREEN_SECTION],
+      sections,
     };
   }
   return base;
@@ -275,6 +324,7 @@ const FUNCTIONAL_PROBLEMS = [
 const supportsESIM = (modelName) => {
   if (!modelName) return false;
   const name = modelName.toLowerCase();
+  if (name.includes('duo')) return true;
   const numMatch = name.match(/iphone\s*(\d+)/i);
   if (numMatch) {
     const seriesNum = parseInt(numMatch[1], 10);
@@ -288,7 +338,7 @@ const supportsESIM = (modelName) => {
     'iphone 16', 'iphone 16 plus', 'iphone 16e', 'iphone 16 pro', 'iphone 16 pro max',
     'iphone 17', 'iphone 17 air', 'iphone 17e', 'iphone 17 pro', 'iphone 17 pro max',
     'iphone 18', 'iphone 18 pro', 'iphone 18 pro max',
-    'iphone 19', 'iphone 20',
+    'iphone 19', 'iphone 20', 'iphone duo', 'apple duo', 'duo'
   ];
   return allowed.some(pattern => name.includes(pattern));
 };
@@ -298,13 +348,14 @@ const bundlesCharger = (brand, modelName) => {
   const name = modelName.toLowerCase();
   const b = brand?.toLowerCase() || '';
   if (b === 'apple' || name.includes('iphone')) {
+    if (name.includes('duo')) return false;
     const numMatch = name.match(/iphone\s*(\d+)/i);
     if (numMatch) {
       const seriesNum = parseInt(numMatch[1], 10);
       if (seriesNum >= 12) return false;
     }
     const noChargerPatterns = [
-      'iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 2022'
+      'iphone 12', 'iphone 13', 'iphone 14', 'iphone 15', 'iphone 16', 'iphone 17', 'iphone 18', 'iphone 19', 'iphone se 2022', 'iphone duo', 'apple duo', 'duo'
     ];
     return !noChargerPatterns.some(p => name.includes(p));
   }
@@ -435,7 +486,7 @@ export default function ConditionQuizPage() {
   // Extract all active sub-defect deduction keys
   const activeSubDefectDeductionKeys = [];
   screenBodyDefects.forEach(defectId => {
-    const config = getSubDefectConfig(defectId, isFoldOrFlip);
+    const config = getSubDefectConfig(defectId, isFoldOrFlip, screenBodyDefects);
     if (config) {
       let hasAnsweredAny = false;
       config.sections.forEach(sec => {
@@ -495,7 +546,7 @@ export default function ConditionQuizPage() {
 
       const activeSubDefectLabels = [];
       screenBodyDefects.forEach(defectId => {
-        const config = getSubDefectConfig(defectId, isFoldOrFlip);
+        const config = getSubDefectConfig(defectId, isFoldOrFlip, screenBodyDefects);
         if (config) {
           config.sections.forEach(sec => {
             const val = subDefectAnswers[sec.id];
@@ -597,7 +648,7 @@ export default function ConditionQuizPage() {
 
   // Validation for Step 2 Sub-defects
   const isSubDefectsComplete = !isSubDefectView || screenBodyDefects.every(d => {
-    const config = getSubDefectConfig(d, isFoldOrFlip);
+    const config = getSubDefectConfig(d, isFoldOrFlip, screenBodyDefects);
     if (!config) return true;
     return config.sections.every(sec => {
       const vals = subDefectAnswers[sec.id];
@@ -858,7 +909,7 @@ export default function ConditionQuizPage() {
                       <div className="space-y-2 mt-1">
                         {screenBodyDefects.map(d => {
                           const catLabel = CASHIFY_SCREEN_BODY_DEFECTS.find(x => x.id === d)?.label || d;
-                          const config = getSubDefectConfig(d, isFoldOrFlip);
+                          const config = getSubDefectConfig(d, isFoldOrFlip, screenBodyDefects);
                           const subLabels = config?.sections
                             .flatMap(sec => {
                               const chosen = subDefectAnswers[sec.id];
@@ -1245,7 +1296,7 @@ export default function ConditionQuizPage() {
                                 const isAlready = prev.includes(defect.id);
                                 if (isAlready) {
                                   // Clear answers for this defect's sections
-                                  const config = getSubDefectConfig(defect.id, isFoldOrFlip);
+                                  const config = getSubDefectConfig(defect.id, isFoldOrFlip, prev);
                                   if (config) {
                                     setSubDefectAnswers(curr => {
                                       const next = { ...curr };
@@ -1269,9 +1320,15 @@ export default function ConditionQuizPage() {
                             </div>
                             <div className="flex-1">
                               <h4 className={`font-black text-sm ${isSelected ? 'text-[#087F8C]' : 'text-gray-900'}`}>
-                                {defect.label}
+                                {defect.id === 'defect_panel_missing_broken' && isFoldOrFlip
+                                  ? 'Device panel / Hinge missing, broken or loose'
+                                  : defect.label}
                               </h4>
-                              <p className="text-xs text-gray-500 mt-1">{defect.desc}</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {defect.id === 'defect_panel_missing_broken' && isFoldOrFlip
+                                  ? 'Back panel, folding hinge loose/damaged, or buttons missing'
+                                  : defect.desc}
+                              </p>
                             </div>
                             <div
                               className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${isSelected ? 'border-[#087F8C] bg-[#087F8C]' : 'border-gray-200'
@@ -1308,7 +1365,7 @@ export default function ConditionQuizPage() {
                 {STEPS[currentStepIndex]?.id === 'screen_body_defects' && isSubDefectView && (
                   <div className="space-y-10 animate-fadeIn">
                     {screenBodyDefects.map((defectId, dIdx) => {
-                      const currentConfig = getSubDefectConfig(defectId, isFoldOrFlip);
+                      const currentConfig = getSubDefectConfig(defectId, isFoldOrFlip, screenBodyDefects);
                       if (!currentConfig) return null;
 
                       return (
@@ -1705,7 +1762,7 @@ export default function ConditionQuizPage() {
                   <div className="space-y-1.5 mt-1">
                     {screenBodyDefects.map(d => {
                       const catLabel = CASHIFY_SCREEN_BODY_DEFECTS.find(x => x.id === d)?.label || d;
-                      const config = getSubDefectConfig(d, isFoldOrFlip);
+                      const config = getSubDefectConfig(d, isFoldOrFlip, screenBodyDefects);
                       const subLabels = config?.sections
                         .flatMap(sec => {
                           const chosen = subDefectAnswers[sec.id];

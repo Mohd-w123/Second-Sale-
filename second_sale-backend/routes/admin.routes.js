@@ -15,6 +15,8 @@ import {
   getAllOrders,
   updateOrderStatus,
   updateOrderCustomerInfo,
+  deleteOrder,
+  bulkDeleteOrders,
   getAllPincodes,
   createPincode,
   updatePincode,
@@ -61,6 +63,8 @@ router.patch('/partners/:id/status', requirePermission('partners'), updatePartne
 router.get('/orders', requirePermission('orders'), getAllOrders);
 router.patch('/orders/:id/status', requirePermission('orders'), updateOrderStatus);
 router.patch('/orders/:id/customer-info', requirePermission('orders'), updateOrderCustomerInfo);
+router.delete('/orders/:id', requirePermission('orders'), deleteOrder);
+router.post('/orders/bulk-delete', requirePermission('orders'), bulkDeleteOrders);
 
 // Pincodes
 router.get('/pincodes', requirePermission('pincodes'), getAllPincodes);

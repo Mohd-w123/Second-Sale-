@@ -139,9 +139,18 @@ export default function TabletConditionQuizPage() {
   const { updateQuote } = useQuote();
   const { isAuthenticated, user } = useAuth();
 
+  const [verifiedPhone, setVerifiedPhone] = useState(() => user?.phone || '');
+
   const [device, setDevice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+
+  // Sync phone if user updates in auth context
+  useEffect(() => {
+    if (user?.phone) {
+      setVerifiedPhone(user.phone);
+    }
+  }, [user]);
 
   // Selections
   const [deviceAge, setDeviceAge] = useState('3 - 6 Months');
@@ -184,8 +193,8 @@ export default function TabletConditionQuizPage() {
       const dev = res.data;
       setDevice(dev);
       setLoading(false);
-      const selectedVariant = dev.variants.find(v => v.storage === storage) || dev.variants[0];
-      setCurrentPrice(selectedVariant.basePrice);
+      const selectedVariant = dev?.variants?.find(v => v.storage === storage || v.storage?.replace(/\s+/g, '') === storage?.replace(/\s+/g, '')) || dev?.variants?.[0];
+      setCurrentPrice(selectedVariant?.basePrice || dev?.basePrice || 0);
     }).catch(() => setLoading(false));
   }, [slug, storage]);
 
@@ -198,7 +207,8 @@ export default function TabletConditionQuizPage() {
 
   useEffect(() => {
     if (!device) return;
-    const variant = device.variants.find(v => v.storage === storage) || device.variants[0];
+    const variant = device?.variants?.find(v => v.storage === storage || v.storage?.replace(/\s+/g, '') === storage?.replace(/\s+/g, '')) || device?.variants?.[0];
+    const basePrice = variant?.basePrice || device?.basePrice || 0;
 
     const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
       ? device.customQuiz
@@ -210,7 +220,7 @@ export default function TabletConditionQuizPage() {
       brand: device.brand,
       modelName: device.modelName,
       device,
-      basePrice: variant.basePrice,
+      basePrice,
       deviceAge,
       isWarrantyEligible: true,
       ableToMakeCalls: ableToMakeCalls ?? true,
@@ -230,8 +240,10 @@ export default function TabletConditionQuizPage() {
 
     setPriceAnimating(true);
     setTimeout(() => setPriceAnimating(false), 400);
-    setCurrentPrice(result.finalPrice);
-    setBreakdown(result);
+    if (result && typeof result.finalPrice === 'number') {
+      setCurrentPrice(result.finalPrice);
+      setBreakdown(result);
+    }
   }, [
     device,
     quizConfig,
@@ -245,48 +257,106 @@ export default function TabletConditionQuizPage() {
     bodyCondition,
     physicalIssues,
     technicalIssues,
-    selectedAccessories
+    selectedAccessories,
+    storage
   ]);
 
-  const finalizeAndShowResult = () => {
-    updateQuote({
-      device: {
-        brand: device.brand,
-        modelName: device.modelName,
-        slug: device.slug,
-        category: 'tablet',
-        imageUrl: device.imageUrl || '',
-        storage: storage || device.variants[0].storage,
+  const finalizeAndShowResult = (authData = {}) => {
+    try {
+      const activePhone = authData?.phone || verifiedPhone || user?.phone || localStorage.getItem('user_phone') || '';
+      const activeUser = authData?.user || user;
+      const variant = device?.variants?.find(v => v.storage === storage || v.storage?.replace(/\s+/g, '') === storage?.replace(/\s+/g, '')) || device?.variants?.[0];
+      const effectiveStorage = storage || variant?.storage || 'Standard';
+      const basePrice = variant?.basePrice || device?.basePrice || 0;
+
+      const effectiveQuizConfig = (device?.hasCustomQuiz && device?.customQuiz?.steps?.length > 0)
+        ? device.customQuiz
+        : quizConfig;
+
+      const isUnderWarranty = underWarranty !== null ? underWarranty : (deviceAge !== 'Above 11 Months');
+      const freshBreakdown = breakdown || calculatePrice({
+        brand: device?.brand,
+        modelName: device?.modelName,
+        device,
+        basePrice,
         deviceAge,
-        ableToMakeCalls,
-        isTouchScreenWorking,
-        isScreenOriginal,
-        underWarranty,
+        isWarrantyEligible: true,
+        ableToMakeCalls: ableToMakeCalls ?? true,
+        isTouchScreenWorking: isTouchScreenWorking ?? true,
+        isScreenOriginal: isScreenOriginal ?? true,
+        underWarranty: isUnderWarranty,
         hasGSTBill: selectedAccessories.includes('Bill'),
         eSIMSupport,
+        screenCondition,
+        bodyCondition,
         physicalIssues,
         technicalIssues,
-        accessories: selectedAccessories,
-        answerSummary: [
-          { question: "Able to make & receive calls?", answer: ableToMakeCalls ? "Yes" : "No" },
-          { question: "Touchscreen working?", answer: isTouchScreenWorking ? "Yes" : "No" },
-          { question: "Screen is Original?", answer: isScreenOriginal ? "Yes" : "No" },
-          { question: "Cellular / eSIM Support", answer: eSIMSupport || "N/A" },
-          { question: "Physical Issues", answer: physicalIssues.length > 0 ? physicalIssues.join(", ") : "None (Flawless)" },
-          { question: "Technical / Functional Faults", answer: technicalIssues.length > 0 ? technicalIssues.join(", ") : "None (All Working)" },
-          { question: "Device Age", answer: deviceAge || "N/A" },
-          { question: "Under Official Brand Warranty?", answer: underWarranty ? "Yes" : "No" },
-          { question: "Accessories Available", answer: selectedAccessories.length > 0 ? selectedAccessories.join(", ") : "None" },
-        ],
-      },
-      priceBreakdown: breakdown,
-    });
-    setShowResult(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+        hasCharger: selectedAccessories.includes('Charger'),
+        hasBox: selectedAccessories.includes('Box'),
+        quizConfig: effectiveQuizConfig,
+      });
+
+      const effectivePrice = freshBreakdown?.finalPrice ?? currentPrice ?? basePrice;
+
+      updateQuote({
+        device: {
+          brand: device?.brand,
+          modelName: device?.modelName,
+          slug: device?.slug,
+          category: 'tablet',
+          imageUrl: device?.imageUrl || '',
+          storage: effectiveStorage,
+          basePrice,
+          deviceAge,
+          ableToMakeCalls,
+          isTouchScreenWorking,
+          isScreenOriginal,
+          underWarranty: isUnderWarranty,
+          hasGSTBill: selectedAccessories.includes('Bill'),
+          eSIMSupport,
+          physicalIssues,
+          technicalIssues,
+          accessories: selectedAccessories,
+          answerSummary: [
+            { question: "Able to make & receive calls?", answer: ableToMakeCalls ? "Yes" : "No" },
+            { question: "Touchscreen working?", answer: isTouchScreenWorking ? "Yes" : "No" },
+            { question: "Screen is Original?", answer: isScreenOriginal ? "Yes" : "No" },
+            { question: "Cellular / eSIM Support", answer: eSIMSupport || "N/A" },
+            { question: "Physical Issues", answer: physicalIssues.length > 0 ? physicalIssues.join(", ") : "None (Flawless)" },
+            { question: "Technical / Functional Faults", answer: technicalIssues.length > 0 ? technicalIssues.join(", ") : "None (All Working)" },
+            { question: "Device Age", answer: deviceAge || "N/A" },
+            { question: "Under Official Brand Warranty?", answer: isUnderWarranty ? "Yes" : "No" },
+            { question: "Accessories Available", answer: selectedAccessories.length > 0 ? selectedAccessories.join(", ") : "None" },
+          ],
+        },
+        customer: {
+          phone: activePhone,
+          name: activeUser?.name || 'Customer',
+        },
+        phone: activePhone,
+        priceBreakdown: freshBreakdown,
+        finalPrice: effectivePrice,
+        price: effectivePrice,
+      });
+
+      if (effectivePrice) {
+        setCurrentPrice(effectivePrice);
+      }
+      if (freshBreakdown) {
+        setBreakdown(freshBreakdown);
+      }
+    } catch (err) {
+      console.error('Error finalizing tablet evaluation quote:', err);
+    } finally {
+      setShowResult(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleGetBestPrice = () => {
-    if (underWarranty === null) setUnderWarranty(false);
+    if (underWarranty === null && deviceAge !== 'Above 11 Months') {
+      setUnderWarranty(false);
+    }
     if (isAuthenticated || user || localStorage.getItem('accessToken')) {
       finalizeAndShowResult();
       return;
@@ -295,7 +365,7 @@ export default function TabletConditionQuizPage() {
   };
 
   const handleSchedulePickup = () => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !user && !localStorage.getItem('accessToken')) {
       navigate('/login?returnUrl=/schedule-pickup');
     } else {
       navigate('/schedule-pickup');
@@ -338,7 +408,7 @@ export default function TabletConditionQuizPage() {
                   <div className="flex-1 text-center sm:text-left">
                     <span className="text-[#087F8C] text-sm font-black uppercase tracking-wider mb-2 block">Offer ready — instant payout</span>
                     <h1 className="text-2xl sm:text-3xl font-black text-[#111827] mb-4">
-                      {device.modelName} ({storage || device.variants[0].storage})
+                      {device.modelName} ({storage || device?.variants?.[0]?.storage || 'Standard'})
                     </h1>
                     <div className="flex items-center justify-center sm:justify-start gap-4 mb-6">
                       <span className="text-5xl font-black text-[#111827]">{formatCurrency(currentPrice)}</span>
@@ -364,7 +434,7 @@ export default function TabletConditionQuizPage() {
                       <svg className="absolute top-1 left-1 w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg>
                     </div>
                     <span className="text-sm font-medium text-gray-500 leading-relaxed group-hover:text-[#111827] transition-colors">
-                      Receive updates via Whatsapp (+91 {user?.phone || '9076116803'})
+                      Receive updates via Whatsapp (+91 {user?.phone || verifiedPhone || 'Customer'})
                     </span>
                   </label>
                   <label className="flex items-start gap-4 cursor-pointer group">
@@ -503,7 +573,7 @@ export default function TabletConditionQuizPage() {
               <div>
                 <p className="text-[#087F8C] text-xs font-bold uppercase tracking-wider mb-1">Evaluating</p>
                 <h1 className="text-2xl font-black text-[#111827]">
-                  {device.modelName} <span className="text-gray-400 font-medium">({storage || device.variants[0].storage})</span>
+                  {device.modelName} <span className="text-gray-400 font-medium">({storage || device?.variants?.[0]?.storage || 'Standard'})</span>
                 </h1>
               </div>
             </div>
@@ -636,11 +706,10 @@ export default function TabletConditionQuizPage() {
                             key={item.id}
                             type="button"
                             onClick={() => setScreenCondition(isSelected ? 'none' : item.id)}
-                            className={`p-6 rounded-2xl border-2 text-left transition-all flex flex-col justify-between min-h-[220px] cursor-pointer ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
-                                : 'border-gray-100 bg-white hover:border-gray-200'
-                            }`}
+                            className={`p-6 rounded-2xl border-2 text-left transition-all flex flex-col justify-between min-h-[220px] cursor-pointer ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
+                              : 'border-gray-100 bg-white hover:border-gray-200'
+                              }`}
                           >
                             <div className="w-full flex justify-center py-2">
                               <IconComponent className="w-16 h-20" isTablet={true} />
@@ -667,11 +736,10 @@ export default function TabletConditionQuizPage() {
                       <button
                         type="button"
                         onClick={() => setScreenCondition('none')}
-                        className={`text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer ${
-                          screenCondition === 'none'
-                            ? 'bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/20'
-                            : 'text-gray-500 hover:text-gray-700 underline'
-                        }`}
+                        className={`text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer ${screenCondition === 'none'
+                          ? 'bg-[#E8F6F7] text-[#087F8C] border border-[#087F8C]/20'
+                          : 'text-gray-500 hover:text-gray-700 underline'
+                          }`}
                       >
                         ✓ My screen is flawless with no defects
                       </button>
@@ -698,11 +766,10 @@ export default function TabletConditionQuizPage() {
                             key={item.id}
                             type="button"
                             onClick={() => setBodyCondition(item.id)}
-                            className={`p-6 rounded-2xl border-2 text-left transition-all flex flex-col justify-between min-h-[220px] cursor-pointer ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
-                                : 'border-gray-100 bg-white hover:border-gray-200'
-                            }`}
+                            className={`p-6 rounded-2xl border-2 text-left transition-all flex flex-col justify-between min-h-[220px] cursor-pointer ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-sm'
+                              : 'border-gray-100 bg-white hover:border-gray-200'
+                              }`}
                           >
                             <div className="w-full flex justify-center py-2">
                               <IconComponent className="w-16 h-20" isTablet={true} />
@@ -917,7 +984,7 @@ export default function TabletConditionQuizPage() {
               <div className="flex items-baseline justify-between">
                 <span className="text-xs font-bold text-slate-600">Get Upto:</span>
                 <span className="text-2xl font-black text-[#116466]">
-                  {formatCurrency(device?.variants?.[0]?.price || device?.basePrice || 0)}
+                  {formatCurrency(device?.variants?.find(v => v.storage === storage)?.basePrice || device?.variants?.[0]?.basePrice || device?.basePrice || 0)}
                 </span>
               </div>
               <div className="mt-3">
@@ -960,9 +1027,12 @@ export default function TabletConditionQuizPage() {
       <EvaluationOtpModal
         isOpen={showOtpModal}
         onClose={() => setShowOtpModal(false)}
-        onSuccess={() => {
+        onSuccess={(authData) => {
           setShowOtpModal(false);
-          finalizeAndShowResult();
+          if (authData?.phone) {
+            setVerifiedPhone(authData.phone);
+          }
+          finalizeAndShowResult(authData);
         }}
         deviceName={device?.modelName || 'Tablet'}
       />

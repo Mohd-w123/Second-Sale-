@@ -40,6 +40,7 @@ export const getBrands = async (req, res, next) => {
       const defaultLogo = cleanSlug === 'mi' ? '/brands/xiaomi.svg' : `/brands/${cleanSlug}.svg`;
       return {
         ...b,
+        slug: bDoc?.slug || b.brand.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
         logo: bDoc?.logo || defaultLogo,
         color: bDoc?.color || '',
         order: bDoc?.order ?? 999,
@@ -60,12 +61,54 @@ export const getModels = async (req, res, next) => {
       return res.status(400).json({ message: 'Brand is required' });
     }
 
+    const clean = String(brand).trim();
+    const escaped = clean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // 1. Resolve canonical brand name from Brand collection if possible (e.g. slug 'ai' -> name 'Ai +')
+    const brandDoc = await Brand.findOne({
+      $or: [
+        { slug: clean.toLowerCase() },
+        { name: new RegExp('^' + escaped + '$', 'i') }
+      ]
+    });
+
+    const brandNamesToMatch = [clean];
+    if (brandDoc && brandDoc.name) {
+      brandNamesToMatch.push(brandDoc.name);
+    }
+    // Handle Pixel / Google alias
+    if (clean.toLowerCase() === 'pixel' || clean.toLowerCase() === 'google-pixel') {
+      brandNamesToMatch.push('Google');
+    }
+    if (clean.toLowerCase() === 'google') {
+      brandNamesToMatch.push('Pixel');
+    }
+    // Handle plus and space variations (e.g. 'ai+', 'ai +', 'ai-plus', 'ai plus')
+    if (clean.includes('+')) {
+      brandNamesToMatch.push(clean.replace(/\+/g, ' +').replace(/\s+/g, ' '));
+      brandNamesToMatch.push(clean.replace(/\s*\+\s*/g, '+'));
+      brandNamesToMatch.push(clean.replace(/\+/g, ' plus'));
+    }
+    if (clean.toLowerCase().includes('plus')) {
+      brandNamesToMatch.push(clean.replace(/[-_]/g, ' ').replace(/plus/i, '+'));
+      brandNamesToMatch.push(clean.replace(/[-_]/g, ' ').replace(/plus/i, ' +').replace(/\s+/g, ' '));
+    }
+
+    const regexPatterns = [...new Set(brandNamesToMatch)].map(b =>
+      new RegExp('^' + b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim() + '$', 'i')
+    );
+
     const models = await Device.find(
-      { brand: new RegExp(`^${brand}$`, 'i'), category: (category === 'console' || category === 'gaming') ? { $in: ['console', 'gaming'] } : category, isActive: true },
-      { modelName: 1, slug: 1, imageUrl: 1, variants: 1, series: 1, processorFamily: 1, gpuType: 1, isGamingLaptop: 1, tier: 1 }
+      {
+        brand: { $in: regexPatterns },
+        category: (category === 'console' || category === 'gaming') ? { $in: ['console', 'gaming'] } : category,
+        isActive: true
+      },
+      { brand: 1, modelName: 1, slug: 1, imageUrl: 1, variants: 1, series: 1, processorFamily: 1, gpuType: 1, isGamingLaptop: 1, tier: 1 }
     ).sort({ 'variants.0.basePrice': -1 });
 
     const result = models.map(m => ({
+      brand: m.brand,
       modelName: m.modelName,
       slug: m.slug,
       imageUrl: m.imageUrl,
@@ -118,7 +161,7 @@ export const calculatePrice = async (req, res, next) => {
         return res.status(400).json({ message: 'All laptop fields are required' });
       }
 
-      const variant = (device.variants || []).find(v => 
+      const variant = (device.variants || []).find(v =>
         (!ram || v.ram === ram) && (!storage || v.storage === storage)
       ) || device.variants?.[0];
       if (!variant) {

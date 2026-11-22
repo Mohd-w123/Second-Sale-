@@ -213,6 +213,118 @@ const getStatusBadgeClass = (s) => {
   }
 };
 
+/* ── Soft Delete Confirmation Modal ────────────────────────────────── */
+function SoftDeleteConfirmModal({ isOpen, mode, order, selectedOrders = [], count = 0, loading, onClose, onConfirm }) {
+  if (!isOpen) return null;
+
+  const isSingle = mode === "single" && order;
+
+  return (
+    <div className="admin-modal-backdrop" onClick={onClose}>
+      <div 
+        className="admin-modal" 
+        style={{ maxWidth: 520 }} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="admin-modal-header border-b border-rose-100 bg-rose-50/60 p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+              <Trash2 size={20} />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-slate-900">
+                {isSingle ? "Soft Delete Order" : `Soft Delete ${count} Orders`}
+              </h3>
+              <p className="text-xs font-semibold text-rose-600 mt-0.5">
+                {isSingle ? `Order ${order.orderId}` : `Bulk delete ${count} selected records`}
+              </p>
+            </div>
+          </div>
+          <button className="admin-modal-close" onClick={onClose} disabled={loading}>
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="admin-modal-body space-y-4 p-5">
+          {/* Info Warning Banner */}
+          <div className="p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-xl flex items-start gap-3">
+            <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+            <div className="text-xs text-amber-900 leading-relaxed">
+              <span className="font-bold">Soft Delete Notice:</span> This action marks the order data as deleted (<code className="font-mono font-bold bg-amber-100/90 px-1 py-0.5 rounded text-amber-800">isDeleted: true</code>). It safely removes the order from active admin listings and customer order history while preserving transaction logs in the database.
+            </div>
+          </div>
+
+          {/* Details Card */}
+          {isSingle ? (
+            <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2 text-xs">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Order ID</span>
+                <span className="font-mono font-bold text-[#087F8C]">{order.orderId}</span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Device</span>
+                <span className="font-bold text-slate-800">{order.device?.brand} {order.device?.modelName}</span>
+              </div>
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Customer</span>
+                <span className="font-medium text-slate-700">
+                  {order.pickup?.name || order.userId?.name || "Customer"} ({order.pickup?.phone || order.userId?.phone || "N/A"})
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Offered Price</span>
+                <span className="font-extrabold text-emerald-600">₹{order.priceBreakdown?.finalPrice || 0}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 space-y-2.5">
+              <div className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                <span>Selected Orders to Soft-Delete:</span>
+                <span className="text-rose-600 font-black">{count} orders</span>
+              </div>
+              <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+                {selectedOrders.map((o) => (
+                  <div key={o._id} className="flex items-center justify-between text-[11px] bg-white p-2 rounded-lg border border-slate-200/60">
+                    <span className="font-mono font-bold text-[#087F8C]">{o.orderId}</span>
+                    <span className="font-semibold text-slate-700 truncate max-w-[200px]">
+                      {o.device?.brand} {o.device?.modelName}
+                    </span>
+                    <span className="font-bold text-slate-900">₹{o.priceBreakdown?.finalPrice || 0}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className="text-xs text-slate-500 font-medium">
+            Are you sure you want to proceed with this soft deletion?
+          </p>
+        </div>
+
+        <div className="admin-modal-footer flex items-center justify-end gap-2.5 bg-slate-50/90 border-t border-slate-100 p-4 rounded-b-2xl">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="px-4 py-2 text-xs font-bold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={loading}
+            className="px-5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded-xl transition shadow-sm cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <Trash2 size={13} />
+            <span>{loading ? "Soft Deleting..." : isSingle ? "Confirm Soft Delete" : `Soft Delete (${count})`}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Order Status & Remark Modal ────────────────────────────────────── */
 function OrderStatusRemarkModal({ order, targetStatus, onClose, onConfirm, isUpdating }) {
   if (!order) return null;
@@ -1160,6 +1272,15 @@ export default function AdminOrders() {
   const [statusModalOrder, setStatusModalOrder] = useState(null);
   const [targetStatus, setTargetStatus] = useState(null);
 
+  // ── Delete State & Selection ─────────────────
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]);
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    mode: "single", // 'single' | 'bulk'
+    order: null,
+    loading: false,
+  });
+
   // Sync status if search params change
   useEffect(() => {
     const qStatus = searchParams.get("status");
@@ -1241,6 +1362,7 @@ export default function AdminOrders() {
   };
 
   useEffect(() => {
+    setSelectedOrderIds([]);
     if (activeTab === "devices") {
       fetchOrders();
     }
@@ -1260,6 +1382,72 @@ export default function AdminOrders() {
       })
       .catch(() => {});
   }, []);
+
+  // ── Selection Handlers ────────────────────────
+  const handleToggleSelect = (orderId) => {
+    setSelectedOrderIds(prev =>
+      prev.includes(orderId) ? prev.filter(id => id !== orderId) : [...prev, orderId]
+    );
+  };
+
+  const handleToggleSelectAll = () => {
+    if (orders.length === 0) return;
+    const allSelectedOnPage = orders.every(o => selectedOrderIds.includes(o._id));
+    if (allSelectedOnPage) {
+      setSelectedOrderIds(prev => prev.filter(id => !orders.some(o => o._id === id)));
+    } else {
+      const pageIds = orders.map(o => o._id);
+      setSelectedOrderIds(prev => Array.from(new Set([...prev, ...pageIds])));
+    }
+  };
+
+  // ── Soft Delete Handlers ───────────────────────
+  const handleInitiateSingleDelete = (order) => {
+    setDeleteModal({
+      isOpen: true,
+      mode: "single",
+      order,
+      loading: false,
+    });
+  };
+
+  const handleInitiateBulkDelete = () => {
+    if (selectedOrderIds.length === 0) return;
+    setDeleteModal({
+      isOpen: true,
+      mode: "bulk",
+      order: null,
+      loading: false,
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    setDeleteModal(prev => ({ ...prev, loading: true }));
+    try {
+      if (deleteModal.mode === "single" && deleteModal.order) {
+        const id = deleteModal.order._id;
+        await adminService.deleteOrder(id);
+        setOrders(prev => prev.filter(o => o._id !== id));
+        setTotal(prev => Math.max(0, prev - 1));
+        setSelectedOrderIds(prev => prev.filter(item => item !== id));
+        if (selectedOrder && selectedOrder._id === id) {
+          setSelectedOrder(null);
+        }
+      } else if (deleteModal.mode === "bulk") {
+        await adminService.bulkDeleteOrders(selectedOrderIds);
+        setOrders(prev => prev.filter(o => !selectedOrderIds.includes(o._id)));
+        setTotal(prev => Math.max(0, prev - selectedOrderIds.length));
+        if (selectedOrder && selectedOrderIds.includes(selectedOrder._id)) {
+          setSelectedOrder(null);
+        }
+        setSelectedOrderIds([]);
+      }
+      setDeleteModal({ isOpen: false, mode: "single", order: null, loading: false });
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to soft delete order(s)");
+      setDeleteModal(prev => ({ ...prev, loading: false }));
+    }
+  };
 
   const handleInitiateStatusChange = (order, newStatus) => {
     setStatusModalOrder(order);
@@ -1401,6 +1589,34 @@ export default function AdminOrders() {
             </div>
           </div>
 
+          {/* Bulk Actions Banner */}
+          {selectedOrderIds.length > 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 bg-rose-50/90 border border-rose-200 rounded-2xl shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+                <span className="text-xs font-bold text-rose-950">
+                  {selectedOrderIds.length} {selectedOrderIds.length === 1 ? "order" : "orders"} selected
+                </span>
+                <span className="text-slate-300">|</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrderIds([])}
+                  className="text-xs font-bold text-rose-700 hover:text-rose-900 underline cursor-pointer"
+                >
+                  Clear selection
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={handleInitiateBulkDelete}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 transition-all shadow-xs cursor-pointer"
+              >
+                <Trash2 size={13} />
+                <span>Bulk Delete ({selectedOrderIds.length})</span>
+              </button>
+            </div>
+          )}
+
           {/* Orders Table */}
           <div className="admin-table-wrapper">
             {loading ? (
@@ -1418,6 +1634,15 @@ export default function AdminOrders() {
                 <table className="admin-table">
                   <thead>
                     <tr>
+                      <th style={{ width: 44 }} className="text-center">
+                        <input
+                          type="checkbox"
+                          checked={orders.length > 0 && orders.every(o => selectedOrderIds.includes(o._id))}
+                          onChange={handleToggleSelectAll}
+                          className="w-4 h-4 rounded border-slate-300 text-[#087F8C] focus:ring-[#087F8C] cursor-pointer"
+                          title="Select all on this page"
+                        />
+                      </th>
                       <th>Order ID</th>
                       <th>User Contact</th>
                       <th>Device Specifications</th>
@@ -1425,12 +1650,21 @@ export default function AdminOrders() {
                       <th>Ordered At</th>
                       <th>Current Status</th>
                       <th>View Details</th>
-                      <th className="text-right">Change Status</th>
+                      <th className="text-right">Change Status / Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.map((order) => (
                       <tr key={order._id}>
+                        <td className="text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedOrderIds.includes(order._id)}
+                            onChange={() => handleToggleSelect(order._id)}
+                            className="w-4 h-4 rounded border-slate-300 text-[#087F8C] focus:ring-[#087F8C] cursor-pointer"
+                            title={`Select order ${order.orderId}`}
+                          />
+                        </td>
                         <td>
                           <span className="font-mono text-xs text-[#087F8C] font-bold">{order.orderId}</span>
                         </td>
@@ -1567,6 +1801,14 @@ export default function AdminOrders() {
                               }}
                             >
                               <MessageSquare size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleInitiateSingleDelete(order)}
+                              title="Delete Order (Soft Delete)"
+                              className="inline-flex items-center justify-center w-7 h-7 rounded-lg transition-all text-xs cursor-pointer border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-300 shadow-2xs hover:scale-105 active:scale-95"
+                            >
+                              <Trash2 size={13} />
                             </button>
                           </div>
                         </td>
@@ -1860,6 +2102,18 @@ export default function AdminOrders() {
           onDelete={handleTvLeadDelete}
         />
       )}
+
+      {/* Soft Delete Confirmation Modal */}
+      <SoftDeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        mode={deleteModal.mode}
+        order={deleteModal.order}
+        selectedOrders={orders.filter(o => selectedOrderIds.includes(o._id))}
+        count={deleteModal.mode === "bulk" ? selectedOrderIds.length : 1}
+        loading={deleteModal.loading}
+        onClose={() => setDeleteModal(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={handleConfirmDelete}
+      />
 
     </div>
   );

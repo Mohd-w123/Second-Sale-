@@ -4,13 +4,20 @@ import {
   CASHIFY_PROCESSORS,
   CASHIFY_RAM,
   CASHIFY_HARD_DISK,
+  MAC_PROCESSORS,
+  APPLE_SILICON_PROCESSORS,
+  INTEL_MAC_PROCESSORS,
+  isAppleSiliconMac,
+  getValidMacProcessors,
+  getValidMacRam,
+  getValidMacStorage,
   WINDOWS_PROCESSORS,
   MASTER_RAM, 
   MASTER_STORAGE
 } from '../utils/laptopSpecs';
 
 export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, initialValues }) {
-  const [selectedProcessor, setSelectedProcessor] = useState(() => initialValues?.processor || null);
+  const [selectedProcessor, setSelectedProcessor] = useState(() => initialValues?.processor || device?.processorFamily || null);
   const [selectedRam, setSelectedRam] = useState(() => initialValues?.ram || null);
   const [selectedStorage, setSelectedStorage] = useState(() => initialValues?.storage || null);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -18,7 +25,7 @@ export default function LaptopSpecModal({ isOpen, onClose, device, onComplete, i
   const [prevInitialValues, setPrevInitialValues] = useState(initialValues);
   if (initialValues !== prevInitialValues) {
     setPrevInitialValues(initialValues);
-    setSelectedProcessor(initialValues?.processor || null);
+    setSelectedProcessor(initialValues?.processor || device?.processorFamily || null);
     setSelectedRam(initialValues?.ram || null);
     setSelectedStorage(initialValues?.storage || null);
   }
@@ -148,13 +155,29 @@ function SpecSelect({ label, value, disabled, setOpen }) {
 function OverlayList({ type, device, selectedProcessor, onSelect }) {
   const [search, setSearch] = useState('');
   
+  const brandName = (device?.brand || '').toLowerCase();
+  const modelName = (device?.modelName || '').toLowerCase();
+  const isApple = brandName.includes('apple') || modelName.includes('macbook') || modelName.includes('imac') || modelName.includes('mac');
+
   let options = [];
   if (type === 'processor') {
-    options = CASHIFY_PROCESSORS;
+    if (isApple) {
+      const tailored = getValidMacProcessors(device);
+      const isSilicon = isAppleSiliconMac(device);
+      if (isSilicon) {
+        // Pure Apple Silicon MacBooks (2021+ or M-series): strictly M-chips, NO INTEL
+        options = tailored && tailored.length > 0 ? [...new Set([...tailored, ...APPLE_SILICON_PROCESSORS])] : APPLE_SILICON_PROCESSORS;
+      } else {
+        // 2020 transition or older Intel models: strictly Intel options (or 2020 transition choices)
+        options = tailored && tailored.length > 0 ? tailored : INTEL_MAC_PROCESSORS;
+      }
+    } else {
+      options = CASHIFY_PROCESSORS;
+    }
   } else if (type === 'ram') {
-    options = CASHIFY_RAM;
+    options = isApple ? getValidMacRam(selectedProcessor, device) : CASHIFY_RAM;
   } else if (type === 'storage') {
-    options = CASHIFY_HARD_DISK;
+    options = isApple ? getValidMacStorage(selectedProcessor, device) : CASHIFY_HARD_DISK;
   }
 
   const filteredOptions = options.filter(o => o.toLowerCase().includes(search.toLowerCase()));

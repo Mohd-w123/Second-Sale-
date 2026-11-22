@@ -1176,6 +1176,7 @@ function ReferralTab({ referral, copyCode, copied }) {
 const supportsESIM = (modelName) => {
   if (!modelName) return false;
   const name = modelName.toLowerCase();
+  if (name.includes('duo')) return true;
   const numMatch = name.match(/iphone\s*(\d+)/i);
   if (numMatch) {
     const seriesNum = parseInt(numMatch[1], 10);
@@ -1189,7 +1190,7 @@ const supportsESIM = (modelName) => {
     'iphone 16 pro', 'iphone 16 pro max',
     'iphone 17', 'iphone 17 air', 'iphone 17 pro', 'iphone 17 pro max',
     'iphone 18', 'iphone 18 pro', 'iphone 18 pro max',
-    'iphone 19', 'iphone 20'
+    'iphone 19', 'iphone 20', 'iphone duo', 'apple duo', 'duo'
   ];
   return allowed.some(pattern => name.includes(pattern));
 };

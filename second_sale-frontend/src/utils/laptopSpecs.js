@@ -1,10 +1,17 @@
 export const CASHIFY_PROCESSORS = [
+  'Apple M1', 'Apple M1 Pro', 'Apple M1 Max', 'Apple M1 Ultra',
+  'Apple M2', 'Apple M2 Pro', 'Apple M2 Max', 'Apple M2 Ultra',
+  'Apple M3', 'Apple M3 Pro', 'Apple M3 Max',
+  'Apple M4', 'Apple M4 Pro', 'Apple M4 Max',
+  'Apple M5', 'Apple M5 Pro', 'Apple M5 Max',
+  'Apple A18 Pro',
   'Intel Core i3', 'Intel Core i3 2nd Gen', 'Intel Core i3 3rd Gen', 'Intel Core i3 4th Gen', 'Intel Core i3 5th Gen', 'Intel Core i3 6th Gen', 'Intel Core i3 7th Gen', 'Intel Core i3 8th Gen', 'Intel Core i3 9th Gen', 'Intel Core i3 10th Gen', 'Intel Core i3 11th Gen', 'Intel Core i3 12th Gen', 'Intel Core i3 13th Gen', 'Intel Core i3 14th Gen',
   'Intel Core i5', 'Intel Core i5 2nd Gen', 'Intel Core i5 3rd Gen', 'Intel Core i5 4th Gen', 'Intel Core i5 5th Gen', 'Intel Core i5 6th Gen', 'Intel Core i5 7th Gen', 'Intel Core i5 8th Gen', 'Intel Core i5 9th Gen', 'Intel Core i5 10th Gen', 'Intel Core i5 11th Gen', 'Intel Core i5 12th Gen', 'Intel Core i5 13th Gen', 'Intel Core i5 14th Gen',
   'Intel Core i7', 'Intel Core i7 2nd Gen', 'Intel Core i7 3rd Gen', 'Intel Core i7 4th Gen', 'Intel Core i7 5th Gen', 'Intel Core i7 6th Gen', 'Intel Core i7 7th Gen', 'Intel Core i7 8th Gen', 'Intel Core i7 9th Gen', 'Intel Core i7 10th Gen', 'Intel Core i7 11th Gen', 'Intel Core i7 12th Gen', 'Intel Core i7 13th Gen', 'Intel Core i7 14th Gen',
   'Intel Core i9', 'Intel Core i9 8th Gen', 'Intel Core i9 9th Gen', 'Intel Core i9 10th Gen', 'Intel Core i9 11th Gen', 'Intel Core i9 12th Gen', 'Intel Core i9 13th Gen', 'Intel Core i9 14th Gen',
   'Intel Core Ultra 5', 'Intel Core Ultra 7', 'Intel Core Ultra 9',
   'Intel Core 2 Duo',
+  'Intel Core M', 'Intel Core m3', 'Intel Core m5', 'Intel Core m7',
   'Intel Celeron',
   'Intel Pentium',
   'AMD Ryzen 3', 'AMD Ryzen 5', 'AMD Ryzen 7', 'AMD Ryzen 9',
@@ -26,16 +33,52 @@ export const CASHIFY_HARD_DISK = [
 
 export const WINDOWS_PROCESSORS = CASHIFY_PROCESSORS;
 
-export const MAC_PROCESSORS = [
-  'Apple M5 Pro', 'Apple M5 Max', 'Apple M5',
-  'Apple M4 Pro', 'Apple M4 Max', 'Apple M4',
-  'Apple M3 Pro', 'Apple M3 Max', 'Apple M3',
-  'Apple M2 Pro', 'Apple M2 Max', 'Apple M2',
-  'Apple M1 Pro', 'Apple M1 Max', 'Apple M1',
-  'Apple A18 Pro',
-  'Intel Core i9', 'Intel Core i7', 'Intel Core i5', 'Intel Core i3',
-  'Intel Core M', 'Intel Core m3', 'Intel Core m5', 'Intel Core m7'
+export const APPLE_SILICON_PROCESSORS = [
+  'Apple M1', 'Apple M1 Pro', 'Apple M1 Max', 'Apple M1 Ultra',
+  'Apple M2', 'Apple M2 Pro', 'Apple M2 Max', 'Apple M2 Ultra',
+  'Apple M3', 'Apple M3 Pro', 'Apple M3 Max',
+  'Apple M4', 'Apple M4 Pro', 'Apple M4 Max',
+  'Apple M5', 'Apple M5 Pro', 'Apple M5 Max',
+  'Apple A18 Pro'
 ];
+
+export const INTEL_MAC_PROCESSORS = [
+  'Intel Core i3', 'Intel Core i5', 'Intel Core i7', 'Intel Core i9',
+  'Intel Core M', 'Intel Core m3', 'Intel Core m5', 'Intel Core m7',
+  'Intel Core 2 Duo'
+];
+
+export const MAC_PROCESSORS = [
+  ...APPLE_SILICON_PROCESSORS,
+  ...INTEL_MAC_PROCESSORS
+];
+
+export const APPLE_SILICON_LINEUP = {
+  2020: ['Apple M1'],
+  2021: ['Apple M1 Pro', 'Apple M1 Max'],
+  2022: ['Apple M2', 'Apple M2 Pro', 'Apple M2 Max'],
+  2023: ['Apple M2 Ultra', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max'],
+  2024: ['Apple M3', 'Apple M3 Pro', 'Apple M3 Max', 'Apple M4', 'Apple M4 Pro', 'Apple M4 Max'],
+  2025: ['Apple M4', 'Apple M4 Pro', 'Apple M4 Max', 'Apple M5', 'Apple M5 Pro', 'Apple M5 Max'],
+  2026: ['Apple M5', 'Apple M5 Pro', 'Apple M5 Max', 'Apple A18 Pro']
+};
+
+export function isAppleSiliconMac(device) {
+  if (!device) return false;
+  const name = (device.modelName || '').toLowerCase();
+  const slug = (device.slug || '').toLowerCase();
+  const pf = (device.processorFamily || '').toLowerCase();
+
+  if (pf.includes('apple') || pf.includes('m1') || pf.includes('m2') || pf.includes('m3') || pf.includes('m4') || pf.includes('m5') || pf.includes('a18')) {
+    return true;
+  }
+  const yearMatch = name.match(/20\d\d/) || slug.match(/20\d\d/);
+  if (yearMatch) {
+    const year = parseInt(yearMatch[0], 10);
+    if (year >= 2021) return true;
+  }
+  return false;
+}
 
 export const MAC_RAM = [
   '4GB', '8GB', '16GB', '18GB', '24GB', '32GB', '36GB', '48GB', '64GB', '96GB', '128GB'
@@ -47,9 +90,13 @@ export const MAC_STORAGE = [
 
 /**
  * Returns valid processor options for a Mac device based on its model, slug, and processorFamily.
+ * Strict Apple Silicon vs Intel partitioning:
+ * - 2021+: Strictly Apple Silicon M-series (no Intel)
+ * - 2020: Transition year (M1 for Apple silicon models; Intel Core for 2020 Intel models)
+ * - 2019 and older: Strictly Intel Core / Core M (no Apple silicon)
  */
 export function getValidMacProcessors(device) {
-  if (!device) return MAC_PROCESSORS;
+  if (!device) return APPLE_SILICON_PROCESSORS;
 
   const pf = (device.processorFamily || '').toLowerCase();
   const gen = (device.generation || '').toLowerCase();
@@ -64,99 +111,88 @@ export function getValidMacProcessors(device) {
     }
   }
 
-  // 1. MacBook Air 2026: Apple M5 chip only (13.6-inch & 15.3-inch)
-  if (name.includes('2026') && name.includes('air')) {
-    return ['Apple M5'];
-  }
-
-  // 2. MacBook Pro 2026: Apple M5 Pro / M5 Max
-  if (name.includes('2026') && name.includes('pro')) {
-    return ['Apple M5 Pro', 'Apple M5 Max'];
-  }
-
-  // 3. MacBook Neo (2026 Neo 13-inch): Apple A18 Pro
-  if (name.includes('neo')) {
+  // 0. MacBook Neo (A18 Pro)
+  if (name.includes('neo') || slug.includes('neo')) {
     return ['Apple A18 Pro'];
   }
 
-  // 4. MacBook Air 2025: Apple M4 chip only (13.6-inch & 15.3-inch)
-  if (name.includes('2025') && name.includes('air')) {
-    return ['Apple M4'];
+  // 1. 2026 Models: M5, M5 Pro, M5 Max, A18 Pro
+  if (name.includes('2026') || slug.includes('2026')) {
+    if (name.includes('air')) return ['Apple M5'];
+    if (name.includes('pro')) return ['Apple M5 Pro', 'Apple M5 Max'];
+    return ['Apple M5', 'Apple M5 Pro', 'Apple M5 Max'];
   }
 
-  // 5. MacBook Pro 2025: Apple M5 (14-inch) or Apple M4 Pro / M4 Max
-  if (name.includes('2025') && name.includes('pro')) {
-    return ['Apple M5', 'Apple M4 Pro', 'Apple M4 Max'];
+  // 2. 2025 Models: M4 models continued; M5 launched
+  if (name.includes('2025') || slug.includes('2025')) {
+    if (name.includes('air')) return ['Apple M4', 'Apple M5'];
+    if (name.includes('pro')) return ['Apple M5', 'Apple M4 Pro', 'Apple M4 Max', 'Apple M5 Pro', 'Apple M5 Max'];
+    return ['Apple M4', 'Apple M4 Pro', 'Apple M4 Max', 'Apple M5', 'Apple M5 Pro', 'Apple M5 Max'];
   }
 
-  // 6. MacBook Air 2024: Apple M3 chip only (13.6-inch & 15.3-inch)
-  if (name.includes('2024') && name.includes('air')) {
-    return ['Apple M3'];
+  // 3. 2024 Models: M3 models continued; M4, M4 Pro and M4 Max arrived
+  if (name.includes('2024') || slug.includes('2024')) {
+    if (name.includes('air')) return ['Apple M3'];
+    if (name.includes('pro')) return ['Apple M4', 'Apple M4 Pro', 'Apple M4 Max', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max'];
+    return ['Apple M3', 'Apple M3 Pro', 'Apple M3 Max', 'Apple M4', 'Apple M4 Pro', 'Apple M4 Max'];
   }
 
-  // 7. MacBook Pro 2024: Apple M4, Apple M4 Pro, Apple M4 Max
-  if (name.includes('2024') && name.includes('pro')) {
-    return ['Apple M4', 'Apple M4 Pro', 'Apple M4 Max'];
+  // 4. 2023 Models: M2 Ultra, M3, M3 Pro, M3 Max (and M2, M2 Pro, M2 Max)
+  if (name.includes('2023') || slug.includes('2023')) {
+    if (name.includes('air')) return ['Apple M2'];
+    if (name.includes('pro')) return ['Apple M2 Pro', 'Apple M2 Max', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max'];
+    if (name.includes('studio') || name.includes('mac pro')) return ['Apple M2 Max', 'Apple M2 Ultra'];
+    return ['Apple M2', 'Apple M2 Pro', 'Apple M2 Max', 'Apple M2 Ultra', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max'];
   }
 
-  // 8. MacBook Air 2023 & 2022: Apple M2 chip only
-  if ((name.includes('2023') || name.includes('2022')) && name.includes('air')) {
-    return ['Apple M2'];
+  // 5. 2022 Models: M2, M2 Pro, M2 Max
+  if (name.includes('2022') || slug.includes('2022')) {
+    if (name.includes('air')) return ['Apple M2'];
+    if (name.includes('pro')) return ['Apple M2', 'Apple M2 Pro', 'Apple M2 Max'];
+    return ['Apple M2', 'Apple M2 Pro', 'Apple M2 Max'];
   }
 
-  // 9. MacBook Pro 2023: Apple M2 Pro, M2 Max (Jan) or Apple M3, M3 Pro, M3 Max (Nov)
-  if (name.includes('2023') && name.includes('pro')) {
-    return ['Apple M2 Pro', 'Apple M2 Max', 'Apple M3', 'Apple M3 Pro', 'Apple M3 Max'];
-  }
-
-  // 10. MacBook Pro 2022 (13-inch M2): Apple M2
-  if (name.includes('2022') && name.includes('pro')) {
-    return ['Apple M2'];
-  }
-
-  // 11. MacBook Pro 2021 (14-inch & 16-inch): Apple M1 Pro, Apple M1 Max
-  if (name.includes('2021') && name.includes('pro')) {
+  // 6. 2021 Models: M1 Pro, M1 Max (Strictly Apple Silicon, No Intel)
+  if (name.includes('2021') || slug.includes('2021')) {
     return ['Apple M1 Pro', 'Apple M1 Max'];
   }
 
-  // 12. MacBook Air 2020:
-  // - MacBook Air 2020 M1: Apple M1
-  // - MacBook Air 2020 Retina (Intel): Intel Core i3 / i5 / i7
-  if (name.includes('2020') && name.includes('air')) {
-    if (name.includes('intel') || pf.includes('intel') || gen.includes('intel')) {
-      return ['Intel Core i3', 'Intel Core i5', 'Intel Core i7'];
-    }
-    return ['Apple M1'];
-  }
-
-  // 13. MacBook Pro 2020:
-  // - MacBook Pro 2020 Apple Silicon: Apple M1
-  // - MacBook Pro 2020 Intel: Intel Core i5 / i7
-  if (name.includes('2020') && name.includes('pro')) {
-    if (name.includes('apple silicon') || name.includes('m1') || pf.includes('m1')) {
+  // 7. 2020 Models: Transition year (Apple Silicon M1 launched; Intel models also sold)
+  if (name.includes('2020') || slug.includes('2020')) {
+    // Explicitly M1 / Apple Silicon model
+    if (name.includes('m1') || pf.includes('m1') || name.includes('apple silicon')) {
       return ['Apple M1'];
     }
-    return ['Intel Core i5', 'Intel Core i7'];
+    // Explicitly Intel model
+    if (name.includes('intel') || pf.includes('intel') || gen.includes('intel')) {
+      if (name.includes('air')) return ['Intel Core i3', 'Intel Core i5', 'Intel Core i7'];
+      return ['Intel Core i5', 'Intel Core i7'];
+    }
+    // Both M1 and Intel were available in 2020
+    if (name.includes('air')) {
+      return ['Apple M1', 'Intel Core i3', 'Intel Core i5', 'Intel Core i7'];
+    }
+    return ['Apple M1', 'Intel Core i5', 'Intel Core i7'];
   }
 
-  // 14. 2019 Models: Intel Core i5 / i7 / i9
-  if (name.includes('2019')) {
+  // 8. 2019 Models: Strictly Intel (Apple stopped introducing Intel MacBooks after transitioning)
+  if (name.includes('2019') || slug.includes('2019')) {
     if (name.includes('16') || name.includes('15')) {
       return ['Intel Core i7', 'Intel Core i9'];
     }
     return ['Intel Core i5', 'Intel Core i7'];
   }
 
-  // 15. 2018 Models: Intel Core i5 / i7 / i9
-  if (name.includes('2018')) {
+  // 9. 2018 Models: Strictly Intel
+  if (name.includes('2018') || slug.includes('2018')) {
     if (name.includes('15')) {
       return ['Intel Core i7', 'Intel Core i9'];
     }
     return ['Intel Core i5', 'Intel Core i7'];
   }
 
-  // 16. 2017 Models:
-  if (name.includes('2017')) {
+  // 10. 2017 Models: Strictly Intel
+  if (name.includes('2017') || slug.includes('2017')) {
     if (name.includes('retina') && (name.includes('12') || !name.includes('pro'))) {
       return ['Intel Core m3', 'Intel Core i5', 'Intel Core i7'];
     }
@@ -166,8 +202,8 @@ export function getValidMacProcessors(device) {
     return ['Intel Core i5', 'Intel Core i7'];
   }
 
-  // 17. 2016 Models:
-  if (name.includes('2016')) {
+  // 11. 2016 Models: Strictly Intel
+  if (name.includes('2016') || slug.includes('2016')) {
     if (name.includes('retina') && (name.includes('12') || !name.includes('pro'))) {
       return ['Intel Core m3', 'Intel Core m5', 'Intel Core m7'];
     }
@@ -177,8 +213,8 @@ export function getValidMacProcessors(device) {
     return ['Intel Core i5', 'Intel Core i7'];
   }
 
-  // 18. 2015 Models:
-  if (name.includes('2015')) {
+  // 12. 2015 Models: Strictly Intel
+  if (name.includes('2015') || slug.includes('2015')) {
     if (name.includes('retina') && (name.includes('12') || !name.includes('pro'))) {
       return ['Intel Core M'];
     }
@@ -188,8 +224,8 @@ export function getValidMacProcessors(device) {
     return ['Intel Core i5', 'Intel Core i7'];
   }
 
-  // 19. 2014 & 2013 Models:
-  if (name.includes('2014') || name.includes('2013')) {
+  // 13. 2014 & 2013 Models: Strictly Intel
+  if (name.includes('2014') || name.includes('2013') || slug.includes('2014') || slug.includes('2013')) {
     if (name.includes('15')) {
       return ['Intel Core i7'];
     }
@@ -198,22 +234,22 @@ export function getValidMacProcessors(device) {
 
   // Fallbacks based on processorFamily:
   if (pf.includes('m5 pro') || pf.includes('m5 max')) return ['Apple M5 Pro', 'Apple M5 Max'];
-  if (pf.includes('m5')) return ['Apple M5'];
+  if (pf.includes('m5')) return ['Apple M5', 'Apple M5 Pro', 'Apple M5 Max'];
   if (pf.includes('m4 pro') || pf.includes('m4 max')) return ['Apple M4 Pro', 'Apple M4 Max', 'Apple M4'];
-  if (pf.includes('m4')) return ['Apple M4'];
+  if (pf.includes('m4')) return ['Apple M4', 'Apple M4 Pro', 'Apple M4 Max'];
   if (pf.includes('m3 pro') || pf.includes('m3 max')) return ['Apple M3 Pro', 'Apple M3 Max', 'Apple M3'];
-  if (pf.includes('m3')) return ['Apple M3'];
+  if (pf.includes('m3')) return ['Apple M3', 'Apple M3 Pro', 'Apple M3 Max'];
   if (pf.includes('m2 pro') || pf.includes('m2 max')) return ['Apple M2 Pro', 'Apple M2 Max', 'Apple M2'];
-  if (pf.includes('m2')) return ['Apple M2'];
+  if (pf.includes('m2')) return ['Apple M2', 'Apple M2 Pro', 'Apple M2 Max'];
   if (pf.includes('m1 pro') || pf.includes('m1 max')) return ['Apple M1 Pro', 'Apple M1 Max'];
-  if (pf.includes('m1')) return ['Apple M1'];
+  if (pf.includes('m1')) return ['Apple M1', 'Apple M1 Pro', 'Apple M1 Max'];
 
   // Generic Intel fallback
   if (gen.includes('intel') || pf.includes('intel') || name.includes('intel')) {
     return ['Intel Core i5', 'Intel Core i7', 'Intel Core i9'];
   }
 
-  return ['Apple M5', 'Apple M4', 'Apple M3', 'Apple M2', 'Apple M1'];
+  return APPLE_SILICON_PROCESSORS;
 }
 
 /**

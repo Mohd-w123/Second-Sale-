@@ -14,6 +14,10 @@ import {
   CASHIFY_PROCESSORS,
   CASHIFY_RAM,
   CASHIFY_HARD_DISK,
+  MAC_PROCESSORS,
+  APPLE_SILICON_PROCESSORS,
+  INTEL_MAC_PROCESSORS,
+  isAppleSiliconMac,
   getValidMacProcessors,
   getValidMacRam,
   getValidMacStorage
@@ -203,11 +207,34 @@ export default function LaptopConditionQuizPage() {
   const [looseHingesCondition, setLooseHingesCondition] = useState('none');
   const [panelCondition, setPanelCondition] = useState('none');
 
-  const isApple = (brand || '').toLowerCase() === 'apple' || (device?.brand || '').toLowerCase() === 'apple';
+  const isApple = (brand || '').toLowerCase() === 'apple' || (device?.brand || '').toLowerCase() === 'apple' || (device?.modelName || '').toLowerCase().includes('macbook');
 
-  const processorOptions = useMemo(() => CASHIFY_PROCESSORS, []);
-  const ramOptions = useMemo(() => CASHIFY_RAM, []);
-  const hardDiskOptions = useMemo(() => CASHIFY_HARD_DISK, []);
+  const processorOptions = useMemo(() => {
+    if (isApple) {
+      const tailored = getValidMacProcessors(device);
+      const isSilicon = isAppleSiliconMac(device);
+      if (isSilicon) {
+        return tailored && tailored.length > 0 ? [...new Set([...tailored, ...APPLE_SILICON_PROCESSORS])] : APPLE_SILICON_PROCESSORS;
+      } else {
+        return tailored && tailored.length > 0 ? tailored : INTEL_MAC_PROCESSORS;
+      }
+    }
+    return CASHIFY_PROCESSORS;
+  }, [isApple, device]);
+
+  const ramOptions = useMemo(() => {
+    if (isApple) {
+      return getValidMacRam(specs?.processor, device);
+    }
+    return CASHIFY_RAM;
+  }, [isApple, specs?.processor, device]);
+
+  const hardDiskOptions = useMemo(() => {
+    if (isApple) {
+      return getValidMacStorage(specs?.processor, device);
+    }
+    return CASHIFY_HARD_DISK;
+  }, [isApple, specs?.processor, device]);
 
   useEffect(() => {
     let isMounted = true;
@@ -229,10 +256,12 @@ export default function LaptopConditionQuizPage() {
       setLoading(false);
       if (!specs && dev) {
         const defVariant = dev.variants?.[0] || {};
+        const devIsApple = (brand || '').toLowerCase() === 'apple' || (dev.brand || '').toLowerCase() === 'apple' || (dev.modelName || '').toLowerCase().includes('macbook');
+        const defaultProc = dev.processorFamily || dev.processor || (devIsApple ? (getValidMacProcessors(dev)[0] || 'Apple M1') : 'Intel Core i3');
         setSpecs({
-          processor: dev.processorFamily || dev.processor || 'Intel Core i3',
-          ram: defVariant.ram || dev.ram || '8 GB',
-          storage: defVariant.storage || dev.storage || '128 GB SSD'
+          processor: defaultProc,
+          ram: defVariant.ram || dev.ram || (devIsApple ? '8GB' : '8 GB'),
+          storage: defVariant.storage || dev.storage || (devIsApple ? '256 GB SSD' : '128 GB SSD')
         });
       }
     }).catch(() => setLoading(false));
@@ -451,11 +480,11 @@ export default function LaptopConditionQuizPage() {
                     value={
                       screenScratchCondition !== 'none' || screenDiscolourCondition !== 'none' || screenSpotsCondition !== 'none' || screenLinesCondition !== 'none'
                         ? [
-                            screenScratchCondition !== 'none' ? SCRATCH_OPTIONS.find(o => o.id === screenScratchCondition)?.label : null,
-                            screenDiscolourCondition !== 'none' ? DISCOLOUR_OPTIONS.find(o => o.id === screenDiscolourCondition)?.label : null,
-                            screenSpotsCondition !== 'none' ? SPOTS_OPTIONS.find(o => o.id === screenSpotsCondition)?.label : null,
-                            screenLinesCondition !== 'none' ? LINES_OPTIONS.find(o => o.id === screenLinesCondition)?.label : null,
-                          ].filter(Boolean).join(' • ')
+                          screenScratchCondition !== 'none' ? SCRATCH_OPTIONS.find(o => o.id === screenScratchCondition)?.label : null,
+                          screenDiscolourCondition !== 'none' ? DISCOLOUR_OPTIONS.find(o => o.id === screenDiscolourCondition)?.label : null,
+                          screenSpotsCondition !== 'none' ? SPOTS_OPTIONS.find(o => o.id === screenSpotsCondition)?.label : null,
+                          screenLinesCondition !== 'none' ? LINES_OPTIONS.find(o => o.id === screenLinesCondition)?.label : null,
+                        ].filter(Boolean).join(' • ')
                         : 'No Scratches / Discolouration / Spots / Lines'
                     }
                     color={screenScratchCondition !== 'none' || screenDiscolourCondition !== 'none' || screenSpotsCondition !== 'none' || screenLinesCondition !== 'none' ? '#EF4444' : '#087F8C'}
@@ -465,12 +494,12 @@ export default function LaptopConditionQuizPage() {
                     value={
                       bodyScratchCondition !== 'none' || dentTopCondition !== 'none' || dentBaseCondition !== 'none' || looseHingesCondition !== 'none' || panelCondition !== 'none'
                         ? [
-                            bodyScratchCondition !== 'none' ? BODY_SCRATCH_OPTIONS.find(o => o.id === bodyScratchCondition)?.label : null,
-                            dentTopCondition !== 'none' ? `Top: ${DENT_TOP_OPTIONS.find(o => o.id === dentTopCondition)?.label}` : null,
-                            dentBaseCondition !== 'none' ? `Base: ${DENT_BASE_OPTIONS.find(o => o.id === dentBaseCondition)?.label}` : null,
-                            looseHingesCondition !== 'none' ? HINGES_OPTIONS.find(o => o.id === looseHingesCondition)?.label : null,
-                            panelCondition !== 'none' ? PANEL_OPTIONS.find(o => o.id === panelCondition)?.label : null,
-                          ].filter(Boolean).join(' • ')
+                          bodyScratchCondition !== 'none' ? BODY_SCRATCH_OPTIONS.find(o => o.id === bodyScratchCondition)?.label : null,
+                          dentTopCondition !== 'none' ? `Top: ${DENT_TOP_OPTIONS.find(o => o.id === dentTopCondition)?.label}` : null,
+                          dentBaseCondition !== 'none' ? `Base: ${DENT_BASE_OPTIONS.find(o => o.id === dentBaseCondition)?.label}` : null,
+                          looseHingesCondition !== 'none' ? HINGES_OPTIONS.find(o => o.id === looseHingesCondition)?.label : null,
+                          panelCondition !== 'none' ? PANEL_OPTIONS.find(o => o.id === panelCondition)?.label : null,
+                        ].filter(Boolean).join(' • ')
                         : 'No Scratches / Dents / Hinge Issues'
                     }
                     color={bodyScratchCondition !== 'none' || dentTopCondition !== 'none' || dentBaseCondition !== 'none' || looseHingesCondition !== 'none' || panelCondition !== 'none' ? '#EF4444' : '#087F8C'}
@@ -749,11 +778,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setScreenScratchCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -787,11 +815,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setScreenDiscolourCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -825,11 +852,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setScreenSpotsCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -863,11 +889,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setScreenLinesCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -981,11 +1006,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setBodyScratchCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -1014,11 +1038,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setDentTopCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -1047,11 +1070,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setDentBaseCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -1080,11 +1102,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setLooseHingesCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -1113,11 +1134,10 @@ export default function LaptopConditionQuizPage() {
                             key={opt.id}
                             type="button"
                             onClick={() => setPanelCondition(opt.id)}
-                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${
-                              isSelected
-                                ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
-                                : 'border-gray-200 bg-white hover:border-gray-300'
-                            }`}
+                            className={`p-5 rounded-2xl border-2 text-center transition-all cursor-pointer flex flex-col items-center justify-between min-h-[160px] ${isSelected
+                              ? 'border-[#087F8C] bg-[#E8F6F7] shadow-xs ring-2 ring-[#087F8C]/20'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                              }`}
                           >
                             <div className="my-2">
                               <IconComp className="w-16 h-12" />
@@ -1225,14 +1245,14 @@ export default function LaptopConditionQuizPage() {
                     value={
                       screenScratchCondition !== 'none' || screenDiscolourCondition !== 'none' || screenSpotsCondition !== 'none' || screenLinesCondition !== 'none'
                         ? [
-                            screenScratchCondition !== 'none' ? SCRATCH_OPTIONS.find(o => o.id === screenScratchCondition)?.label : null,
-                            screenDiscolourCondition !== 'none' ? DISCOLOUR_OPTIONS.find(o => o.id === screenDiscolourCondition)?.label : null,
-                            screenSpotsCondition !== 'none' ? SPOTS_OPTIONS.find(o => o.id === screenSpotsCondition)?.label : null,
-                            screenLinesCondition !== 'none' ? LINES_OPTIONS.find(o => o.id === screenLinesCondition)?.label : null,
-                          ].filter(Boolean).join(' • ')
+                          screenScratchCondition !== 'none' ? SCRATCH_OPTIONS.find(o => o.id === screenScratchCondition)?.label : null,
+                          screenDiscolourCondition !== 'none' ? DISCOLOUR_OPTIONS.find(o => o.id === screenDiscolourCondition)?.label : null,
+                          screenSpotsCondition !== 'none' ? SPOTS_OPTIONS.find(o => o.id === screenSpotsCondition)?.label : null,
+                          screenLinesCondition !== 'none' ? LINES_OPTIONS.find(o => o.id === screenLinesCondition)?.label : null,
+                        ].filter(Boolean).join(' • ')
                         : currentStepIndex >= STEPS.findIndex(s => s.id === 'screen')
-                        ? 'No Scratches / Discolouration / Spots / Lines'
-                        : '-'
+                          ? 'No Scratches / Discolouration / Spots / Lines'
+                          : '-'
                     }
                     active={currentStepIndex >= STEPS.findIndex(s => s.id === 'screen')}
                   />
@@ -1251,15 +1271,15 @@ export default function LaptopConditionQuizPage() {
                     value={
                       bodyScratchCondition !== 'none' || dentTopCondition !== 'none' || dentBaseCondition !== 'none' || looseHingesCondition !== 'none' || panelCondition !== 'none'
                         ? [
-                            bodyScratchCondition !== 'none' ? BODY_SCRATCH_OPTIONS.find(o => o.id === bodyScratchCondition)?.label : null,
-                            dentTopCondition !== 'none' ? `Top Dent: ${DENT_TOP_OPTIONS.find(o => o.id === dentTopCondition)?.label}` : null,
-                            dentBaseCondition !== 'none' ? `Base Dent: ${DENT_BASE_OPTIONS.find(o => o.id === dentBaseCondition)?.label}` : null,
-                            looseHingesCondition !== 'none' ? HINGES_OPTIONS.find(o => o.id === looseHingesCondition)?.label : null,
-                            panelCondition !== 'none' ? PANEL_OPTIONS.find(o => o.id === panelCondition)?.label : null,
-                          ].filter(Boolean).join(' • ')
+                          bodyScratchCondition !== 'none' ? BODY_SCRATCH_OPTIONS.find(o => o.id === bodyScratchCondition)?.label : null,
+                          dentTopCondition !== 'none' ? `Top Dent: ${DENT_TOP_OPTIONS.find(o => o.id === dentTopCondition)?.label}` : null,
+                          dentBaseCondition !== 'none' ? `Base Dent: ${DENT_BASE_OPTIONS.find(o => o.id === dentBaseCondition)?.label}` : null,
+                          looseHingesCondition !== 'none' ? HINGES_OPTIONS.find(o => o.id === looseHingesCondition)?.label : null,
+                          panelCondition !== 'none' ? PANEL_OPTIONS.find(o => o.id === panelCondition)?.label : null,
+                        ].filter(Boolean).join(' • ')
                         : currentStepIndex >= STEPS.findIndex(s => s.id === 'body')
-                        ? 'No Scratches / Dents / Hinge Issues'
-                        : '-'
+                          ? 'No Scratches / Dents / Hinge Issues'
+                          : '-'
                     }
                     active={currentStepIndex >= STEPS.findIndex(s => s.id === 'body')}
                   />
@@ -1410,11 +1430,10 @@ function ConfigDropdown({ label, value, options, onChange, placeholder = 'Select
                     onChange(opt);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-5 py-3 text-sm font-semibold transition-colors flex items-center justify-between cursor-pointer ${
-                    opt === value
-                      ? 'bg-[#E8F6F7] text-[#087F8C] font-bold'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                  className={`w-full text-left px-5 py-3 text-sm font-semibold transition-colors flex items-center justify-between cursor-pointer ${opt === value
+                    ? 'bg-[#E8F6F7] text-[#087F8C] font-bold'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
                 >
                   <span>{opt}</span>
                   {opt === value && (

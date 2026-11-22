@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Lock, X, AlertCircle, ShieldCheck, ArrowRight, CheckCircle2 } from "lucide-react";
 
@@ -20,14 +20,26 @@ export default function EvaluationOtpModal({
   const [dummyCode, setDummyCode] = useState("");
   const [resendCountdown, setResendCountdown] = useState(30);
 
+  const hasTriggeredSuccessRef = useRef(false);
+
+  // Reset trigger state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      hasTriggeredSuccessRef.current = false;
+    }
+  }, [isOpen]);
+
   // If user is already logged in, bypass OTP modal entirely and trigger onSuccess immediately
   useEffect(() => {
     if (isOpen && (isAuthenticated || user?.phone || localStorage.getItem("accessToken"))) {
-      if (onSuccess) {
-        onSuccess({ phone: user?.phone, user });
-      }
-      if (onClose) {
-        onClose();
+      if (!hasTriggeredSuccessRef.current) {
+        hasTriggeredSuccessRef.current = true;
+        if (onSuccess) {
+          onSuccess({ phone: user?.phone, user });
+        }
+        if (onClose) {
+          onClose();
+        }
       }
     }
   }, [isOpen, isAuthenticated, user, onSuccess, onClose]);
@@ -79,11 +91,14 @@ export default function EvaluationOtpModal({
           code: "123456",
           sessionId: data.sessionId,
         });
-        if (onSuccess) {
-          onSuccess({ phone: cleanPhone, user: result?.user || user });
-        }
-        if (onClose) {
-          onClose();
+        if (!hasTriggeredSuccessRef.current) {
+          hasTriggeredSuccessRef.current = true;
+          if (onSuccess) {
+            onSuccess({ phone: cleanPhone, user: result?.user || user });
+          }
+          if (onClose) {
+            onClose();
+          }
         }
         return;
       }
@@ -114,11 +129,14 @@ export default function EvaluationOtpModal({
         code: otpCode,
         sessionId: otpSessionId || `session-${Date.now()}`,
       });
-      if (onSuccess) {
-        onSuccess({ phone: cleanPhone, user: result?.user || user });
-      }
-      if (onClose) {
-        onClose();
+      if (!hasTriggeredSuccessRef.current) {
+        hasTriggeredSuccessRef.current = true;
+        if (onSuccess) {
+          onSuccess({ phone: cleanPhone, user: result?.user || user });
+        }
+        if (onClose) {
+          onClose();
+        }
       }
     } catch (err) {
       setOtpError(

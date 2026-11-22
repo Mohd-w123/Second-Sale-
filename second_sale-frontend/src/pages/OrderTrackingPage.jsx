@@ -161,12 +161,12 @@ export default function OrderTrackingPage() {
               <h3 className="text-lg font-black text-[#111827]">
                 Order Status: <span className="text-[#087F8C] uppercase">
                   {order.status === 'scheduled' ? 'Pickup Scheduled' :
-                   order.status === 'assigned' ? 'Partner Assigned' :
-                   order.status === 'picked' ? 'Out For Pickup' :
-                   order.status === 'verified' ? 'Device Verified' :
-                   order.status === 'payment_initiated' ? 'Payment Initiated' :
-                   order.status === 'completed' ? 'Completed' :
-                   order.status === 'cancelled' ? 'Cancelled' : 'Order Placed'}
+                    order.status === 'assigned' ? 'Partner Assigned' :
+                      order.status === 'picked' ? 'Out For Pickup' :
+                        order.status === 'verified' ? 'Device Verified' :
+                          order.status === 'payment_initiated' ? 'Payment Initiated' :
+                            order.status === 'completed' ? 'Completed' :
+                              order.status === 'cancelled' ? 'Cancelled' : 'Order Placed'}
                 </span>
               </h3>
               <span className="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full w-max">
@@ -201,19 +201,19 @@ export default function OrderTrackingPage() {
 
             <p className="text-sm font-bold text-gray-500 text-center mt-6">
               {order.status === 'scheduled' ? 'Inspection team has been scheduled for your device pickup.' :
-               order.status === 'assigned' ? 'A pickup executive has been assigned and will contact you shortly.' :
-               order.status === 'picked' ? 'Your device is on its way to inspection.' :
-               order.status === 'verified' ? 'Inspection completed successfully.' :
-               order.status === 'completed' ? 'Order completed and payment sent.' :
-               order.status === 'cancelled' ? 'This order has been cancelled.' :
-               'Your order has been confirmed and is being processed.'}
+                order.status === 'assigned' ? 'A pickup executive has been assigned and will contact you shortly.' :
+                  order.status === 'picked' ? 'Your device is on its way to inspection.' :
+                    order.status === 'verified' ? 'Inspection completed successfully.' :
+                      order.status === 'completed' ? 'Order completed and payment sent.' :
+                        order.status === 'cancelled' ? 'This order has been cancelled.' :
+                          'Your order has been confirmed and is being processed.'}
             </p>
 
             {/* Optional Remark from Admin / Staff */}
             {order.remark && (
               <div className="mt-6 bg-amber-50/90 border border-amber-200/90 rounded-2xl p-4 flex items-start gap-3 text-left shadow-xs">
                 <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                 </div>
                 <div className="flex-1">
                   <span className="text-[11px] font-extrabold text-amber-800 uppercase tracking-wider block">
@@ -371,6 +371,7 @@ export default function OrderTrackingPage() {
 const supportsESIM = (modelName) => {
   if (!modelName) return false;
   const name = modelName.toLowerCase();
+  if (name.includes('duo')) return true;
   const numMatch = name.match(/iphone\s*(\d+)/i);
   if (numMatch) {
     const seriesNum = parseInt(numMatch[1], 10);
@@ -384,7 +385,7 @@ const supportsESIM = (modelName) => {
     'iphone 16 pro', 'iphone 16 pro max',
     'iphone 17', 'iphone 17 air', 'iphone 17 pro', 'iphone 17 pro max',
     'iphone 18', 'iphone 18 pro', 'iphone 18 pro max',
-    'iphone 19', 'iphone 20'
+    'iphone 19', 'iphone 20', 'iphone duo', 'apple duo', 'duo'
   ];
   return allowed.some(pattern => name.includes(pattern));
 };
@@ -662,7 +663,7 @@ function UpdatePaymentModal({ order, user, onClose, onSuccess }) {
           });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {

@@ -539,5 +539,5 @@ export function isFoldOrFlipDevice(brand, modelName) {
   const b = (brand || '').trim().toLowerCase();
   const m = (modelName || '').trim().toLowerCase();
   const full = `${b} ${m}`;
-  return full.includes('fold') || full.includes('flip');
+  return full.includes('fold') || full.includes('flip') || (b === 'apple' && m.includes('duo')) || full.includes('surface duo') || full.includes('iphone duo');
 }
